@@ -485,6 +485,11 @@ async function initCharacter(){
 
 document.addEventListener("DOMContentLoaded", async ()=>{
 
+  // If the user already pressed "Play" once, don't force them through the splash again.
+  // This prevents the splash from reappearing when we do location.reload() during setup/draft changes.
+  const SPLASH_KEY = STORAGE_PREFIX + "splashDismissed";
+  const splashDismissed = localStorage.getItem(SPLASH_KEY) === "1";
+
   function showSplash(){
     const splash = document.getElementById("splash");
     if(splash){ splash.style.display = "block"; }
@@ -499,6 +504,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   if(playBtn){
     playBtn.addEventListener("click", ()=>{
       playPressStart();
+      localStorage.setItem(SPLASH_KEY, "1");
       document.body.classList.remove('has-splash');
       hideSplash();
       });
@@ -507,8 +513,15 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   const backToSplash = document.getElementById("backToSplash");
   if(backToSplash){
     backToSplash.addEventListener("click", ()=>{
+      localStorage.removeItem(SPLASH_KEY);
       location.reload();
     });
+  }
+
+  // Auto-hide splash if it was already dismissed earlier.
+  if(splashDismissed){
+    document.body.classList.remove('has-splash');
+    hideSplash();
   }
 
 
