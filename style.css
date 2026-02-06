@@ -687,3 +687,15 @@ html.splash-dismissed body.has-splash .controls{
 .splash-overlay .hero-bg{
   pointer-events: none;
 }
+
+
+/* FIX MOBILE – texte des boutons */
+@media (max-width: 480px) {
+  .mkw-btn {
+    padding: 14px 18px;
+    font-size: 15px;
+    line-height: 1.2;
+    white-space: nowrap;
+    box-sizing: border-box;
+  }
+}
