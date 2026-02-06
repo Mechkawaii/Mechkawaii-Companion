@@ -498,8 +498,9 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   if(playBtn){
     playBtn.addEventListener("click", ()=>{
       playPressStart();
+      document.body.classList.remove('has-splash');
       hideSplash();
-    });
+      });
   }
 
   const backToSplash = document.getElementById("backToSplash");

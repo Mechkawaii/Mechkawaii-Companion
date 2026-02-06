@@ -470,3 +470,54 @@ button:active{transform: translateY(1px)}
 @media (prefers-reduced-motion: reduce){
   .brand .mascot, #playBtn.mkw-btn{ animation: none !important; }
 }
+
+
+/* --- Splash overlay fixes --- */
+.splash-full{
+  position: fixed;
+  inset: 0;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  z-index: 9999;
+  background: #000;
+}
+
+/* Center brand + small mascot above logo */
+.splash-full .brand{
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width: min(860px, 92vw);
+}
+.splash-full .brand .logo{
+  width: 100% !important;
+}
+.splash-full .brand .mascot{
+  position: absolute;
+  top: -46px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(44px, 9vw, 86px) !important;
+  margin: 0 !important;
+  animation: mkw-float 2.8s ease-in-out infinite;
+  filter: drop-shadow(0 10px 22px rgba(0,0,0,0.45));
+}
+
+/* Menu spacing under logo */
+.splash-full .menu{
+  margin-top: 42px !important;
+}
+
+/* Hide underlying UI while splash is visible (even if it exists in DOM) */
+body.has-splash .topbar,
+body.has-splash #setupCard,
+body.has-splash #draftCard,
+body.has-splash #charList,
+body.has-splash .footer-note,
+body.has-splash .controls{
+  visibility: hidden;
+}
