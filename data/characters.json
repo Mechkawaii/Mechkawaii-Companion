@@ -399,7 +399,7 @@
       "movement": "assets/patterns/goryo_movement.png",
       "attack": "assets/patterns/goryo_attack.png"
     },
-    "camp": "mechkawaii"
+    "camp": "prodrome"
   },
   {
     "id": "genbu",
@@ -466,7 +466,7 @@
       "movement": "assets/patterns/genbu_movement.png",
       "attack": "assets/patterns/genbu_attack.png"
     },
-    "camp": "mechkawaii"
+    "camp": "prodrome"
   },
   {
     "id": "goki",
@@ -533,7 +533,7 @@
       "movement": "assets/patterns/goki_movement.png",
       "attack": "assets/patterns/goki_attack.png"
     },
-    "camp": "mechkawaii"
+    "camp": "prodrome"
   },
   {
     "id": "gaoro",
@@ -600,7 +600,7 @@
       "movement": "assets/patterns/gaoro_movement.png",
       "attack": "assets/patterns/gaoro_attack.png"
     },
-    "camp": "mechkawaii"
+    "camp": "prodrome"
   },
   {
     "id": "gyuki",
@@ -667,6 +667,6 @@
       "movement": "assets/patterns/gyuki_movement.png",
       "attack": "assets/patterns/gyuki_attack.png"
     },
-    "camp": "mechkawaii"
+    "camp": "prodrome"
   }
 ]
