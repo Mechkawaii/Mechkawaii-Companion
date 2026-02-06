@@ -377,23 +377,3 @@ button:active{transform: translateY(1px)}
 @media (min-width: 1200px){
   .splash .hero{ min-height: 480px; }
 }
-
-/* Icon button (discreet) */
-.btn-icon{
-  padding: 10px 12px;
-  border-radius: 12px;
-  line-height: 1;
-  font-weight: 900;
-  letter-spacing: .2px;
-}
-.btn-icon:hover{ border-color: rgba(255,210,0,.45); }
-
-/* Animated logo/title on splash */
-@keyframes titleFloat{
-  0%,100%{ transform: translateY(0); filter: drop-shadow(0 10px 18px rgba(0,0,0,.35)); }
-  50%{ transform: translateY(-3px); filter: drop-shadow(0 14px 22px rgba(0,0,0,.45)); }
-}
-.splash .title{
-  animation: titleFloat 2.8s ease-in-out infinite;
-}
-.splash.hidden{ display:none; }
