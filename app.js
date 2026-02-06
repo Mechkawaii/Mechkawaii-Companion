@@ -1,65 +1,13 @@
 const STORAGE_PREFIX = "mechkawaii:";
 
-function playPressStart(){
-  try{
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if(!AudioCtx) return;
-    const ctx = new AudioCtx();
-    const master = ctx.createGain();
-    master.gain.value = 0.12;
-    master.connect(ctx.destination);
-
-    const now = ctx.currentTime;
-
-    // Little “arcade” two-tone blip
-    const osc1 = ctx.createOscillator();
-    const osc2 = ctx.createOscillator();
-    osc1.type = "square";
-    osc2.type = "triangle";
-
-    const g1 = ctx.createGain();
-    const g2 = ctx.createGain();
-    g1.gain.setValueAtTime(0.0001, now);
-    g2.gain.setValueAtTime(0.0001, now);
-
-    osc1.frequency.setValueAtTime(660, now);
-    osc1.frequency.exponentialRampToValueAtTime(990, now + 0.06);
-
-    osc2.frequency.setValueAtTime(330, now);
-    osc2.frequency.exponentialRampToValueAtTime(440, now + 0.08);
-
-    g1.gain.exponentialRampToValueAtTime(0.9, now + 0.01);
-    g1.gain.exponentialRampToValueAtTime(0.0001, now + 0.10);
-
-    g2.gain.exponentialRampToValueAtTime(0.6, now + 0.01);
-    g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
-
-    osc1.connect(g1); g1.connect(master);
-    osc2.connect(g2); g2.connect(master);
-
-    osc1.start(now); osc2.start(now);
-    osc1.stop(now + 0.12);
-    osc2.stop(now + 0.14);
-
-    // Close context after sound to avoid keeping audio running
-    setTimeout(()=>{ try{ ctx.close(); }catch(e){} }, 250);
-  }catch(e){}
-}
-
-
 function heartIcon(filled){
-  const src = filled
-    ? "./assets/pv.svg"
-    : "./assets/pv_off.svg";
-
+  const src = filled ? "./assets/pv.svg" : "./assets/pv_off.svg";
   return `
-    <img
-      src="${src}"
-      class="heart"
-      alt="PV"
-    />
+    <img src="${src}" class="heart" alt="PV" />
   `;
 }
+
+
 
 
 function qs(sel){ return document.querySelector(sel); }
@@ -86,16 +34,6 @@ function setState(charId, state){
   localStorage.setItem(STORAGE_PREFIX + "state:" + charId, JSON.stringify(state));
 }
 
-function heartSvg(filled){
-  // Inline SVG so it works offline + no assets needed
-  const fill = filled ? "var(--accent)" : "rgba(255,255,255,.14)";
-  const stroke = filled ? "rgba(0,0,0,.25)" : "rgba(255,255,255,.20)";
-  return `
-  <svg class="heart" viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M12 21s-7.5-4.6-10-9.4C.3 8.2 2.2 5.2 5.4 4.5c1.9-.4 3.8.3 5 1.7 1.2-1.4 3.1-2.1 5-1.7 3.2.7 5.1 3.7 3.4 7.1C19.5 16.4 12 21 12 21z"
-      fill="${fill}" stroke="${stroke}" stroke-width="1.2" />
-  </svg>`;
-}
 
 async function loadCharacters(){
   const res = await fetch("./data/characters.json", {cache:"no-store"});
@@ -485,34 +423,20 @@ async function initCharacter(){
 
 document.addEventListener("DOMContentLoaded", async ()=>{
 
-  function showSplash(){
-    const splash = document.getElementById("splash");
-    if(splash){ splash.style.display = "block"; }
+  // Splash screen: show only once per device (stored locally)
+  const splash = document.getElementById("splash");
+  const played = localStorage.getItem(STORAGE_PREFIX + "played") === "1";
+  if(played && splash){
+    splash.remove();
   }
-  function hideSplash(){
-    const splash = document.getElementById("splash");
-    if(splash){ splash.remove(); }
-    document.body.classList.remove("has-splash");
-  }
-
   const playBtn = document.getElementById("playBtn");
-  if(playBtn){
+  if(playBtn && splash && !played){
     playBtn.addEventListener("click", ()=>{
-      playPressStart();
-      document.body.classList.remove('has-splash');
-      hideSplash();
-      });
-  }
-
-  const backToSplash = document.getElementById("backToSplash");
-  if(backToSplash){
-    backToSplash.addEventListener("click", ()=>{
-      location.reload();
+      localStorage.setItem(STORAGE_PREFIX + "played", "1");
+      splash.classList.add("fadeout");
+      setTimeout(()=>{ splash.remove(); }, 230);
     });
   }
-
-
-  
 
   try{
     if(document.body.classList.contains("page-index")) await initIndex();
