@@ -329,46 +329,71 @@ button:active{transform: translateY(1px)}
 .splash .content{ animation: splashRise .45s ease .08s both; }
 .splash.fadeout{ opacity:0; transform: translateY(-4px); transition: opacity .22s ease, transform .22s ease; }
 
-/* Simple splash (stable) */
-.splash-simple{
-  margin-top:16px;
-  border:1px solid var(--border);
-  border-radius: var(--radius);
-  overflow:hidden;
-  background: rgba(19,19,26,.72);
-  box-shadow: var(--shadow);
-}
-.splash-img{
-  width:100%;
-  height:auto;
-  display:block;
-}
-.splash-bar{
-  display:flex;
-  gap:10px;
-  padding:12px;
-  flex-wrap:wrap;
-  align-items:center;
-  justify-content:flex-end;
-}
-.splash-hidden{ display:none !important; }
-.linkbtn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding:10px 12px;
-  border-radius: 12px;
-  border:1px solid var(--border);
-  background: rgba(0,0,0,.25);
-  color: var(--text);
-  text-decoration:none;
-}
-.linkbtn:hover{ border-color: rgba(255,210,0,.45); }
+
+/* Desktop layout improvements */
 @media (min-width: 900px){
-  .splash-bar{ justify-content:space-between; }
+  .splash .hero{
+    display:grid;
+    grid-template-columns: 1.6fr 1fr;
+    min-height: 420px;
+  }
+  .splash .hero img{
+    height: 100%;
+    object-fit: cover;
+  }
+  .splash .overlay{
+    display:none;
+  }
+  .splash .content{
+    position:relative;
+    left:auto; right:auto; bottom:auto;
+    padding: 18px;
+    align-items:flex-start;
+    justify-content:flex-start;
+    align-content:flex-start;
+    gap:14px;
+    background: rgba(11,11,14,.55);
+    border-left:1px solid var(--border);
+    height:100%;
+  }
+  .splash .title{
+    font-size: 32px;
+  }
+  .splash .tag{
+    font-size: 14px;
+    max-width: 32ch;
+  }
+  .splash .content > div:last-child{
+    margin-top:auto;
+  }
+  .topbar{
+    position: sticky;
+    top: 16px;
+    z-index: 5;
+  }
 }
 
+/* Very large screens */
+@media (min-width: 1200px){
+  .splash .hero{ min-height: 480px; }
+}
 
-/* Splash toggle without JS (super stable) */
-#playToggle:checked ~ #splash{ display:none !important; }
-.btn-like{ display:inline-flex; align-items:center; justify-content:center; cursor:pointer; user-select:none; }
+/* Icon button (discreet) */
+.btn-icon{
+  padding: 10px 12px;
+  border-radius: 12px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: .2px;
+}
+.btn-icon:hover{ border-color: rgba(255,210,0,.45); }
+
+/* Animated logo/title on splash */
+@keyframes titleFloat{
+  0%,100%{ transform: translateY(0); filter: drop-shadow(0 10px 18px rgba(0,0,0,.35)); }
+  50%{ transform: translateY(-3px); filter: drop-shadow(0 14px 22px rgba(0,0,0,.45)); }
+}
+.splash .title{
+  animation: titleFloat 2.8s ease-in-out infinite;
+}
+.splash.hidden{ display:none; }
