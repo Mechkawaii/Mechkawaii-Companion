@@ -1,5 +1,20 @@
 const STORAGE_PREFIX = "mechkawaii:";
 
+function heartIcon(filled){
+  const src = filled
+    ? "./assets/pv.svg"
+    : "./assets/pv_off.svg";
+
+  return `
+    <img
+      src="${src}"
+      class="heart"
+      alt="PV"
+    />
+  `;
+}
+
+
 function qs(sel){ return document.querySelector(sel); }
 function qsa(sel){ return [...document.querySelectorAll(sel)]; }
 
@@ -78,7 +93,7 @@ function renderHP(container, hpCur, hpMax){
   hearts.className = "hearts";
   for(let i=1;i<=hpMax;i++){
     const span = document.createElement("span");
-    span.innerHTML = heartSvg(i<=hpCur);
+    span.innerHTML = heartIcon(i<=hpCur);
     hearts.appendChild(span.firstElementChild);
   }
   container.appendChild(hearts);
