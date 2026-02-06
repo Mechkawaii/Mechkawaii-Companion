@@ -423,6 +423,25 @@ async function initCharacter(){
 
 document.addEventListener("DOMContentLoaded", async ()=>{
 
+  // Splash screen (video-game vibe): hidden after clicking "Jouer" for this tab
+  const splash = document.getElementById("splash");
+  if(splash){
+    const played = sessionStorage.getItem("mechkawaii_played") === "1";
+    if(played) splash.classList.add("hidden");
+    const playBtn = document.getElementById("playBtn");
+    if(playBtn){
+      playBtn.addEventListener("click", ()=>{
+        sessionStorage.setItem("mechkawaii_played","1");
+        splash.classList.add("fadeout");
+        setTimeout(()=>{
+          splash.classList.remove("fadeout");
+          splash.classList.add("hidden");
+        }, 230);
+      });
+    }
+  }
+
+
   // Splash screen: show only once per device (stored locally)
   const splash = document.getElementById("splash");
   const played = localStorage.getItem(STORAGE_PREFIX + "played") === "1";
