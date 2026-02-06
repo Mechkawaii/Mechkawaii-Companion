@@ -1,0 +1,672 @@
+[
+  {
+    "id": "johanna",
+    "name": {
+      "fr": "Johanna",
+      "en": "Johanna"
+    },
+    "class": {
+      "fr": "Grenadier",
+      "en": "Grenadier"
+    },
+    "hp": {
+      "max": 3
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe",
+        "en": "Class Action"
+      },
+      "class_action_body": {
+        "fr": "Tes blobs, sa ligne de mire n'est jamais bloquée par un terrain infranchissable ou une unité.",
+        "en": "Your blob shots: line of sight is never blocked by impassable terrain or a unit."
+      },
+      "ultimate_title": {
+        "fr": "Coup unique : Correction de trajectoire",
+        "en": "Ultimate: Trajectory Correction"
+      },
+      "ultimate_body": {
+        "fr": "Une unité alliée au choix ne peut plus manquer ses tirs pour toute la partie. Les critiques restent applicables. Ce coup unique ne peut pas être remboursé.",
+        "en": "Choose an allied unit: it can no longer miss its shots for the rest of the game. Critical hits still apply. This ultimate cannot be refunded."
+      }
+    },
+    "toggles": [
+      {
+        "id": "abacus",
+        "label": {
+          "fr": "Boulier",
+          "en": "Abacus"
+        }
+      },
+      {
+        "id": "repair",
+        "label": {
+          "fr": "Réparer",
+          "en": "Repair"
+        }
+      },
+      {
+        "id": "protect",
+        "label": {
+          "fr": "Protéger",
+          "en": "Protect"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup unique utilisé",
+          "en": "Ultimate used"
+        }
+      }
+    ],
+    "images": {
+      "movement": "assets/patterns/johanna_movement.png",
+      "attack": "assets/patterns/johanna_attack.png"
+    },
+    "camp": "mechkawaii"
+  },
+  {
+    "id": "banado",
+    "name": {
+      "fr": "Banado",
+      "en": "Banado"
+    },
+    "class": {
+      "fr": "Technicien",
+      "en": "Technician"
+    },
+    "hp": {
+      "max": 4
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe",
+        "en": "Class Action"
+      },
+      "class_action_body": {
+        "fr": "Crée un boulier infini qui ne compte pas dans le stock des trois boucliers de la partie.",
+        "en": "Create an infinite abacus that does not count toward the game’s pool of three shields."
+      },
+      "ultimate_title": {
+        "fr": "Coup unique : Cœur mécanique",
+        "en": "Ultimate: Mechanical Heart"
+      },
+      "ultimate_body": {
+        "fr": "Restaure 1 PV à tous les alliés sur un terrain adjacent au technicien, sans consommer de clés.",
+        "en": "Restore 1 HP to all allies on spaces adjacent to the Technician, without spending any keys."
+      }
+    },
+    "toggles": [
+      {
+        "id": "abacus",
+        "label": {
+          "fr": "Boulier",
+          "en": "Abacus"
+        }
+      },
+      {
+        "id": "repair",
+        "label": {
+          "fr": "Réparer",
+          "en": "Repair"
+        }
+      },
+      {
+        "id": "protect",
+        "label": {
+          "fr": "Protéger",
+          "en": "Protect"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup unique utilisé",
+          "en": "Ultimate used"
+        }
+      }
+    ],
+    "images": {
+      "movement": "assets/patterns/banado_movement.png",
+      "attack": "assets/patterns/banado_attack.png"
+    },
+    "camp": "mechkawaii"
+  },
+  {
+    "id": "fuyu",
+    "name": {
+      "fr": "Fuyu",
+      "en": "Fuyu"
+    },
+    "class": {
+      "fr": "Pyrotechnicien",
+      "en": "Pyrotechnician"
+    },
+    "hp": {
+      "max": 3
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe",
+        "en": "Class Action"
+      },
+      "class_action_body": {
+        "fr": "Tir simultanément sur les 3 terrains face à lui. Touche les alliés. Sur un tir manqué, subit 1 PV par recul de flamme.",
+        "en": "Shoot simultaneously at the 3 spaces in front of you (can hit allies). On a missed shot, take 1 HP from flame recoil."
+      },
+      "ultimate_title": {
+        "fr": "Coup unique : Réveil enflammé",
+        "en": "Ultimate: Blazing Revival"
+      },
+      "ultimate_body": {
+        "fr": "De leurs cendres, il rallume l'étincelle. Tous les Mechkawaii H5 reviennent avec 2 PV et peuvent jouer immédiatement. Ce coup unique ne peut pas être remboursé.",
+        "en": "From their ashes, the spark returns. All H5 Mechkawaii come back with 2 HP and may act immediately. This ultimate cannot be refunded."
+      }
+    },
+    "toggles": [
+      {
+        "id": "abacus",
+        "label": {
+          "fr": "Boulier",
+          "en": "Abacus"
+        }
+      },
+      {
+        "id": "repair",
+        "label": {
+          "fr": "Réparer",
+          "en": "Repair"
+        }
+      },
+      {
+        "id": "protect",
+        "label": {
+          "fr": "Protéger",
+          "en": "Protect"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup unique utilisé",
+          "en": "Ultimate used"
+        }
+      }
+    ],
+    "images": {
+      "movement": "assets/patterns/fuyu_movement.png",
+      "attack": "assets/patterns/fuyu_attack.png"
+    },
+    "camp": "mechkawaii"
+  },
+  {
+    "id": "meimei",
+    "name": {
+      "fr": "Meimei",
+      "en": "Meimei"
+    },
+    "class": {
+      "fr": "Éclaireur",
+      "en": "Scout"
+    },
+    "hp": {
+      "max": 3
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe",
+        "en": "Class Action"
+      },
+      "class_action_body": {
+        "fr": "Contrairement aux autres classes, cette unité rapide comme l'éclair peut se déplacer deux fois durant son tour.",
+        "en": "Unlike other classes, this lightning-fast unit may move twice on its turn."
+      },
+      "ultimate_title": {
+        "fr": "Coup unique : Disruption visuelle",
+        "en": "Ultimate: Visual Disruption"
+      },
+      "ultimate_body": {
+        "fr": "Rend invisible tous les Mechkawaii pendant 1 tour. Les unités invisibles ne peuvent pas être prises pour cible.",
+        "en": "All Mechkawaii become invisible for 1 turn. Invisible units cannot be targeted."
+      }
+    },
+    "toggles": [
+      {
+        "id": "abacus",
+        "label": {
+          "fr": "Boulier",
+          "en": "Abacus"
+        }
+      },
+      {
+        "id": "repair",
+        "label": {
+          "fr": "Réparer",
+          "en": "Repair"
+        }
+      },
+      {
+        "id": "protect",
+        "label": {
+          "fr": "Protéger",
+          "en": "Protect"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup unique utilisé",
+          "en": "Ultimate used"
+        }
+      }
+    ],
+    "images": {
+      "movement": "assets/patterns/meimei_movement.png",
+      "attack": "assets/patterns/meimei_attack.png"
+    },
+    "camp": "mechkawaii"
+  },
+  {
+    "id": "yamabato",
+    "name": {
+      "fr": "Yamabato",
+      "en": "Yamabato"
+    },
+    "class": {
+      "fr": "Voltigeur",
+      "en": "Skirmisher"
+    },
+    "hp": {
+      "max": 2
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe",
+        "en": "Class Action"
+      },
+      "class_action_body": {
+        "fr": "Ignore les terrains infranchissables et les unités pour ses déplacements. Ne subit pas les terrains accidentés.",
+        "en": "Ignore impassable terrain and units while moving. Does not suffer from rough terrain."
+      },
+      "ultimate_title": {
+        "fr": "Coup unique : Tempête de tir",
+        "en": "Ultimate: Firing Storm"
+      },
+      "ultimate_body": {
+        "fr": "Tous les Mechkawaii ailés peuvent tirer une fois gratuitement ce tour.",
+        "en": "All winged Mechkawaii may take one free shot this turn."
+      }
+    },
+    "toggles": [
+      {
+        "id": "abacus",
+        "label": {
+          "fr": "Boulier",
+          "en": "Abacus"
+        }
+      },
+      {
+        "id": "repair",
+        "label": {
+          "fr": "Réparer",
+          "en": "Repair"
+        }
+      },
+      {
+        "id": "protect",
+        "label": {
+          "fr": "Protéger",
+          "en": "Protect"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup unique utilisé",
+          "en": "Ultimate used"
+        }
+      }
+    ],
+    "images": {
+      "movement": "assets/patterns/yamabato_movement.png",
+      "attack": "assets/patterns/yamabato_attack.png"
+    },
+    "camp": "mechkawaii"
+  },
+  {
+    "id": "goryo",
+    "name": {
+      "fr": "Goryo",
+      "en": "Goryo"
+    },
+    "class": {
+      "fr": "Grenadier",
+      "en": "Grenadier"
+    },
+    "hp": {
+      "max": 3
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe",
+        "en": "Class Action"
+      },
+      "class_action_body": {
+        "fr": "Tes blobs, sa ligne de mire n'est jamais bloquée par un terrain infranchissable ou une unité.",
+        "en": "Your blob shots: line of sight is never blocked by impassable terrain or a unit."
+      },
+      "ultimate_title": {
+        "fr": "Coup unique : Rayon orbital",
+        "en": "Ultimate: Orbital Beam"
+      },
+      "ultimate_body": {
+        "fr": "Après un jet de dé de tir réussi, cette unité inflige H5 à une unité ennemie. Les boucliers sont ignorés. Ce coup unique ne peut pas être remboursé.",
+        "en": "After a successful shot roll, this unit deals H5 to an enemy unit. Shields are ignored. This ultimate cannot be refunded."
+      }
+    },
+    "toggles": [
+      {
+        "id": "abacus",
+        "label": {
+          "fr": "Boulier",
+          "en": "Abacus"
+        }
+      },
+      {
+        "id": "repair",
+        "label": {
+          "fr": "Réparer",
+          "en": "Repair"
+        }
+      },
+      {
+        "id": "protect",
+        "label": {
+          "fr": "Protéger",
+          "en": "Protect"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup unique utilisé",
+          "en": "Ultimate used"
+        }
+      }
+    ],
+    "images": {
+      "movement": "assets/patterns/goryo_movement.png",
+      "attack": "assets/patterns/goryo_attack.png"
+    },
+    "camp": "prodrome"
+  },
+  {
+    "id": "genbu",
+    "name": {
+      "fr": "Genbu",
+      "en": "Genbu"
+    },
+    "class": {
+      "fr": "Technicien",
+      "en": "Technician"
+    },
+    "hp": {
+      "max": 4
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe",
+        "en": "Class Action"
+      },
+      "class_action_body": {
+        "fr": "Crée un boulier infini qui ne compte pas dans le stock des trois boucliers de la partie.",
+        "en": "Create an infinite abacus that does not count toward the game’s pool of three shields."
+      },
+      "ultimate_title": {
+        "fr": "Coup unique : Regard laser",
+        "en": "Ultimate: Laser Stare"
+      },
+      "ultimate_body": {
+        "fr": "Les résultats de dé critiques font perdre un seul PV. Applicable sur une unité adverse durant toute la partie. Ce coup unique ne peut pas être remboursé.",
+        "en": "Critical die results only make you lose 1 HP. Applies to one enemy unit for the rest of the game. This ultimate cannot be refunded."
+      }
+    },
+    "toggles": [
+      {
+        "id": "abacus",
+        "label": {
+          "fr": "Boulier",
+          "en": "Abacus"
+        }
+      },
+      {
+        "id": "repair",
+        "label": {
+          "fr": "Réparer",
+          "en": "Repair"
+        }
+      },
+      {
+        "id": "protect",
+        "label": {
+          "fr": "Protéger",
+          "en": "Protect"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup unique utilisé",
+          "en": "Ultimate used"
+        }
+      }
+    ],
+    "images": {
+      "movement": "assets/patterns/genbu_movement.png",
+      "attack": "assets/patterns/genbu_attack.png"
+    },
+    "camp": "prodrome"
+  },
+  {
+    "id": "goki",
+    "name": {
+      "fr": "Goki",
+      "en": "Goki"
+    },
+    "class": {
+      "fr": "Pyrotechnicien",
+      "en": "Pyrotechnician"
+    },
+    "hp": {
+      "max": 3
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe",
+        "en": "Class Action"
+      },
+      "class_action_body": {
+        "fr": "Tir simultanément sur les 3 terrains face à lui. Touche les alliés. Sur un tir manqué, subit 1 PV par recul de flamme.",
+        "en": "Shoot simultaneously at the 3 spaces in front of you (can hit allies). On a missed shot, take 1 HP from flame recoil."
+      },
+      "ultimate_title": {
+        "fr": "Coup unique : Poings corrosifs",
+        "en": "Ultimate: Corrosive Fists"
+      },
+      "ultimate_body": {
+        "fr": "Sur une unité alliée, jusqu'à la fin de la partie, ses attaques de mêlée infligent 2 PV même sur les résultats de dé simple. Ce coup unique ne peut pas être remboursé.",
+        "en": "Choose an allied unit: until end of game, its melee attacks deal 2 HP damage even on basic die results. This ultimate cannot be refunded."
+      }
+    },
+    "toggles": [
+      {
+        "id": "abacus",
+        "label": {
+          "fr": "Boulier",
+          "en": "Abacus"
+        }
+      },
+      {
+        "id": "repair",
+        "label": {
+          "fr": "Réparer",
+          "en": "Repair"
+        }
+      },
+      {
+        "id": "protect",
+        "label": {
+          "fr": "Protéger",
+          "en": "Protect"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup unique utilisé",
+          "en": "Ultimate used"
+        }
+      }
+    ],
+    "images": {
+      "movement": "assets/patterns/goki_movement.png",
+      "attack": "assets/patterns/goki_attack.png"
+    },
+    "camp": "prodrome"
+  },
+  {
+    "id": "gaoro",
+    "name": {
+      "fr": "Gaoro",
+      "en": "Gaoro"
+    },
+    "class": {
+      "fr": "Éclaireur",
+      "en": "Scout"
+    },
+    "hp": {
+      "max": 3
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe",
+        "en": "Class Action"
+      },
+      "class_action_body": {
+        "fr": "Contrairement aux autres classes, cette unité rapide comme l'éclair peut se déplacer deux fois durant son tour.",
+        "en": "Unlike other classes, this lightning-fast unit may move twice on its turn."
+      },
+      "ultimate_title": {
+        "fr": "Coup unique : Ruée tactique",
+        "en": "Ultimate: Tactical Rush"
+      },
+      "ultimate_body": {
+        "fr": "L'éclaireur ouvre la voie. Chaque unité alliée peut se déplacer gratuitement ce tour.",
+        "en": "The Scout opens the way. Each allied unit may move once for free this turn."
+      }
+    },
+    "toggles": [
+      {
+        "id": "abacus",
+        "label": {
+          "fr": "Boulier",
+          "en": "Abacus"
+        }
+      },
+      {
+        "id": "repair",
+        "label": {
+          "fr": "Réparer",
+          "en": "Repair"
+        }
+      },
+      {
+        "id": "protect",
+        "label": {
+          "fr": "Protéger",
+          "en": "Protect"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup unique utilisé",
+          "en": "Ultimate used"
+        }
+      }
+    ],
+    "images": {
+      "movement": "assets/patterns/gaoro_movement.png",
+      "attack": "assets/patterns/gaoro_attack.png"
+    },
+    "camp": "prodrome"
+  },
+  {
+    "id": "gyuki",
+    "name": {
+      "fr": "Gyuki",
+      "en": "Gyuki"
+    },
+    "class": {
+      "fr": "Voltigeur",
+      "en": "Skirmisher"
+    },
+    "hp": {
+      "max": 2
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe",
+        "en": "Class Action"
+      },
+      "class_action_body": {
+        "fr": "Ignore les terrains infranchissables et les unités pour ses déplacements. Ne subit pas les terrains accidentés.",
+        "en": "Ignore impassable terrain and units while moving. Does not suffer from rough terrain."
+      },
+      "ultimate_title": {
+        "fr": "Coup unique : Détonation ionique",
+        "en": "Ultimate: Ionic Detonation"
+      },
+      "ultimate_body": {
+        "fr": "Déclenche une onde explosive. Soufflés par la détonation, les ennemis sont déplacés sur une case adjacente à leur position.",
+        "en": "Trigger an explosive shockwave. Blasted by the detonation, enemies are pushed to an adjacent space."
+      }
+    },
+    "toggles": [
+      {
+        "id": "abacus",
+        "label": {
+          "fr": "Boulier",
+          "en": "Abacus"
+        }
+      },
+      {
+        "id": "repair",
+        "label": {
+          "fr": "Réparer",
+          "en": "Repair"
+        }
+      },
+      {
+        "id": "protect",
+        "label": {
+          "fr": "Protéger",
+          "en": "Protect"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup unique utilisé",
+          "en": "Ultimate used"
+        }
+      }
+    ],
+    "images": {
+      "movement": "assets/patterns/gyuki_movement.png",
+      "attack": "assets/patterns/gyuki_attack.png"
+    },
+    "camp": "prodrome"
+  }
+]

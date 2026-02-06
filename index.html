@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mechkawaii Companion</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <div class="title">Mechkawaii Companion</div>
+      <div class="subtitle">Fiches персона / local only • FR / EN</div>
+    </div>
+    <div class="actions">
+      <button id="langBtn" type="button" class="btn">FR / EN</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <div class="row">
+        <div class="h">Filtre</div>
+        <div class="seg">
+          <button id="campAll" type="button" class="segbtn active">Tous</button>
+          <button id="campMech" type="button" class="segbtn">Mechkawaii</button>
+          <button id="campProd" type="button" class="segbtn">Prodrome</button>
+        </div>
+      </div>
+      <div class="note" id="statusNote"></div>
+    </section>
+
+    <section id="list" class="grid"></section>
+
+    <footer class="foot">
+      <div>Tout est stocké en local sur ton device (localStorage). Aucun serveur, aucun compte.</div>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

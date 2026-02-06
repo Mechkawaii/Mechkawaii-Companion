@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mechkawaii Companion — Fiche</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="top">
+    <a class="back" href="./index.html">← Retour</a>
+    <div class="actions">
+      <button id="langBtn" type="button" class="btn">FR / EN</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <div class="row">
+        <div>
+          <div class="big" id="name">…</div>
+          <div class="badges">
+            <span class="badge" id="camp">…</span>
+            <span class="badge" id="cls">…</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="row">
+        <div class="h">Points de vie</div>
+        <div class="hpctl">
+          <button id="hpMinus" type="button" class="btn">–</button>
+          <div class="hpicons" id="hpIcons"></div>
+          <button id="hpPlus" type="button" class="btn">+</button>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="row">
+        <div class="h">État</div>
+        <div class="toggles" id="toggles"></div>
+      </div>
+
+      <div class="hr"></div>
+      <div class="note">Astuce : tu peux rafraîchir la page, les PV/états restent sauvegardés.</div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
