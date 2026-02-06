@@ -522,6 +522,20 @@ body.has-splash .controls{
   visibility: hidden;
 }
 
+/* If the splash has already been dismissed, hide it immediately (prevents desktop "flash")
+   and reveal the UI even before JS finishes booting. */
+html.splash-dismissed body.has-splash #splash,
+html.splash-dismissed body.has-splash .splash-overlay{
+  display: none !important;
+}
+html.splash-dismissed body.has-splash .topbar,
+html.splash-dismissed body.has-splash #setupCard,
+html.splash-dismissed body.has-splash #draftCard,
+html.splash-dismissed body.has-splash .footer-note,
+html.splash-dismissed body.has-splash .controls{
+  visibility: visible !important;
+}
+
 
 /* --- Splash overlay (final) --- */
 .splash-overlay{

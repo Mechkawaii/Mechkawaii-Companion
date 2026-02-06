@@ -4,6 +4,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mechkawaii — Fiches</title>
+  <script>
+    // Prevent splash "flash" on reload: apply the state *before* CSS paints
+    (function(){
+      try{
+        if (localStorage.getItem('mechkawaii:splashDismissed') === '1') {
+          document.documentElement.classList.add('splash-dismissed');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body class="page-index has-splash">
