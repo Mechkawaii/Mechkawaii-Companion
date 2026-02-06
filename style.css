@@ -616,3 +616,34 @@ body.has-splash .controls{
 @media (max-width: 380px){
   .mkw-label{ font-size: 18px; letter-spacing: 5px; }
 }
+
+
+/* ===== Desktop Splash UI Fix ===== */
+@media (min-width: 900px){
+  .splash-overlay .hero-ui{
+    overflow-y: auto;
+    gap: 16px;
+    padding: 24px;
+  }
+
+  .brand-stack .logo{
+    width: min(420px, 60vw);
+  }
+
+  .brand-stack .mascot{
+    width: 56px;
+  }
+
+  .mkw-btn{
+    width: min(340px, 38vw);
+  }
+
+  .mkw-label{
+    font-size: 18px;
+    letter-spacing: 5px;
+  }
+}
+
+.splash-overlay .hero-bg{
+  pointer-events: none;
+}
