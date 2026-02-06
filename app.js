@@ -423,6 +423,21 @@ async function initCharacter(){
 
 document.addEventListener("DOMContentLoaded", async ()=>{
 
+  // Safety: delegated click handler (prevents "dead button" if the splash markup changes)
+  document.addEventListener("click", (e)=>{
+    const btn = e.target && (e.target.id === "playBtn" ? e.target : e.target.closest && e.target.closest("#playBtn"));
+    if(!btn) return;
+    const splash = document.getElementById("splash");
+    if(!splash) return;
+    sessionStorage.setItem("mechkawaii_played","1");
+    splash.classList.add("fadeout");
+    setTimeout(()=>{
+      splash.classList.remove("fadeout");
+      splash.classList.add("hidden");
+    }, 230);
+  });
+
+
   // Splash screen (video-game vibe)
   // - Click "Jouer" hides it for this browser tab (sessionStorage)
   const splashEl = document.getElementById("splash");

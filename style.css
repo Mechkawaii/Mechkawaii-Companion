@@ -384,3 +384,10 @@ button:active{transform: translateY(1px)}
 .splash .hero img{ position:relative; z-index:0; }
 .splash .overlay{ z-index:1; pointer-events:none; }
 .splash .content{ z-index:2; pointer-events:auto; }
+
+
+/* Splash clickability hardening */
+.splash .hero{ position:relative; }
+.splash .overlay{ pointer-events:none; }
+.splash .content{ position:absolute; z-index:5; pointer-events:auto; }
+.splash button, .splash .linkbtn{ cursor:pointer; }
