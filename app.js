@@ -1,223 +1,432 @@
-const STORAGE_PREFIX = "mechkawaii_v0:";
-const LS = window.localStorage;
+const STORAGE_PREFIX = "mechkawaii:";
 
 function qs(sel){ return document.querySelector(sel); }
-function qsa(sel){ return Array.from(document.querySelectorAll(sel)); }
-
-function getParam(name){
-  const u = new URL(window.location.href);
-  return u.searchParams.get(name);
-}
+function qsa(sel){ return [...document.querySelectorAll(sel)]; }
 
 function getLang(){
-  return LS.getItem(STORAGE_PREFIX + "lang") || "fr";
+  const saved = localStorage.getItem(STORAGE_PREFIX + "lang");
+  return saved || "fr";
 }
-function toggleLang(){
-  const next = getLang() === "fr" ? "en" : "fr";
-  LS.setItem(STORAGE_PREFIX + "lang", next);
-  return next;
+function setLang(lang){
+  localStorage.setItem(STORAGE_PREFIX + "lang", lang);
 }
-function t(val, lang){
-  if(val == null) return "";
-  if(typeof val === "string") return val;
-  // expecting {fr, en}
-  return (lang === "en" ? (val.en ?? val.fr) : (val.fr ?? val.en)) ?? "";
+
+function getState(charId){
+  try{
+    const raw = localStorage.getItem(STORAGE_PREFIX + "state:" + charId);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){
+    return null;
+  }
+}
+function setState(charId, state){
+  localStorage.setItem(STORAGE_PREFIX + "state:" + charId, JSON.stringify(state));
+}
+
+function heartSvg(filled){
+  // Inline SVG so it works offline + no assets needed
+  const fill = filled ? "var(--accent)" : "rgba(255,255,255,.14)";
+  const stroke = filled ? "rgba(0,0,0,.25)" : "rgba(255,255,255,.20)";
+  return `
+  <svg class="heart" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 21s-7.5-4.6-10-9.4C.3 8.2 2.2 5.2 5.4 4.5c1.9-.4 3.8.3 5 1.7 1.2-1.4 3.1-2.1 5-1.7 3.2.7 5.1 3.7 3.4 7.1C19.5 16.4 12 21 12 21z"
+      fill="${fill}" stroke="${stroke}" stroke-width="1.2" />
+  </svg>`;
 }
 
 async function loadCharacters(){
   const res = await fetch("./data/characters.json", {cache:"no-store"});
-  if(!res.ok) throw new Error("characters.json not found");
+  if(!res.ok) throw new Error("Cannot load characters.json");
   return await res.json();
 }
 
-function normCamp(c){
-  const camp = (c.camp || "").toLowerCase();
-  if(camp.includes("pro")) return "prodrome";
-  return "mechkawaii";
+function t(obj, lang){
+  // obj can be {fr,en} or string
+  if(obj == null) return "";
+  if(typeof obj === "string") return obj;
+  return obj[lang] || obj["fr"] || "";
 }
 
-function campLabel(camp, lang){
-  if(lang === "en") return camp === "prodrome" ? "Prodrome" : "Mechkawaii";
-  return camp === "prodrome" ? "Prodrome" : "Mechkawaii";
-}
-
-function bindLangButton(){
-  const btn = qs("#langBtn");
-  if(!btn) return;
-  btn.addEventListener("click", ()=>{
-    toggleLang();
-    location.reload();
+function setLangUI(lang){
+  const sel = qs("#lang");
+  if(sel) sel.value = lang;
+  qsa("[data-i18n]").forEach(el=>{
+    const key = el.getAttribute("data-i18n");
+    const dict = window.__i18n || {};
+    el.textContent = (dict[key] && (dict[key][lang] || dict[key]["fr"])) || el.textContent;
   });
 }
 
-function setSegActive(id){
-  qsa(".segbtn").forEach(b=>b.classList.remove("active"));
-  const el = qs("#"+id);
-  if(el) el.classList.add("active");
-}
-
-function keyFor(id){ return STORAGE_PREFIX + "char:" + id; }
-function loadState(id){
-  try{
-    return JSON.parse(LS.getItem(keyFor(id)) || "{}");
-  }catch(e){
-    return {};
+function bindTopbar(lang){
+  const sel = qs("#lang");
+  if(sel){
+    sel.value = lang;
+    sel.addEventListener("change", ()=>{
+      const v = sel.value;
+      setLang(v);
+      location.reload();
+    });
   }
 }
-function saveState(id, obj){
-  LS.setItem(keyFor(id), JSON.stringify(obj));
+
+function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+function renderHP(container, hpCur, hpMax){
+  container.innerHTML = "";
+  const hearts = document.createElement("div");
+  hearts.className = "hearts";
+  for(let i=1;i<=hpMax;i++){
+    const span = document.createElement("span");
+    span.innerHTML = heartSvg(i<=hpCur);
+    hearts.appendChild(span.firstElementChild);
+  }
+  container.appendChild(hearts);
 }
 
-function heartImg(filled){
-  const src = filled ? "./assets/pv.svg" : "./assets/pv_off.svg";
-  return `<img class="heart" src="${src}" alt="HP" />`;
+function renderToggleRow(root, toggle, isOn, lang, onChange){
+  const row = document.createElement("div");
+  row.className = "toggle";
+  const left = document.createElement("div");
+  left.className = "lbl";
+  const title = document.createElement("div");
+  title.className = "t";
+  title.textContent = t(toggle.label, lang);
+  const desc = document.createElement("div");
+  desc.className = "d";
+  desc.textContent = toggle.hint ? t(toggle.hint, lang) : "";
+  left.appendChild(title);
+  left.appendChild(desc);
+
+  const sw = document.createElement("div");
+  sw.className = "switch" + (isOn ? " on" : "");
+  sw.setAttribute("role","switch");
+  sw.setAttribute("tabindex","0");
+  sw.setAttribute("aria-checked", isOn ? "true" : "false");
+
+  function flip(){
+    isOn = !isOn;
+    sw.className = "switch" + (isOn ? " on" : "");
+    sw.setAttribute("aria-checked", isOn ? "true" : "false");
+    onChange(isOn);
+  }
+
+  sw.addEventListener("click", flip);
+  sw.addEventListener("keydown", (e)=>{
+    if(e.key === "Enter" || e.key === " "){
+      e.preventDefault();
+      flip();
+    }
+  });
+
+  row.appendChild(left);
+  row.appendChild(sw);
+  root.appendChild(row);
 }
 
+function urlParam(name){
+  const u = new URL(location.href);
+  return u.searchParams.get(name);
+}
+
+// ---------- Pages ----------
 async function initIndex(){
-  bindLangButton();
   const lang = getLang();
+  bindTopbar(lang);
 
-  const list = qs("#list");
-  const note = qs("#statusNote");
+  const list = qs("#charList");
   if(!list) return;
 
-  let campFilter = LS.getItem(STORAGE_PREFIX + "campFilter") || "all";
-  function applyFilter(chars){
-    if(campFilter === "all") return chars;
-    return chars.filter(c => normCamp(c) === campFilter);
-  }
+  const setupCard = qs("#setupCard");
+  const draftCard = qs("#draftCard");
+  const campPick = qs("#campPick");
+  const draftList = qs("#draftList");
+  const draftError = qs("#draftError");
+
+  const changeSetupBtn = qs("#changeSetupBtn");
+  const changeDraftBtn = qs("#changeDraftBtn");
 
   const chars = await loadCharacters();
 
-  function render(){
-    const filtered = applyFilter(chars);
+  // --- Setup state ---
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const setup = setupRaw ? JSON.parse(setupRaw) : null;
+
+  function saveSetup(obj){
+    localStorage.setItem(STORAGE_PREFIX + "setup", JSON.stringify(obj));
+  }
+  function clearSetup(){
+    localStorage.removeItem(STORAGE_PREFIX + "setup");
+    localStorage.removeItem(STORAGE_PREFIX + "draft");
+    location.reload();
+  }
+
+  // Buttons always available when setup exists
+  if(changeSetupBtn){
+    changeSetupBtn.addEventListener("click", ()=>{
+      localStorage.removeItem(STORAGE_PREFIX + "setup");
+      location.reload();
+    });
+  }
+  if(changeDraftBtn){
+    changeDraftBtn.addEventListener("click", ()=>{
+      localStorage.removeItem(STORAGE_PREFIX + "draft");
+      location.reload();
+    });
+  }
+
+  // If no setup, show setup UI
+  if(!setup){
+    if(setupCard) setupCard.style.display = "block";
+    if(draftCard) draftCard.style.display = "none";
+    if(changeSetupBtn) changeSetupBtn.style.display = "none";
+    if(changeDraftBtn) changeDraftBtn.style.display = "none";
     list.innerHTML = "";
-    filtered.forEach(c=>{
-      const camp = normCamp(c);
-      const a = document.createElement("a");
-      a.className = "item";
-      a.href = `character.html?id=${encodeURIComponent(c.id)}`;
-      a.innerHTML = `
-        <div class="n">${t(c.name, lang)}</div>
-        <div class="m">
-          <span class="badge">${campLabel(camp, lang)}</span>
-          <span class="badge">${t(c.class, lang)}</span>
-          <span class="badge">HP ${c.hp?.max ?? "?"}</span>
-        </div>
-      `;
-      list.appendChild(a);
+
+    let mode = null; // "single" or "multi"
+    let camp = null; // "mechkawaii" or "prodrome"
+
+    qs("#modeSingle")?.addEventListener("click", ()=>{
+      mode = "single";
+      saveSetup({mode});
+      location.reload();
+    });
+    qs("#modeMulti")?.addEventListener("click", ()=>{
+      mode = "multi";
+      if(campPick) campPick.style.display = "block";
     });
 
-    if(note){
-      const total = chars.length;
-      const shown = filtered.length;
-      note.textContent = (lang === "en")
-        ? `${shown} / ${total} characters`
-        : `${shown} / ${total} personnages`;
-    }
+    qs("#campMech")?.addEventListener("click", ()=>{
+      camp = "mechkawaii";
+      saveSetup({mode:"multi", camp});
+      location.reload();
+    });
+    qs("#campProd")?.addEventListener("click", ()=>{
+      camp = "prodrome";
+      saveSetup({mode:"multi", camp});
+      location.reload();
+    });
+
+    qs("#resetSetupBtn")?.addEventListener("click", clearSetup);
+
+    return;
   }
 
-  // Filter buttons
-  const bAll = qs("#campAll");
-  const bMech = qs("#campMech");
-  const bProd = qs("#campProd");
+  // Setup exists
+  if(changeSetupBtn) changeSetupBtn.style.display = "inline-block";
+  if(changeDraftBtn) changeDraftBtn.style.display = "inline-block";
 
-  function setFilter(val){
-    campFilter = val;
-    LS.setItem(STORAGE_PREFIX + "campFilter", val);
-    setSegActive(val === "all" ? "campAll" : (val === "mechkawaii" ? "campMech" : "campProd"));
-    render();
+  // Filter characters by camp if needed
+  let available = chars;
+  if(setup.mode === "multi"){
+    available = chars.filter(c => (c.camp || "mechkawaii") === (setup.camp || "mechkawaii"));
   }
 
-  bAll?.addEventListener("click", ()=>setFilter("all"));
-  bMech?.addEventListener("click", ()=>setFilter("mechkawaii"));
-  bProd?.addEventListener("click", ()=>setFilter("prodrome"));
+  // --- Draft selection ---
+  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
+  let draft = draftRaw ? JSON.parse(draftRaw) : null; // { activeIds: [] }
 
-  // Init active state
-  setSegActive(campFilter === "all" ? "campAll" : (campFilter === "mechkawaii" ? "campMech" : "campProd"));
-  render();
+  function saveDraft(obj){
+    localStorage.setItem(STORAGE_PREFIX + "draft", JSON.stringify(obj));
+  }
+
+  // If no draft, show selection UI
+  if(!draft){
+    if(draftCard) draftCard.style.display = "block";
+    if(setupCard) setupCard.style.display = "none";
+    list.innerHTML = "";
+
+    // Build check list
+    draftList.innerHTML = "";
+    const selected = new Set();
+
+    available.forEach(c=>{
+      const row = document.createElement("div");
+      row.className = "toggle";
+
+      const left = document.createElement("div");
+      left.className = "lbl";
+      left.innerHTML = `<div class="t">${t(c.name, lang)}</div><div class="d">${t(c.class, lang)} — HP ${c.hp?.max ?? "?"}</div>`;
+
+      const sw = document.createElement("div");
+      sw.className = "switch";
+      sw.setAttribute("role","switch");
+      sw.setAttribute("tabindex","0");
+      sw.setAttribute("aria-checked","false");
+
+      function refresh(){
+        const on = selected.has(c.id);
+        sw.className = "switch" + (on ? " on" : "");
+        sw.setAttribute("aria-checked", on ? "true" : "false");
+      }
+      function flip(){
+        if(selected.has(c.id)){
+          selected.delete(c.id);
+        }else{
+          if(selected.size >= 3){
+            draftError.textContent = (lang === "fr") ? "Tu as déjà 3 persos sélectionnés." : "You already selected 3 characters.";
+            return;
+          }
+          selected.add(c.id);
+        }
+        draftError.textContent = "";
+        refresh();
+      }
+      sw.addEventListener("click", flip);
+      sw.addEventListener("keydown",(e)=>{
+        if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flip(); }
+      });
+
+      row.appendChild(left);
+      row.appendChild(sw);
+      draftList.appendChild(row);
+      refresh();
+    });
+
+    qs("#confirmDraft")?.addEventListener("click", ()=>{
+      if(selected.size !== 3){
+        draftError.textContent = (lang === "fr") ? "Sélectionne exactement 3 persos." : "Select exactly 3 characters.";
+        return;
+      }
+      saveDraft({activeIds:[...selected]});
+      location.reload();
+    });
+
+    qs("#skipDraft")?.addEventListener("click", ()=>{
+      saveDraft({activeIds: null}); // null means show all
+      location.reload();
+    });
+
+    return;
+  }
+
+  // Determine active characters
+  let toShow = available;
+  if(Array.isArray(draft.activeIds) && draft.activeIds.length){
+    toShow = available.filter(c => draft.activeIds.includes(c.id));
+  }
+
+  // Render list
+  list.innerHTML = "";
+  toShow.forEach(c=>{
+    const a = document.createElement("a");
+    a.className = "char";
+    a.href = `character.html?id=${encodeURIComponent(c.id)}`;
+    a.innerHTML = `
+      <div class="n">${t(c.name, lang)}</div>
+      <div class="m">
+        <span class="badge">${t(c.class, lang)}</span>
+        <span class="badge">HP ${c.hp?.max ?? "?"}</span>
+      </div>
+    `;
+    list.appendChild(a);
+  });
+
+  // If nothing to show (e.g. prodrome camp but no prodrome chars yet)
+  if(toShow.length === 0){
+    const msg = document.createElement("div");
+    msg.className = "footer-note";
+    msg.style.color = "var(--muted)";
+    msg.textContent = (lang === "fr")
+      ? "Aucun perso disponible pour ce camp (pour l’instant). Change de camp via “Changer config”."
+      : "No characters available for this camp (yet). Change camp via “Change setup”.";
+    list.appendChild(msg);
+  }
 }
 
 async function initCharacter(){
-  bindLangButton();
   const lang = getLang();
-  const id = getParam("id");
-  if(!id) return;
+  bindTopbar(lang);
 
+  const id = urlParam("id");
+  if(!id){
+    qs("#error").textContent = "Missing character id.";
+    return;
+  }
   const chars = await loadCharacters();
-  const c = chars.find(x => x.id === id);
-  if(!c) return;
-
-  const camp = normCamp(c);
-
-  qs("#name").textContent = t(c.name, lang);
-  qs("#camp").textContent = campLabel(camp, lang);
-  qs("#cls").textContent = t(c.class, lang);
-
-  const state = loadState(id);
-  const hpMax = c.hp?.max ?? 0;
-  let hpCur = Math.min(hpMax, Math.max(0, state.hp ?? hpMax));
-
-  function renderHP(){
-    const hpIcons = qs("#hpIcons");
-    hpIcons.innerHTML = "";
-    for(let i=1;i<=hpMax;i++){
-      const span = document.createElement("span");
-      span.innerHTML = heartImg(i <= hpCur);
-      hpIcons.appendChild(span);
-    }
+  const c = chars.find(x=>x.id === id);
+  if(!c){
+    qs("#error").textContent = "Character not found.";
+    return;
   }
 
-  function save(){
-    saveState(id, {
-      ...state,
-      hp: hpCur,
-      toggles: toggles
-    });
+  // State init
+  const saved = getState(c.id);
+  const state = saved || {
+    hp: c.hp?.max ?? 0,
+    toggles: Object.fromEntries((c.toggles||[]).map(tg => [tg.id, false]))
+  };
+
+  // UI
+  qs("#charName").textContent = t(c.name, lang);
+    qs("#charClass").textContent = t(c.class, lang);
+  qs("#hpMaxLabel").textContent = `/${c.hp?.max ?? 0}`;
+
+  const hpCurEl = qs("#hpCur");
+  const hpHeartsEl = qs("#hpHearts");
+
+  function refreshHP(){
+    hpCurEl.textContent = String(state.hp);
+    renderHP(hpHeartsEl, state.hp, c.hp?.max ?? 0);
   }
 
-  const togglesDef = [
-    { key:"abacus", fr:"Boulier", en:"Abacus" },
-    { key:"shield", fr:"Bouclier", en:"Shield" },
-    { key:"stunned", fr:"Étourdi", en:"Stunned" },
-  ];
+  qs("#hpMinus").addEventListener("click", ()=>{
+    state.hp = clamp(state.hp - 1, 0, c.hp?.max ?? 0);
+    setState(c.id, state);
+    refreshHP();
+  });
+  qs("#hpPlus").addEventListener("click", ()=>{
+    state.hp = clamp(state.hp + 1, 0, c.hp?.max ?? 0);
+    setState(c.id, state);
+    refreshHP();
+  });
 
-  let toggles = state.toggles || {};
-  const tgWrap = qs("#toggles");
-  tgWrap.innerHTML = "";
-  togglesDef.forEach(def=>{
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "pill" + (toggles[def.key] ? " on" : "");
-    b.textContent = (lang === "en" ? def.en : def.fr);
-    b.addEventListener("click", ()=>{
-      toggles[def.key] = !toggles[def.key];
-      b.classList.toggle("on", !!toggles[def.key]);
-      save();
+  refreshHP();
+
+  // Text blocks
+  qs("#classActionTitle").textContent = t(c.texts?.class_action_title, lang);
+  qs("#classActionBody").textContent  = t(c.texts?.class_action_body, lang);
+  qs("#ultTitle").textContent         = t(c.texts?.ultimate_title, lang);
+  qs("#ultBody").textContent          = t(c.texts?.ultimate_body, lang);
+
+  // Toggles
+  const togglesRoot = qs("#toggles");
+  togglesRoot.innerHTML = "";
+  (c.toggles || []).forEach(tg=>{
+    const isOn = !!state.toggles[tg.id];
+    renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
+      state.toggles[tg.id] = v;
+      setState(c.id, state);
     });
-    tgWrap.appendChild(b);
   });
 
-  qs("#hpMinus")?.addEventListener("click", ()=>{
-    hpCur = Math.max(0, hpCur - 1);
-    renderHP(); save();
-  });
-  qs("#hpPlus")?.addEventListener("click", ()=>{
-    hpCur = Math.min(hpMax, hpCur + 1);
-    renderHP(); save();
+  // Images
+  const movImg = qs("#movementImg");
+  const atkImg = qs("#attackImg");
+  movImg.src = c.images?.movement || "";
+  atkImg.src = c.images?.attack || "";
+
+  // Reset
+  qs("#resetBtn").addEventListener("click", ()=>{
+    const fresh = {
+      hp: c.hp?.max ?? 0,
+      toggles: Object.fromEntries((c.toggles||[]).map(tg => [tg.id, false]))
+    };
+    setState(c.id, fresh);
+    location.reload();
   });
 
-  renderHP();
-  save(); // ensure defaults saved
+  // Back
+  qs("#backBtn").addEventListener("click", ()=>{ location.href = "./index.html"; });
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
   try{
-    if(qs("#list")) await initIndex();
-    if(qs("#hpIcons")) await initCharacter();
-  }catch(err){
-    console.error(err);
-    const n = qs("#statusNote");
-    if(n) n.textContent = "Erreur de chargement. Vérifie que data/characters.json existe à la racine.";
+    if(document.body.classList.contains("page-index")) await initIndex();
+    if(document.body.classList.contains("page-character")) await initCharacter();
+  }catch(e){
+    console.error(e);
+    const err = qs("#error");
+    if(err) err.textContent = "Erreur de chargement. Vérifie que le site est servi via un lien web (pas en ouvrant le fichier localement).";
   }
 });
