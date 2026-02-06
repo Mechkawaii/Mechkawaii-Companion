@@ -632,13 +632,39 @@ html.splash-dismissed body.has-splash .controls{
 }
 
 
-/* ===== Desktop Splash UI Fix ===== */
+/* ===== Desktop Splash UI Fix (compact & truly responsive) ===== */
 @media (min-width: 900px){
+  /* Prevent the splash from feeling "mobile giant" on desktop */
   .splash-overlay .hero-ui{
     overflow-y: auto;
-    gap: 16px;
-    padding: 24px;
+    gap: 14px;
+    padding: 22px;
   }
+
+  /* Keep brand assets reasonable on large screens */
+  .brand-stack .logo{
+    width: clamp(260px, 28vw, 420px);
+    max-height: 26vh;
+    object-fit: contain;
+  }
+
+  .brand-stack .mascot{
+    width: clamp(44px, 4.5vw, 64px);
+    max-height: 8vh;
+    object-fit: contain;
+  }
+
+  /* Buttons shouldn't become billboards */
+  .mkw-btn{
+    width: clamp(240px, 22vw, 340px);
+  }
+
+  .mkw-label{
+    font-size: 18px;
+    letter-spacing: 5px;
+  }
+}
+
 
   .brand-stack .logo{
     width: min(420px, 60vw);
