@@ -1,7 +1,6 @@
 [
   {
     "id": "johanna",
-    "code": "MKW_RAIDER",
     "name": {
       "fr": "Johanna",
       "en": "Johanna"
@@ -64,11 +63,11 @@
     "images": {
       "movement": "assets/patterns/johanna_movement.png",
       "attack": "assets/patterns/johanna_attack.png"
-    }
+    },
+    "camp": "mechkawaii"
   },
   {
     "id": "banado",
-    "code": "MKW_UZUME",
     "name": {
       "fr": "Banado",
       "en": "Banado"
@@ -131,11 +130,11 @@
     "images": {
       "movement": "assets/patterns/banado_movement.png",
       "attack": "assets/patterns/banado_attack.png"
-    }
+    },
+    "camp": "mechkawaii"
   },
   {
     "id": "fuyu",
-    "code": "MKW_FUUN",
     "name": {
       "fr": "Fuyu",
       "en": "Fuyu"
@@ -198,11 +197,11 @@
     "images": {
       "movement": "assets/patterns/fuyu_movement.png",
       "attack": "assets/patterns/fuyu_attack.png"
-    }
+    },
+    "camp": "mechkawaii"
   },
   {
     "id": "meimei",
-    "code": "MKW_AMATERASU",
     "name": {
       "fr": "Meimei",
       "en": "Meimei"
@@ -265,11 +264,11 @@
     "images": {
       "movement": "assets/patterns/meimei_movement.png",
       "attack": "assets/patterns/meimei_attack.png"
-    }
+    },
+    "camp": "mechkawaii"
   },
   {
     "id": "yamabato",
-    "code": "MKW_RYUJIN",
     "name": {
       "fr": "Yamabato",
       "en": "Yamabato"
@@ -332,11 +331,11 @@
     "images": {
       "movement": "assets/patterns/yamabato_movement.png",
       "attack": "assets/patterns/yamabato_attack.png"
-    }
+    },
+    "camp": "mechkawaii"
   },
   {
     "id": "goryo",
-    "code": "",
     "name": {
       "fr": "Goryo",
       "en": "Goryo"
@@ -399,11 +398,11 @@
     "images": {
       "movement": "assets/patterns/goryo_movement.png",
       "attack": "assets/patterns/goryo_attack.png"
-    }
+    },
+    "camp": "mechkawaii"
   },
   {
     "id": "genbu",
-    "code": "",
     "name": {
       "fr": "Genbu",
       "en": "Genbu"
@@ -466,11 +465,11 @@
     "images": {
       "movement": "assets/patterns/genbu_movement.png",
       "attack": "assets/patterns/genbu_attack.png"
-    }
+    },
+    "camp": "mechkawaii"
   },
   {
     "id": "goki",
-    "code": "",
     "name": {
       "fr": "Goki",
       "en": "Goki"
@@ -533,11 +532,11 @@
     "images": {
       "movement": "assets/patterns/goki_movement.png",
       "attack": "assets/patterns/goki_attack.png"
-    }
+    },
+    "camp": "mechkawaii"
   },
   {
     "id": "gaoro",
-    "code": "",
     "name": {
       "fr": "Gaoro",
       "en": "Gaoro"
@@ -600,11 +599,11 @@
     "images": {
       "movement": "assets/patterns/gaoro_movement.png",
       "attack": "assets/patterns/gaoro_attack.png"
-    }
+    },
+    "camp": "mechkawaii"
   },
   {
     "id": "gyuki",
-    "code": "",
     "name": {
       "fr": "Gyuki",
       "en": "Gyuki"
@@ -667,6 +666,7 @@
     "images": {
       "movement": "assets/patterns/gyuki_movement.png",
       "attack": "assets/patterns/gyuki_attack.png"
-    }
+    },
+    "camp": "mechkawaii"
   }
 ]

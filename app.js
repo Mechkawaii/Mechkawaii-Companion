@@ -137,23 +137,201 @@ async function initIndex(){
   const list = qs("#charList");
   if(!list) return;
 
+  const setupCard = qs("#setupCard");
+  const draftCard = qs("#draftCard");
+  const campPick = qs("#campPick");
+  const draftList = qs("#draftList");
+  const draftError = qs("#draftError");
+
+  const changeSetupBtn = qs("#changeSetupBtn");
+  const changeDraftBtn = qs("#changeDraftBtn");
+
   const chars = await loadCharacters();
 
+  // --- Setup state ---
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const setup = setupRaw ? JSON.parse(setupRaw) : null;
+
+  function saveSetup(obj){
+    localStorage.setItem(STORAGE_PREFIX + "setup", JSON.stringify(obj));
+  }
+  function clearSetup(){
+    localStorage.removeItem(STORAGE_PREFIX + "setup");
+    localStorage.removeItem(STORAGE_PREFIX + "draft");
+    location.reload();
+  }
+
+  // Buttons always available when setup exists
+  if(changeSetupBtn){
+    changeSetupBtn.addEventListener("click", ()=>{
+      localStorage.removeItem(STORAGE_PREFIX + "setup");
+      location.reload();
+    });
+  }
+  if(changeDraftBtn){
+    changeDraftBtn.addEventListener("click", ()=>{
+      localStorage.removeItem(STORAGE_PREFIX + "draft");
+      location.reload();
+    });
+  }
+
+  // If no setup, show setup UI
+  if(!setup){
+    if(setupCard) setupCard.style.display = "block";
+    if(draftCard) draftCard.style.display = "none";
+    if(changeSetupBtn) changeSetupBtn.style.display = "none";
+    if(changeDraftBtn) changeDraftBtn.style.display = "none";
+    list.innerHTML = "";
+
+    let mode = null; // "single" or "multi"
+    let camp = null; // "mechkawaii" or "prodrome"
+
+    qs("#modeSingle")?.addEventListener("click", ()=>{
+      mode = "single";
+      saveSetup({mode});
+      location.reload();
+    });
+    qs("#modeMulti")?.addEventListener("click", ()=>{
+      mode = "multi";
+      if(campPick) campPick.style.display = "block";
+    });
+
+    qs("#campMech")?.addEventListener("click", ()=>{
+      camp = "mechkawaii";
+      saveSetup({mode:"multi", camp});
+      location.reload();
+    });
+    qs("#campProd")?.addEventListener("click", ()=>{
+      camp = "prodrome";
+      saveSetup({mode:"multi", camp});
+      location.reload();
+    });
+
+    qs("#resetSetupBtn")?.addEventListener("click", clearSetup);
+
+    return;
+  }
+
+  // Setup exists
+  if(changeSetupBtn) changeSetupBtn.style.display = "inline-block";
+  if(changeDraftBtn) changeDraftBtn.style.display = "inline-block";
+
+  // Filter characters by camp if needed
+  let available = chars;
+  if(setup.mode === "multi"){
+    available = chars.filter(c => (c.camp || "mechkawaii") === (setup.camp || "mechkawaii"));
+  }
+
+  // --- Draft selection ---
+  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
+  let draft = draftRaw ? JSON.parse(draftRaw) : null; // { activeIds: [] }
+
+  function saveDraft(obj){
+    localStorage.setItem(STORAGE_PREFIX + "draft", JSON.stringify(obj));
+  }
+
+  // If no draft, show selection UI
+  if(!draft){
+    if(draftCard) draftCard.style.display = "block";
+    if(setupCard) setupCard.style.display = "none";
+    list.innerHTML = "";
+
+    // Build check list
+    draftList.innerHTML = "";
+    const selected = new Set();
+
+    available.forEach(c=>{
+      const row = document.createElement("div");
+      row.className = "toggle";
+
+      const left = document.createElement("div");
+      left.className = "lbl";
+      left.innerHTML = `<div class="t">${t(c.name, lang)}</div><div class="d">${t(c.class, lang)} — HP ${c.hp?.max ?? "?"}</div>`;
+
+      const sw = document.createElement("div");
+      sw.className = "switch";
+      sw.setAttribute("role","switch");
+      sw.setAttribute("tabindex","0");
+      sw.setAttribute("aria-checked","false");
+
+      function refresh(){
+        const on = selected.has(c.id);
+        sw.className = "switch" + (on ? " on" : "");
+        sw.setAttribute("aria-checked", on ? "true" : "false");
+      }
+      function flip(){
+        if(selected.has(c.id)){
+          selected.delete(c.id);
+        }else{
+          if(selected.size >= 3){
+            draftError.textContent = (lang === "fr") ? "Tu as déjà 3 persos sélectionnés." : "You already selected 3 characters.";
+            return;
+          }
+          selected.add(c.id);
+        }
+        draftError.textContent = "";
+        refresh();
+      }
+      sw.addEventListener("click", flip);
+      sw.addEventListener("keydown",(e)=>{
+        if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flip(); }
+      });
+
+      row.appendChild(left);
+      row.appendChild(sw);
+      draftList.appendChild(row);
+      refresh();
+    });
+
+    qs("#confirmDraft")?.addEventListener("click", ()=>{
+      if(selected.size !== 3){
+        draftError.textContent = (lang === "fr") ? "Sélectionne exactement 3 persos." : "Select exactly 3 characters.";
+        return;
+      }
+      saveDraft({activeIds:[...selected]});
+      location.reload();
+    });
+
+    qs("#skipDraft")?.addEventListener("click", ()=>{
+      saveDraft({activeIds: null}); // null means show all
+      location.reload();
+    });
+
+    return;
+  }
+
+  // Determine active characters
+  let toShow = available;
+  if(Array.isArray(draft.activeIds) && draft.activeIds.length){
+    toShow = available.filter(c => draft.activeIds.includes(c.id));
+  }
+
+  // Render list
   list.innerHTML = "";
-  chars.forEach(c=>{
+  toShow.forEach(c=>{
     const a = document.createElement("a");
     a.className = "char";
     a.href = `character.html?id=${encodeURIComponent(c.id)}`;
     a.innerHTML = `
       <div class="n">${t(c.name, lang)}</div>
       <div class="m">
-        <span class="badge">${c.code || ""}</span>
         <span class="badge">${t(c.class, lang)}</span>
         <span class="badge">HP ${c.hp?.max ?? "?"}</span>
       </div>
     `;
     list.appendChild(a);
   });
+
+  // If nothing to show (e.g. prodrome camp but no prodrome chars yet)
+  if(toShow.length === 0){
+    const msg = document.createElement("div");
+    msg.className = "footer-note";
+    msg.style.color = "var(--muted)";
+    msg.textContent = (lang === "fr")
+      ? "Aucun perso disponible pour ce camp (pour l’instant). Change de camp via “Changer config”."
+      : "No characters available for this camp (yet). Change camp via “Change setup”.";
+    list.appendChild(msg);
+  }
 }
 
 async function initCharacter(){
@@ -181,8 +359,7 @@ async function initCharacter(){
 
   // UI
   qs("#charName").textContent = t(c.name, lang);
-  qs("#charCode").textContent = c.code || "";
-  qs("#charClass").textContent = t(c.class, lang);
+    qs("#charClass").textContent = t(c.class, lang);
   qs("#hpMaxLabel").textContent = `/${c.hp?.max ?? 0}`;
 
   const hpCurEl = qs("#hpCur");
