@@ -462,12 +462,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   }
 
 
-  const playBtn = document.getElementById("playBtn");
-  if(playBtn){
-    playBtn.addEventListener("click", ()=>{
-      document.getElementById("splash")?.remove();
-      });
-  }
+  
 
   try{
     if(document.body.classList.contains("page-index")) await initIndex();

@@ -317,3 +317,16 @@ button:active{transform: translateY(1px)}
   font-size:28px; font-weight:900; letter-spacing:.8px;
 }
 .splash .tag{ color:var(--muted); font-size:14px; }
+
+.btn-raw{
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.btn-raw img{
+  width: min(520px, 80vw);
+  height: auto;
+  display: block;
+}
+.btn-raw:active{ transform: translateY(1px); }
