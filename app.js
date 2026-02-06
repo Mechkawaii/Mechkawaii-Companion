@@ -492,6 +492,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   function hideSplash(){
     const splash = document.getElementById("splash");
     if(splash){ splash.remove(); }
+    document.body.classList.remove("has-splash");
   }
 
   const playBtn = document.getElementById("playBtn");
