@@ -6,7 +6,7 @@
   <title>Mechkawaii — Fiches</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
-<body class="page-index">
+<body class="page-index has-splash">
   <div class="container">
     <div class="topbar">
       <div class="brand">
@@ -59,13 +59,13 @@
     <div id="draftCard" class="card" style="margin-top:16px; display:none;">
       <div class="card-h">
         <div class="section-title" style="margin:0;">Sélection de début de partie</div>
-        <div class="small">Choisis 3 persos (sur 5)</div>
+        <div class="small">Choisis les persos joués</div>
       </div>
       <div class="card-b">
-        <p class="text" style="margin-top:0;">Sélectionne uniquement les <span id="pickCountDesc">3</span> persos réellement joués. Les autres ne s’afficheront pas.</p>
+        <p class="text" style="margin-top:0;">Sélectionne uniquement les persos réellement joués. Les autres ne s’afficheront pas.</p>
         <div id="draftList" class="toggles" style="margin-top:12px;"></div>
         <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-          <button id="confirmDraft" class="btn-accent">Valider les <span id="pickCountLabel">3</span> persos</button>
+          <button id="confirmDraft" class="btn-accent">Valider les 3 persos</button>
           <button id="skipDraft">Afficher tout (pour l’instant)</button>
         </div>
         <div id="draftError" class="footer-note" style="color: var(--danger);"></div>
@@ -73,9 +73,39 @@
     </div>
 
     <div class="controls" style="margin-top:16px; display:flex; justify-content:flex-end;">
+      <button id="backToSplash">Écran titre</button>
       <button id="changeSetupBtn">Changer config</button>
       <button id="changeDraftBtn">Changer sélection</button>
     </div>
+
+  
+  <div id="splash" class="splash splash-full">
+    <div class="hero">
+      <img src="./assets/cover.png" alt="Mechkawaii cover" class="hero-bg" />
+      <div class="overlay"></div>
+
+      <div class="hero-ui">
+        <div class="brand">
+          <img src="./assets/logo.png" alt="Mechkawaii" class="logo" />
+          <img src="./assets/heart.png" alt="" class="mascot" />
+        </div>
+
+        <div class="menu">
+          <button id="playBtn" class="btn-raw"><img src="./assets/ui/btn_play.svg" alt="Jouer"></button>
+
+          <a class="linkbtn" href="https://mechkawaii.com" target="_blank" rel="noopener">
+            <button class="menu-btn">SITE</button>
+          </a>
+
+          <a class="linkbtn" href="https://instagram.com/mechkawaii" target="_blank" rel="noopener">
+            <button class="menu-btn">INSTAGRAM</button>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
 
     <div class="footer-note">
       Astuce : mets ce lien derrière un QR code dans la boîte. Les joueurs n’installent rien et ça marche.

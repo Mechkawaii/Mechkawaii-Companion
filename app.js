@@ -1,5 +1,67 @@
 const STORAGE_PREFIX = "mechkawaii:";
 
+function playPressStart(){
+  try{
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const master = ctx.createGain();
+    master.gain.value = 0.12;
+    master.connect(ctx.destination);
+
+    const now = ctx.currentTime;
+
+    // Little “arcade” two-tone blip
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    osc1.type = "square";
+    osc2.type = "triangle";
+
+    const g1 = ctx.createGain();
+    const g2 = ctx.createGain();
+    g1.gain.setValueAtTime(0.0001, now);
+    g2.gain.setValueAtTime(0.0001, now);
+
+    osc1.frequency.setValueAtTime(660, now);
+    osc1.frequency.exponentialRampToValueAtTime(990, now + 0.06);
+
+    osc2.frequency.setValueAtTime(330, now);
+    osc2.frequency.exponentialRampToValueAtTime(440, now + 0.08);
+
+    g1.gain.exponentialRampToValueAtTime(0.9, now + 0.01);
+    g1.gain.exponentialRampToValueAtTime(0.0001, now + 0.10);
+
+    g2.gain.exponentialRampToValueAtTime(0.6, now + 0.01);
+    g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+    osc1.connect(g1); g1.connect(master);
+    osc2.connect(g2); g2.connect(master);
+
+    osc1.start(now); osc2.start(now);
+    osc1.stop(now + 0.12);
+    osc2.stop(now + 0.14);
+
+    // Close context after sound to avoid keeping audio running
+    setTimeout(()=>{ try{ ctx.close(); }catch(e){} }, 250);
+  }catch(e){}
+}
+
+
+function heartIcon(filled){
+  const src = filled
+    ? "./assets/pv.svg"
+    : "./assets/pv_off.svg";
+
+  return `
+    <img
+      src="${src}"
+      class="heart"
+      alt="PV"
+    />
+  `;
+}
+
+
 function qs(sel){ return document.querySelector(sel); }
 function qsa(sel){ return [...document.querySelectorAll(sel)]; }
 
@@ -78,7 +140,7 @@ function renderHP(container, hpCur, hpMax){
   hearts.className = "hearts";
   for(let i=1;i<=hpMax;i++){
     const span = document.createElement("span");
-    span.innerHTML = heartSvg(i<=hpCur);
+    span.innerHTML = heartIcon(i<=hpCur);
     hearts.appendChild(span.firstElementChild);
   }
   container.appendChild(hearts);
@@ -223,7 +285,7 @@ async function initIndex(){
   }
 
   // --- Draft selection ---
-  const pickLimit = (setup.mode === "single") ? 6 : 3;
+  const maxPick = (setup.mode === "single") ? 6 : 3;
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
   let draft = draftRaw ? JSON.parse(draftRaw) : null; // { activeIds: [] }
 
@@ -264,8 +326,8 @@ async function initIndex(){
         if(selected.has(c.id)){
           selected.delete(c.id);
         }else{
-          if(selected.size >= pickLimit){
-            draftError.textContent = (lang === "fr") ? "Tu as déjà ${pickLimit} persos sélectionnés." : "You already selected 3 characters.";
+          if(selected.size >= maxPick){
+            draftError.textContent = (lang === "fr") ? `Tu as déjà ${maxPick} persos sélectionnés.` : `You already selected ${maxPick} characters.`;
             return;
           }
           selected.add(c.id);
@@ -285,8 +347,8 @@ async function initIndex(){
     });
 
     qs("#confirmDraft")?.addEventListener("click", ()=>{
-      if(selected.size !== pickLimit){
-        draftError.textContent = (lang === "fr") ? `Sélectionne exactement ${pickLimit} persos.` : `Select exactly ${pickLimit} characters.`;
+      if(selected.size !== maxPick){
+        draftError.textContent = (lang === "fr") ? `Sélectionne exactement ${maxPick} persos.` : `Select exactly ${maxPick} characters.`;
         return;
       }
       saveDraft({activeIds:[...selected]});
@@ -422,6 +484,35 @@ async function initCharacter(){
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
+
+  function showSplash(){
+    const splash = document.getElementById("splash");
+    if(splash){ splash.style.display = "block"; }
+  }
+  function hideSplash(){
+    const splash = document.getElementById("splash");
+    if(splash){ splash.remove(); }
+  }
+
+  const playBtn = document.getElementById("playBtn");
+  if(playBtn){
+    playBtn.addEventListener("click", ()=>{
+      playPressStart();
+      document.body.classList.remove('has-splash');
+      hideSplash();
+      });
+  }
+
+  const backToSplash = document.getElementById("backToSplash");
+  if(backToSplash){
+    backToSplash.addEventListener("click", ()=>{
+      location.reload();
+    });
+  }
+
+
+  
+
   try{
     if(document.body.classList.contains("page-index")) await initIndex();
     if(document.body.classList.contains("page-character")) await initCharacter();

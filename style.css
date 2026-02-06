@@ -291,3 +291,233 @@ button:active{transform: translateY(1px)}
   color: var(--muted);
   font-size: 13px;
 }
+
+/* Splash screen */
+.splash{
+  margin-top:16px;
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(19,19,26,.72);
+  box-shadow: var(--shadow);
+  overflow:hidden;
+}
+.splash .hero{ position:relative; }
+.splash .hero img{ width:100%; height:auto; display:block; }
+.splash .overlay{
+  position:absolute; inset:0;
+  background: linear-gradient(to top, rgba(0,0,0,.75), rgba(0,0,0,.1));
+}
+.splash .content{
+  position:absolute;
+  left:16px; right:16px; bottom:16px;
+  display:flex; justify-content:space-between; align-items:flex-end;
+  gap:12px; flex-wrap:wrap;
+}
+.splash .title{
+  font-size:28px; font-weight:900; letter-spacing:.8px;
+}
+.splash .tag{ color:var(--muted); font-size:14px; }
+
+.btn-raw{
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.btn-raw img{
+  width: min(520px, 80vw);
+  height: auto;
+  display: block;
+}
+.btn-raw:active{ transform: translateY(1px); }
+
+/* --- Splash (Mechkawaii Companion) --- */
+.splash-full{
+  margin-top:16px;
+  border-radius: 18px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.10);
+}
+.hero{ position:relative; }
+.hero-bg{ width:100%; height: auto; display:block; filter: none; }
+.overlay{
+  position:absolute; inset:0;
+  background: rgba(0,0,0,0.35);
+}
+.hero-ui{
+  position:absolute; inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 22px;
+}
+.brand{
+  position:absolute;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+}
+.brand .logo{
+  width: min(780px, 88vw);
+  height:auto;
+  display:block;
+}
+.brand .mascot{
+  width: min(160px, 18vw);
+  height:auto;
+  margin-left: 12px;
+  margin-top: -10px;
+  display:block;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.35));
+}
+.menu{
+  margin-top: 90px;
+  display:flex;
+  flex-direction:column;
+  gap: 16px;
+  align-items:center;
+  justify-content:center;
+}
+.menu .menu-btn{
+  width: min(520px, 80vw);
+  height: 64px;
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,0.18);
+  background: rgba(26,20,34,0.86);
+  color: rgba(255,255,255,0.95);
+  font-weight: 900;
+  letter-spacing: 4px;
+  font-size: 20px;
+  cursor:pointer;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+}
+.menu .menu-btn:hover{
+  border-color: rgba(255,79,216,0.45);
+}
+.menu .menu-btn:active{
+  transform: translateY(1px);
+}
+.linkbtn{ text-decoration:none; }
+@media (max-width: 420px){
+  .brand{ top: 18px; }
+  .menu{ margin-top: 60px; gap: 12px; }
+  .brand .mascot{ margin-top: -6px; }
+}
+
+.mkw-btn{
+  position: relative;
+  width: min(520px, 80vw);
+  cursor: pointer;
+}
+.mkw-btn img{
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.mkw-label{
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  letter-spacing: 6px;
+  font-size: 22px;
+  color: #ffffff;
+  text-shadow:
+    0 2px 8px rgba(0,0,0,0.6),
+    0 0 12px rgba(255,79,216,0.35);
+  pointer-events: none;
+}
+.mkw-btn:hover{ filter: brightness(1.08); }
+.mkw-btn:active{ transform: translateY(1px); }
+
+
+/* --- Micro-animations (splash polish) --- */
+@keyframes mkw-float {
+  0%   { transform: translateY(0px) rotate(-2deg); }
+  50%  { transform: translateY(-6px) rotate(2deg); }
+  100% { transform: translateY(0px) rotate(-2deg); }
+}
+@keyframes mkw-glow {
+  0%   { filter: drop-shadow(0 0 0 rgba(255,79,216,0.0)) drop-shadow(0 0 0 rgba(255,181,107,0.0)); }
+  50%  { filter: drop-shadow(0 0 14px rgba(255,79,216,0.55)) drop-shadow(0 0 18px rgba(255,181,107,0.35)); }
+  100% { filter: drop-shadow(0 0 0 rgba(255,79,216,0.0)) drop-shadow(0 0 0 rgba(255,181,107,0.0)); }
+}
+
+/* Heart mascot: subtle float */
+.brand .mascot{
+  animation: mkw-float 2.8s ease-in-out infinite;
+  transform-origin: 50% 60%;
+}
+
+/* Play button: pulsing glow */
+#playBtn.mkw-btn{
+  animation: mkw-glow 1.8s ease-in-out infinite;
+}
+#playBtn.mkw-btn:hover{
+  animation-duration: 1.2s;
+}
+#playBtn.mkw-btn:active{
+  animation: none;
+  filter: drop-shadow(0 0 18px rgba(255,79,216,0.55));
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .brand .mascot, #playBtn.mkw-btn{ animation: none !important; }
+}
+
+
+/* --- Splash overlay fixes --- */
+.splash-full{
+  position: fixed;
+  inset: 0;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  z-index: 9999;
+  background: #000;
+}
+
+/* Center brand + small mascot above logo */
+.splash-full .brand{
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width: min(860px, 92vw);
+}
+.splash-full .brand .logo{
+  width: 100% !important;
+}
+.splash-full .brand .mascot{
+  position: absolute;
+  top: -46px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(44px, 9vw, 86px) !important;
+  margin: 0 !important;
+  animation: mkw-float 2.8s ease-in-out infinite;
+  filter: drop-shadow(0 10px 22px rgba(0,0,0,0.45));
+}
+
+/* Menu spacing under logo */
+.splash-full .menu{
+  margin-top: 42px !important;
+}
+
+/* Hide underlying UI while splash is visible (even if it exists in DOM) */
+body.has-splash .topbar,
+body.has-splash #setupCard,
+body.has-splash #draftCard,
+body.has-splash #charList,
+body.has-splash .footer-note,
+body.has-splash .controls{
+  visibility: hidden;
+}
