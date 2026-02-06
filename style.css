@@ -367,3 +367,8 @@ button:active{transform: translateY(1px)}
 @media (min-width: 900px){
   .splash-bar{ justify-content:space-between; }
 }
+
+
+/* Splash toggle without JS (super stable) */
+#playToggle:checked ~ #splash{ display:none !important; }
+.btn-like{ display:inline-flex; align-items:center; justify-content:center; cursor:pointer; user-select:none; }
