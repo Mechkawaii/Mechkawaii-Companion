@@ -423,13 +423,18 @@ async function initCharacter(){
 
 document.addEventListener("DOMContentLoaded", async ()=>{
 
-  // Splash screen: show only once per device (stored locally)
+  // Splash screen: shown once per session
   const splash = document.getElementById("splash");
-  const played = localStorage.getItem(STORAGE_PREFIX + "played") === "1";
-  if(played && splash){
-    splash.remove();
-  }
   const playBtn = document.getElementById("playBtn");
+  if(playBtn && splash){
+    playBtn.addEventListener("click", ()=>{
+      splash.classList.add("fadeout");
+      setTimeout(()=>{ splash.remove(); }, 230);
+    });
+  }
+
+
+    const playBtn = document.getElementById("playBtn");
   if(playBtn && splash && !played){
     playBtn.addEventListener("click", ()=>{
       localStorage.setItem(STORAGE_PREFIX + "played", "1");
