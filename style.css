@@ -330,3 +330,107 @@ button:active{transform: translateY(1px)}
   display: block;
 }
 .btn-raw:active{ transform: translateY(1px); }
+
+/* --- Splash (Mechkawaii Companion) --- */
+.splash-full{
+  margin-top:16px;
+  border-radius: 18px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.10);
+}
+.hero{ position:relative; }
+.hero-bg{ width:100%; height: auto; display:block; filter: none; }
+.overlay{
+  position:absolute; inset:0;
+  background: rgba(0,0,0,0.35);
+}
+.hero-ui{
+  position:absolute; inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 22px;
+}
+.brand{
+  position:absolute;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+}
+.brand .logo{
+  width: min(780px, 88vw);
+  height:auto;
+  display:block;
+}
+.brand .mascot{
+  width: min(160px, 18vw);
+  height:auto;
+  margin-left: 12px;
+  margin-top: -10px;
+  display:block;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.35));
+}
+.menu{
+  margin-top: 90px;
+  display:flex;
+  flex-direction:column;
+  gap: 16px;
+  align-items:center;
+  justify-content:center;
+}
+.menu .menu-btn{
+  width: min(520px, 80vw);
+  height: 64px;
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,0.18);
+  background: rgba(26,20,34,0.86);
+  color: rgba(255,255,255,0.95);
+  font-weight: 900;
+  letter-spacing: 4px;
+  font-size: 20px;
+  cursor:pointer;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+}
+.menu .menu-btn:hover{
+  border-color: rgba(255,79,216,0.45);
+}
+.menu .menu-btn:active{
+  transform: translateY(1px);
+}
+.linkbtn{ text-decoration:none; }
+@media (max-width: 420px){
+  .brand{ top: 18px; }
+  .menu{ margin-top: 60px; gap: 12px; }
+  .brand .mascot{ margin-top: -6px; }
+}
+
+.mkw-btn{
+  position: relative;
+  width: min(520px, 80vw);
+  cursor: pointer;
+}
+.mkw-btn img{
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.mkw-label{
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  letter-spacing: 6px;
+  font-size: 22px;
+  color: #ffffff;
+  text-shadow:
+    0 2px 8px rgba(0,0,0,0.6),
+    0 0 12px rgba(255,79,216,0.35);
+  pointer-events: none;
+}
+.mkw-btn:hover{ filter: brightness(1.08); }
+.mkw-btn:active{ transform: translateY(1px); }
