@@ -1,5 +1,20 @@
 const STORAGE_PREFIX = "mechkawaii:";
 
+function heartIcon(filled){
+  const src = filled
+    ? "./assets/pv.svg"
+    : "./assets/pv_off.svg";
+
+  return `
+    <img
+      src="${src}"
+      class="heart"
+      alt="PV"
+    />
+  `;
+}
+
+
 function qs(sel){ return document.querySelector(sel); }
 function qsa(sel){ return [...document.querySelectorAll(sel)]; }
 
@@ -78,7 +93,7 @@ function renderHP(container, hpCur, hpMax){
   hearts.className = "hearts";
   for(let i=1;i<=hpMax;i++){
     const span = document.createElement("span");
-    span.innerHTML = heartSvg(i<=hpCur);
+    span.innerHTML = heartIcon(i<=hpCur);
     hearts.appendChild(span.firstElementChild);
   }
   container.appendChild(hearts);
@@ -223,6 +238,7 @@ async function initIndex(){
   }
 
   // --- Draft selection ---
+  const maxPick = (setup.mode === "single") ? 6 : 3;
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
   let draft = draftRaw ? JSON.parse(draftRaw) : null; // { activeIds: [] }
 
@@ -263,8 +279,8 @@ async function initIndex(){
         if(selected.has(c.id)){
           selected.delete(c.id);
         }else{
-          if(selected.size >= 3){
-            draftError.textContent = (lang === "fr") ? "Tu as déjà 3 persos sélectionnés." : "You already selected 3 characters.";
+          if(selected.size >= maxPick){
+            draftError.textContent = (lang === "fr") ? `Tu as déjà ${maxPick} persos sélectionnés.` : `You already selected ${maxPick} characters.`;
             return;
           }
           selected.add(c.id);
@@ -284,8 +300,8 @@ async function initIndex(){
     });
 
     qs("#confirmDraft")?.addEventListener("click", ()=>{
-      if(selected.size !== 3){
-        draftError.textContent = (lang === "fr") ? "Sélectionne exactement 3 persos." : "Select exactly 3 characters.";
+      if(selected.size !== maxPick){
+        draftError.textContent = (lang === "fr") ? `Sélectionne exactement ${maxPick} persos.` : `Select exactly ${maxPick} characters.`;
         return;
       }
       saveDraft({activeIds:[...selected]});
