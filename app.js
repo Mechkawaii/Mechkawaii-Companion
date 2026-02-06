@@ -423,15 +423,37 @@ async function initCharacter(){
 
 document.addEventListener("DOMContentLoaded", async ()=>{
 
-  // Splash screen: shown once per session
+  // Splash screen: hide after "Jouer" for this browser tab (survives reloads via sessionStorage)
   const splash = document.getElementById("splash");
+  const played = sessionStorage.getItem("mechkawaii_played") === "1";
+  if(played && splash){
+    splash.classList.add("hidden");
+  }
+
   const playBtn = document.getElementById("playBtn");
   if(playBtn && splash){
     playBtn.addEventListener("click", ()=>{
+      sessionStorage.setItem("mechkawaii_played", "1");
       splash.classList.add("fadeout");
-      setTimeout(()=>{ splash.remove(); }, 230);
+      setTimeout(()=>{
+        splash.classList.remove("fadeout");
+        splash.classList.add("hidden");
+      }, 230);
     });
   }
+
+  const homeBtn = document.getElementById("homeBtn");
+  if(homeBtn && splash){
+    homeBtn.addEventListener("click", ()=>{
+      sessionStorage.removeItem("mechkawaii_played");
+      splash.classList.remove("hidden");
+      // Small re-entry animation
+      splash.classList.add("fadeout");
+      setTimeout(()=>{ splash.classList.remove("fadeout"); }, 10);
+      window.scrollTo({top:0, behavior:"smooth"});
+    });
+  }
+
 
 
     const playBtn = document.getElementById("playBtn");
