@@ -291,3 +291,29 @@ button:active{transform: translateY(1px)}
   color: var(--muted);
   font-size: 13px;
 }
+
+/* Splash screen */
+.splash{
+  margin-top:16px;
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(19,19,26,.72);
+  box-shadow: var(--shadow);
+  overflow:hidden;
+}
+.splash .hero{ position:relative; }
+.splash .hero img{ width:100%; height:auto; display:block; }
+.splash .overlay{
+  position:absolute; inset:0;
+  background: linear-gradient(to top, rgba(0,0,0,.75), rgba(0,0,0,.1));
+}
+.splash .content{
+  position:absolute;
+  left:16px; right:16px; bottom:16px;
+  display:flex; justify-content:space-between; align-items:flex-end;
+  gap:12px; flex-wrap:wrap;
+}
+.splash .title{
+  font-size:28px; font-weight:900; letter-spacing:.8px;
+}
+.splash .tag{ color:var(--muted); font-size:14px; }

@@ -437,6 +437,38 @@ async function initCharacter(){
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
+
+  function showSplash(){
+    const splash = document.getElementById("splash");
+    if(splash){ splash.style.display = "block"; }
+  }
+  function hideSplash(){
+    const splash = document.getElementById("splash");
+    if(splash){ splash.remove(); }
+  }
+
+  const playBtn = document.getElementById("playBtn");
+  if(playBtn){
+    playBtn.addEventListener("click", ()=>{
+      hideSplash();
+    });
+  }
+
+  const backToSplash = document.getElementById("backToSplash");
+  if(backToSplash){
+    backToSplash.addEventListener("click", ()=>{
+      location.reload();
+    });
+  }
+
+
+  const playBtn = document.getElementById("playBtn");
+  if(playBtn){
+    playBtn.addEventListener("click", ()=>{
+      document.getElementById("splash")?.remove();
+      });
+  }
+
   try{
     if(document.body.classList.contains("page-index")) await initIndex();
     if(document.body.classList.contains("page-character")) await initCharacter();
