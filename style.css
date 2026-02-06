@@ -328,3 +328,66 @@ button:active{transform: translateY(1px)}
 .splash{ animation: splashFadeIn .35s ease both; }
 .splash .content{ animation: splashRise .45s ease .08s both; }
 .splash.fadeout{ opacity:0; transform: translateY(-4px); transition: opacity .22s ease, transform .22s ease; }
+
+
+/* Desktop layout improvements */
+@media (min-width: 900px){
+  .splash .hero{
+    display:grid;
+    grid-template-columns: 1.6fr 1fr;
+    min-height: 420px;
+  }
+  .splash .hero img{
+    height: 100%;
+    object-fit: cover;
+  }
+  .splash .overlay{
+    display:none;
+  }
+  .splash .content{
+    position:relative;
+    left:auto; right:auto; bottom:auto;
+    padding: 18px;
+    align-items:flex-start;
+    justify-content:flex-start;
+    align-content:flex-start;
+    gap:14px;
+    background: rgba(11,11,14,.55);
+    border-left:1px solid var(--border);
+    height:100%;
+  }
+  .splash .title{
+    font-size: 32px;
+  }
+  .splash .tag{
+    font-size: 14px;
+    max-width: 32ch;
+  }
+  .splash .content > div:last-child{
+    margin-top:auto;
+  }
+  .topbar{
+    position: sticky;
+    top: 16px;
+    z-index: 5;
+  }
+}
+
+/* Very large screens */
+@media (min-width: 1200px){
+  .splash .hero{ min-height: 480px; }
+}
+
+
+/* Splash clickability fixes */
+.splash .hero{ position:relative; }
+.splash .hero img{ position:relative; z-index:0; }
+.splash .overlay{ z-index:1; pointer-events:none; }
+.splash .content{ z-index:2; pointer-events:auto; }
+
+
+/* Splash clickability hardening */
+.splash .hero{ position:relative; }
+.splash .overlay{ pointer-events:none; }
+.splash .content{ position:absolute; z-index:5; pointer-events:auto; }
+.splash button, .splash .linkbtn{ cursor:pointer; }
