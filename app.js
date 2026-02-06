@@ -1,5 +1,15 @@
 const STORAGE_PREFIX = "mechkawaii:";
 
+function heartIcon(filled){
+  const src = filled ? "./assets/pv.svg" : "./assets/pv_off.svg";
+  return `
+    <img src="${src}" class="heart" alt="PV" />
+  `;
+}
+
+
+
+
 function qs(sel){ return document.querySelector(sel); }
 function qsa(sel){ return [...document.querySelectorAll(sel)]; }
 
@@ -24,16 +34,6 @@ function setState(charId, state){
   localStorage.setItem(STORAGE_PREFIX + "state:" + charId, JSON.stringify(state));
 }
 
-function heartSvg(filled){
-  // Inline SVG so it works offline + no assets needed
-  const fill = filled ? "var(--accent)" : "rgba(255,255,255,.14)";
-  const stroke = filled ? "rgba(0,0,0,.25)" : "rgba(255,255,255,.20)";
-  return `
-  <svg class="heart" viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M12 21s-7.5-4.6-10-9.4C.3 8.2 2.2 5.2 5.4 4.5c1.9-.4 3.8.3 5 1.7 1.2-1.4 3.1-2.1 5-1.7 3.2.7 5.1 3.7 3.4 7.1C19.5 16.4 12 21 12 21z"
-      fill="${fill}" stroke="${stroke}" stroke-width="1.2" />
-  </svg>`;
-}
 
 async function loadCharacters(){
   const res = await fetch("./data/characters.json", {cache:"no-store"});
@@ -78,7 +78,7 @@ function renderHP(container, hpCur, hpMax){
   hearts.className = "hearts";
   for(let i=1;i<=hpMax;i++){
     const span = document.createElement("span");
-    span.innerHTML = heartSvg(i<=hpCur);
+    span.innerHTML = heartIcon(i<=hpCur);
     hearts.appendChild(span.firstElementChild);
   }
   container.appendChild(hearts);
@@ -223,6 +223,7 @@ async function initIndex(){
   }
 
   // --- Draft selection ---
+  const maxPick = (setup.mode === "single") ? 6 : 3;
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
   let draft = draftRaw ? JSON.parse(draftRaw) : null; // { activeIds: [] }
 
@@ -263,8 +264,8 @@ async function initIndex(){
         if(selected.has(c.id)){
           selected.delete(c.id);
         }else{
-          if(selected.size >= 3){
-            draftError.textContent = (lang === "fr") ? "Tu as déjà 3 persos sélectionnés." : "You already selected 3 characters.";
+          if(selected.size >= maxPick){
+            draftError.textContent = (lang === "fr") ? `Tu as déjà ${maxPick} persos sélectionnés.` : `You already selected ${maxPick} characters.`;
             return;
           }
           selected.add(c.id);
@@ -284,8 +285,8 @@ async function initIndex(){
     });
 
     qs("#confirmDraft")?.addEventListener("click", ()=>{
-      if(selected.size !== 3){
-        draftError.textContent = (lang === "fr") ? "Sélectionne exactement 3 persos." : "Select exactly 3 characters.";
+      if(selected.size !== maxPick){
+        draftError.textContent = (lang === "fr") ? `Sélectionne exactement ${maxPick} persos.` : `Select exactly ${maxPick} characters.`;
         return;
       }
       saveDraft({activeIds:[...selected]});
@@ -421,6 +422,22 @@ async function initCharacter(){
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
+
+  // Splash screen: show only once per device (stored locally)
+  const splash = document.getElementById("splash");
+  const played = localStorage.getItem(STORAGE_PREFIX + "played") === "1";
+  if(played && splash){
+    splash.remove();
+  }
+  const playBtn = document.getElementById("playBtn");
+  if(playBtn && splash && !played){
+    playBtn.addEventListener("click", ()=>{
+      localStorage.setItem(STORAGE_PREFIX + "played", "1");
+      splash.classList.add("fadeout");
+      setTimeout(()=>{ splash.remove(); }, 230);
+    });
+  }
+
   try{
     if(document.body.classList.contains("page-index")) await initIndex();
     if(document.body.classList.contains("page-character")) await initCharacter();
