@@ -434,3 +434,39 @@ button:active{transform: translateY(1px)}
 }
 .mkw-btn:hover{ filter: brightness(1.08); }
 .mkw-btn:active{ transform: translateY(1px); }
+
+
+/* --- Micro-animations (splash polish) --- */
+@keyframes mkw-float {
+  0%   { transform: translateY(0px) rotate(-2deg); }
+  50%  { transform: translateY(-6px) rotate(2deg); }
+  100% { transform: translateY(0px) rotate(-2deg); }
+}
+@keyframes mkw-glow {
+  0%   { filter: drop-shadow(0 0 0 rgba(255,79,216,0.0)) drop-shadow(0 0 0 rgba(255,181,107,0.0)); }
+  50%  { filter: drop-shadow(0 0 14px rgba(255,79,216,0.55)) drop-shadow(0 0 18px rgba(255,181,107,0.35)); }
+  100% { filter: drop-shadow(0 0 0 rgba(255,79,216,0.0)) drop-shadow(0 0 0 rgba(255,181,107,0.0)); }
+}
+
+/* Heart mascot: subtle float */
+.brand .mascot{
+  animation: mkw-float 2.8s ease-in-out infinite;
+  transform-origin: 50% 60%;
+}
+
+/* Play button: pulsing glow */
+#playBtn.mkw-btn{
+  animation: mkw-glow 1.8s ease-in-out infinite;
+}
+#playBtn.mkw-btn:hover{
+  animation-duration: 1.2s;
+}
+#playBtn.mkw-btn:active{
+  animation: none;
+  filter: drop-shadow(0 0 18px rgba(255,79,216,0.55));
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .brand .mascot, #playBtn.mkw-btn{ animation: none !important; }
+}

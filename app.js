@@ -1,5 +1,52 @@
 const STORAGE_PREFIX = "mechkawaii:";
 
+function playPressStart(){
+  try{
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const master = ctx.createGain();
+    master.gain.value = 0.12;
+    master.connect(ctx.destination);
+
+    const now = ctx.currentTime;
+
+    // Little “arcade” two-tone blip
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    osc1.type = "square";
+    osc2.type = "triangle";
+
+    const g1 = ctx.createGain();
+    const g2 = ctx.createGain();
+    g1.gain.setValueAtTime(0.0001, now);
+    g2.gain.setValueAtTime(0.0001, now);
+
+    osc1.frequency.setValueAtTime(660, now);
+    osc1.frequency.exponentialRampToValueAtTime(990, now + 0.06);
+
+    osc2.frequency.setValueAtTime(330, now);
+    osc2.frequency.exponentialRampToValueAtTime(440, now + 0.08);
+
+    g1.gain.exponentialRampToValueAtTime(0.9, now + 0.01);
+    g1.gain.exponentialRampToValueAtTime(0.0001, now + 0.10);
+
+    g2.gain.exponentialRampToValueAtTime(0.6, now + 0.01);
+    g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+    osc1.connect(g1); g1.connect(master);
+    osc2.connect(g2); g2.connect(master);
+
+    osc1.start(now); osc2.start(now);
+    osc1.stop(now + 0.12);
+    osc2.stop(now + 0.14);
+
+    // Close context after sound to avoid keeping audio running
+    setTimeout(()=>{ try{ ctx.close(); }catch(e){} }, 250);
+  }catch(e){}
+}
+
+
 function heartIcon(filled){
   const src = filled
     ? "./assets/pv.svg"
@@ -450,6 +497,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   const playBtn = document.getElementById("playBtn");
   if(playBtn){
     playBtn.addEventListener("click", ()=>{
+      playPressStart();
       hideSplash();
     });
   }
