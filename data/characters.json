@@ -1,72 +1,5 @@
 [
   {
-    "id": "johanna",
-    "name": {
-      "fr": "Johanna",
-      "en": "Johanna"
-    },
-    "class": {
-      "fr": "Grenadier",
-      "en": "Grenadier"
-    },
-    "hp": {
-      "max": 3
-    },
-    "texts": {
-      "class_action_title": {
-        "fr": "Action de classe",
-        "en": "Class Action"
-      },
-      "class_action_body": {
-        "fr": "Tes blobs, sa ligne de mire n'est jamais bloquée par un terrain infranchissable ou une unité.",
-        "en": "Your blob shots: line of sight is never blocked by impassable terrain or a unit."
-      },
-      "ultimate_title": {
-        "fr": "Coup unique : Correction de trajectoire",
-        "en": "Ultimate: Trajectory Correction"
-      },
-      "ultimate_body": {
-        "fr": "Une unité alliée au choix ne peut plus manquer ses tirs pour toute la partie. Les critiques restent applicables. Ce coup unique ne peut pas être remboursé.",
-        "en": "Choose an allied unit: it can no longer miss its shots for the rest of the game. Critical hits still apply. This ultimate cannot be refunded."
-      }
-    },
-    "toggles": [
-      {
-        "id": "abacus",
-        "label": {
-          "fr": "Boulier",
-          "en": "Abacus"
-        }
-      },
-      {
-        "id": "repair",
-        "label": {
-          "fr": "Réparer",
-          "en": "Repair"
-        }
-      },
-      {
-        "id": "protect",
-        "label": {
-          "fr": "Protéger",
-          "en": "Protect"
-        }
-      },
-      {
-        "id": "ultimate_used",
-        "label": {
-          "fr": "Coup unique utilisé",
-          "en": "Ultimate used"
-        }
-      }
-    ],
-    "images": {
-      "movement": "assets/patterns/johanna_movement.png",
-      "attack": "assets/patterns/johanna_attack.png"
-    },
-    "camp": "mechkawaii"
-  },
-  {
     "id": "banado",
     "name": {
       "fr": "Banado",
@@ -76,129 +9,35 @@
       "fr": "Technicien",
       "en": "Technician"
     },
+    "camp": "mechkawaii",
     "hp": {
       "max": 4
     },
-    "texts": {
-      "class_action_title": {
-        "fr": "Action de classe",
-        "en": "Class Action"
-      },
-      "class_action_body": {
-        "fr": "Crée un boulier infini qui ne compte pas dans le stock des trois boucliers de la partie.",
-        "en": "Create an infinite abacus that does not count toward the game’s pool of three shields."
-      },
-      "ultimate_title": {
-        "fr": "Coup unique : Cœur mécanique",
-        "en": "Ultimate: Mechanical Heart"
-      },
-      "ultimate_body": {
-        "fr": "Restaure 1 PV à tous les alliés sur un terrain adjacent au technicien, sans consommer de clés.",
-        "en": "Restore 1 HP to all allies on spaces adjacent to the Technician, without spending any keys."
-      }
-    },
-    "toggles": [
-      {
-        "id": "abacus",
-        "label": {
-          "fr": "Boulier",
-          "en": "Abacus"
-        }
-      },
-      {
-        "id": "repair",
-        "label": {
-          "fr": "Réparer",
-          "en": "Repair"
-        }
-      },
-      {
-        "id": "protect",
-        "label": {
-          "fr": "Protéger",
-          "en": "Protect"
-        }
-      },
-      {
-        "id": "ultimate_used",
-        "label": {
-          "fr": "Coup unique utilisé",
-          "en": "Ultimate used"
-        }
-      }
-    ],
     "images": {
-      "movement": "assets/patterns/banado_movement.png",
-      "attack": "assets/patterns/banado_attack.png"
-    },
-    "camp": "mechkawaii"
-  },
-  {
-    "id": "fuyu",
-    "name": {
-      "fr": "Fuyu",
-      "en": "Fuyu"
-    },
-    "class": {
-      "fr": "Pyrotechnicien",
-      "en": "Pyrotechnician"
-    },
-    "hp": {
-      "max": 3
+      "movement": "./assets/patterns/banado_movement_normal.png",
+      "attack": "./assets/patterns/banado_attack_normal.png",
+      "movement_expert": "./assets/patterns/banado_movement_expert.png",
+      "attack_expert": "./assets/patterns/banado_attack_expert.png"
     },
     "texts": {
       "class_action_title": {
-        "fr": "Action de classe",
-        "en": "Class Action"
+        "fr": "Action de classe : Technicien",
+        "en": "Class Action: Technician"
       },
       "class_action_body": {
-        "fr": "Tir simultanément sur les 3 terrains face à lui. Touche les alliés. Sur un tir manqué, subit 1 PV par recul de flamme.",
-        "en": "Shoot simultaneously at the 3 spaces in front of you (can hit allies). On a missed shot, take 1 HP from flame recoil."
+        "fr": "Description de l'action de classe du technicien.",
+        "en": "Technician class action description."
       },
       "ultimate_title": {
-        "fr": "Coup unique : Réveil enflammé",
-        "en": "Ultimate: Blazing Revival"
+        "fr": "Ultime",
+        "en": "Ultimate"
       },
       "ultimate_body": {
-        "fr": "De leurs cendres, il rallume l'étincelle. Tous les Mechkawaii H5 reviennent avec 2 PV et peuvent jouer immédiatement. Ce coup unique ne peut pas être remboursé.",
-        "en": "From their ashes, the spark returns. All H5 Mechkawaii come back with 2 HP and may act immediately. This ultimate cannot be refunded."
+        "fr": "Description de l'ultime de Banado.",
+        "en": "Banado's ultimate description."
       }
     },
-    "toggles": [
-      {
-        "id": "abacus",
-        "label": {
-          "fr": "Boulier",
-          "en": "Abacus"
-        }
-      },
-      {
-        "id": "repair",
-        "label": {
-          "fr": "Réparer",
-          "en": "Repair"
-        }
-      },
-      {
-        "id": "protect",
-        "label": {
-          "fr": "Protéger",
-          "en": "Protect"
-        }
-      },
-      {
-        "id": "ultimate_used",
-        "label": {
-          "fr": "Coup unique utilisé",
-          "en": "Ultimate used"
-        }
-      }
-    ],
-    "images": {
-      "movement": "assets/patterns/fuyu_movement.png",
-      "attack": "assets/patterns/fuyu_attack.png"
-    },
-    "camp": "mechkawaii"
+    "toggles": []
   },
   {
     "id": "meimei",
@@ -210,62 +49,75 @@
       "fr": "Éclaireur",
       "en": "Scout"
     },
+    "camp": "mechkawaii",
     "hp": {
       "max": 3
     },
+    "images": {
+      "movement": "./assets/patterns/meimei_movement_normal.png",
+      "attack": "./assets/patterns/meimei_attack_normal.png",
+      "movement_expert": "./assets/patterns/meimei_movement_expert.png",
+      "attack_expert": "./assets/patterns/meimei_attack_expert.png"
+    },
     "texts": {
       "class_action_title": {
-        "fr": "Action de classe",
-        "en": "Class Action"
+        "fr": "Action de classe : Éclaireur",
+        "en": "Class Action: Scout"
       },
       "class_action_body": {
-        "fr": "Contrairement aux autres classes, cette unité rapide comme l'éclair peut se déplacer deux fois durant son tour.",
-        "en": "Unlike other classes, this lightning-fast unit may move twice on its turn."
+        "fr": "Description de l'action de classe de l'éclaireur.",
+        "en": "Scout class action description."
       },
       "ultimate_title": {
-        "fr": "Coup unique : Disruption visuelle",
-        "en": "Ultimate: Visual Disruption"
+        "fr": "Ultime",
+        "en": "Ultimate"
       },
       "ultimate_body": {
-        "fr": "Rend invisible tous les Mechkawaii pendant 1 tour. Les unités invisibles ne peuvent pas être prises pour cible.",
-        "en": "All Mechkawaii become invisible for 1 turn. Invisible units cannot be targeted."
+        "fr": "Description de l'ultime de Meimei.",
+        "en": "Meimei's ultimate description."
       }
     },
-    "toggles": [
-      {
-        "id": "abacus",
-        "label": {
-          "fr": "Boulier",
-          "en": "Abacus"
-        }
-      },
-      {
-        "id": "repair",
-        "label": {
-          "fr": "Réparer",
-          "en": "Repair"
-        }
-      },
-      {
-        "id": "protect",
-        "label": {
-          "fr": "Protéger",
-          "en": "Protect"
-        }
-      },
-      {
-        "id": "ultimate_used",
-        "label": {
-          "fr": "Coup unique utilisé",
-          "en": "Ultimate used"
-        }
-      }
-    ],
+    "toggles": []
+  },
+  {
+    "id": "johanna",
+    "name": {
+      "fr": "Johanna",
+      "en": "Johanna"
+    },
+    "class": {
+      "fr": "Grenadier",
+      "en": "Grenadier"
+    },
+    "camp": "mechkawaii",
+    "hp": {
+      "max": 3
+    },
     "images": {
-      "movement": "assets/patterns/meimei_movement.png",
-      "attack": "assets/patterns/meimei_attack.png"
+      "movement": "./assets/patterns/johanna_movement_normal.png",
+      "attack": "./assets/patterns/johanna_attack_normal.png",
+      "movement_expert": "./assets/patterns/johanna_movement_expert.png",
+      "attack_expert": "./assets/patterns/johanna_attack_expert.png"
     },
-    "camp": "mechkawaii"
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Grenadier",
+        "en": "Class Action: Grenadier"
+      },
+      "class_action_body": {
+        "fr": "Description de l'action de classe du grenadier.",
+        "en": "Grenadier class action description."
+      },
+      "ultimate_title": {
+        "fr": "Ultime",
+        "en": "Ultimate"
+      },
+      "ultimate_body": {
+        "fr": "Description de l'ultime de Johanna.",
+        "en": "Johanna's ultimate description."
+      }
+    },
+    "toggles": []
   },
   {
     "id": "yamabato",
@@ -277,196 +129,75 @@
       "fr": "Voltigeur",
       "en": "Skirmisher"
     },
+    "camp": "mechkawaii",
     "hp": {
       "max": 2
     },
+    "images": {
+      "movement": "./assets/patterns/yamabato_movement_normal.png",
+      "attack": "./assets/patterns/yamabato_attack_normal.png",
+      "movement_expert": "./assets/patterns/yamabato_movement_expert.png",
+      "attack_expert": "./assets/patterns/yamabato_attack_expert.png"
+    },
     "texts": {
       "class_action_title": {
-        "fr": "Action de classe",
-        "en": "Class Action"
+        "fr": "Action de classe : Voltigeur",
+        "en": "Class Action: Skirmisher"
       },
       "class_action_body": {
-        "fr": "Ignore les terrains infranchissables et les unités pour ses déplacements. Ne subit pas les terrains accidentés.",
-        "en": "Ignore impassable terrain and units while moving. Does not suffer from rough terrain."
+        "fr": "Description de l'action de classe du voltigeur.",
+        "en": "Skirmisher class action description."
       },
       "ultimate_title": {
-        "fr": "Coup unique : Tempête de tir",
-        "en": "Ultimate: Firing Storm"
+        "fr": "Ultime",
+        "en": "Ultimate"
       },
       "ultimate_body": {
-        "fr": "Tous les Mechkawaii ailés peuvent tirer une fois gratuitement ce tour.",
-        "en": "All winged Mechkawaii may take one free shot this turn."
+        "fr": "Description de l'ultime de Yamabato.",
+        "en": "Yamabato's ultimate description."
       }
     },
-    "toggles": [
-      {
-        "id": "abacus",
-        "label": {
-          "fr": "Boulier",
-          "en": "Abacus"
-        }
-      },
-      {
-        "id": "repair",
-        "label": {
-          "fr": "Réparer",
-          "en": "Repair"
-        }
-      },
-      {
-        "id": "protect",
-        "label": {
-          "fr": "Protéger",
-          "en": "Protect"
-        }
-      },
-      {
-        "id": "ultimate_used",
-        "label": {
-          "fr": "Coup unique utilisé",
-          "en": "Ultimate used"
-        }
-      }
-    ],
-    "images": {
-      "movement": "assets/patterns/yamabato_movement.png",
-      "attack": "assets/patterns/yamabato_attack.png"
-    },
-    "camp": "mechkawaii"
+    "toggles": []
   },
   {
-    "id": "goryo",
+    "id": "fuyu",
     "name": {
-      "fr": "Goryo",
-      "en": "Goryo"
+      "fr": "Fuyu",
+      "en": "Fuyu"
     },
     "class": {
-      "fr": "Grenadier",
-      "en": "Grenadier"
+      "fr": "Pyrotechnicien",
+      "en": "Pyrotechnician"
     },
+    "camp": "mechkawaii",
     "hp": {
       "max": 3
     },
-    "texts": {
-      "class_action_title": {
-        "fr": "Action de classe",
-        "en": "Class Action"
-      },
-      "class_action_body": {
-        "fr": "Tes blobs, sa ligne de mire n'est jamais bloquée par un terrain infranchissable ou une unité.",
-        "en": "Your blob shots: line of sight is never blocked by impassable terrain or a unit."
-      },
-      "ultimate_title": {
-        "fr": "Coup unique : Rayon orbital",
-        "en": "Ultimate: Orbital Beam"
-      },
-      "ultimate_body": {
-        "fr": "Après un jet de dé de tir réussi, cette unité inflige H5 à une unité ennemie. Les boucliers sont ignorés. Ce coup unique ne peut pas être remboursé.",
-        "en": "After a successful shot roll, this unit deals H5 to an enemy unit. Shields are ignored. This ultimate cannot be refunded."
-      }
-    },
-    "toggles": [
-      {
-        "id": "abacus",
-        "label": {
-          "fr": "Boulier",
-          "en": "Abacus"
-        }
-      },
-      {
-        "id": "repair",
-        "label": {
-          "fr": "Réparer",
-          "en": "Repair"
-        }
-      },
-      {
-        "id": "protect",
-        "label": {
-          "fr": "Protéger",
-          "en": "Protect"
-        }
-      },
-      {
-        "id": "ultimate_used",
-        "label": {
-          "fr": "Coup unique utilisé",
-          "en": "Ultimate used"
-        }
-      }
-    ],
     "images": {
-      "movement": "assets/patterns/goryo_movement.png",
-      "attack": "assets/patterns/goryo_attack.png"
-    },
-    "camp": "prodrome"
-  },
-  {
-    "id": "genbu",
-    "name": {
-      "fr": "Genbu",
-      "en": "Genbu"
-    },
-    "class": {
-      "fr": "Technicien",
-      "en": "Technician"
-    },
-    "hp": {
-      "max": 4
+      "movement": "./assets/patterns/fuyu_movement_normal.png",
+      "attack": "./assets/patterns/fuyu_attack_normal.png",
+      "movement_expert": "./assets/patterns/fuyu_movement_expert.png",
+      "attack_expert": "./assets/patterns/fuyu_attack_expert.png"
     },
     "texts": {
       "class_action_title": {
-        "fr": "Action de classe",
-        "en": "Class Action"
+        "fr": "Action de classe : Pyrotechnicien",
+        "en": "Class Action: Pyrotechnician"
       },
       "class_action_body": {
-        "fr": "Crée un boulier infini qui ne compte pas dans le stock des trois boucliers de la partie.",
-        "en": "Create an infinite abacus that does not count toward the game’s pool of three shields."
+        "fr": "Description de l'action de classe du pyrotechnicien.",
+        "en": "Pyrotechnician class action description."
       },
       "ultimate_title": {
-        "fr": "Coup unique : Regard laser",
-        "en": "Ultimate: Laser Stare"
+        "fr": "Ultime",
+        "en": "Ultimate"
       },
       "ultimate_body": {
-        "fr": "Les résultats de dé critiques font perdre un seul PV. Applicable sur une unité adverse durant toute la partie. Ce coup unique ne peut pas être remboursé.",
-        "en": "Critical die results only make you lose 1 HP. Applies to one enemy unit for the rest of the game. This ultimate cannot be refunded."
+        "fr": "Description de l'ultime de Fuyu.",
+        "en": "Fuyu's ultimate description."
       }
     },
-    "toggles": [
-      {
-        "id": "abacus",
-        "label": {
-          "fr": "Boulier",
-          "en": "Abacus"
-        }
-      },
-      {
-        "id": "repair",
-        "label": {
-          "fr": "Réparer",
-          "en": "Repair"
-        }
-      },
-      {
-        "id": "protect",
-        "label": {
-          "fr": "Protéger",
-          "en": "Protect"
-        }
-      },
-      {
-        "id": "ultimate_used",
-        "label": {
-          "fr": "Coup unique utilisé",
-          "en": "Ultimate used"
-        }
-      }
-    ],
-    "images": {
-      "movement": "assets/patterns/genbu_movement.png",
-      "attack": "assets/patterns/genbu_attack.png"
-    },
-    "camp": "prodrome"
+    "toggles": []
   },
   {
     "id": "goki",
@@ -478,129 +209,75 @@
       "fr": "Pyrotechnicien",
       "en": "Pyrotechnician"
     },
+    "camp": "prodrome",
     "hp": {
       "max": 3
     },
+    "images": {
+      "movement": "./assets/patterns/goki_movement_normal.png",
+      "attack": "./assets/patterns/goki_attack_normal.png",
+      "movement_expert": "./assets/patterns/goki_movement_expert.png",
+      "attack_expert": "./assets/patterns/goki_attack_expert.png"
+    },
     "texts": {
       "class_action_title": {
-        "fr": "Action de classe",
-        "en": "Class Action"
+        "fr": "Action de classe : Pyrotechnicien",
+        "en": "Class Action: Pyrotechnician"
       },
       "class_action_body": {
-        "fr": "Tir simultanément sur les 3 terrains face à lui. Touche les alliés. Sur un tir manqué, subit 1 PV par recul de flamme.",
-        "en": "Shoot simultaneously at the 3 spaces in front of you (can hit allies). On a missed shot, take 1 HP from flame recoil."
+        "fr": "Description de l'action de classe du pyrotechnicien.",
+        "en": "Pyrotechnician class action description."
       },
       "ultimate_title": {
-        "fr": "Coup unique : Poings corrosifs",
-        "en": "Ultimate: Corrosive Fists"
+        "fr": "Ultime",
+        "en": "Ultimate"
       },
       "ultimate_body": {
-        "fr": "Sur une unité alliée, jusqu'à la fin de la partie, ses attaques de mêlée infligent 2 PV même sur les résultats de dé simple. Ce coup unique ne peut pas être remboursé.",
-        "en": "Choose an allied unit: until end of game, its melee attacks deal 2 HP damage even on basic die results. This ultimate cannot be refunded."
+        "fr": "Description de l'ultime de Goki.",
+        "en": "Goki's ultimate description."
       }
     },
-    "toggles": [
-      {
-        "id": "abacus",
-        "label": {
-          "fr": "Boulier",
-          "en": "Abacus"
-        }
-      },
-      {
-        "id": "repair",
-        "label": {
-          "fr": "Réparer",
-          "en": "Repair"
-        }
-      },
-      {
-        "id": "protect",
-        "label": {
-          "fr": "Protéger",
-          "en": "Protect"
-        }
-      },
-      {
-        "id": "ultimate_used",
-        "label": {
-          "fr": "Coup unique utilisé",
-          "en": "Ultimate used"
-        }
-      }
-    ],
-    "images": {
-      "movement": "assets/patterns/goki_movement.png",
-      "attack": "assets/patterns/goki_attack.png"
-    },
-    "camp": "prodrome"
+    "toggles": []
   },
   {
-    "id": "gaoro",
+    "id": "goryo",
     "name": {
-      "fr": "Gaoro",
-      "en": "Gaoro"
+      "fr": "Goryo",
+      "en": "Goryo"
     },
     "class": {
-      "fr": "Éclaireur",
-      "en": "Scout"
+      "fr": "Grenadier",
+      "en": "Grenadier"
     },
+    "camp": "prodrome",
     "hp": {
       "max": 3
     },
+    "images": {
+      "movement": "./assets/patterns/goryo_movement_normal.png",
+      "attack": "./assets/patterns/goryo_attack_normal.png",
+      "movement_expert": "./assets/patterns/goryo_movement_expert.png",
+      "attack_expert": "./assets/patterns/goryo_attack_expert.png"
+    },
     "texts": {
       "class_action_title": {
-        "fr": "Action de classe",
-        "en": "Class Action"
+        "fr": "Action de classe : Grenadier",
+        "en": "Class Action: Grenadier"
       },
       "class_action_body": {
-        "fr": "Contrairement aux autres classes, cette unité rapide comme l'éclair peut se déplacer deux fois durant son tour.",
-        "en": "Unlike other classes, this lightning-fast unit may move twice on its turn."
+        "fr": "Description de l'action de classe du grenadier.",
+        "en": "Grenadier class action description."
       },
       "ultimate_title": {
-        "fr": "Coup unique : Ruée tactique",
-        "en": "Ultimate: Tactical Rush"
+        "fr": "Ultime",
+        "en": "Ultimate"
       },
       "ultimate_body": {
-        "fr": "L'éclaireur ouvre la voie. Chaque unité alliée peut se déplacer gratuitement ce tour.",
-        "en": "The Scout opens the way. Each allied unit may move once for free this turn."
+        "fr": "Description de l'ultime de Goryo.",
+        "en": "Goryo's ultimate description."
       }
     },
-    "toggles": [
-      {
-        "id": "abacus",
-        "label": {
-          "fr": "Boulier",
-          "en": "Abacus"
-        }
-      },
-      {
-        "id": "repair",
-        "label": {
-          "fr": "Réparer",
-          "en": "Repair"
-        }
-      },
-      {
-        "id": "protect",
-        "label": {
-          "fr": "Protéger",
-          "en": "Protect"
-        }
-      },
-      {
-        "id": "ultimate_used",
-        "label": {
-          "fr": "Coup unique utilisé",
-          "en": "Ultimate used"
-        }
-      }
-    ],
-    "images": {
-      "movement": "assets/patterns/gaoro_movement.png",
-      "attack": "assets/patterns/gaoro_attack.png"
-    },
-    "camp": "prodrome"
+    "toggles": []
   },
   {
     "id": "gyuki",
@@ -612,61 +289,114 @@
       "fr": "Voltigeur",
       "en": "Skirmisher"
     },
+    "camp": "prodrome",
     "hp": {
       "max": 2
     },
+    "images": {
+      "movement": "./assets/patterns/gyuki_movement_normal.png",
+      "attack": "./assets/patterns/gyuki_attack_normal.png",
+      "movement_expert": "./assets/patterns/gyuki_movement_expert.png",
+      "attack_expert": "./assets/patterns/gyuki_attack_expert.png"
+    },
     "texts": {
       "class_action_title": {
-        "fr": "Action de classe",
-        "en": "Class Action"
+        "fr": "Action de classe : Voltigeur",
+        "en": "Class Action: Skirmisher"
       },
       "class_action_body": {
-        "fr": "Ignore les terrains infranchissables et les unités pour ses déplacements. Ne subit pas les terrains accidentés.",
-        "en": "Ignore impassable terrain and units while moving. Does not suffer from rough terrain."
+        "fr": "Description de l'action de classe du voltigeur.",
+        "en": "Skirmisher class action description."
       },
       "ultimate_title": {
-        "fr": "Coup unique : Détonation ionique",
-        "en": "Ultimate: Ionic Detonation"
+        "fr": "Ultime",
+        "en": "Ultimate"
       },
       "ultimate_body": {
-        "fr": "Déclenche une onde explosive. Soufflés par la détonation, les ennemis sont déplacés sur une case adjacente à leur position.",
-        "en": "Trigger an explosive shockwave. Blasted by the detonation, enemies are pushed to an adjacent space."
+        "fr": "Description de l'ultime de Gyuki.",
+        "en": "Gyuki's ultimate description."
       }
     },
-    "toggles": [
-      {
-        "id": "abacus",
-        "label": {
-          "fr": "Boulier",
-          "en": "Abacus"
-        }
-      },
-      {
-        "id": "repair",
-        "label": {
-          "fr": "Réparer",
-          "en": "Repair"
-        }
-      },
-      {
-        "id": "protect",
-        "label": {
-          "fr": "Protéger",
-          "en": "Protect"
-        }
-      },
-      {
-        "id": "ultimate_used",
-        "label": {
-          "fr": "Coup unique utilisé",
-          "en": "Ultimate used"
-        }
-      }
-    ],
+    "toggles": []
+  },
+  {
+    "id": "gaoro",
+    "name": {
+      "fr": "Gaoro",
+      "en": "Gaoro"
+    },
+    "class": {
+      "fr": "Éclaireur",
+      "en": "Scout"
+    },
+    "camp": "prodrome",
+    "hp": {
+      "max": 2
+    },
     "images": {
-      "movement": "assets/patterns/gyuki_movement.png",
-      "attack": "assets/patterns/gyuki_attack.png"
+      "movement": "./assets/patterns/gaoro_movement_normal.png",
+      "attack": "./assets/patterns/gaoro_attack_normal.png",
+      "movement_expert": "./assets/patterns/gaoro_movement_expert.png",
+      "attack_expert": "./assets/patterns/gaoro_attack_expert.png"
     },
-    "camp": "prodrome"
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Éclaireur",
+        "en": "Class Action: Scout"
+      },
+      "class_action_body": {
+        "fr": "Description de l'action de classe de l'éclaireur.",
+        "en": "Scout class action description."
+      },
+      "ultimate_title": {
+        "fr": "Ultime",
+        "en": "Ultimate"
+      },
+      "ultimate_body": {
+        "fr": "Description de l'ultime de Gaoro.",
+        "en": "Gaoro's ultimate description."
+      }
+    },
+    "toggles": []
+  },
+  {
+    "id": "genbu",
+    "name": {
+      "fr": "Genbu",
+      "en": "Genbu"
+    },
+    "class": {
+      "fr": "Technicien",
+      "en": "Technician"
+    },
+    "camp": "prodrome",
+    "hp": {
+      "max": 4
+    },
+    "images": {
+      "movement": "./assets/patterns/genbu_movement_normal.png",
+      "attack": "./assets/patterns/genbu_attack_normal.png",
+      "movement_expert": "./assets/patterns/genbu_movement_expert.png",
+      "attack_expert": "./assets/patterns/genbu_attack_expert.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Technicien",
+        "en": "Class Action: Technician"
+      },
+      "class_action_body": {
+        "fr": "Description de l'action de classe du technicien.",
+        "en": "Technician class action description."
+      },
+      "ultimate_title": {
+        "fr": "Ultime",
+        "en": "Ultimate"
+      },
+      "ultimate_body": {
+        "fr": "Description de l'ultime de Genbu.",
+        "en": "Genbu's ultimate description."
+      }
+    },
+    "toggles": []
   }
 ]
