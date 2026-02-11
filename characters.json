@@ -1,0 +1,402 @@
+[
+  {
+    "id": "banado",
+    "name": {
+      "fr": "Banado",
+      "en": "Banado"
+    },
+    "class": {
+      "fr": "Technicien",
+      "en": "Technician"
+    },
+    "camp": "mechkawaii",
+    "hp": {
+      "max": 4
+    },
+    "images": {
+      "movement": "./assets/patterns/banado_movement_normal.png",
+      "attack": "./assets/patterns/banado_attack_normal.png",
+      "movement_expert": "./assets/patterns/banado_movement_expert.png",
+      "attack_expert": "./assets/patterns/banado_attack_expert.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Technicien",
+        "en": "Class Action: Technician"
+      },
+      "class_action_body": {
+        "fr": "Description de l'action de classe du technicien.",
+        "en": "Technician class action description."
+      },
+      "ultimate_title": {
+        "fr": "Ultime",
+        "en": "Ultimate"
+      },
+      "ultimate_body": {
+        "fr": "Description de l'ultime de Banado.",
+        "en": "Banado's ultimate description."
+      }
+    },
+    "toggles": []
+  },
+  {
+    "id": "meimei",
+    "name": {
+      "fr": "Meimei",
+      "en": "Meimei"
+    },
+    "class": {
+      "fr": "Éclaireur",
+      "en": "Scout"
+    },
+    "camp": "mechkawaii",
+    "hp": {
+      "max": 3
+    },
+    "images": {
+      "movement": "./assets/patterns/meimei_movement_normal.png",
+      "attack": "./assets/patterns/meimei_attack_normal.png",
+      "movement_expert": "./assets/patterns/meimei_movement_expert.png",
+      "attack_expert": "./assets/patterns/meimei_attack_expert.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Éclaireur",
+        "en": "Class Action: Scout"
+      },
+      "class_action_body": {
+        "fr": "Description de l'action de classe de l'éclaireur.",
+        "en": "Scout class action description."
+      },
+      "ultimate_title": {
+        "fr": "Ultime",
+        "en": "Ultimate"
+      },
+      "ultimate_body": {
+        "fr": "Description de l'ultime de Meimei.",
+        "en": "Meimei's ultimate description."
+      }
+    },
+    "toggles": []
+  },
+  {
+    "id": "johanna",
+    "name": {
+      "fr": "Johanna",
+      "en": "Johanna"
+    },
+    "class": {
+      "fr": "Grenadier",
+      "en": "Grenadier"
+    },
+    "camp": "mechkawaii",
+    "hp": {
+      "max": 3
+    },
+    "images": {
+      "movement": "./assets/patterns/johanna_movement_normal.png",
+      "attack": "./assets/patterns/johanna_attack_normal.png",
+      "movement_expert": "./assets/patterns/johanna_movement_expert.png",
+      "attack_expert": "./assets/patterns/johanna_attack_expert.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Grenadier",
+        "en": "Class Action: Grenadier"
+      },
+      "class_action_body": {
+        "fr": "Description de l'action de classe du grenadier.",
+        "en": "Grenadier class action description."
+      },
+      "ultimate_title": {
+        "fr": "Ultime",
+        "en": "Ultimate"
+      },
+      "ultimate_body": {
+        "fr": "Description de l'ultime de Johanna.",
+        "en": "Johanna's ultimate description."
+      }
+    },
+    "toggles": []
+  },
+  {
+    "id": "yamabato",
+    "name": {
+      "fr": "Yamabato",
+      "en": "Yamabato"
+    },
+    "class": {
+      "fr": "Voltigeur",
+      "en": "Skirmisher"
+    },
+    "camp": "mechkawaii",
+    "hp": {
+      "max": 2
+    },
+    "images": {
+      "movement": "./assets/patterns/yamabato_movement_normal.png",
+      "attack": "./assets/patterns/yamabato_attack_normal.png",
+      "movement_expert": "./assets/patterns/yamabato_movement_expert.png",
+      "attack_expert": "./assets/patterns/yamabato_attack_expert.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Voltigeur",
+        "en": "Class Action: Skirmisher"
+      },
+      "class_action_body": {
+        "fr": "Description de l'action de classe du voltigeur.",
+        "en": "Skirmisher class action description."
+      },
+      "ultimate_title": {
+        "fr": "Ultime",
+        "en": "Ultimate"
+      },
+      "ultimate_body": {
+        "fr": "Description de l'ultime de Yamabato.",
+        "en": "Yamabato's ultimate description."
+      }
+    },
+    "toggles": []
+  },
+  {
+    "id": "fuyu",
+    "name": {
+      "fr": "Fuyu",
+      "en": "Fuyu"
+    },
+    "class": {
+      "fr": "Pyrotechnicien",
+      "en": "Pyrotechnician"
+    },
+    "camp": "mechkawaii",
+    "hp": {
+      "max": 3
+    },
+    "images": {
+      "movement": "./assets/patterns/fuyu_movement_normal.png",
+      "attack": "./assets/patterns/fuyu_attack_normal.png",
+      "movement_expert": "./assets/patterns/fuyu_movement_expert.png",
+      "attack_expert": "./assets/patterns/fuyu_attack_expert.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Pyrotechnicien",
+        "en": "Class Action: Pyrotechnician"
+      },
+      "class_action_body": {
+        "fr": "Description de l'action de classe du pyrotechnicien.",
+        "en": "Pyrotechnician class action description."
+      },
+      "ultimate_title": {
+        "fr": "Ultime",
+        "en": "Ultimate"
+      },
+      "ultimate_body": {
+        "fr": "Description de l'ultime de Fuyu.",
+        "en": "Fuyu's ultimate description."
+      }
+    },
+    "toggles": []
+  },
+  {
+    "id": "goki",
+    "name": {
+      "fr": "Goki",
+      "en": "Goki"
+    },
+    "class": {
+      "fr": "Pyrotechnicien",
+      "en": "Pyrotechnician"
+    },
+    "camp": "prodrome",
+    "hp": {
+      "max": 3
+    },
+    "images": {
+      "movement": "./assets/patterns/goki_movement_normal.png",
+      "attack": "./assets/patterns/goki_attack_normal.png",
+      "movement_expert": "./assets/patterns/goki_movement_expert.png",
+      "attack_expert": "./assets/patterns/goki_attack_expert.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Pyrotechnicien",
+        "en": "Class Action: Pyrotechnician"
+      },
+      "class_action_body": {
+        "fr": "Description de l'action de classe du pyrotechnicien.",
+        "en": "Pyrotechnician class action description."
+      },
+      "ultimate_title": {
+        "fr": "Ultime",
+        "en": "Ultimate"
+      },
+      "ultimate_body": {
+        "fr": "Description de l'ultime de Goki.",
+        "en": "Goki's ultimate description."
+      }
+    },
+    "toggles": []
+  },
+  {
+    "id": "goryo",
+    "name": {
+      "fr": "Goryo",
+      "en": "Goryo"
+    },
+    "class": {
+      "fr": "Grenadier",
+      "en": "Grenadier"
+    },
+    "camp": "prodrome",
+    "hp": {
+      "max": 3
+    },
+    "images": {
+      "movement": "./assets/patterns/goryo_movement_normal.png",
+      "attack": "./assets/patterns/goryo_attack_normal.png",
+      "movement_expert": "./assets/patterns/goryo_movement_expert.png",
+      "attack_expert": "./assets/patterns/goryo_attack_expert.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Grenadier",
+        "en": "Class Action: Grenadier"
+      },
+      "class_action_body": {
+        "fr": "Description de l'action de classe du grenadier.",
+        "en": "Grenadier class action description."
+      },
+      "ultimate_title": {
+        "fr": "Ultime",
+        "en": "Ultimate"
+      },
+      "ultimate_body": {
+        "fr": "Description de l'ultime de Goryo.",
+        "en": "Goryo's ultimate description."
+      }
+    },
+    "toggles": []
+  },
+  {
+    "id": "gyuki",
+    "name": {
+      "fr": "Gyuki",
+      "en": "Gyuki"
+    },
+    "class": {
+      "fr": "Voltigeur",
+      "en": "Skirmisher"
+    },
+    "camp": "prodrome",
+    "hp": {
+      "max": 2
+    },
+    "images": {
+      "movement": "./assets/patterns/gyuki_movement_normal.png",
+      "attack": "./assets/patterns/gyuki_attack_normal.png",
+      "movement_expert": "./assets/patterns/gyuki_movement_expert.png",
+      "attack_expert": "./assets/patterns/gyuki_attack_expert.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Voltigeur",
+        "en": "Class Action: Skirmisher"
+      },
+      "class_action_body": {
+        "fr": "Description de l'action de classe du voltigeur.",
+        "en": "Skirmisher class action description."
+      },
+      "ultimate_title": {
+        "fr": "Ultime",
+        "en": "Ultimate"
+      },
+      "ultimate_body": {
+        "fr": "Description de l'ultime de Gyuki.",
+        "en": "Gyuki's ultimate description."
+      }
+    },
+    "toggles": []
+  },
+  {
+    "id": "gaoro",
+    "name": {
+      "fr": "Gaoro",
+      "en": "Gaoro"
+    },
+    "class": {
+      "fr": "Éclaireur",
+      "en": "Scout"
+    },
+    "camp": "prodrome",
+    "hp": {
+      "max": 2
+    },
+    "images": {
+      "movement": "./assets/patterns/gaoro_movement_normal.png",
+      "attack": "./assets/patterns/gaoro_attack_normal.png",
+      "movement_expert": "./assets/patterns/gaoro_movement_expert.png",
+      "attack_expert": "./assets/patterns/gaoro_attack_expert.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Éclaireur",
+        "en": "Class Action: Scout"
+      },
+      "class_action_body": {
+        "fr": "Description de l'action de classe de l'éclaireur.",
+        "en": "Scout class action description."
+      },
+      "ultimate_title": {
+        "fr": "Ultime",
+        "en": "Ultimate"
+      },
+      "ultimate_body": {
+        "fr": "Description de l'ultime de Gaoro.",
+        "en": "Gaoro's ultimate description."
+      }
+    },
+    "toggles": []
+  },
+  {
+    "id": "genbu",
+    "name": {
+      "fr": "Genbu",
+      "en": "Genbu"
+    },
+    "class": {
+      "fr": "Technicien",
+      "en": "Technician"
+    },
+    "camp": "prodrome",
+    "hp": {
+      "max": 4
+    },
+    "images": {
+      "movement": "./assets/patterns/genbu_movement_normal.png",
+      "attack": "./assets/patterns/genbu_attack_normal.png",
+      "movement_expert": "./assets/patterns/genbu_movement_expert.png",
+      "attack_expert": "./assets/patterns/genbu_attack_expert.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Technicien",
+        "en": "Class Action: Technician"
+      },
+      "class_action_body": {
+        "fr": "Description de l'action de classe du technicien.",
+        "en": "Technician class action description."
+      },
+      "ultimate_title": {
+        "fr": "Ultime",
+        "en": "Ultimate"
+      },
+      "ultimate_body": {
+        "fr": "Description de l'ultime de Genbu.",
+        "en": "Genbu's ultimate description."
+      }
+    },
+    "toggles": []
+  }
+]
