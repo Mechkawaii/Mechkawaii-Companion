@@ -479,6 +479,7 @@ button:focus-visible {
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 12px;
   margin-top: var(--space-lg);
+  justify-items: center;
 }
 
 .char {
@@ -491,6 +492,8 @@ button:focus-visible {
   box-shadow: var(--shadow-sm);
   transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
+  width: 100%;
+  max-width: 280px;
 }
 
 .char:hover {
@@ -578,7 +581,7 @@ button:focus-visible {
 }
 
 .brand-stack .mascot {
-  width: clamp(200px, 60vw, 180px);
+  width: clamp(140px, 35vw, 180px);
   height: auto;
   filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.35));
 }
