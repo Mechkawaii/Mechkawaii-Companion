@@ -437,11 +437,15 @@ async function initCharacter(){
     state.hp = clamp(state.hp - 1, 0, c.hp?.max ?? 0);
     setState(c.id, state);
     refreshHP();
+    // Mettre à jour le tab aussi
+    updateTabHP(c.id, state.hp);
   });
   qs("#hpPlus").addEventListener("click", ()=>{
     state.hp = clamp(state.hp + 1, 0, c.hp?.max ?? 0);
     setState(c.id, state);
     refreshHP();
+    // Mettre à jour le tab aussi
+    updateTabHP(c.id, state.hp);
   });
 
   refreshHP();
@@ -481,6 +485,11 @@ async function initCharacter(){
 
   // Back
   qs("#backBtn").addEventListener("click", ()=>{ location.href = "./index.html"; });
+
+  // ========================================
+  // ONGLETS DES AUTRES UNITÉS
+  // ========================================
+  initUnitTabs(id, chars, lang);
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
@@ -536,3 +545,134 @@ document.addEventListener("DOMContentLoaded", async ()=>{
     if(err) err.textContent = "Erreur de chargement. Vérifie que le site est servi via un lien web (pas en ouvrant le fichier localement).";
   }
 });
+
+// ========================================
+// SYSTÈME D'ONGLETS DES UNITÉS
+// ========================================
+
+function initUnitTabs(currentCharId, allChars, lang){
+  const tabsContainer = qs("#unitTabs");
+  const unitTabsWrapper = qs(".unit-tabs-container");
+  
+  if(!tabsContainer || !unitTabsWrapper) {
+    console.warn('Containers de tabs non trouvés');
+    return;
+  }
+
+  // Récupérer le setup et le draft
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
+  
+  if(!setupRaw || !draftRaw) return;
+  
+  const setup = JSON.parse(setupRaw);
+  const draft = JSON.parse(draftRaw);
+  
+  // Déterminer quels personnages afficher dans les tabs
+  let tabCharacters = [];
+  
+  if(setup.mode === "single"){
+    // Mode table: afficher les 5 AUTRES personnages (pas celui actuellement affiché)
+    if(Array.isArray(draft.activeIds) && draft.activeIds.length){
+      tabCharacters = allChars.filter(c => 
+        draft.activeIds.includes(c.id) && c.id !== currentCharId
+      );
+    }
+  } else {
+    // Mode multi-appareils: afficher les 2 AUTRES du même camp
+    const currentCamp = setup.camp || "mechkawaii";
+    if(Array.isArray(draft.activeIds) && draft.activeIds.length){
+      tabCharacters = allChars.filter(c => 
+        draft.activeIds.includes(c.id) && 
+        c.id !== currentCharId &&
+        (c.camp || "mechkawaii") === currentCamp
+      );
+    }
+  }
+
+  // Si pas d'autres personnages, cacher les tabs
+  if(tabCharacters.length === 0){
+    unitTabsWrapper.classList.remove('visible');
+    document.body.classList.remove('tabs-visible');
+    return;
+  }
+
+  // Afficher la barre de tabs
+  unitTabsWrapper.classList.add('visible');
+  document.body.classList.add('tabs-visible');
+
+  // Générer les tabs
+  tabsContainer.innerHTML = '';
+  tabCharacters.forEach(char => {
+    const tab = createCharacterTab(char, lang);
+    tabsContainer.appendChild(tab);
+  });
+}
+
+function createCharacterTab(char, lang){
+  const tab = document.createElement('div');
+  tab.className = 'unit-tab';
+  tab.dataset.charId = char.id;
+
+  // Récupérer les HP sauvegardés
+  const saved = getState(char.id);
+  const hp = saved?.hp ?? (char.hp?.max ?? 0);
+  const maxHp = char.hp?.max ?? 0;
+
+  // Déterminer si HP est bas
+  const hpPercentage = maxHp > 0 ? (hp / maxHp) * 100 : 100;
+  const hpClass = hpPercentage <= 33 ? 'low' : '';
+
+  // Créer le placeholder avec initiale
+  const initial = t(char.name, lang).charAt(0);
+  const placeholderHtml = `
+    <div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">
+      ${initial}
+    </div>
+  `;
+
+  tab.innerHTML = `
+    <div class="unit-tab-visual">
+      ${placeholderHtml}
+      <div class="unit-tab-hp ${hpClass}">
+        <span>❤️</span>
+        <span>${hp}/${maxHp}</span>
+      </div>
+    </div>
+    <div class="unit-tab-info">
+      <div class="unit-tab-name">${t(char.name, lang)}</div>
+      <div class="unit-tab-role">${t(char.class, lang)}</div>
+    </div>
+  `;
+
+  // Clic pour aller vers ce personnage
+  tab.addEventListener('click', () => {
+    location.href = `character.html?id=${encodeURIComponent(char.id)}`;
+  });
+
+  return tab;
+}
+
+function updateTabHP(charId, newHp){
+  const tab = document.querySelector(`.unit-tab[data-char-id="${charId}"]`);
+  if(!tab) return;
+
+  const hpBadge = tab.querySelector('.unit-tab-hp');
+  if(!hpBadge) return;
+
+  // Récupérer maxHP du personnage
+  const chars = JSON.parse(sessionStorage.getItem('characters') || '[]');
+  const char = chars.find(c => c.id === charId);
+  const maxHp = char?.hp?.max ?? 0;
+
+  // Mettre à jour le badge
+  const hpPercentage = maxHp > 0 ? (newHp / maxHp) * 100 : 100;
+  hpBadge.className = 'unit-tab-hp' + (hpPercentage <= 33 ? ' low' : '');
+  hpBadge.querySelector('span:last-child').textContent = `${newHp}/${maxHp}`;
+
+  // Animation shake
+  tab.style.animation = 'none';
+  setTimeout(() => {
+    tab.style.animation = 'heartShake 0.3s ease';
+  }, 10);
+}
