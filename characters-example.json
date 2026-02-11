@@ -1,0 +1,26 @@
+{
+  "characters": [
+    {
+      "id": "goryo",
+      "name": {"fr": "Goryo", "en": "Goryo"},
+      "class": {"fr": "Grenadier", "en": "Grenadier"},
+      "camp": "mechkawaii",
+      "hp": {
+        "max": 3
+      },
+      "images": {
+        "movement": "./assets/patterns/goryo_movement_normal.png",
+        "attack": "./assets/patterns/goryo_attack_normal.png",
+        "movement_expert": "./assets/patterns/goryo_movement_expert.png",
+        "attack_expert": "./assets/patterns/goryo_attack_expert.png"
+      },
+      "texts": {
+        "class_action_title": {"fr": "Action de classe", "en": "Class Action"},
+        "class_action_body": {"fr": "Description...", "en": "Description..."},
+        "ultimate_title": {"fr": "Ultime", "en": "Ultimate"},
+        "ultimate_body": {"fr": "Description...", "en": "Description..."}
+      },
+      "toggles": []
+    }
+  ]
+}

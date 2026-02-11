@@ -247,11 +247,12 @@ async function initIndex(){
 
     let mode = null; // "single" or "multi"
     let camp = null; // "mechkawaii" or "prodrome"
+    let difficulty = null; // "normal" or "expert"
 
     qs("#modeSingle")?.addEventListener("click", ()=>{
       mode = "single";
-      saveSetup({mode});
-      location.reload();
+      // Après avoir choisi le mode, demander la difficulté
+      showDifficultyPick();
     });
     qs("#modeMulti")?.addEventListener("click", ()=>{
       mode = "multi";
@@ -260,14 +261,31 @@ async function initIndex(){
 
     qs("#campMech")?.addEventListener("click", ()=>{
       camp = "mechkawaii";
-      saveSetup({mode:"multi", camp});
-      location.reload();
+      // Après avoir choisi le camp, demander la difficulté
+      showDifficultyPick();
     });
     qs("#campProd")?.addEventListener("click", ()=>{
       camp = "prodrome";
-      saveSetup({mode:"multi", camp});
+      // Après avoir choisi le camp, demander la difficulté
+      showDifficultyPick();
+    });
+
+    // Boutons de difficulté
+    qs("#diffNormal")?.addEventListener("click", ()=>{
+      difficulty = "normal";
+      saveSetup({mode, camp, difficulty});
       location.reload();
     });
+    qs("#diffExpert")?.addEventListener("click", ()=>{
+      difficulty = "expert";
+      saveSetup({mode, camp, difficulty});
+      location.reload();
+    });
+
+    function showDifficultyPick(){
+      const diffPick = qs("#difficultyPick");
+      if(diffPick) diffPick.style.display = "block";
+    }
 
     qs("#resetSetupBtn")?.addEventListener("click", clearSetup);
 
@@ -467,11 +485,22 @@ async function initCharacter(){
     });
   });
 
-  // Images
+  // Images - Utiliser les images selon la difficulté
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const setup = setupRaw ? JSON.parse(setupRaw) : null;
+  const difficulty = setup?.difficulty || "normal";
+  
   const movImg = qs("#movementImg");
   const atkImg = qs("#attackImg");
-  movImg.src = c.images?.movement || "";
-  atkImg.src = c.images?.attack || "";
+  
+  // Charger les images selon la difficulté
+  if(difficulty === "expert"){
+    movImg.src = c.images?.movement_expert || c.images?.movement || "";
+    atkImg.src = c.images?.attack_expert || c.images?.attack || "";
+  } else {
+    movImg.src = c.images?.movement || "";
+    atkImg.src = c.images?.attack || "";
+  }
 
   // Reset
   qs("#resetBtn").addEventListener("click", ()=>{
