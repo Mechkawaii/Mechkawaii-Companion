@@ -578,7 +578,7 @@ button:focus-visible {
 }
 
 .brand-stack .mascot {
-  width: clamp(120px, 20vw, 180px);
+  width: clamp(140px, 35vw, 180px);
   height: auto;
   filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.35));
 }
