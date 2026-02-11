@@ -6,6 +6,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mechkawaii — Fiche personnage</title>
   <link rel="stylesheet" href="./style.css" />
+  <style>
+    .image-container {
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .image-container img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* Mobile first - petits écrans */
+    @media (max-width: 480px) {
+      .image-container {
+        max-height: 200px;
+      }
+    }
+
+    /* Tablettes */
+    @media (min-width: 481px) and (max-width: 768px) {
+      .image-container {
+        max-height: 280px;
+      }
+    }
+
+    /* Desktops */
+    @media (min-width: 769px) {
+      .image-container {
+        max-height: 350px;
+      }
+    }
+
+    /* Very large screens */
+    @media (min-width: 1200px) {
+      .image-container {
+        max-height: 400px;
+      }
+    }
+  </style>
 </head>
 <body class="page-character">
   <div class="container">
@@ -84,8 +134,8 @@
       </div>
       <div class="card-b">
         <p id="movementDesc" class="text" style="margin: 0 0 12px 0;"></p>
-        <div style="width: 100%; max-height: 300px; overflow: auto; border-radius: var(--radius-md); border: 1px solid var(--border);">
-          <img id="movementImg" src="/api/placeholder/400/300" alt="Movement pattern" style="width: 100%; height: auto; display: block;" />
+        <div class="image-container">
+          <img id="movementImg" src="/api/placeholder/400/300" alt="Movement pattern" />
         </div>
       </div>
     </div>
@@ -97,8 +147,8 @@
       </div>
       <div class="card-b">
         <p id="attackDesc" class="text" style="margin: 0 0 12px 0;"></p>
-        <div style="width: 100%; max-height: 300px; overflow: auto; border-radius: var(--radius-md); border: 1px solid var(--border);">
-          <img id="attackImg" src="/api/placeholder/400/300" alt="Attack pattern" style="width: 100%; height: auto; display: block;" />
+        <div class="image-container">
+          <img id="attackImg" src="/api/placeholder/400/300" alt="Attack pattern" />
         </div>
       </div>
     </div>
