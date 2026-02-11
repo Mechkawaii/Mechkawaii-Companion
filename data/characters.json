@@ -18,6 +18,7 @@
       "attack": "./assets/patterns/banado_attack_normal.png",
       "movement_expert": "./assets/patterns/banado_movement_expert.png",
       "attack_expert": "./assets/patterns/banado_attack_expert.png"
+      "portrait": "./assets/characters/classe_technicien.png",
     },
     "texts": {
       "class_action_title": {
@@ -58,6 +59,7 @@
       "attack": "./assets/patterns/meimei_attack_normal.png",
       "movement_expert": "./assets/patterns/meimei_movement_expert.png",
       "attack_expert": "./assets/patterns/meimei_attack_expert.png"
+      "portrait": "./assets/characters/classe_eclaireur.png",
     },
     "texts": {
       "class_action_title": {
@@ -98,6 +100,7 @@
       "attack": "./assets/patterns/johanna_attack_normal.png",
       "movement_expert": "./assets/patterns/johanna_movement_expert.png",
       "attack_expert": "./assets/patterns/johanna_attack_expert.png"
+      "portrait": "./assets/characters/classe_grenadier.png",
     },
     "texts": {
       "class_action_title": {
@@ -138,6 +141,7 @@
       "attack": "./assets/patterns/yamabato_attack_normal.png",
       "movement_expert": "./assets/patterns/yamabato_movement_expert.png",
       "attack_expert": "./assets/patterns/yamabato_attack_expert.png"
+      "portrait": "./assets/characters/classe_voltigeur.png",
     },
     "texts": {
       "class_action_title": {
@@ -178,6 +182,7 @@
       "attack": "./assets/patterns/fuyu_attack_normal.png",
       "movement_expert": "./assets/patterns/fuyu_movement_expert.png",
       "attack_expert": "./assets/patterns/fuyu_attack_expert.png"
+      "portrait": "./assets/characters/classe_pyrotechnicien.png",
     },
     "texts": {
       "class_action_title": {
@@ -218,6 +223,7 @@
       "attack": "./assets/patterns/goki_attack_normal.png",
       "movement_expert": "./assets/patterns/goki_movement_expert.png",
       "attack_expert": "./assets/patterns/goki_attack_expert.png"
+      "portrait": "./assets/characters/classe_pyrotechnicien.png",
     },
     "texts": {
       "class_action_title": {
@@ -258,6 +264,7 @@
       "attack": "./assets/patterns/goryo_attack_normal.png",
       "movement_expert": "./assets/patterns/goryo_movement_expert.png",
       "attack_expert": "./assets/patterns/goryo_attack_expert.png"
+      "portrait": "./assets/characters/classe_grenadier.png",
     },
     "texts": {
       "class_action_title": {
@@ -298,6 +305,7 @@
       "attack": "./assets/patterns/gyuki_attack_normal.png",
       "movement_expert": "./assets/patterns/gyuki_movement_expert.png",
       "attack_expert": "./assets/patterns/gyuki_attack_expert.png"
+      "portrait": "./assets/characters/classe_voltigeur.png",
     },
     "texts": {
       "class_action_title": {
@@ -338,6 +346,7 @@
       "attack": "./assets/patterns/gaoro_attack_normal.png",
       "movement_expert": "./assets/patterns/gaoro_movement_expert.png",
       "attack_expert": "./assets/patterns/gaoro_attack_expert.png"
+      "portrait": "./assets/characters/classe_eclaireur.png",
     },
     "texts": {
       "class_action_title": {
@@ -378,6 +387,7 @@
       "attack": "./assets/patterns/genbu_attack_normal.png",
       "movement_expert": "./assets/patterns/genbu_movement_expert.png",
       "attack_expert": "./assets/patterns/genbu_attack_expert.png"
+      "portrait": "./assets/characters/classe_technicien.png",
     },
     "texts": {
       "class_action_title": {
