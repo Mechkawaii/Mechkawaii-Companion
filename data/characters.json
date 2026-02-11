@@ -38,7 +38,13 @@
         "fr": "Restaure 1 PV à tous les alliés sur un terrain adjacent au technicien, sans consommer de clés.",
         "en": "Restore 1 HP to all allied units on spaces adjacent to the Technician. This effect does not consume Repair Keys."
       },
-     
+      "movement_desc": {
+        "fr": "Se déplace rapidement en diagonale.",
+        "en": "Moves quickly diagonally."
+      },
+      "attack_desc": {
+        "fr": "Attaque les cases adjacentes.",
+        "en": "Attacks adjacent squares."
     },
     "toggles": []
   },
