@@ -752,8 +752,17 @@ body.game-active .toggle.locked::after {
     object-fit: contain;
   }
 
-  .mkw-btn {
-    width: clamp(240px, 22vw, 340px);
+  /* Fix centrage boutons desktop */
+  .splash-overlay .menu {
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .mkw-btn,
+  .mkw-link {
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
   }
 }
 
