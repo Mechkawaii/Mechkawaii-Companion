@@ -44,7 +44,8 @@
       },
       "attack_desc": {
         "fr": "Attaque les cases adjacentes.",
-        "en": "Attacks adjacent squares.",
+        "en": "Attacks adjacent squares."
+      }
     },
     "toggles": []
   },
