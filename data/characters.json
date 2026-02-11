@@ -47,7 +47,41 @@
         "en": "Attacks adjacent squares."
       }
     },
-    "toggles": []
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Bouclier",
+          "en": "Shield"
+        },
+        "hint": {
+          "fr": "🛡️ Bouclier activé",
+          "en": "🛡️ Shield activated"
+        }
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
+          "en": "🔧 Keys used (0, 1 or 2)"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate used"
+        },
+        "hint": {
+          "fr": "⚡ Coup Unique activé",
+          "en": "⚡ Ultimate activated"
+        }
+      }
+    ]
   },
   {
     "id": "meimei",
@@ -96,7 +130,41 @@
         "en": "Attacks adjacent squares."
       }
     },
-    "toggles": []
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Bouclier",
+          "en": "Shield"
+        },
+        "hint": {
+          "fr": "🛡️ Bouclier activé",
+          "en": "🛡️ Shield activated"
+        }
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
+          "en": "🔧 Keys used (0, 1 or 2)"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate used"
+        },
+        "hint": {
+          "fr": "⚡ Coup Unique activé",
+          "en": "⚡ Ultimate activated"
+        }
+      }
+    ]
   },
   {
     "id": "johanna",
@@ -145,7 +213,41 @@
         "en": "Throws grenades in area."
       }
     },
-    "toggles": []
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Bouclier",
+          "en": "Shield"
+        },
+        "hint": {
+          "fr": "🛡️ Bouclier activé",
+          "en": "🛡️ Shield activated"
+        }
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
+          "en": "🔧 Keys used (0, 1 or 2)"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate used"
+        },
+        "hint": {
+          "fr": "⚡ Coup Unique activé",
+          "en": "⚡ Ultimate activated"
+        }
+      }
+    ]
   },
   {
     "id": "yamabato",
@@ -194,7 +296,41 @@
         "en": "Fast and precise attack."
       }
     },
-    "toggles": []
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Bouclier",
+          "en": "Shield"
+        },
+        "hint": {
+          "fr": "🛡️ Bouclier activé",
+          "en": "🛡️ Shield activated"
+        }
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
+          "en": "🔧 Keys used (0, 1 or 2)"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate used"
+        },
+        "hint": {
+          "fr": "⚡ Coup Unique activé",
+          "en": "⚡ Ultimate activated"
+        }
+      }
+    ]
   },
   {
     "id": "fuyu",
@@ -243,7 +379,41 @@
         "en": "Attacks in fire spiral."
       }
     },
-    "toggles": []
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Bouclier",
+          "en": "Shield"
+        },
+        "hint": {
+          "fr": "🛡️ Bouclier activé",
+          "en": "🛡️ Shield activated"
+        }
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
+          "en": "🔧 Keys used (0, 1 or 2)"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate used"
+        },
+        "hint": {
+          "fr": "⚡ Coup Unique activé",
+          "en": "⚡ Ultimate activated"
+        }
+      }
+    ]
   },
   {
     "id": "goki",
@@ -292,7 +462,41 @@
         "en": "Attacks all enemies in front."
       }
     },
-    "toggles": []
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Bouclier",
+          "en": "Shield"
+        },
+        "hint": {
+          "fr": "🛡️ Bouclier activé",
+          "en": "🛡️ Shield activated"
+        }
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
+          "en": "🔧 Keys used (0, 1 or 2)"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate used"
+        },
+        "hint": {
+          "fr": "⚡ Coup Unique activé",
+          "en": "⚡ Ultimate activated"
+        }
+      }
+    ]
   },
   {
     "id": "goryo",
@@ -341,7 +545,41 @@
         "en": "Attacks in X pattern."
       }
     },
-    "toggles": []
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Bouclier",
+          "en": "Shield"
+        },
+        "hint": {
+          "fr": "🛡️ Bouclier activé",
+          "en": "🛡️ Shield activated"
+        }
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
+          "en": "🔧 Keys used (0, 1 or 2)"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate used"
+        },
+        "hint": {
+          "fr": "⚡ Coup Unique activé",
+          "en": "⚡ Ultimate activated"
+        }
+      }
+    ]
   },
   {
     "id": "gyuki",
@@ -390,7 +628,41 @@
         "en": "Attacks in T shape."
       }
     },
-    "toggles": []
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Bouclier",
+          "en": "Shield"
+        },
+        "hint": {
+          "fr": "🛡️ Bouclier activé",
+          "en": "🛡️ Shield activated"
+        }
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
+          "en": "🔧 Keys used (0, 1 or 2)"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate used"
+        },
+        "hint": {
+          "fr": "⚡ Coup Unique activé",
+          "en": "⚡ Ultimate activated"
+        }
+      }
+    ]
   },
   {
     "id": "gaoro",
@@ -439,7 +711,41 @@
         "en": "Attacks from distance."
       }
     },
-    "toggles": []
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Bouclier",
+          "en": "Shield"
+        },
+        "hint": {
+          "fr": "🛡️ Bouclier activé",
+          "en": "🛡️ Shield activated"
+        }
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
+          "en": "🔧 Keys used (0, 1 or 2)"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate used"
+        },
+        "hint": {
+          "fr": "⚡ Coup Unique activé",
+          "en": "⚡ Ultimate activated"
+        }
+      }
+    ]
   },
   {
     "id": "genbu",
@@ -488,6 +794,40 @@
         "en": "Powerful but slow attack."
       }
     },
-    "toggles": []
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Bouclier",
+          "en": "Shield"
+        },
+        "hint": {
+          "fr": "🛡️ Bouclier activé",
+          "en": "🛡️ Shield activated"
+        }
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
+          "en": "🔧 Keys used (0, 1 or 2)"
+        }
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate used"
+        },
+        "hint": {
+          "fr": "⚡ Coup Unique activé",
+          "en": "⚡ Ultimate activated"
+        }
+      }
+    ]
   }
 ]
