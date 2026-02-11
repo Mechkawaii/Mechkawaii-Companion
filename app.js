@@ -1,3 +1,4 @@
+
 const STORAGE_PREFIX = "mechkawaii:";
 
 function playPressStart(){
@@ -11,7 +12,6 @@ function playPressStart(){
 
     const now = ctx.currentTime;
 
-    // Little “arcade” two-tone blip
     const osc1 = ctx.createOscillator();
     const osc2 = ctx.createOscillator();
     osc1.type = "square";
@@ -41,26 +41,16 @@ function playPressStart(){
     osc1.stop(now + 0.12);
     osc2.stop(now + 0.14);
 
-    // Close context after sound to avoid keeping audio running
     setTimeout(()=>{ try{ ctx.close(); }catch(e){} }, 250);
   }catch(e){}
 }
-
 
 function heartIcon(filled){
   const src = filled
     ? "./assets/pv.svg"
     : "./assets/pv_off.svg";
-
-  return `
-    <img
-      src="${src}"
-      class="heart"
-      alt="PV"
-    />
-  `;
+  return `<img src="${src}" class="heart" alt="PV" />`;
 }
-
 
 function qs(sel){ return document.querySelector(sel); }
 function qsa(sel){ return [...document.querySelectorAll(sel)]; }
@@ -87,14 +77,9 @@ function setState(charId, state){
 }
 
 function heartSvg(filled){
-  // Inline SVG so it works offline + no assets needed
   const fill = filled ? "var(--accent)" : "rgba(255,255,255,.14)";
   const stroke = filled ? "rgba(0,0,0,.25)" : "rgba(255,255,255,.20)";
-  return `
-  <svg class="heart" viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M12 21s-7.5-4.6-10-9.4C.3 8.2 2.2 5.2 5.4 4.5c1.9-.4 3.8.3 5 1.7 1.2-1.4 3.1-2.1 5-1.7 3.2.7 5.1 3.7 3.4 7.1C19.5 16.4 12 21 12 21z"
-      fill="${fill}" stroke="${stroke}" stroke-width="1.2" />
-  </svg>`;
+  return `<svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.4C.3 8.2 2.2 5.2 5.4 4.5c1.9-.4 3.8.3 5 1.7 1.2-1.4 3.1-2.1 5-1.7 3.2.7 5.1 3.7 3.4 7.1C19.5 16.4 12 21 12 21z" fill="${fill}" stroke="${stroke}" stroke-width="1.2" /></svg>`;
 }
 
 async function loadCharacters(){
@@ -104,7 +89,6 @@ async function loadCharacters(){
 }
 
 function t(obj, lang){
-  // obj can be {fr,en} or string
   if(obj == null) return "";
   if(typeof obj === "string") return obj;
   return obj[lang] || obj["fr"] || "";
@@ -191,7 +175,6 @@ function urlParam(name){
   return u.searchParams.get(name);
 }
 
-// ---------- Pages ----------
 async function initIndex(){
   const lang = getLang();
   bindTopbar(lang);
@@ -210,7 +193,6 @@ async function initIndex(){
 
   const chars = await loadCharacters();
 
-  // --- Setup state ---
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
   const setup = setupRaw ? JSON.parse(setupRaw) : null;
 
@@ -223,7 +205,6 @@ async function initIndex(){
     location.reload();
   }
 
-  // Buttons always available when setup exists
   if(changeSetupBtn){
     changeSetupBtn.addEventListener("click", ()=>{
       localStorage.removeItem(STORAGE_PREFIX + "setup");
@@ -237,7 +218,6 @@ async function initIndex(){
     });
   }
 
-  // If no setup, show setup UI
   if(!setup){
     if(setupCard) setupCard.style.display = "block";
     if(draftCard) draftCard.style.display = "none";
@@ -245,13 +225,12 @@ async function initIndex(){
     if(changeDraftBtn) changeDraftBtn.style.display = "none";
     list.innerHTML = "";
 
-    let mode = null; // "single" or "multi"
-    let camp = null; // "mechkawaii" or "prodrome"
-    let difficulty = null; // "normal" or "expert"
+    let mode = null;
+    let camp = null;
+    let difficulty = null;
 
     qs("#modeSingle")?.addEventListener("click", ()=>{
       mode = "single";
-      // Après avoir choisi le mode, demander la difficulté
       showDifficultyPick();
     });
     qs("#modeMulti")?.addEventListener("click", ()=>{
@@ -261,16 +240,13 @@ async function initIndex(){
 
     qs("#campMech")?.addEventListener("click", ()=>{
       camp = "mechkawaii";
-      // Après avoir choisi le camp, demander la difficulté
       showDifficultyPick();
     });
     qs("#campProd")?.addEventListener("click", ()=>{
       camp = "prodrome";
-      // Après avoir choisi le camp, demander la difficulté
       showDifficultyPick();
     });
 
-    // Boutons de difficulté
     qs("#diffNormal")?.addEventListener("click", ()=>{
       difficulty = "normal";
       saveSetup({mode, camp, difficulty});
@@ -292,32 +268,27 @@ async function initIndex(){
     return;
   }
 
-  // Setup exists
   if(changeSetupBtn) changeSetupBtn.style.display = "inline-block";
   if(changeDraftBtn) changeDraftBtn.style.display = "inline-block";
 
-  // Filter characters by camp if needed
   let available = chars;
   if(setup.mode === "multi"){
     available = chars.filter(c => (c.camp || "mechkawaii") === (setup.camp || "mechkawaii"));
   }
 
-  // --- Draft selection ---
   const maxPick = (setup.mode === "single") ? 6 : 3;
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
-  let draft = draftRaw ? JSON.parse(draftRaw) : null; // { activeIds: [] }
+  let draft = draftRaw ? JSON.parse(draftRaw) : null;
 
   function saveDraft(obj){
     localStorage.setItem(STORAGE_PREFIX + "draft", JSON.stringify(obj));
   }
 
-  // If no draft, show selection UI
   if(!draft){
     if(draftCard) draftCard.style.display = "block";
     if(setupCard) setupCard.style.display = "none";
     list.innerHTML = "";
 
-    // Build check list
     draftList.innerHTML = "";
     const selected = new Set();
 
@@ -374,20 +345,18 @@ async function initIndex(){
     });
 
     qs("#skipDraft")?.addEventListener("click", ()=>{
-      saveDraft({activeIds: null}); // null means show all
+      saveDraft({activeIds: null});
       location.reload();
     });
 
     return;
   }
 
-  // Determine active characters
   let toShow = available;
   if(Array.isArray(draft.activeIds) && draft.activeIds.length){
     toShow = available.filter(c => draft.activeIds.includes(c.id));
   }
 
-  // Render list
   list.innerHTML = "";
   toShow.forEach(c=>{
     const a = document.createElement("a");
@@ -403,14 +372,13 @@ async function initIndex(){
     list.appendChild(a);
   });
 
-  // If nothing to show (e.g. prodrome camp but no prodrome chars yet)
   if(toShow.length === 0){
     const msg = document.createElement("div");
     msg.className = "footer-note";
     msg.style.color = "var(--muted)";
     msg.textContent = (lang === "fr")
-      ? "Aucun perso disponible pour ce camp (pour l’instant). Change de camp via “Changer config”."
-      : "No characters available for this camp (yet). Change camp via “Change setup”.";
+      ? "Aucun perso disponible pour ce camp (pour l'instant). Change de camp via \"Changer config\"."
+      : "No characters available for this camp (yet). Change camp via \"Change setup\".";
     list.appendChild(msg);
   }
 }
@@ -431,16 +399,14 @@ async function initCharacter(){
     return;
   }
 
-  // State init
   const saved = getState(c.id);
   const state = saved || {
     hp: c.hp?.max ?? 0,
     toggles: Object.fromEntries((c.toggles||[]).map(tg => [tg.id, false]))
   };
 
-  // UI
   qs("#charName").textContent = t(c.name, lang);
-    qs("#charClass").textContent = t(c.class, lang);
+  qs("#charClass").textContent = t(c.class, lang);
   qs("#hpMaxLabel").textContent = `/${c.hp?.max ?? 0}`;
 
   const hpCurEl = qs("#hpCur");
@@ -455,26 +421,25 @@ async function initCharacter(){
     state.hp = clamp(state.hp - 1, 0, c.hp?.max ?? 0);
     setState(c.id, state);
     refreshHP();
-    // Mettre à jour le tab aussi
     updateTabHP(c.id, state.hp);
   });
   qs("#hpPlus").addEventListener("click", ()=>{
     state.hp = clamp(state.hp + 1, 0, c.hp?.max ?? 0);
     setState(c.id, state);
     refreshHP();
-    // Mettre à jour le tab aussi
     updateTabHP(c.id, state.hp);
   });
 
   refreshHP();
 
-  // Text blocks
   qs("#classActionTitle").textContent = t(c.texts?.class_action_title, lang);
-  qs("#classActionBody").textContent  = t(c.texts?.class_action_body, lang);
-  qs("#ultTitle").textContent         = t(c.texts?.ultimate_title, lang);
-  qs("#ultBody").textContent          = t(c.texts?.ultimate_body, lang);
+  qs("#classActionBody").textContent = t(c.texts?.class_action_body, lang);
+  qs("#ultTitle").textContent = t(c.texts?.ultimate_title, lang);
+  qs("#ultBody").textContent = t(c.texts?.ultimate_body, lang);
 
-  // Toggles
+  qs("#movementDesc").textContent = t(c.texts?.movement_desc, lang) || "";
+  qs("#attackDesc").textContent = t(c.texts?.attack_desc, lang) || "";
+
   const togglesRoot = qs("#toggles");
   togglesRoot.innerHTML = "";
   (c.toggles || []).forEach(tg=>{
@@ -485,7 +450,6 @@ async function initCharacter(){
     });
   });
 
-  // Images - Utiliser les images selon la difficulté
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
   const setup = setupRaw ? JSON.parse(setupRaw) : null;
   const difficulty = setup?.difficulty || "normal";
@@ -493,7 +457,6 @@ async function initCharacter(){
   const movImg = qs("#movementImg");
   const atkImg = qs("#attackImg");
   
-  // Charger les images selon la difficulté
   if(difficulty === "expert"){
     movImg.src = c.images?.movement_expert || c.images?.movement || "";
     atkImg.src = c.images?.attack_expert || c.images?.attack || "";
@@ -502,7 +465,6 @@ async function initCharacter(){
     atkImg.src = c.images?.attack || "";
   }
 
-  // Reset
   qs("#resetBtn").addEventListener("click", ()=>{
     const fresh = {
       hp: c.hp?.max ?? 0,
@@ -512,19 +474,13 @@ async function initCharacter(){
     location.reload();
   });
 
-  // Back
   qs("#backBtn").addEventListener("click", ()=>{ location.href = "./index.html"; });
 
-  // ========================================
-  // ONGLETS DES AUTRES UNITÉS
-  // ========================================
   initUnitTabs(id, chars, lang);
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
 
-  // If the user already pressed "Play" once, don't force them through the splash again.
-  // This prevents the splash from reappearing when we do location.reload() during setup/draft changes.
   const SPLASH_KEY = STORAGE_PREFIX + "splashDismissed";
   const splashDismissed = localStorage.getItem(SPLASH_KEY) === "1";
 
@@ -545,7 +501,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
       localStorage.setItem(SPLASH_KEY, "1");
       document.body.classList.remove('has-splash');
       hideSplash();
-      });
+    });
   }
 
   const backToSplash = document.getElementById("backToSplash");
@@ -556,14 +512,10 @@ document.addEventListener("DOMContentLoaded", async ()=>{
     });
   }
 
-  // Auto-hide splash if it was already dismissed earlier.
   if(splashDismissed){
     document.body.classList.remove('has-splash');
     hideSplash();
   }
-
-
-  
 
   try{
     if(document.body.classList.contains("page-index")) await initIndex();
@@ -575,10 +527,6 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   }
 });
 
-// ========================================
-// SYSTÈME D'ONGLETS DES UNITÉS
-// ========================================
-
 function initUnitTabs(currentCharId, allChars, lang){
   const tabsContainer = qs("#unitTabs");
   const unitTabsWrapper = qs(".unit-tabs-container");
@@ -588,7 +536,6 @@ function initUnitTabs(currentCharId, allChars, lang){
     return;
   }
 
-  // Récupérer le setup et le draft
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
   
@@ -597,18 +544,15 @@ function initUnitTabs(currentCharId, allChars, lang){
   const setup = JSON.parse(setupRaw);
   const draft = JSON.parse(draftRaw);
   
-  // Déterminer quels personnages afficher dans les tabs
   let tabCharacters = [];
   
   if(setup.mode === "single"){
-    // Mode table: afficher les 5 AUTRES personnages (pas celui actuellement affiché)
     if(Array.isArray(draft.activeIds) && draft.activeIds.length){
       tabCharacters = allChars.filter(c => 
         draft.activeIds.includes(c.id) && c.id !== currentCharId
       );
     }
   } else {
-    // Mode multi-appareils: afficher les 2 AUTRES du même camp
     const currentCamp = setup.camp || "mechkawaii";
     if(Array.isArray(draft.activeIds) && draft.activeIds.length){
       tabCharacters = allChars.filter(c => 
@@ -619,18 +563,15 @@ function initUnitTabs(currentCharId, allChars, lang){
     }
   }
 
-  // Si pas d'autres personnages, cacher les tabs
   if(tabCharacters.length === 0){
     unitTabsWrapper.classList.remove('visible');
     document.body.classList.remove('tabs-visible');
     return;
   }
 
-  // Afficher la barre de tabs
   unitTabsWrapper.classList.add('visible');
   document.body.classList.add('tabs-visible');
 
-  // Générer les tabs
   tabsContainer.innerHTML = '';
   tabCharacters.forEach(char => {
     const tab = createCharacterTab(char, lang);
@@ -643,48 +584,52 @@ function createCharacterTab(char, lang){
   tab.className = 'unit-tab';
   tab.dataset.charId = char.id;
 
-  // Récupérer les HP sauvegardés
   const saved = getState(char.id);
   const hp = saved?.hp ?? (char.hp?.max ?? 0);
   const maxHp = char.hp?.max ?? 0;
 
-  // Déterminer si HP est bas
   const hpPercentage = maxHp > 0 ? (hp / maxHp) * 100 : 100;
   const hpClass = hpPercentage <= 33 ? 'low' : '';
 
-   // Créer le contenu visuel : image OU placeholder
+  // Créer l'élément visual
+  const visualEl = document.createElement('div');
+  visualEl.className = 'unit-tab-visual';
+  
   const charImage = char.images?.portrait || char.images?.character;
-  const visualHtml = charImage 
-    ? ` img src="${charImage}" alt="${t(char.name, lang)}" style="max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));" />`
-    : ` div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">
-        ${t(char.name, lang).charAt(0)} /div>`;
+  
+  if(charImage){
+    const img = document.createElement('img');
+    img.src = charImage;
+    img.alt = t(char.name, lang);
+    img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));';
+    
+    // Fallback si l'image ne charge pas
+    img.onerror = function(){
+      visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
+    };
+    visualEl.appendChild(img);
+  } else {
+    // Placeholder si pas d'image
+    visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
+  }
 
-  tab.innerHTML = ` div class="unit-tab-visual">
-      ${visualHtml} div class="unit-tab-hp ${hpClass}"> span>❤️ /span> span>${hp}/${maxHp} /span> /div> /div> div class="unit-tab-info"> div class="unit-tab-name">${t(char.name, lang)} /div> div class="unit-tab-role">${t(char.class, lang)} /div> /div>
+  // Ajouter le badge HP
+  const hpBadge = document.createElement('div');
+  hpBadge.className = `unit-tab-hp ${hpClass}`;
+  hpBadge.innerHTML = `<span>❤️</span><span>${hp}/${maxHp}</span>`;
+  visualEl.appendChild(hpBadge);
+
+  // Ajouter les infos
+  const infoEl = document.createElement('div');
+  infoEl.className = 'unit-tab-info';
+  infoEl.innerHTML = `
+    <div class="unit-tab-name">${t(char.name, lang)}</div>
+    <div class="unit-tab-role">${t(char.class, lang)}</div>
   `;
 
-  // Clic pour aller vers ce personnage
-  tab.addEventListener('click', () => {
-    location.href = `character.html?id=${encodeURIComponent(char.id)}`;
-  });
+  tab.appendChild(visualEl);
+  tab.appendChild(infoEl);
 
-  return tab;
-
-  tab.innerHTML = `
-    <div class="unit-tab-visual">
-      ${placeholderHtml}
-      <div class="unit-tab-hp ${hpClass}">
-        <span>❤️</span>
-        <span>${hp}/${maxHp}</span>
-      </div>
-    </div>
-    <div class="unit-tab-info">
-      <div class="unit-tab-name">${t(char.name, lang)}</div>
-      <div class="unit-tab-role">${t(char.class, lang)}</div>
-    </div>
-  `;
-
-  // Clic pour aller vers ce personnage
   tab.addEventListener('click', () => {
     location.href = `character.html?id=${encodeURIComponent(char.id)}`;
   });
@@ -699,19 +644,24 @@ function updateTabHP(charId, newHp){
   const hpBadge = tab.querySelector('.unit-tab-hp');
   if(!hpBadge) return;
 
-  // Récupérer maxHP du personnage
-  const chars = JSON.parse(sessionStorage.getItem('characters') || '[]');
-  const char = chars.find(c => c.id === charId);
-  const maxHp = char?.hp?.max ?? 0;
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
+  
+  if(!setupRaw || !draftRaw) return;
 
-  // Mettre à jour le badge
-  const hpPercentage = maxHp > 0 ? (newHp / maxHp) * 100 : 100;
-  hpBadge.className = 'unit-tab-hp' + (hpPercentage <= 33 ? ' low' : '');
-  hpBadge.querySelector('span:last-child').textContent = `${newHp}/${maxHp}`;
+  // Récupérer le max HP du personnage
+  const allChars = window.__cachedChars;
+  if(allChars){
+    const char = allChars.find(c => c.id === charId);
+    const maxHp = char?.hp?.max ?? 0;
+    
+    const hpPercentage = maxHp > 0 ? (newHp / maxHp) * 100 : 100;
+    hpBadge.className = 'unit-tab-hp' + (hpPercentage <= 33 ? ' low' : '');
+    hpBadge.querySelector('span:last-child').textContent = `${newHp}/${maxHp}`;
 
-  // Animation shake
-  tab.style.animation = 'none';
-  setTimeout(() => {
-    tab.style.animation = 'heartShake 0.3s ease';
-  }, 10);
+    tab.style.animation = 'none';
+    setTimeout(() => {
+      tab.style.animation = 'heartShake 0.3s ease';
+    }, 10);
+  }
 }
