@@ -451,7 +451,7 @@ button:active{transform: translateY(1px)}
 /* Heart mascot: subtle float */
 .brand .mascot{
   animation: mkw-float 2.8s ease-in-out infinite;
-  transform-origin: 50% 60%;
+  transform-origin: 30% 60%;
 }
 
 /* Play button: pulsing glow */
@@ -501,7 +501,7 @@ button:active{transform: translateY(1px)}
   top: -46px;
   left: 50%;
   transform: translateX(-50%);
-  width: clamp(44px, 9vw, 86px) !important;
+  width: clamp(140px, 45vw, 320px) !important;
   margin: 0 !important;
   animation: mkw-float 2.8s ease-in-out infinite;
   filter: drop-shadow(0 10px 22px rgba(0,0,0,0.45));
@@ -649,7 +649,7 @@ html.splash-dismissed body.has-splash .controls{
   }
 
   .brand-stack .mascot{
-    width: clamp(44px, 4.5vw, 64px);
+    width: clamp(140px, 45vw, 320px);
     max-height: 8vh;
     object-fit: contain;
   }
@@ -671,7 +671,7 @@ html.splash-dismissed body.has-splash .controls{
   }
 
   .brand-stack .mascot{
-    width: 56px;
+    width: clamp(140px, 45vw, 320px);
   }
 
   .mkw-btn{
