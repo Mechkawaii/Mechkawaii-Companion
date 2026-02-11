@@ -27,35 +27,30 @@
       object-fit: contain;
     }
 
-    /* Mobile first - petits écrans */
     @media (max-width: 480px) {
       .image-container {
         min-height: 150px;
       }
     }
 
-    /* Tablettes */
     @media (min-width: 481px) and (max-width: 768px) {
       .image-container {
         min-height: 250px;
       }
     }
 
-    /* Desktops */
     @media (min-width: 769px) {
       .image-container {
         min-height: 300px;
       }
     }
 
-    /* Very large screens */
     @media (min-width: 1200px) {
       .image-container {
         min-height: 350px;
       }
     }
 
-    /* Layout deux colonnes pour patterns */
     .patterns-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -131,10 +126,20 @@
     <!-- Ultimate -->
     <div class="card" style="margin-top: 16px;">
       <div class="card-h">
-        <div class="section-title" style="margin: 0;" id="ultTitle">Coup Unique</div>
+        <div class="section-title" style="margin: 0;" id="ultTitle">Ultime</div>
       </div>
       <div class="card-b">
-        <p class="text" id="ultBody" style="margin: 0;">Description du coup Unique.</p>
+        <p class="text" id="ultBody" style="margin: 0;">Description de l'ultime.</p>
+      </div>
+    </div>
+
+    <!-- Toggles Section -->
+    <div class="card" style="margin-top: 16px;" id="togglesCard">
+      <div class="card-h">
+        <div class="section-title" style="margin: 0;">États & Effets</div>
+      </div>
+      <div class="card-b">
+        <div id="toggles" class="toggles"></div>
       </div>
     </div>
 
@@ -144,7 +149,7 @@
       <div class="pattern-card">
         <div class="card">
           <div class="card-h">
-            <div class="section-title" style="margin: 0;">Déplacement</div>
+            <div class="section-title" style="margin: 0;">Modèle de déplacement</div>
           </div>
           <div class="card-b">
             <p id="movementDesc" class="text" style="margin: 0 0 12px 0;"></p>
@@ -159,7 +164,7 @@
       <div class="pattern-card">
         <div class="card">
           <div class="card-h">
-            <div class="section-title" style="margin: 0;">Attaque</div>
+            <div class="section-title" style="margin: 0;">Modèle d'attaque</div>
           </div>
           <div class="card-b">
             <p id="attackDesc" class="text" style="margin: 0 0 12px 0;"></p>
