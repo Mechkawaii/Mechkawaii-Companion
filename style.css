@@ -579,13 +579,13 @@ html.splash-dismissed body.has-splash .controls{
   margin-bottom: 6px;
 }
 .brand-stack .logo{
-  width: min(640px, 92vw);
+  width: clamp(140px, 45vw, 320px);
   height:auto;
   display:block;
   filter: drop-shadow(0 10px 28px rgba(0,0,0,0.35));
 }
 .brand-stack .mascot{
-  width: clamp(45vw);
+  width: clamp(140px, 45vw, 320px);
   height:auto;
   display:block;
   filter: drop-shadow(0 8px 22px rgba(0,0,0,0.35));
