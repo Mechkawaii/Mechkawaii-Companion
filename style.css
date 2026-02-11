@@ -492,6 +492,10 @@ button:focus-visible {
   gap: 12px;
   margin-top: var(--space-lg);
   justify-items: center;
+  width: 100%;
+  max-width: var(--maxw);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .char {
