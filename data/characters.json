@@ -1,3 +1,4 @@
+
 [
   {
     "id": "banado",
@@ -17,8 +18,8 @@
       "movement": "./assets/patterns/banado_movement_normal.png",
       "attack": "./assets/patterns/banado_attack_normal.png",
       "movement_expert": "./assets/patterns/banado_movement_expert.png",
-      "attack_expert": "./assets/patterns/banado_attack_expert.png"
-      "portrait": "./assets/characters/classe_technicien.png",
+      "attack_expert": "./assets/patterns/banado_attack_expert.png",
+      "portrait": "./assets/characters/classe_technicien.png"
     },
     "texts": {
       "class_action_title": {
@@ -36,6 +37,14 @@
       "ultimate_body": {
         "fr": "Description de l'ultime de Banado.",
         "en": "Banado's ultimate description."
+      },
+      "movement_desc": {
+        "fr": "Se déplace selon les règles standard.",
+        "en": "Moves according to standard rules."
+      },
+      "attack_desc": {
+        "fr": "Attaque en ligne droite.",
+        "en": "Attacks in straight line."
       }
     },
     "toggles": []
@@ -58,8 +67,8 @@
       "movement": "./assets/patterns/meimei_movement_normal.png",
       "attack": "./assets/patterns/meimei_attack_normal.png",
       "movement_expert": "./assets/patterns/meimei_movement_expert.png",
-      "attack_expert": "./assets/patterns/meimei_attack_expert.png"
-      "portrait": "./assets/characters/classe_eclaireur.png",
+      "attack_expert": "./assets/patterns/meimei_attack_expert.png",
+      "portrait": "./assets/characters/classe_eclaireur.png"
     },
     "texts": {
       "class_action_title": {
@@ -77,6 +86,14 @@
       "ultimate_body": {
         "fr": "Description de l'ultime de Meimei.",
         "en": "Meimei's ultimate description."
+      },
+      "movement_desc": {
+        "fr": "Se déplace rapidement en diagonale.",
+        "en": "Moves quickly diagonally."
+      },
+      "attack_desc": {
+        "fr": "Attaque les cases adjacentes.",
+        "en": "Attacks adjacent squares."
       }
     },
     "toggles": []
@@ -99,8 +116,8 @@
       "movement": "./assets/patterns/johanna_movement_normal.png",
       "attack": "./assets/patterns/johanna_attack_normal.png",
       "movement_expert": "./assets/patterns/johanna_movement_expert.png",
-      "attack_expert": "./assets/patterns/johanna_attack_expert.png"
-      "portrait": "./assets/characters/classe_grenadier.png",
+      "attack_expert": "./assets/patterns/johanna_attack_expert.png",
+      "portrait": "./assets/characters/classe_grenadier.png"
     },
     "texts": {
       "class_action_title": {
@@ -118,6 +135,14 @@
       "ultimate_body": {
         "fr": "Description de l'ultime de Johanna.",
         "en": "Johanna's ultimate description."
+      },
+      "movement_desc": {
+        "fr": "Se déplace lentement mais peut attaquer de loin.",
+        "en": "Moves slowly but can attack from distance."
+      },
+      "attack_desc": {
+        "fr": "Lance des grenades en zone.",
+        "en": "Throws grenades in area."
       }
     },
     "toggles": []
@@ -140,8 +165,8 @@
       "movement": "./assets/patterns/yamabato_movement_normal.png",
       "attack": "./assets/patterns/yamabato_attack_normal.png",
       "movement_expert": "./assets/patterns/yamabato_movement_expert.png",
-      "attack_expert": "./assets/patterns/yamabato_attack_expert.png"
-      "portrait": "./assets/characters/classe_voltigeur.png",
+      "attack_expert": "./assets/patterns/yamabato_attack_expert.png",
+      "portrait": "./assets/characters/classe_voltigeur.png"
     },
     "texts": {
       "class_action_title": {
@@ -159,6 +184,14 @@
       "ultimate_body": {
         "fr": "Description de l'ultime de Yamabato.",
         "en": "Yamabato's ultimate description."
+      },
+      "movement_desc": {
+        "fr": "Se déplace très rapidement en tous sens.",
+        "en": "Moves very quickly in all directions."
+      },
+      "attack_desc": {
+        "fr": "Attaque rapide et précise.",
+        "en": "Fast and precise attack."
       }
     },
     "toggles": []
@@ -181,8 +214,8 @@
       "movement": "./assets/patterns/fuyu_movement_normal.png",
       "attack": "./assets/patterns/fuyu_attack_normal.png",
       "movement_expert": "./assets/patterns/fuyu_movement_expert.png",
-      "attack_expert": "./assets/patterns/fuyu_attack_expert.png"
-      "portrait": "./assets/characters/classe_pyrotechnicien.png",
+      "attack_expert": "./assets/patterns/fuyu_attack_expert.png",
+      "portrait": "./assets/characters/classe_pyrotechnicien.png"
     },
     "texts": {
       "class_action_title": {
@@ -200,6 +233,14 @@
       "ultimate_body": {
         "fr": "Description de l'ultime de Fuyu.",
         "en": "Fuyu's ultimate description."
+      },
+      "movement_desc": {
+        "fr": "Se déplace en zigzag.",
+        "en": "Moves in zigzag."
+      },
+      "attack_desc": {
+        "fr": "Attaque en spirale de feu.",
+        "en": "Attacks in fire spiral."
       }
     },
     "toggles": []
@@ -222,8 +263,8 @@
       "movement": "./assets/patterns/goki_movement_normal.png",
       "attack": "./assets/patterns/goki_attack_normal.png",
       "movement_expert": "./assets/patterns/goki_movement_expert.png",
-      "attack_expert": "./assets/patterns/goki_attack_expert.png"
-      "portrait": "./assets/characters/classe_pyrotechnicien.png",
+      "attack_expert": "./assets/patterns/goki_attack_expert.png",
+      "portrait": "./assets/characters/classe_pyrotechnicien.png"
     },
     "texts": {
       "class_action_title": {
@@ -241,6 +282,14 @@
       "ultimate_body": {
         "fr": "Description de l'ultime de Goki.",
         "en": "Goki's ultimate description."
+      },
+      "movement_desc": {
+        "fr": "Se déplace en avant droit.",
+        "en": "Moves straight forward."
+      },
+      "attack_desc": {
+        "fr": "Attaque tous les ennemis devant lui.",
+        "en": "Attacks all enemies in front."
       }
     },
     "toggles": []
@@ -263,8 +312,8 @@
       "movement": "./assets/patterns/goryo_movement_normal.png",
       "attack": "./assets/patterns/goryo_attack_normal.png",
       "movement_expert": "./assets/patterns/goryo_movement_expert.png",
-      "attack_expert": "./assets/patterns/goryo_attack_expert.png"
-      "portrait": "./assets/characters/classe_grenadier.png",
+      "attack_expert": "./assets/patterns/goryo_attack_expert.png",
+      "portrait": "./assets/characters/classe_grenadier.png"
     },
     "texts": {
       "class_action_title": {
@@ -282,6 +331,14 @@
       "ultimate_body": {
         "fr": "Description de l'ultime de Goryo.",
         "en": "Goryo's ultimate description."
+      },
+      "movement_desc": {
+        "fr": "Se déplace en carré.",
+        "en": "Moves in square pattern."
+      },
+      "attack_desc": {
+        "fr": "Attaque en X.",
+        "en": "Attacks in X pattern."
       }
     },
     "toggles": []
@@ -304,8 +361,8 @@
       "movement": "./assets/patterns/gyuki_movement_normal.png",
       "attack": "./assets/patterns/gyuki_attack_normal.png",
       "movement_expert": "./assets/patterns/gyuki_movement_expert.png",
-      "attack_expert": "./assets/patterns/gyuki_attack_expert.png"
-      "portrait": "./assets/characters/classe_voltigeur.png",
+      "attack_expert": "./assets/patterns/gyuki_attack_expert.png",
+      "portrait": "./assets/characters/classe_voltigeur.png"
     },
     "texts": {
       "class_action_title": {
@@ -323,6 +380,14 @@
       "ultimate_body": {
         "fr": "Description de l'ultime de Gyuki.",
         "en": "Gyuki's ultimate description."
+      },
+      "movement_desc": {
+        "fr": "Se déplace en L.",
+        "en": "Moves in L shape."
+      },
+      "attack_desc": {
+        "fr": "Attaque en T.",
+        "en": "Attacks in T shape."
       }
     },
     "toggles": []
@@ -345,8 +410,8 @@
       "movement": "./assets/patterns/gaoro_movement_normal.png",
       "attack": "./assets/patterns/gaoro_attack_normal.png",
       "movement_expert": "./assets/patterns/gaoro_movement_expert.png",
-      "attack_expert": "./assets/patterns/gaoro_attack_expert.png"
-      "portrait": "./assets/characters/classe_eclaireur.png",
+      "attack_expert": "./assets/patterns/gaoro_attack_expert.png",
+      "portrait": "./assets/characters/classe_eclaireur.png"
     },
     "texts": {
       "class_action_title": {
@@ -364,6 +429,14 @@
       "ultimate_body": {
         "fr": "Description de l'ultime de Gaoro.",
         "en": "Gaoro's ultimate description."
+      },
+      "movement_desc": {
+        "fr": "Se déplace en saut.",
+        "en": "Moves by jumping."
+      },
+      "attack_desc": {
+        "fr": "Attaque à distance.",
+        "en": "Attacks from distance."
       }
     },
     "toggles": []
@@ -386,8 +459,8 @@
       "movement": "./assets/patterns/genbu_movement_normal.png",
       "attack": "./assets/patterns/genbu_attack_normal.png",
       "movement_expert": "./assets/patterns/genbu_movement_expert.png",
-      "attack_expert": "./assets/patterns/genbu_attack_expert.png"
-      "portrait": "./assets/characters/classe_technicien.png",
+      "attack_expert": "./assets/patterns/genbu_attack_expert.png",
+      "portrait": "./assets/characters/classe_technicien.png"
     },
     "texts": {
       "class_action_title": {
@@ -405,6 +478,14 @@
       "ultimate_body": {
         "fr": "Description de l'ultime de Genbu.",
         "en": "Genbu's ultimate description."
+      },
+      "movement_desc": {
+        "fr": "Se déplace lentement en ligne.",
+        "en": "Moves slowly in line."
+      },
+      "attack_desc": {
+        "fr": "Attaque puissante mais lente.",
+        "en": "Powerful but slow attack."
       }
     },
     "toggles": []
