@@ -54,6 +54,28 @@
         min-height: 350px;
       }
     }
+
+    /* Layout deux colonnes pour patterns */
+    .patterns-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 769px) {
+      .patterns-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .pattern-card {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pattern-card .card {
+      margin-top: 0;
+    }
   </style>
 </head>
 <body class="page-character">
@@ -126,28 +148,35 @@
       </div>
     </div>
 
-    <!-- Movement Patterns -->
-    <div class="card" style="margin-top: 16px;">
-      <div class="card-h">
-        <div class="section-title" style="margin: 0;">Modèle de déplacement</div>
-      </div>
-      <div class="card-b">
-        <p id="movementDesc" class="text" style="margin: 0 0 12px 0;"></p>
-        <div class="image-container">
-          <img id="movementImg" src="/api/placeholder/400/300" alt="Movement pattern" />
+    <!-- Movement & Attack Patterns - Two Columns -->
+    <div class="patterns-grid" style="margin-top: 16px;">
+      <!-- Movement Patterns -->
+      <div class="pattern-card">
+        <div class="card">
+          <div class="card-h">
+            <div class="section-title" style="margin: 0;">Modèle de déplacement</div>
+          </div>
+          <div class="card-b">
+            <p id="movementDesc" class="text" style="margin: 0 0 12px 0;"></p>
+            <div class="image-container">
+              <img id="movementImg" src="/api/placeholder/400/300" alt="Movement pattern" />
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Attack Patterns -->
-    <div class="card" style="margin-top: 16px;">
-      <div class="card-h">
-        <div class="section-title" style="margin: 0;">Modèle d'attaque</div>
-      </div>
-      <div class="card-b">
-        <p id="attackDesc" class="text" style="margin: 0 0 12px 0;"></p>
-        <div class="image-container">
-          <img id="attackImg" src="/api/placeholder/400/300" alt="Attack pattern" />
+      <!-- Attack Patterns -->
+      <div class="pattern-card">
+        <div class="card">
+          <div class="card-h">
+            <div class="section-title" style="margin: 0;">Modèle d'attaque</div>
+          </div>
+          <div class="card-b">
+            <p id="attackDesc" class="text" style="margin: 0 0 12px 0;"></p>
+            <div class="image-container">
+              <img id="attackImg" src="/api/placeholder/400/300" alt="Attack pattern" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
