@@ -652,13 +652,23 @@ function createCharacterTab(char, lang){
   const hpPercentage = maxHp > 0 ? (hp / maxHp) * 100 : 100;
   const hpClass = hpPercentage <= 33 ? 'low' : '';
 
-  // Créer le placeholder avec initiale
-  const initial = t(char.name, lang).charAt(0);
-  const placeholderHtml = `
-    <div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">
-      ${initial}
-    </div>
+   // Créer le contenu visuel : image OU placeholder
+  const charImage = char.images?.portrait || char.images?.character;
+  const visualHtml = charImage 
+    ? ` img src="${charImage}" alt="${t(char.name, lang)}" style="max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));" />`
+    : ` div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">
+        ${t(char.name, lang).charAt(0)} /div>`;
+
+  tab.innerHTML = ` div class="unit-tab-visual">
+      ${visualHtml} div class="unit-tab-hp ${hpClass}"> span>❤️ /span> span>${hp}/${maxHp} /span> /div> /div> div class="unit-tab-info"> div class="unit-tab-name">${t(char.name, lang)} /div> div class="unit-tab-role">${t(char.class, lang)} /div> /div>
   `;
+
+  // Clic pour aller vers ce personnage
+  tab.addEventListener('click', () => {
+    location.href = `character.html?id=${encodeURIComponent(char.id)}`;
+  });
+
+  return tab;
 
   tab.innerHTML = `
     <div class="unit-tab-visual">
