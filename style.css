@@ -714,3 +714,26 @@ html.splash-dismissed body.has-splash .controls{
   align-items: center;
   text-align: center;
 }
+/* Fix mobile: éviter la superposition Lang / titre */
+@media (max-width: 520px){
+  .topbar{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .brand{
+    width: 100%;
+    text-align: center;
+  }
+
+  .controls{
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  /* option: centrer la pill (plus clean visuellement) */
+  .controls .pill{
+    margin: 0 auto;
+  }
+}
