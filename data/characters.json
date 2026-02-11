@@ -27,25 +27,18 @@
         "en": "Class Action: Technician"
       },
       "class_action_body": {
-        "fr": "Description de l'action de classe du technicien.",
-        "en": "Technician class action description."
+        "fr": "Crée un bouclier 🛡️ infini qui ne compte pas dans le stock des trois boucliers de la partie.",
+        "en": "Once per turn, you may create 1 Shield 🛡️. This Shield does not count toward the three-Shield limit for the game."
       },
       "ultimate_title": {
-        "fr": "Ultime",
-        "en": "Ultimate"
+        "fr": "Coup Unique : Cœur Mécanique",
+        "en": "Ultimate Ability : Mechanical Heart"
       },
       "ultimate_body": {
-        "fr": "Description de l'ultime de Banado.",
-        "en": "Banado's ultimate description."
+        "fr": "Restaure 1 PV à tous les alliés sur un terrain adjacent au technicien, sans consommer de clés.",
+        "en": "Restore 1 HP to all allied units on spaces adjacent to the Technician. This effect does not consume Repair Keys."
       },
-      "movement_desc": {
-        "fr": "Se déplace selon les règles standard.",
-        "en": "Moves according to standard rules."
-      },
-      "attack_desc": {
-        "fr": "Attaque en ligne droite.",
-        "en": "Attacks in straight line."
-      }
+     }
     },
     "toggles": []
   },
