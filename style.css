@@ -366,7 +366,7 @@ button:active{transform: translateY(1px)}
   display:block;
 }
 .brand .mascot{
-  width: min(160px, 18vw);
+  width: clamp(140px, 45vw, 320px);
   height:auto;
   margin-left: 12px;
   margin-top: -10px;
