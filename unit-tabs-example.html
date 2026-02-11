@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mechkawaii - Unit Tabs Example</title>
+  <link rel="stylesheet" href="mechkawaii-improved.css">
+</head>
+<body class="tabs-visible">
+  
+  <!-- Ton contenu existant ici -->
+  <div class="container">
+    <!-- ... -->
+  </div>
+
+  <!-- NOUVEAU: Barre d'onglets des unités -->
+  <div class="unit-tabs-container visible">
+    <div class="unit-tabs" id="unitTabs">
+      <!-- Les tabs seront générés dynamiquement par JavaScript -->
+    </div>
+  </div>
+
+  <script>
+    // ========================================
+    // SYSTÈME DE TABS D'UNITÉS
+    // ========================================
+
+    // Données exemple des unités sélectionnées
+    let selectedUnits = [
+      {
+        id: 'goryo',
+        name: 'Goryo',
+        role: 'Grenadier',
+        hp: 3,
+        maxHp: 3,
+        image: 'assets/units/goryo.png' // Chemin vers ton image
+      },
+      {
+        id: 'goki',
+        name: 'Goki',
+        role: 'Pyrotechnicien',
+        hp: 2,
+        maxHp: 3,
+        image: 'assets/units/goki.png'
+      },
+      {
+        id: 'gyuki',
+        name: 'Gyuki',
+        role: 'Voltigeur',
+        hp: 1,
+        maxHp: 2,
+        image: 'assets/units/gyuki.png'
+      }
+    ];
+
+    let currentUnitId = 'goryo'; // Unité actuellement affichée
+
+    // Initialiser les tabs
+    function initUnitTabs() {
+      const tabsContainer = document.getElementById('unitTabs');
+      const unitTabsWrapper = document.querySelector('.unit-tabs-container');
+      
+      // Vider les tabs existants
+      tabsContainer.innerHTML = '';
+      
+      // Si aucune unité, cacher la barre
+      if (selectedUnits.length === 0) {
+        unitTabsWrapper.classList.remove('visible');
+        document.body.classList.remove('tabs-visible');
+        return;
+      }
+      
+      // Afficher la barre
+      unitTabsWrapper.classList.add('visible');
+      document.body.classList.add('tabs-visible');
+      
+      // Créer un tab pour chaque unité
+      selectedUnits.forEach((unit, index) => {
+        const tab = createUnitTab(unit);
+        tabsContainer.appendChild(tab);
+      });
+    }
+
+    // Créer un tab d'unité
+    function createUnitTab(unit) {
+      const tab = document.createElement('div');
+      tab.className = 'unit-tab';
+      tab.dataset.unitId = unit.id;
+      
+      // Marquer comme active si c'est l'unité courante
+      if (unit.id === currentUnitId) {
+        tab.classList.add('active');
+      }
+      
+      // Déterminer si HP est bas
+      const hpPercentage = (unit.hp / unit.maxHp) * 100;
+      const hpClass = hpPercentage <= 33 ? 'low' : '';
+      
+      tab.innerHTML = `
+        <div class="unit-tab-visual">
+          <img src="${unit.image}" alt="${unit.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%2333333a%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-size=%2214%22%3E${unit.name[0]}%3C/text%3E%3C/svg%3E'">
+          <div class="unit-tab-hp ${hpClass}">
+            <span>❤️</span>
+            <span>${unit.hp}/${unit.maxHp}</span>
+          </div>
+        </div>
+        <div class="unit-tab-info">
+          <div class="unit-tab-name">${unit.name}</div>
+          <div class="unit-tab-role">${unit.role}</div>
+        </div>
+      `;
+      
+      // Événement click pour changer d'unité
+      tab.addEventListener('click', () => {
+        switchToUnit(unit.id);
+      });
+      
+      return tab;
+    }
+
+    // Changer d'unité active
+    function switchToUnit(unitId) {
+      // Mettre à jour l'unité courante
+      currentUnitId = unitId;
+      
+      // Mettre à jour les classes active
+      document.querySelectorAll('.unit-tab').forEach(tab => {
+        if (tab.dataset.unitId === unitId) {
+          tab.classList.add('active');
+        } else {
+          tab.classList.remove('active');
+        }
+      });
+      
+      // Scroll smooth vers le tab actif
+      const activeTab = document.querySelector(`.unit-tab[data-unit-id="${unitId}"]`);
+      if (activeTab) {
+        activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+      
+      // Mettre à jour l'affichage principal
+      displayUnitDetails(unitId);
+      
+      // Feedback visuel
+      console.log('Unité active:', unitId);
+    }
+
+    // Afficher les détails de l'unité dans la page principale
+    function displayUnitDetails(unitId) {
+      const unit = selectedUnits.find(u => u.id === unitId);
+      if (!unit) return;
+      
+      // ICI: Mettre à jour ton UI principal avec les infos de l'unité
+      // Par exemple:
+      // - Afficher la fiche complète
+      // - Mettre à jour les contrôles HP
+      // - Afficher les capacités spéciales
+      // etc.
+      
+      console.log('Affichage détails pour:', unit);
+    }
+
+    // Mettre à jour les HP d'une unité
+    function updateUnitHP(unitId, newHp) {
+      const unit = selectedUnits.find(u => u.id === unitId);
+      if (!unit) return;
+      
+      unit.hp = Math.max(0, Math.min(newHp, unit.maxHp));
+      
+      // Rafraîchir les tabs
+      initUnitTabs();
+      
+      // Animation de feedback
+      const tab = document.querySelector(`.unit-tab[data-unit-id="${unitId}"]`);
+      if (tab) {
+        tab.style.animation = 'none';
+        setTimeout(() => {
+          tab.style.animation = 'heartShake 0.3s ease';
+        }, 10);
+      }
+    }
+
+    // Ajouter une unité aux tabs
+    function addUnit(unit) {
+      selectedUnits.push(unit);
+      initUnitTabs();
+    }
+
+    // Retirer une unité des tabs
+    function removeUnit(unitId) {
+      selectedUnits = selectedUnits.filter(u => u.id !== unitId);
+      
+      // Si on retire l'unité active, passer à la première
+      if (currentUnitId === unitId && selectedUnits.length > 0) {
+        currentUnitId = selectedUnits[0].id;
+      }
+      
+      initUnitTabs();
+    }
+
+    // ========================================
+    // ÉVÉNEMENTS EXEMPLE
+    // ========================================
+
+    // Quand l'utilisateur choisit des personnages
+    document.addEventListener('characterSelected', (e) => {
+      const character = e.detail;
+      addUnit({
+        id: character.id,
+        name: character.name,
+        role: character.role,
+        hp: character.maxHp,
+        maxHp: character.maxHp,
+        image: character.image
+      });
+    });
+
+    // Boutons HP +/-
+    document.addEventListener('click', (e) => {
+      if (e.target.matches('.hp-btn-plus')) {
+        updateUnitHP(currentUnitId, getCurrentUnit().hp + 1);
+      }
+      if (e.target.matches('.hp-btn-minus')) {
+        updateUnitHP(currentUnitId, getCurrentUnit().hp - 1);
+      }
+    });
+
+    // Utilitaire: obtenir l'unité courante
+    function getCurrentUnit() {
+      return selectedUnits.find(u => u.id === currentUnitId);
+    }
+
+    // ========================================
+    // INITIALISATION
+    // ========================================
+    
+    // Initialiser les tabs au chargement
+    initUnitTabs();
+    
+    // Afficher l'unité par défaut
+    if (selectedUnits.length > 0) {
+      displayUnitDetails(currentUnitId);
+    }
+
+    // EXEMPLE: Simuler des changements de HP toutes les 3 secondes (pour tester)
+    // Décommenter pour voir l'animation
+    /*
+    setInterval(() => {
+      if (selectedUnits.length > 0) {
+        const randomUnit = selectedUnits[Math.floor(Math.random() * selectedUnits.length)];
+        const newHp = Math.max(0, randomUnit.hp - 1);
+        updateUnitHP(randomUnit.id, newHp);
+      }
+    }, 3000);
+    */
+  </script>
+</body>
+</html>
