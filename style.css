@@ -1,544 +1,527 @@
-:root{
-  --bg:#0b0b0e;
-  --panel:#13131a;
-  --panel2:#0f0f15;
-  --text:#f2f2f2;
-  --muted:#b9b9c3;
-  --accent:#ffd200;
-  --danger:#ff4d4d;
-  --ok:#3ddc97;
-  --border:rgba(255,255,255,.10);
-  --shadow: 0 10px 30px rgba(0,0,0,.35);
-  --radius:16px;
-  --radius2:12px;
+/* ============================================
+   MECHKAWAII COMPANION - Improved Stylesheet
+   Game companion app pour suivre les parties
+   ============================================ */
+
+/* ===================
+   Design Tokens
+   =================== */
+:root {
+  /* Colors */
+  --bg: #0b0b0e;
+  --panel: #13131a;
+  --panel2: #0f0f15;
+  --text: #f2f2f2;
+  --muted: #b9b9c3;
+  --accent: #ffd200;
+  --danger: #ff4d4d;
+  --ok: #3ddc97;
+  --border: rgba(255, 255, 255, 0.10);
+  
+  /* Spacing (nouvelles variables pour cohérence) */
+  --space-xs: 6px;
+  --space-sm: 10px;
+  --space-md: 14px;
+  --space-lg: 18px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  
+  /* Border radius */
+  --radius: 16px;
+  --radius-md: 12px;
+  --radius-sm: 10px;
+  --radius-full: 999px;
+  
+  /* Shadows */
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
+  
+  /* Layout */
   --maxw: 980px;
-  font-synthesis-weight:none;
+  
+  /* Touch targets (44px minimum recommandé) */
+  --touch-min: 44px;
+  
+  /* Performance: réduire blur sur mobile */
+  --blur: 10px;
+  
+  /* Misc */
+  font-synthesis-weight: none;
 }
 
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-  background: radial-gradient(1200px 700px at 20% 0%, rgba(255,210,0,.08), transparent 55%),
-              radial-gradient(900px 600px at 80% 10%, rgba(61,220,151,.07), transparent 50%),
-              var(--bg);
-  color:var(--text);
+/* Mobile: moins de blur pour performance */
+@media (max-width: 768px) {
+  :root {
+    --blur: 6px;
+  }
 }
 
-a{color:inherit}
-.container{
-  width: min(var(--maxw), calc(100% - 32px));
+/* ===================
+   Reset & Base
+   =================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+  background: 
+    radial-gradient(1200px 700px at 20% 0%, rgba(255, 210, 0, 0.08), transparent 55%),
+    radial-gradient(900px 600px at 80% 10%, rgba(61, 220, 151, 0.07), transparent 50%),
+    var(--bg);
+  background-attachment: fixed; /* Évite re-render du gradient au scroll */
+  color: var(--text);
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Amélioration tap highlight sur mobile */
+button, a, .toggle, .char {
+  -webkit-tap-highlight-color: rgba(255, 210, 0, 0.15);
+}
+
+/* ===================
+   Layout
+   =================== */
+.container {
+  width: min(var(--maxw), calc(100% - var(--space-2xl)));
   margin: 0 auto;
-  padding: 24px 0 64px;
+  padding: var(--space-xl) 0 64px;
 }
-.topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  padding: 12px 14px;
-  border:1px solid var(--border);
-  background: rgba(19,19,26,.75);
-  backdrop-filter: blur(10px);
+
+/* ===================
+   Topbar
+   =================== */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  background: rgba(19, 19, 26, 0.75);
+  backdrop-filter: blur(var(--blur));
   border-radius: var(--radius);
   box-shadow: var(--shadow);
 }
-.brand{
-  display:flex; flex-direction:column; gap:2px;
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
-.brand .title{
-  font-weight:800;
-  letter-spacing:.5px;
+
+.brand .title {
+  font-weight: 800;
+  letter-spacing: 0.5px;
 }
-.brand .subtitle{
-  color:var(--muted);
+
+.brand .subtitle {
+  color: var(--muted);
   font-size: 13px;
 }
 
-.controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-.pill{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding: 10px 12px;
-  border-radius: 999px;
-  border:1px solid var(--border);
-  background: rgba(15,15,21,.7);
+/* ===================
+   Controls & Forms
+   =================== */
+.controls {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+  flex-wrap: wrap;
 }
-select, button, input[type="checkbox"]{
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--space-sm) 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: rgba(15, 15, 21, 0.7);
+}
+
+select, button, input[type="checkbox"] {
   font: inherit;
 }
-button{
-  cursor:pointer;
-  border:1px solid var(--border);
-  background: rgba(15,15,21,.8);
+
+button {
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: rgba(15, 15, 21, 0.8);
   color: var(--text);
-  padding: 10px 12px;
-  border-radius: 12px;
-  transition: transform .04s ease, border-color .2s ease, background .2s ease;
-}
-button:hover{border-color: rgba(255,210,0,.45)}
-button:active{transform: translateY(1px)}
-.btn-accent{
-  border-color: rgba(255,210,0,.55);
-  background: rgba(255,210,0,.12);
-}
-.btn-danger{
-  border-color: rgba(255,77,77,.55);
-  background: rgba(255,77,77,.10);
+  padding: 12px 16px; /* Touch-friendly: min 44px */
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: 
+    transform 0.04s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+  min-height: var(--touch-min);
+  min-width: var(--touch-min);
 }
 
-.grid{
-  margin-top:18px;
-  display:grid;
-  grid-template-columns: 1.2fr .8fr;
-  gap:16px;
-}
-@media (max-width: 900px){
-  .grid{grid-template-columns: 1fr}
+button:hover {
+  border-color: rgba(255, 210, 0, 0.45);
+  box-shadow: 0 0 12px rgba(255, 210, 0, 0.15);
 }
 
-.card{
-  border:1px solid var(--border);
+button:active {
+  transform: translateY(1px);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.btn-accent {
+  border-color: rgba(255, 210, 0, 0.55);
+  background: rgba(255, 210, 0, 0.12);
+}
+
+.btn-danger {
+  border-color: rgba(255, 77, 77, 0.55);
+  background: rgba(255, 77, 77, 0.10);
+}
+
+/* ===================
+   Grid Layout
+   =================== */
+.grid {
+  margin-top: var(--space-lg);
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: var(--space-md);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===================
+   Cards
+   =================== */
+.card {
+  border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: rgba(19,19,26,.72);
+  background: rgba(19, 19, 26, 0.72);
   box-shadow: var(--shadow);
-  overflow:hidden;
+  overflow: hidden;
 }
-.card .card-h{
-  padding: 14px 16px;
-  background: rgba(15,15,21,.65);
-  border-bottom:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
+
+.card .card-h {
+  padding: var(--space-md) var(--space-md);
+  background: rgba(15, 15, 21, 0.65);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
-.card .card-b{padding: 14px 16px}
-.h1{
-  font-size: 28px;
-  margin:0;
-  letter-spacing:.6px;
+
+.card .card-b {
+  padding: var(--space-md) var(--space-md);
 }
-.meta{
-  color:var(--muted);
+
+/* ===================
+   Typography
+   =================== */
+.h1 {
+  font-size: clamp(22px, 5vw, 28px);
+  margin: 0;
+  letter-spacing: 0.6px;
+  font-weight: 800;
+}
+
+.meta {
+  color: var(--muted);
   font-size: 14px;
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
 }
-.badge{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border:1px solid var(--border);
-  background: rgba(15,15,21,.75);
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: rgba(15, 15, 21, 0.75);
   color: var(--muted);
   font-size: 13px;
 }
 
-.hp{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.hearts{display:flex; gap:6px; align-items:center}
-.heart{
-  width: 22px;
-  height: 22px;
-  display:inline-block;
-  filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
-}
-.hp-ctl{display:flex; gap:8px}
-.hp-ctl button{padding: 8px 10px; border-radius: 10px}
-
-.section-title{
-  font-weight:800;
-  letter-spacing:.4px;
+.section-title {
+  font-weight: 800;
+  letter-spacing: 0.4px;
   margin: 0 0 8px 0;
 }
-.text{
-  color: var(--muted);
-  line-height: 1.5;
-  margin:0;
-}
-.rule{
-  margin-top: 12px;
-  padding: 12px 12px;
-  border-radius: var(--radius2);
-  border:1px solid var(--border);
-  background: rgba(11,11,14,.55);
-}
-.rule h3{margin:0 0 6px 0; font-size: 16px}
-.rule p{margin:0; color: var(--muted); line-height: 1.5}
 
-.toggles{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:10px;
+.text {
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
 }
-@media (max-width: 520px){
-  .toggles{grid-template-columns: 1fr}
+
+.small {
+  color: var(--muted);
+  font-size: 13px;
 }
-.toggle{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding: 12px 12px;
-  border-radius: var(--radius2);
-  border:1px solid var(--border);
-  background: rgba(11,11,14,.55);
+
+/* ===================
+   HP System (Game specific)
+   =================== */
+.hp {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
 }
-.toggle .lbl{
-  display:flex;
-  flex-direction:column;
-  gap:2px;
+
+.hearts {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
 }
-.toggle .lbl .t{
-  font-weight:700;
+
+.heart {
+  width: 22px;
+  height: 22px;
+  display: inline-block;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25));
+  transition: transform 0.15s ease;
 }
-.toggle .lbl .d{
-  color:var(--muted);
+
+/* Feedback visuel quand HP change */
+.heart.damaged {
+  animation: heartShake 0.3s ease;
+}
+
+@keyframes heartShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.hp-ctl {
+  display: flex;
+  gap: 8px;
+}
+
+.hp-ctl button {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  min-height: var(--touch-min);
+  min-width: var(--touch-min);
+  font-weight: 700;
+}
+
+/* ===================
+   Rules & Info Sections
+   =================== */
+.rule {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: rgba(11, 11, 14, 0.55);
+}
+
+.rule h3 {
+  margin: 0 0 var(--space-xs) 0;
+  font-size: 16px;
+}
+
+.rule p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ===================
+   Toggle Switches
+   =================== */
+.toggles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-sm);
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: rgba(11, 11, 14, 0.55);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  min-height: var(--touch-min);
+}
+
+.toggle:hover {
+  border-color: rgba(255, 210, 0, 0.3);
+}
+
+.toggle .lbl {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.toggle .lbl .t {
+  font-weight: 700;
+}
+
+.toggle .lbl .d {
+  color: var(--muted);
   font-size: 12px;
 }
 
-.switch{
+/* Switch améliorer avec transitions plus smooth */
+.switch {
   width: 46px;
   height: 28px;
-  border-radius: 999px;
-  border:1px solid var(--border);
-  background: rgba(255,255,255,.08);
-  position:relative;
-  flex: 0 0 auto;
-}
-.switch::after{
-  content:"";
-  position:absolute;
-  top:3px; left:3px;
-  width: 22px; height: 22px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.85);
-  transition: transform .15s ease, background .15s ease;
-}
-.switch.on{
-  border-color: rgba(61,220,151,.55);
-  background: rgba(61,220,151,.14);
-}
-.switch.on::after{
-  transform: translateX(18px);
-  background: rgba(255,255,255,.92);
-}
-
-.patterns{
-  display:grid;
-  grid-template-columns: 1fr;
-  gap:12px;
-}
-.pattern{
-  border:1px solid var(--border);
-  border-radius: var(--radius2);
-  background: rgba(11,11,14,.55);
-  overflow:hidden;
-}
-.pattern .ph{
-  padding: 10px 12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  border-bottom:1px solid var(--border);
-}
-.pattern .ph .k{font-weight:800}
-.pattern img{
-  width: 100%;
-  height: auto;
-  display:block;
-}
-.small{
-  color: var(--muted);
-  font-size: 13px;
-}
-.list{
-  display:grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap:12px;
-  margin-top: 18px;
-}
-@media (max-width: 820px){
-  .list{grid-template-columns: repeat(2, 1fr)}
-}
-@media (max-width: 520px){
-  .list{grid-template-columns: 1fr}
-}
-.char{
-  display:block;
-  text-decoration:none;
-  border:1px solid var(--border);
-  border-radius: var(--radius);
-  background: rgba(19,19,26,.68);
-  padding: 14px 14px;
-  box-shadow: var(--shadow);
-}
-.char:hover{border-color: rgba(255,210,0,.45)}
-.char .n{font-weight:900; letter-spacing:.4px; font-size:18px}
-.char .m{margin-top:6px; color:var(--muted); font-size: 13px; display:flex; gap:8px; flex-wrap:wrap}
-.footer-note{
-  margin-top: 18px;
-  color: var(--muted);
-  font-size: 13px;
-}
-
-/* Splash screen */
-.splash{
-  margin-top:16px;
-  border:1px solid var(--border);
-  border-radius: var(--radius);
-  background: rgba(19,19,26,.72);
-  box-shadow: var(--shadow);
-  overflow:hidden;
-}
-.splash .hero{ position:relative; }
-.splash .hero img{ width: 100%; height:auto; display:block; }
-.splash .overlay{
-  position:absolute; inset:0;
-  background: linear-gradient(to top, rgba(0,0,0,.75), rgba(0,0,0,.1));
-}
-.splash .content{
-  position:absolute;
-  left:16px; right:16px; bottom:16px;
-  display:flex; justify-content:space-between; align-items:flex-end;
-  gap:12px; flex-wrap:wrap;
-}
-.splash .title{
-  font-size:28px; font-weight:900; letter-spacing:.8px;
-}
-.splash .tag{ color:var(--muted); font-size:14px; }
-
-.btn-raw{
-  background: transparent;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-}
-.btn-raw img{
-  width: min(520px, 80vw);
-  height: auto;
-  display: block;
-}
-.btn-raw:active{ transform: translateY(1px); }
-
-/* --- Splash (Mechkawaii Companion) --- */
-.splash-full{
-  margin-top:16px;
-  border-radius: 18px;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,0.10);
-}
-.hero{ position:relative; }
-.hero-bg{ width:100%; height: auto; display:block; filter: none; }
-.overlay{
-  position:absolute; inset:0;
-  background: rgba(0,0,0,0.35);
-}
-.hero-ui{
-  position:absolute; inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding: 22px;
-}
-.brand{
-  position:absolute;
-  top: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  display:flex;
-  align-items:flex-start;
-  justify-content:center;
-}
-.brand .logo{
-  width: min(780px, 88vw);
-  height:auto;
-  display:block;
-}
-.brand .mascot{
-  width: clamp(140px, 45vw, 320px);
-  height:auto;
-  margin-left: 12px;
-  margin-top: -10px;
-  display:block;
-  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.35));
-}
-.menu{
-  margin-top: 90px;
-  display:flex;
-  flex-direction:column;
-  gap: 16px;
-  align-items:center;
-  justify-content:center;
-}
-.menu .menu-btn{
-  width: min(520px, 80vw);
-  height: 64px;
-  border-radius: 12px;
-  border: 2px solid rgba(255,255,255,0.18);
-  background: rgba(26,20,34,0.86);
-  color: rgba(255,255,255,0.95);
-  font-weight: 900;
-  letter-spacing: 4px;
-  font-size: 20px;
-  cursor:pointer;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.25);
-}
-.menu .menu-btn:hover{
-  border-color: rgba(255,79,216,0.45);
-}
-.menu .menu-btn:active{
-  transform: translateY(1px);
-}
-.linkbtn{ text-decoration:none; }
-@media (max-width: 420px){
-  .brand{ top: 18px; }
-  .menu{ margin-top: 60px; gap: 12px; }
-  .brand .mascot{ margin-top: -6px; }
-}
-
-.mkw-btn{
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.08);
   position: relative;
-  width: min(520px, 80vw);
-  cursor: pointer;
+  flex: 0 0 auto;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
-.mkw-btn img{
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.switch.on {
+  border-color: rgba(61, 220, 151, 0.55);
+  background: rgba(61, 220, 151, 0.14);
+}
+
+.switch.on::after {
+  transform: translateX(18px);
+  background: rgba(61, 220, 151, 0.95);
+}
+
+/* ===================
+   Pattern/Image Gallery
+   =================== */
+.patterns {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.pattern {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(11, 11, 14, 0.55);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.pattern:hover {
+  transform: translateY(-2px);
+}
+
+.pattern .ph {
+  padding: var(--space-sm) 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+  border-bottom: 1px solid var(--border);
+}
+
+.pattern .ph .k {
+  font-weight: 800;
+}
+
+.pattern img {
   width: 100%;
   height: auto;
   display: block;
 }
-.mkw-label{
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
+/* ===================
+   Character List
+   =================== */
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin-top: var(--space-lg);
+}
+
+.char {
+  display: block;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(19, 19, 26, 0.68);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.char:hover {
+  border-color: rgba(255, 210, 0, 0.45);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.char:active {
+  transform: translateY(-2px);
+}
+
+.char .n {
   font-weight: 900;
-  letter-spacing: 6px;
-  font-size: 22px;
-  color: #ffffff;
-  text-shadow:
-    0 2px 8px rgba(0,0,0,0.6),
-    0 0 12px rgba(255,79,216,0.35);
-  pointer-events: none;
-}
-.mkw-btn:hover{ filter: brightness(1.08); }
-.mkw-btn:active{ transform: translateY(1px); }
-
-
-/* --- Micro-animations (splash polish) --- */
-@keyframes mkw-float {
-  0%   { transform: translateY(0px) rotate(-2deg); }
-  50%  { transform: translateY(-6px) rotate(2deg); }
-  100% { transform: translateY(0px) rotate(-2deg); }
-}
-@keyframes mkw-glow {
-  0%   { filter: drop-shadow(0 0 0 rgba(255,79,216,0.0)) drop-shadow(0 0 0 rgba(255,181,107,0.0)); }
-  50%  { filter: drop-shadow(0 0 14px rgba(255,79,216,0.55)) drop-shadow(0 0 18px rgba(255,181,107,0.35)); }
-  100% { filter: drop-shadow(0 0 0 rgba(255,79,216,0.0)) drop-shadow(0 0 0 rgba(255,181,107,0.0)); }
+  letter-spacing: 0.4px;
+  font-size: 18px;
 }
 
-/* Heart mascot: subtle float */
-.brand .mascot{
-  animation: mkw-float 2.8s ease-in-out infinite;
-  transform-origin: 30% 60%;
+.char .m {
+  margin-top: var(--space-xs);
+  color: var(--muted);
+  font-size: 13px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-/* Play button: pulsing glow */
-#playBtn.mkw-btn{
-  animation: mkw-glow 1.8s ease-in-out infinite;
-}
-#playBtn.mkw-btn:hover{
-  animation-duration: 1.2s;
-}
-#playBtn.mkw-btn:active{
-  animation: none;
-  filter: drop-shadow(0 0 18px rgba(255,79,216,0.55));
-}
-
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce){
-  .brand .mascot, #playBtn.mkw-btn{ animation: none !important; }
-}
-
-
-/* --- Splash overlay fixes --- */
-.splash-full{
-  position: fixed;
-  inset: 0;
-  margin: 0 !important;
-  border-radius: 0 !important;
-  z-index: 9999;
-  background: #000;
-}
-
-/* Center brand + small mascot above logo */
-.splash-full .brand{
-  position: relative !important;
-  top: auto !important;
-  left: auto !important;
-  transform: none !important;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width: min(860px, 92vw);
-}
-.splash-full .brand .logo{
-  width: 100% !important;
-}
-.splash-full .brand .mascot{
-  position: absolute;
-  top: -46px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: clamp(140px, 45vw, 320px) !important;
-  margin: 0 !important;
-  animation: mkw-float 2.8s ease-in-out infinite;
-  filter: drop-shadow(0 10px 22px rgba(0,0,0,0.45));
-}
-
-/* Menu spacing under logo */
-.splash-full .menu{
-  margin-top: 42px !important;
-}
-
-/* Hide underlying UI while splash is visible (even if it exists in DOM) */
-body.has-splash .topbar,
-body.has-splash #setupCard,
-body.has-splash #draftCard,
-body.has-splash #charList,
-body.has-splash .footer-note,
-body.has-splash .controls{
-  visibility: hidden;
-}
-
-/* If the splash has already been dismissed, hide it immediately (prevents desktop "flash")
-   and reveal the UI even before JS finishes booting. */
-html.splash-dismissed body.has-splash #splash,
-html.splash-dismissed body.has-splash .splash-overlay{
-  display: none !important;
-}
-html.splash-dismissed body.has-splash .topbar,
-html.splash-dismissed body.has-splash #setupCard,
-html.splash-dismissed body.has-splash #draftCard,
-html.splash-dismissed body.has-splash .footer-note,
-html.splash-dismissed body.has-splash .controls{
-  visibility: visible !important;
-}
-
-
-/* --- Splash overlay (final) --- */
-.splash-overlay{
+/* ===================
+   Splash Screen
+   =================== */
+.splash-overlay {
   position: fixed;
   inset: 0;
   margin: 0;
@@ -546,177 +529,251 @@ html.splash-dismissed body.has-splash .controls{
   z-index: 9999;
   overflow: hidden;
   border: none;
+  background: #000;
 }
+
 .splash-overlay .hero,
-.splash-overlay .hero-ui{ height: 100%; }
-.splash-overlay .hero-bg{
+.splash-overlay .hero-ui {
+  height: 100%;
+}
+
+.splash-overlay .hero-bg {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  pointer-events: none;
 }
-.splash-overlay .overlay{
-  position:absolute;
-  inset:0;
-  background: rgba(0,0,0,0.38);
+
+.splash-overlay .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.38);
 }
-.splash-overlay .hero-ui{
-  position:absolute;
-  inset:0;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+
+.splash-overlay .hero-ui {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 22px;
   padding: 28px 18px;
 }
-.brand-stack{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap: 10px;
-  margin-bottom: 6px;
+
+.brand-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
 }
-.brand-stack .logo{
-  width: clamp(140px, 45vw, 320px);
-  height:auto;
-  display:block;
-  filter: drop-shadow(0 10px 28px rgba(0,0,0,0.35));
+
+.brand-stack .logo {
+  width: clamp(180px, 60vw, 420px);
+  height: auto;
+  filter: drop-shadow(0 10px 28px rgba(0, 0, 0, 0.35));
 }
-.brand-stack .mascot{
-  width: clamp(140px, 45vw, 320px);
-  height:auto;
-  display:block;
-  filter: drop-shadow(0 8px 22px rgba(0,0,0,0.35));
+
+.brand-stack .mascot {
+  width: clamp(44px, 12vw, 64px);
+  height: auto;
+  filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.35));
 }
-.splash-overlay .menu{
-  display:flex;
-  flex-direction:column;
-  gap: 14px;
-  align-items:center;
-  justify-content:center;
+
+.splash-overlay .menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  align-items: center;
+  justify-content: center;
 }
-.mkw-link{ text-decoration:none; }
-.mkw-btn{
+
+/* Boutons splash uniformisés */
+.mkw-btn,
+.mkw-link {
   position: relative;
-  width: min(520px, 80vw);
+  width: clamp(220px, 80vw, 360px);
+  max-width: 90vw;
   cursor: pointer;
+  text-decoration: none;
+  display: block;
 }
-.mkw-btn img{
+
+.mkw-btn img {
   width: 100%;
   height: auto;
   display: block;
 }
-.mkw-label{
+
+.mkw-label {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 900;
-  letter-spacing: 6px;
-  font-size: 22px;
+  letter-spacing: clamp(4px, 1.5vw, 6px);
+  font-size: clamp(16px, 4vw, 22px);
   color: #ffffff;
   text-shadow:
-    0 2px 10px rgba(0,0,0,0.65),
-    0 0 12px rgba(255,79,216,0.35);
+    0 2px 10px rgba(0, 0, 0, 0.65),
+    0 0 12px rgba(255, 79, 216, 0.35);
   pointer-events: none;
 }
-.mkw-btn:hover{ filter: brightness(1.08); }
-.mkw-btn:active{ transform: translateY(1px); }
 
-/* Smaller typography on very small screens */
-@media (max-width: 380px){
-  .mkw-label{ font-size: 18px; letter-spacing: 5px; }
+.mkw-btn:hover {
+  filter: brightness(1.08);
 }
 
+.mkw-btn:active {
+  transform: translateY(1px);
+}
 
-/* ===== Desktop Splash UI Fix (compact & truly responsive) ===== */
-@media (min-width: 900px){
-  /* Prevent the splash from feeling "mobile giant" on desktop */
-  .splash-overlay .hero-ui{
+/* ===================
+   Animations
+   =================== */
+@keyframes mkw-float {
+  0% { transform: translateY(0px) rotate(-2deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+  100% { transform: translateY(0px) rotate(-2deg); }
+}
+
+@keyframes mkw-glow {
+  0% { filter: drop-shadow(0 0 0 rgba(255, 79, 216, 0.0)); }
+  50% { filter: drop-shadow(0 0 14px rgba(255, 79, 216, 0.55)) drop-shadow(0 0 18px rgba(255, 181, 107, 0.35)); }
+  100% { filter: drop-shadow(0 0 0 rgba(255, 79, 216, 0.0)); }
+}
+
+/* Animation mascot */
+.brand .mascot,
+.brand-stack .mascot {
+  animation: mkw-float 2.8s ease-in-out infinite;
+  transform-origin: 50% 60%;
+}
+
+/* Animation bouton play */
+#playBtn.mkw-btn {
+  animation: mkw-glow 1.8s ease-in-out infinite;
+}
+
+#playBtn.mkw-btn:hover {
+  animation-duration: 1.2s;
+}
+
+#playBtn.mkw-btn:active {
+  animation: none;
+  filter: drop-shadow(0 0 18px rgba(255, 79, 216, 0.55));
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .brand .mascot,
+  .brand-stack .mascot,
+  #playBtn.mkw-btn {
+    animation: none !important;
+  }
+}
+
+/* ===================
+   Splash Dismissed State
+   =================== */
+body.has-splash .topbar,
+body.has-splash #setupCard,
+body.has-splash #draftCard,
+body.has-splash #charList,
+body.has-splash .footer-note,
+body.has-splash .controls {
+  visibility: hidden;
+}
+
+html.splash-dismissed body.has-splash #splash,
+html.splash-dismissed body.has-splash .splash-overlay {
+  display: none !important;
+}
+
+html.splash-dismissed body.has-splash .topbar,
+html.splash-dismissed body.has-splash #setupCard,
+html.splash-dismissed body.has-splash #draftCard,
+html.has-splash .footer-note,
+html.splash-dismissed body.has-splash .controls {
+  visibility: visible !important;
+}
+
+/* ===================
+   Utilities
+   =================== */
+.footer-note {
+  margin-top: var(--space-lg);
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* État "partie en cours" - verrouille certains choix */
+body.game-active .toggle.locked {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+body.game-active .toggle.locked::after {
+  content: "🔒";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+}
+
+/* ===================
+   Desktop Optimizations
+   =================== */
+@media (min-width: 900px) {
+  .splash-overlay .hero-ui {
     overflow-y: auto;
-    gap: 14px;
+    gap: var(--space-md);
     padding: 22px;
   }
 
-  /* Keep brand assets reasonable on large screens */
-  .brand-stack .logo{
+  .brand-stack .logo {
     width: clamp(260px, 28vw, 420px);
     max-height: 26vh;
     object-fit: contain;
   }
 
-  .brand-stack .mascot{
-    width: clamp(140px, 45vw, 320px);
-    max-height: 8vh;
-    object-fit: contain;
-  }
-
-  /* Buttons shouldn't become billboards */
-  .mkw-btn{
+  .mkw-btn {
     width: clamp(240px, 22vw, 340px);
   }
+}
 
-  .mkw-label{
-    font-size: 18px;
-    letter-spacing: 5px;
+/* ===================
+   Print Styles (utile pour imprimer résumé de partie)
+   =================== */
+@media print {
+  body {
+    background: white;
+    color: black;
   }
-}
-
-
-  .brand-stack .logo{
-    width: min(420px, 60vw);
+  
+  .splash-overlay,
+  button,
+  .controls {
+    display: none !important;
   }
-
-  .brand-stack .mascot{
-    width: clamp(140px, 45vw, 320px);
-  }
-
-  .mkw-btn{
-    width: min(340px, 38vw);
-  }
-
-  .mkw-label{
-    font-size: 18px;
-    letter-spacing: 5px;
-  }
-}
-
-.splash-overlay .hero-bg{
-  pointer-events: none;
-}
-
-
-/* --- Responsive splash sizing + uniform buttons (v1.3.8) --- */
-.brand-stack .logo{
-  width: clamp(180px, 60vw, 420px);
-  height: auto;
-}
-
-.brand-stack .mascot{
-  width: clamp(44px, 12vw, 64px);
-  height: auto;
-}
-
-.splash-overlay .mkw-btn,
-.splash-overlay a.mkw-btn,
-.splash-overlay .link-btn{
-  width: clamp(220px, 80vw, 360px);
-  max-width: 90vw;
-  padding: 14px 18px;
-  font-size: clamp(14px, 4vw, 16px);
-  line-height: 1.2;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-  /* option: centrer la pill (plus clean visuellement) */
-  .controls .pill{
-    margin: 0 auto;
+  
+  .card {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 }
