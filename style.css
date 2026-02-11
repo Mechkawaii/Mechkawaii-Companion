@@ -80,6 +80,18 @@ body {
   line-height: 1.6;
 }
 
+/* Bloquer scroll quand splash est visible */
+body.has-splash {
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Débloquer scroll quand splash est fermé */
+html.splash-dismissed body.has-splash {
+  overflow: auto;
+  height: auto;
+}
+
 a {
   color: inherit;
   text-decoration: none;
