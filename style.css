@@ -1,11 +1,12 @@
-/* ============================================
+
+/* =====================================
    MECHKAWAII COMPANION - Improved Stylesheet
    Game companion app pour suivre les parties
-   ============================================ */
+   ===================================== */
 
-/* ===================
+/* =====================================
    Design Tokens
-   =================== */
+   ===================================== */
 :root {
   /* Colors */
   --bg: #0b0b0e;
@@ -17,6 +18,7 @@
   --danger: #ff4d4d;
   --ok: #3ddc97;
   --border: rgba(255, 255, 255, 0.10);
+  --shield: #3b82f6;
   
   /* Spacing (nouvelles variables pour cohérence) */
   --space-xs: 6px;
@@ -56,9 +58,9 @@
   }
 }
 
-/* ===================
+/* =====================================
    Reset & Base
-   =================== */
+   ===================================== */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -102,18 +104,25 @@ button, a, .toggle, .char {
   -webkit-tap-highlight-color: rgba(255, 210, 0, 0.15);
 }
 
-/* ===================
+/* =====================================
    Layout
-   =================== */
+   ===================================== */
 .container {
   width: min(var(--maxw), calc(100% - var(--space-2xl)));
   margin: 0 auto;
   padding: var(--space-xl) 0 64px;
+  transition: border-left 0.2s ease, padding-left 0.2s ease;
 }
 
-/* ===================
+/* Effet visuel quand une unité a un bouclier */
+.container.has-shield {
+  border-left: 5px solid var(--shield);
+  padding-left: 15px;
+}
+
+/* =====================================
    Topbar
-   =================== */
+   ===================================== */
 .topbar {
   display: flex;
   align-items: center;
@@ -143,9 +152,9 @@ button, a, .toggle, .char {
   font-size: 13px;
 }
 
-/* ===================
+/* =====================================
    Controls & Forms
-   =================== */
+   ===================================== */
 .controls {
   display: flex;
   gap: var(--space-sm);
@@ -208,9 +217,9 @@ button:focus-visible {
   background: rgba(255, 77, 77, 0.10);
 }
 
-/* ===================
+/* =====================================
    Grid Layout
-   =================== */
+   ===================================== */
 .grid {
   margin-top: var(--space-lg);
   display: grid;
@@ -224,9 +233,9 @@ button:focus-visible {
   }
 }
 
-/* ===================
+/* =====================================
    Cards
-   =================== */
+   ===================================== */
 .card {
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -249,9 +258,9 @@ button:focus-visible {
   padding: var(--space-md) var(--space-md);
 }
 
-/* ===================
+/* =====================================
    Typography
-   =================== */
+   ===================================== */
 .h1 {
   font-size: clamp(22px, 5vw, 28px);
   margin: 0;
@@ -296,13 +305,31 @@ button:focus-visible {
   font-size: 13px;
 }
 
-/* ===================
-   HP System (Game specific)
-   =================== */
+/* =====================================
+   HP & Shields System
+   ===================================== */
+.hp-shields-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 769px) {
+  .hp-shields-wrapper {
+    flex-direction: row;
+    gap: 24px;
+  }
+}
+
+.hp-section, .shields-section {
+  flex: 1;
+}
+
 .hp {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
+  margin-bottom: 12px;
 }
 
 .hearts {
@@ -343,9 +370,67 @@ button:focus-visible {
   font-weight: 700;
 }
 
-/* ===================
+/* =====================================
+   Shields Display
+   ===================================== */
+.shields-display {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.shield-button {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: #f5f5f5;
+  background-size: 20px;
+  background-position: 8px center;
+  background-repeat: no-repeat;
+  padding-left: 36px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  transition: all 0.2s ease;
+}
+
+.shield-button:hover {
+  border-color: var(--shield);
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.shield-button:active {
+  transform: translateY(1px);
+}
+
+.shield-remove-btn {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid var(--danger);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: rgba(255, 77, 77, 0.1);
+  color: var(--danger);
+  font-weight: 500;
+  margin-top: 8px;
+  transition: all 0.2s ease;
+}
+
+.shield-remove-btn:hover {
+  background: rgba(255, 77, 77, 0.2);
+}
+
+.shield-remove-btn:active {
+  transform: translateY(1px);
+}
+
+/* =====================================
    Rules & Info Sections
-   =================== */
+   ===================================== */
 .rule {
   margin-top: 12px;
   padding: 12px;
@@ -365,9 +450,9 @@ button:focus-visible {
   line-height: 1.6;
 }
 
-/* ===================
+/* =====================================
    Toggle Switches
-   =================== */
+   ===================================== */
 .toggles {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -408,6 +493,44 @@ button:focus-visible {
   font-size: 12px;
 }
 
+/* Visual Keys Toggle */
+.toggle-visual-keys {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.keys-display {
+  display: flex;
+  gap: 8px;
+}
+
+.key-button {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  background: #f5f5f5;
+  transition: all 0.2s ease;
+  padding: 0;
+  background-size: 70%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.key-button:hover {
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.key-button:active {
+  transform: translateY(1px);
+}
+
 /* Switch améliorer avec transitions plus smooth */
 .switch {
   width: 46px;
@@ -443,9 +566,9 @@ button:focus-visible {
   background: rgba(61, 220, 151, 0.95);
 }
 
-/* ===================
+/* =====================================
    Pattern/Image Gallery
-   =================== */
+   ===================================== */
 .patterns {
   display: grid;
   grid-template-columns: 1fr;
@@ -483,9 +606,9 @@ button:focus-visible {
   display: block;
 }
 
-/* ===================
+/* =====================================
    Character List
-   =================== */
+   ===================================== */
 .list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -537,9 +660,9 @@ button:focus-visible {
   flex-wrap: wrap;
 }
 
-/* ===================
+/* =====================================
    Splash Screen
-   =================== */
+   ===================================== */
 .splash-overlay {
   position: fixed;
   inset: 0;
@@ -651,9 +774,9 @@ button:focus-visible {
   transform: translateY(1px);
 }
 
-/* ===================
+/* =====================================
    Animations
-   =================== */
+   ===================================== */
 @keyframes mkw-float {
   0% { transform: translateY(0px) rotate(-2deg); }
   50% { transform: translateY(-6px) rotate(2deg); }
@@ -704,9 +827,9 @@ button:focus-visible {
   }
 }
 
-/* ===================
+/* =====================================
    Splash Dismissed State
-   =================== */
+   ===================================== */
 body.has-splash .topbar,
 body.has-splash #setupCard,
 body.has-splash #draftCard,
@@ -729,9 +852,9 @@ html.splash-dismissed body.has-splash .controls {
   visibility: visible !important;
 }
 
-/* ===================
+/* =====================================
    Utilities
-   =================== */
+   ===================================== */
 .footer-note {
   margin-top: var(--space-lg);
   color: var(--muted);
@@ -739,9 +862,9 @@ html.splash-dismissed body.has-splash .controls {
   text-align: center;
 }
 
-/* ===================
+/* =====================================
    Unit Tabs (Bottom Navigation)
-   =================== */
+   ===================================== */
 .unit-tabs-container {
   position: fixed;
   bottom: 0;
@@ -845,6 +968,14 @@ html.splash-dismissed body.has-splash .controls {
   justify-content: center;
   margin-bottom: 8px;
   position: relative;
+  transition: all 0.2s ease;
+  border-left: none;
+}
+
+/* Effet visuel bouclier sur les tabs */
+.unit-tab-visual.has-shield {
+  border-left: 4px solid var(--shield);
+  padding-left: 8px;
 }
 
 .unit-tab-visual img {
@@ -937,9 +1068,9 @@ body.game-active .toggle.locked::after {
   font-size: 12px;
 }
 
-/* ===================
+/* =====================================
    Desktop Optimizations
-   =================== */
+   ===================================== */
 @media (min-width: 900px) {
   .splash-overlay .hero-ui {
     overflow-y: auto;
@@ -967,9 +1098,9 @@ body.game-active .toggle.locked::after {
   }
 }
 
-/* ===================
+/* =====================================
    Print Styles (utile pour imprimer résumé de partie)
-   =================== */
+   ===================================== */
 @media print {
   body {
     background: white;
