@@ -79,14 +79,27 @@ function setState(charId, state){
 function getSharedShields(){
   try{
     const raw = localStorage.getItem(STORAGE_PREFIX + "shields");
-    if(!raw) return [false, false, false];
+    if(!raw) return [true, true, true];
     return JSON.parse(raw);
   }catch(e){
-    return [false, false, false];
+    return [true, true, true];
   }
 }
 function setSharedShields(shields){
   localStorage.setItem(STORAGE_PREFIX + "shields", JSON.stringify(shields));
+}
+
+function getShieldAssignments(){
+  try{
+    const raw = localStorage.getItem(STORAGE_PREFIX + "shield-assignments");
+    if(!raw) return {};
+    return JSON.parse(raw);
+  }catch(e){
+    return {};
+  }
+}
+function setShieldAssignments(assignments){
+  localStorage.setItem(STORAGE_PREFIX + "shield-assignments", JSON.stringify(assignments));
 }
 
 function heartSvg(filled){
@@ -144,7 +157,6 @@ function renderHP(container, hpCur, hpMax){
 }
 
 function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = null){
-  // Si c'est un toggle visuel pour les clés
   if (toggle.type === 'visual_keys') {
     const keysContainer = document.createElement('div');
     keysContainer.className = 'toggle-visual-keys';
@@ -194,31 +206,21 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
         justify-content: center;
         transition: all 0.2s ease;
         padding: 0;
-        background-image: url('./assets/icons/${isShield ? 'shield' : 'key'}_off.svg');
+        background-image: url('./assets/icons/${isShield ? 'shield' : 'key'}_${currentState[i] ? 'on' : 'off'}.svg');
         background-size: 70%;
         background-position: center;
         background-repeat: no-repeat;
       `;
       
-      const isActive = currentState[i] || false;
       key.dataset.keyIndex = i;
       key.dataset.toggleId = toggle.id;
-      key.dataset.active = isActive ? 'true' : 'false';
-
-      if (isActive) {
-        key.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_on.svg')`;
-      }
+      key.dataset.active = currentState[i] ? 'true' : 'false';
 
       key.addEventListener('click', function(e) {
         e.preventDefault();
         this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true';
+        this.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_${this.dataset.active === 'true' ? 'on' : 'off'}.svg')`;
         
-        if (this.dataset.active === 'true') {
-          this.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_on.svg')`;
-        } else {
-          this.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_off.svg')`;
-        }
-
         const keysState = [];
         keysDisplay.querySelectorAll('.key-button').forEach(kb => {
           keysState.push(kb.dataset.active === 'true');
@@ -330,6 +332,7 @@ async function initIndex(){
     localStorage.removeItem(STORAGE_PREFIX + "setup");
     localStorage.removeItem(STORAGE_PREFIX + "draft");
     localStorage.removeItem(STORAGE_PREFIX + "shields");
+    localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
     location.reload();
   }
 
@@ -337,6 +340,7 @@ async function initIndex(){
     changeSetupBtn.addEventListener("click", ()=>{
       localStorage.removeItem(STORAGE_PREFIX + "setup");
       localStorage.removeItem(STORAGE_PREFIX + "shields");
+      localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
       location.reload();
     });
   }
@@ -535,6 +539,7 @@ async function initCharacter(){
   };
 
   const sharedShields = getSharedShields();
+  const assignments = getShieldAssignments();
 
   qs("#charName").textContent = t(c.name, lang);
   qs("#charClass").textContent = t(c.class, lang);
@@ -546,6 +551,18 @@ async function initCharacter(){
   function refreshHP(){
     hpCurEl.textContent = String(state.hp);
     renderHP(hpHeartsEl, state.hp, c.hp?.max ?? 0);
+  }
+
+  function updateShieldDisplay(){
+    const hasShield = assignments[c.id] ? true : false;
+    const container = qs(".container");
+    if (hasShield) {
+      container.style.borderLeft = "5px solid #3b82f6";
+      container.style.paddingLeft = "15px";
+    } else {
+      container.style.borderLeft = "none";
+      container.style.paddingLeft = "0";
+    }
   }
 
   qs("#hpMinus").addEventListener("click", ()=>{
@@ -577,23 +594,67 @@ async function initCharacter(){
     shieldsDisplay.innerHTML = '';
     const shieldToggle = c.toggles?.find(tg => tg.id === 'shield');
     if (shieldToggle) {
-      const shields = getSharedShields();
       for (let i = 0; i < 3; i++) {
+        if (!sharedShields[i]) continue;
+        
         const shield = document.createElement('button');
         shield.className = 'shield-button';
         shield.type = 'button';
-        shield.style.backgroundImage = shields[i] ? "url('./assets/icons/shield_on.svg')" : "url('./assets/icons/shield_off.svg')";
+        shield.style.backgroundImage = `url('./assets/icons/shield_on.svg')`;
         shield.dataset.shieldIndex = i;
+        shield.textContent = `Bouclier ${i + 1}`;
+        shield.style.cssText = `
+          width: 100%;
+          padding: 8px 12px;
+          border: 2px solid #ccc;
+          border-radius: 6px;
+          cursor: pointer;
+          background: #f5f5f5;
+          background-image: url('./assets/icons/shield_on.svg');
+          background-size: 20px;
+          background-position: 8px center;
+          background-repeat: no-repeat;
+          padding-left: 36px;
+          text-align: left;
+          font-size: 14px;
+          font-weight: 500;
+          margin-bottom: 6px;
+          transition: all 0.2s ease;
+        `;
         
         shield.addEventListener('click', function(e) {
           e.preventDefault();
-          shields[i] = !shields[i];
-          this.style.backgroundImage = shields[i] ? "url('./assets/icons/shield_on.svg')" : "url('./assets/icons/shield_off.svg')";
-          setSharedShields(shields);
-          updateShieldsOnAllTabs();
+          showShieldAssignmentModal(i, c.id, lang, chars, assignments);
         });
         
         shieldsDisplay.appendChild(shield);
+      }
+
+      // Bouton pour retirer le bouclier de cette unité
+      if (assignments[c.id]) {
+        const removeShield = document.createElement('button');
+        removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove shield';
+        removeShield.style.cssText = `
+          width: 100%;
+          padding: 8px 12px;
+          border: 2px solid #ef4444;
+          border-radius: 6px;
+          cursor: pointer;
+          background: #fee2e2;
+          color: #dc2626;
+          font-weight: 500;
+          margin-top: 8px;
+          transition: all 0.2s ease;
+        `;
+        
+        removeShield.addEventListener('click', function(e) {
+          e.preventDefault();
+          delete assignments[c.id];
+          setShieldAssignments(assignments);
+          location.reload();
+        });
+        
+        shieldsDisplay.appendChild(removeShield);
       }
     }
   }
@@ -605,7 +666,7 @@ async function initCharacter(){
     if (tg.id === 'shield') return;
     
     if (tg.type === 'visual_keys') {
-      const keysState = state.toggles[tg.id] || [];
+      const keysState = state.toggles[tg.id] || [true, true];
       const isOn = keysState.some(k => k === true);
       renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
         state.toggles[tg.id] = v;
@@ -638,7 +699,7 @@ async function initCharacter(){
   qs("#resetBtn").addEventListener("click", ()=>{
     const fresh = {
       hp: c.hp?.max ?? 0,
-      toggles: Object.fromEntries((c.toggles||[]).map(tg => [tg.id, tg.type === 'visual_keys' ? [] : false]))
+      toggles: Object.fromEntries((c.toggles||[]).map(tg => [tg.id, tg.type === 'visual_keys' ? [true, true] : false]))
     };
     setState(c.id, fresh);
     location.reload();
@@ -646,25 +707,107 @@ async function initCharacter(){
 
   qs("#backBtn").addEventListener("click", ()=>{ location.href = "./index.html"; });
 
+  updateShieldDisplay();
   initUnitTabs(id, chars, lang);
 }
 
-function updateShieldsOnAllTabs(){
-  const tabs = qsa('.unit-tab');
-  tabs.forEach(tab => {
-    const charId = tab.getAttribute('data-char-id');
-    const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
-    const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
-    
-    if(setupRaw && draftRaw){
-      const setup = JSON.parse(setupRaw);
-      const draft = JSON.parse(draftRaw);
-      
-      if(setup.mode === "single" || (setup.mode === "multi" && Array.isArray(draft.activeIds))){
-        updateTabHP(charId, getState(charId)?.hp ?? 0);
-      }
-    }
+function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, assignments){
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  `;
+
+  const content = document.createElement('div');
+  content.style.cssText = `
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 400px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+  `;
+
+  const title = document.createElement('h2');
+  title.textContent = lang === 'fr' ? 'Assigner le bouclier' : 'Assign shield';
+  title.style.marginTop = '0';
+  content.appendChild(title);
+
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const setup = JSON.parse(setupRaw);
+  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
+  const draft = JSON.parse(draftRaw);
+
+  let teamChars = allChars.filter(c => {
+    if (setup.mode === 'single') return draft.activeIds?.includes(c.id);
+    const currentChar = allChars.find(ch => ch.id === currentCharId);
+    return draft.activeIds?.includes(c.id) && (c.camp || "mechkawaii") === (currentChar.camp || "mechkawaii");
   });
+
+  teamChars.forEach(char => {
+    const btn = document.createElement('button');
+    btn.textContent = t(char.name, lang);
+    btn.style.cssText = `
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      cursor: pointer;
+      background: white;
+      transition: all 0.2s ease;
+    `;
+    
+    btn.addEventListener('mouseover', () => {
+      btn.style.borderColor = '#3b82f6';
+      btn.style.background = '#eff6ff';
+    });
+    btn.addEventListener('mouseout', () => {
+      btn.style.borderColor = '#ddd';
+      btn.style.background = 'white';
+    });
+    
+    btn.addEventListener('click', () => {
+      assignments[char.id] = shieldIndex;
+      setShieldAssignments(assignments);
+      document.body.removeChild(modal);
+      location.reload();
+    });
+    
+    content.appendChild(btn);
+  });
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = lang === 'fr' ? 'Annuler' : 'Cancel';
+  closeBtn.style.cssText = `
+    width: 100%;
+    padding: 10px;
+    margin-top: 16px;
+    border: 2px solid #999;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #f5f5f5;
+  `;
+  closeBtn.addEventListener('click', () => {
+    document.body.removeChild(modal);
+  });
+  content.appendChild(closeBtn);
+
+  modal.appendChild(content);
+  document.body.appendChild(modal);
+}
+
+function updateShieldsOnAllTabs(){
+  location.reload();
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
@@ -720,7 +863,6 @@ function initUnitTabs(currentCharId, allChars, lang){
   const unitTabsWrapper = qs(".unit-tabs-container");
   
   if(!tabsContainer || !unitTabsWrapper) {
-    console.warn('Containers de tabs non trouvés');
     return;
   }
 
@@ -779,8 +921,15 @@ function createCharacterTab(char, lang){
   const hpPercentage = maxHp > 0 ? (hp / maxHp) * 100 : 100;
   const hpClass = hpPercentage <= 33 ? 'low' : '';
 
+  const assignments = getShieldAssignments();
+  const hasShield = assignments[char.id] ? true : false;
+
   const visualEl = document.createElement('div');
   visualEl.className = 'unit-tab-visual';
+  if (hasShield) {
+    visualEl.style.borderLeft = '4px solid #3b82f6';
+    visualEl.style.paddingLeft = '8px';
+  }
   
   const charImage = char.images?.portrait || char.images?.character;
   
