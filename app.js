@@ -603,7 +603,7 @@ async function initCharacter(){
         
         shield.addEventListener('click', function(e) {
           e.preventDefault();
-          showShieldAssignmentModal(i, c.id, lang, chars, assignments);
+          showShieldAssignmentModal(i, c.id, lang, chars, sharedShields, assignments);
         });
         
         shieldsDisplay.appendChild(shield);
@@ -617,8 +617,11 @@ async function initCharacter(){
         
         removeShield.addEventListener('click', function(e) {
           e.preventDefault();
+          const shieldIndex = assignments[c.id];
           delete assignments[c.id];
           setShieldAssignments(assignments);
+          sharedShields[shieldIndex] = true;
+          setSharedShields(sharedShields);
           location.reload();
         });
         
@@ -679,7 +682,7 @@ async function initCharacter(){
   initUnitTabs(id, chars, lang);
 }
 
-function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, assignments){
+function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, sharedShields, assignments){
   const modal = document.createElement('div');
   modal.style.cssText = `
     position: fixed;
@@ -703,6 +706,7 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, a
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
+    color: black;
   `;
 
   const title = document.createElement('h2');
@@ -732,6 +736,7 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, a
       border-radius: 6px;
       cursor: pointer;
       background: white;
+      color: black;
       transition: all 0.2s ease;
     `;
     
@@ -747,6 +752,8 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, a
     btn.addEventListener('click', () => {
       assignments[char.id] = shieldIndex;
       setShieldAssignments(assignments);
+      sharedShields[shieldIndex] = false;
+      setSharedShields(sharedShields);
       document.body.removeChild(modal);
       location.reload();
     });
@@ -764,6 +771,7 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, a
     border-radius: 6px;
     cursor: pointer;
     background: #f5f5f5;
+    color: black;
   `;
   closeBtn.addEventListener('click', () => {
     document.body.removeChild(modal);
