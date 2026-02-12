@@ -641,6 +641,7 @@ async function initCharacter(){
       }
 
       if (freshAssignments[c.id] !== undefined) {
+        const shieldIndex = freshAssignments[c.id];
         const removeShield = document.createElement('button');
         removeShield.className = 'shield-remove-btn';
         removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove shield';
@@ -648,8 +649,14 @@ async function initCharacter(){
         removeShield.addEventListener('click', function(e) {
           e.preventDefault();
           const currentAssignments = getShieldAssignments();
+          const currentShields = getSharedShields();
+          
           delete currentAssignments[c.id];
+          currentShields[shieldIndex] = true;
+          
           setShieldAssignments(currentAssignments);
+          setSharedShields(currentShields);
+          
           location.reload();
         });
         
@@ -783,8 +790,13 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, s
     
     btn.addEventListener('click', () => {
       const currentAssignments = getShieldAssignments();
+      const currentShields = getSharedShields();
+      
       currentAssignments[char.id] = shieldIndex;
+      currentShields[shieldIndex] = false;
+      
       setShieldAssignments(currentAssignments);
+      setSharedShields(currentShields);
       
       document.body.removeChild(modal);
       
