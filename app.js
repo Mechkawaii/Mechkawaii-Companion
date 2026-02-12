@@ -188,12 +188,15 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
 
     const maxKeys = toggle.maxKeys || 2;
     const isShield = toggle.id === 'shield';
-    const currentState = isShield ? sharedShields : isOn;
+    
+    // For shields, use sharedShields array. For other visual_keys, use the isOn array
+    const currentState = isShield ? sharedShields : (Array.isArray(isOn) ? isOn : [isOn, isOn]);
 
     for (let i = 0; i < maxKeys; i++) {
       const key = document.createElement('button');
       key.className = 'key-button';
       key.type = 'button';
+      const keyState = currentState[i] !== undefined ? currentState[i] : true;
       key.style.cssText = `
         width: 40px;
         height: 40px;
@@ -206,7 +209,7 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
         justify-content: center;
         transition: all 0.2s ease;
         padding: 0;
-        background-image: url('./assets/icons/${isShield ? 'shield' : 'key'}_${(currentState[i] !== undefined ? currentState[i] : true) ? 'on' : 'off'}.svg');
+        background-image: url('./assets/icons/${isShield ? 'shield' : 'key'}_${keyState ? 'on' : 'off'}.svg');
         background-size: 70%;
         background-position: center;
         background-repeat: no-repeat;
@@ -214,7 +217,7 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
       
       key.dataset.keyIndex = i;
       key.dataset.toggleId = toggle.id;
-      key.dataset.active = (currentState[i] !== undefined ? currentState[i] : true) ? 'true' : 'false';
+      key.dataset.active = keyState ? 'true' : 'false';
 
       key.addEventListener('click', function(e) {
         e.preventDefault();
@@ -678,7 +681,6 @@ async function initCharacter(){
     };
     setState(c.id, fresh);
     
-    // Réinitialiser tous les boucliers
     setSharedShields([true, true, true]);
     setShieldAssignments({});
     
