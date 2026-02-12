@@ -929,6 +929,10 @@ function createCharacterTab(char, lang){
   tab.appendChild(visualEl);
   tab.appendChild(infoEl);
 
+  if (hasShield) {
+    tab.classList.add('has-shield');
+  }
+
   tab.addEventListener('click', () => {
     location.href = `character.html?id=${encodeURIComponent(char.id)}`;
   });
