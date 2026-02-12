@@ -641,7 +641,6 @@ async function initCharacter(){
       }
 
       if (freshAssignments[c.id] !== undefined) {
-        const shieldIndex = freshAssignments[c.id];
         const removeShield = document.createElement('button');
         removeShield.className = 'shield-remove-btn';
         removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove shield';
@@ -649,13 +648,9 @@ async function initCharacter(){
         removeShield.addEventListener('click', function(e) {
           e.preventDefault();
           const currentAssignments = getShieldAssignments();
-          const currentShields = getSharedShields();
           
           delete currentAssignments[c.id];
-          currentShields[shieldIndex] = true;
-          
           setShieldAssignments(currentAssignments);
-          setSharedShields(currentShields);
           
           location.reload();
         });
