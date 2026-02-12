@@ -1,1121 +1,1015 @@
 
-/* =====================================================
-   MECHKAWAII COMPANION - Improved Stylesheet
-   Game companion app pour suivre les parties
-   ===================================================== */
+const STORAGE_PREFIX = "mechkawaii:";
 
-/* =====================================================
-   Design Tokens
-   ===================================================== */
-:root {
-  /* Colors */
-  --bg: #0b0b0e;
-  --panel: #13131a;
-  --panel2: #0f0f15;
-  --text: #f2f2f2;
-  --muted: #b9b9c3;
-  --accent: #ffd200;
-  --danger: #ff4d4d;
-  --ok: #3ddc97;
-  --border: rgba(255, 255, 255, 0.10);
-  --shield: #3b82f6;
-  
-  /* Spacing (nouvelles variables pour cohérence) */
-  --space-xs: 6px;
-  --space-sm: 10px;
-  --space-md: 14px;
-  --space-lg: 18px;
-  --space-xl: 24px;
-  --space-2xl: 32px;
-  
-  /* Border radius */
-  --radius: 16px;
-  --radius-md: 12px;
-  --radius-sm: 10px;
-  --radius-full: 999px;
-  
-  /* Shadows */
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
-  
-  /* Layout */
-  --maxw: 980px;
-  
-  /* Touch targets (44px minimum recommandé) */
-  --touch-min: 44px;
-  
-  /* Performance: réduire blur sur mobile */
-  --blur: 10px;
-  
-  /* Misc */
-  font-synthesis-weight: none;
+function playPressStart(){
+  try{
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const master = ctx.createGain();
+    master.gain.value = 0.12;
+    master.connect(ctx.destination);
+
+    const now = ctx.currentTime;
+
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    osc1.type = "square";
+    osc2.type = "triangle";
+
+    const g1 = ctx.createGain();
+    const g2 = ctx.createGain();
+    g1.gain.setValueAtTime(0.0001, now);
+    g2.gain.setValueAtTime(0.0001, now);
+
+    osc1.frequency.setValueAtTime(660, now);
+    osc1.frequency.exponentialRampToValueAtTime(990, now + 0.06);
+
+    osc2.frequency.setValueAtTime(330, now);
+    osc2.frequency.exponentialRampToValueAtTime(440, now + 0.08);
+
+    g1.gain.exponentialRampToValueAtTime(0.9, now + 0.01);
+    g1.gain.exponentialRampToValueAtTime(0.0001, now + 0.10);
+
+    g2.gain.exponentialRampToValueAtTime(0.6, now + 0.01);
+    g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+    osc1.connect(g1); g1.connect(master);
+    osc2.connect(g2); g2.connect(master);
+
+    osc1.start(now); osc2.start(now);
+    osc1.stop(now + 0.12);
+    osc2.stop(now + 0.14);
+
+    setTimeout(()=>{ try{ ctx.close(); }catch(e){} }, 250);
+  }catch(e){}
 }
 
-/* Mobile: moins de blur pour performance */
-@media (max-width: 768px) {
-  :root {
-    --blur: 6px;
+function heartIcon(filled){
+  const src = filled ? "./assets/pv.svg" : "./assets/pv_off.svg";
+  return `<img src="${src}" class="heart" alt="PV" />`;
+}
+
+function qs(sel){ return document.querySelector(sel); }
+function qsa(sel){ return [...document.querySelectorAll(sel)]; }
+
+function getLang(){
+  const saved = localStorage.getItem(STORAGE_PREFIX + "lang");
+  return saved || "fr";
+}
+
+function setLang(lang){
+  localStorage.setItem(STORAGE_PREFIX + "lang", lang);
+}
+
+function getState(charId){
+  try{
+    const raw = localStorage.getItem(STORAGE_PREFIX + "state:" + charId);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){
+    return null;
   }
 }
 
-/* =====================================================
-   Reset & Base
-   ===================================================== */
-*, *::before, *::after {
-  box-sizing: border-box;
+function setState(charId, state){
+  localStorage.setItem(STORAGE_PREFIX + "state:" + charId, JSON.stringify(state));
 }
 
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
-  background: 
-    radial-gradient(1200px 700px at 20% 0%, rgba(255, 210, 0, 0.08), transparent 55%),
-    radial-gradient(900px 600px at 80% 10%, rgba(61, 220, 151, 0.07), transparent 50%),
-    var(--bg);
-  background-attachment: fixed; /* Évite re-render du gradient au scroll */
-  color: var(--text);
-  line-height: 1.6;
-}
-
-/* Bloquer scroll quand splash est visible */
-body.has-splash {
-  overflow: hidden;
-  height: 100vh;
-}
-
-/* Débloquer scroll quand splash est fermé */
-html.splash-dismissed body.has-splash {
-  overflow: auto;
-  height: auto;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-/* Amélioration tap highlight sur mobile */
-button, a, .toggle, .char {
-  -webkit-tap-highlight-color: rgba(255, 210, 0, 0.15);
-}
-
-/* =====================================================
-   Layout
-   ===================================================== */
-.container {
-  width: min(var(--maxw), calc(100% - var(--space-2xl)));
-  margin: 0 auto;
-  padding: var(--space-xl) 0 64px;
-}
-
-/* =====================================================
-   Topbar
-   ===================================================== */
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md);
-  padding: var(--space-md);
-  border: 1px solid var(--border);
-  background: rgba(19, 19, 26, 0.75);
-  backdrop-filter: blur(var(--blur));
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-
-.brand {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.brand .title {
-  font-weight: 800;
-  letter-spacing: 0.5px;
-}
-
-.brand .subtitle {
-  color: var(--muted);
-  font-size: 13px;
-}
-
-/* =====================================================
-   Controls & Forms
-   ===================================================== */
-.controls {
-  display: flex;
-  gap: var(--space-sm);
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: var(--space-sm) 12px;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border);
-  background: rgba(15, 15, 21, 0.7);
-}
-
-select, button, input[type="checkbox"] {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-  border: 1px solid var(--border);
-  background: rgba(15, 15, 21, 0.8);
-  color: var(--text);
-  padding: 12px 16px; /* Touch-friendly: min 44px */
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  transition: 
-    transform 0.04s ease,
-    border-color 0.2s ease,
-    background 0.2s ease,
-    box-shadow 0.2s ease;
-  min-height: var(--touch-min);
-  min-width: var(--touch-min);
-}
-
-button:hover {
-  border-color: rgba(255, 210, 0, 0.45);
-  box-shadow: 0 0 12px rgba(255, 210, 0, 0.15);
-}
-
-button:active {
-  transform: translateY(1px);
-}
-
-button:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.btn-accent {
-  border-color: rgba(255, 210, 0, 0.55);
-  background: rgba(255, 210, 0, 0.12);
-}
-
-.btn-danger {
-  border-color: rgba(255, 77, 77, 0.55);
-  background: rgba(255, 77, 77, 0.10);
-}
-
-/* =====================================================
-   Grid Layout
-   ===================================================== */
-.grid {
-  margin-top: var(--space-lg);
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: var(--space-md);
-}
-
-@media (max-width: 900px) {
-  .grid {
-    grid-template-columns: 1fr;
+function getSharedShields(){
+  try{
+    const raw = localStorage.getItem(STORAGE_PREFIX + "shields");
+    if(!raw) return [true, true, true];
+    return JSON.parse(raw);
+  }catch(e){
+    return [true, true, true];
   }
 }
 
-/* =====================================================
-   Cards
-   ===================================================== */
-.card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: rgba(19, 19, 26, 0.72);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-  transition: background 0.2s ease;
+function setSharedShields(shields){
+  localStorage.setItem(STORAGE_PREFIX + "shields", JSON.stringify(shields));
 }
 
-.card.has-shield {
-  background: rgba(59, 130, 246, 0.15);
-  border-color: rgba(59, 130, 246, 0.3);
-}
-
-.card .card-h {
-  padding: var(--space-md) var(--space-md);
-  background: rgba(15, 15, 21, 0.65);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.card.has-shield .card-h {
-  background: rgba(59, 130, 246, 0.25);
-}
-
-.card .card-b {
-  padding: var(--space-md) var(--space-md);
-}
-
-/* =====================================================
-   Typography
-   ===================================================== */
-.h1 {
-  font-size: clamp(22px, 5vw, 28px);
-  margin: 0;
-  letter-spacing: 0.6px;
-  font-weight: 800;
-}
-
-.meta {
-  color: var(--muted);
-  font-size: 14px;
-  display: flex;
-  gap: var(--space-sm);
-  flex-wrap: wrap;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border);
-  background: rgba(15, 15, 21, 0.75);
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.section-title {
-  font-weight: 800;
-  letter-spacing: 0.4px;
-  margin: 0 0 8px 0;
-}
-
-.text {
-  color: var(--muted);
-  line-height: 1.6;
-  margin: 0;
-}
-
-.small {
-  color: var(--muted);
-  font-size: 13px;
-}
-
-/* =====================================================
-   HP & Shields System
-   ===================================================== */
-.hp-shields-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-@media (min-width: 769px) {
-  .hp-shields-wrapper {
-    flex-direction: row;
-    gap: 24px;
+function getShieldAssignments(){
+  try{
+    const raw = localStorage.getItem(STORAGE_PREFIX + "shield-assignments");
+    if(!raw) return {};
+    return JSON.parse(raw);
+  }catch(e){
+    return {};
   }
 }
 
-.hp-section, .shields-section {
-  flex: 1;
-}
-
-.hp {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  margin-bottom: 12px;
-}
-
-.hearts {
-  display: flex;
-  gap: var(--space-xs);
-  align-items: center;
-}
-
-.heart {
-  width: 22px;
-  height: 22px;
-  display: inline-block;
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25));
-  transition: transform 0.15s ease;
-}
-
-/* Feedback visuel quand HP change */
-.heart.damaged {
-  animation: heartShake 0.3s ease;
-}
-
-@keyframes heartShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-3px); }
-  75% { transform: translateX(3px); }
-}
-
-.hp-ctl {
-  display: flex;
-  gap: 8px;
-}
-
-.hp-ctl button {
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  min-height: var(--touch-min);
-  min-width: var(--touch-min);
-  font-weight: 700;
-}
-
-/* =====================================================
-   Shields Display
-   ===================================================== */
-#shieldsDisplay {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  width: fit-content;
-  margin-top: 8px;
-}
-
-.shield-button {
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  background: #f5f5f5;
-  background-size: 70%;
-  background-position: center;
-  background-repeat: no-repeat;
-  flex-shrink: 0;
-  font-size: 0;
-  transition: all 0.2s ease;
-}
-
-.shield-button:hover {
-  border-color: var(--shield);
-  background-color: rgba(59, 130, 246, 0.1);
-}
-
-.shield-button:active {
-  transform: translateY(1px);
-}
-
-.shield-remove-btn {
-  width: 100%;
-  padding: 8px 12px;
-  border: 2px solid var(--danger);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  background: rgba(255, 77, 77, 0.1);
-  color: var(--danger);
-  font-weight: 500;
-  margin-top: 8px;
-  transition: all 0.2s ease;
-}
-
-.shield-remove-btn:hover {
-  background: rgba(255, 77, 77, 0.2);
-}
-
-.shield-remove-btn:active {
-  transform: translateY(1px);
-}
-
-/* =====================================================
-   Rules & Info Sections
-   ===================================================== */
-.rule {
-  margin-top: 12px;
-  padding: 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: rgba(11, 11, 14, 0.55);
-}
-
-.rule h3 {
-  margin: 0 0 var(--space-xs) 0;
-  font-size: 16px;
-}
-
-.rule p {
-  margin: 0;
-  color: var(--muted);
-  line-height: 1.6;
-}
-
-/* =====================================================
-   Toggle Switches
-   ===================================================== */
-.toggles {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--space-sm);
-}
-
-.toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: rgba(11, 11, 14, 0.55);
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-  min-height: var(--touch-min);
-}
-
-.toggle:hover {
-  border-color: rgba(255, 210, 0, 0.3);
-}
-
-.toggle .lbl {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  pointer-events: none;
-}
-
-.toggle .lbl .t {
-  font-weight: 700;
-}
-
-.toggle .lbl .d {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-/* Visual Keys Toggle */
-.toggle-visual-keys {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  padding: 12px;
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 8px;
-  margin-bottom: 8px;
-}
-
-.keys-display {
-  display: flex;
-  gap: 8px;
-}
-
-.key-button {
-  width: 40px;
-  height: 40px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  background: #f5f5f5;
-  transition: all 0.2s ease;
-  padding: 0;
-  background-size: 70%;
-  background-position: center;
-  background-repeat: no-repeat;
-  flex-shrink: 0;
-}
-
-.key-button:hover {
-  border-color: rgba(59, 130, 246, 0.5);
-}
-
-.key-button:active {
-  transform: translateY(1px);
-}
-
-/* Switch améliorer avec transitions plus smooth */
-.switch {
-  width: 46px;
-  height: 28px;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.08);
-  position: relative;
-  flex: 0 0 auto;
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.switch::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.85);
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.switch.on {
-  border-color: rgba(61, 220, 151, 0.55);
-  background: rgba(61, 220, 151, 0.14);
-}
-
-.switch.on::after {
-  transform: translateX(18px);
-  background: rgba(61, 220, 151, 0.95);
-}
-
-/* =====================================================
-   Pattern/Image Gallery
-   ===================================================== */
-.patterns {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-.pattern {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: rgba(11, 11, 14, 0.55);
-  overflow: hidden;
-  transition: transform 0.2s ease;
-}
-
-.pattern:hover {
-  transform: translateY(-2px);
-}
-
-.pattern .ph {
-  padding: var(--space-sm) 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-sm);
-  border-bottom: 1px solid var(--border);
-}
-
-.pattern .ph .k {
-  font-weight: 800;
-}
-
-.pattern img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* =====================================================
-   Character List
-   ===================================================== */
-.list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 12px;
-  margin-top: var(--space-lg);
-  justify-items: center;
-  width: 100%;
-  max-width: var(--maxw);
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.char {
-  display: block;
-  text-decoration: none;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: rgba(19, 19, 26, 0.68);
-  padding: var(--space-md);
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
-  width: 100%;
-  max-width: 280px;
-}
-
-.char:hover {
-  border-color: rgba(255, 210, 0, 0.45);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
-}
-
-.char:active {
-  transform: translateY(-2px);
-}
-
-.char .n {
-  font-weight: 900;
-  letter-spacing: 0.4px;
-  font-size: 18px;
-}
-
-.char .m {
-  margin-top: var(--space-xs);
-  color: var(--muted);
-  font-size: 13px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-/* =====================================================
-   Splash Screen
-   ===================================================== */
-.splash-overlay {
-  position: fixed;
-  inset: 0;
-  margin: 0;
-  border-radius: 0;
-  z-index: 9999;
-  overflow: hidden;
-  border: none;
-  background: #000;
-}
-
-.splash-overlay .hero,
-.splash-overlay .hero-ui {
-  height: 100%;
-}
-
-.splash-overlay .hero-bg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  pointer-events: none;
-}
-
-.splash-overlay .overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.38);
-}
-
-.splash-overlay .hero-ui {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 22px;
-  padding: 28px 18px;
-}
-
-.brand-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-xs);
-}
-
-.brand-stack .logo {
-  width: clamp(180px, 60vw, 420px);
-  height: auto;
-  filter: drop-shadow(0 10px 28px rgba(0, 0, 0, 0.35));
-}
-
-.brand-stack .mascot {
-  width: clamp(140px, 35vw, 180px);
-  height: auto;
-  filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.35));
-}
-
-.splash-overlay .menu {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-  align-items: center;
-  justify-content: center;
-}
-
-/* Boutons splash uniformisés */
-.mkw-btn,
-.mkw-link {
-  position: relative;
-  width: clamp(220px, 80vw, 360px);
-  max-width: 90vw;
-  cursor: pointer;
-  text-decoration: none;
-  display: block;
-}
-
-.mkw-btn img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.mkw-label {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  letter-spacing: clamp(4px, 1.5vw, 6px);
-  font-size: clamp(16px, 4vw, 22px);
-  color: #ffffff;
-  text-shadow:
-    0 2px 10px rgba(0, 0, 0, 0.65),
-    0 0 12px rgba(255, 79, 216, 0.35);
-  pointer-events: none;
-}
-
-.mkw-btn:hover {
-  filter: brightness(1.08);
-}
-
-.mkw-btn:active {
-  transform: translateY(1px);
-}
-
-/* =====================================================
-   Animations
-   ===================================================== */
-@keyframes mkw-float {
-  0% { transform: translateY(0px) rotate(-2deg); }
-  50% { transform: translateY(-6px) rotate(2deg); }
-  100% { transform: translateY(0px) rotate(-2deg); }
-}
-
-@keyframes mkw-glow {
-  0% { filter: drop-shadow(0 0 0 rgba(255, 79, 216, 0.0)); }
-  50% { filter: drop-shadow(0 0 14px rgba(255, 79, 216, 0.55)) drop-shadow(0 0 18px rgba(255, 181, 107, 0.35)); }
-  100% { filter: drop-shadow(0 0 0 rgba(255, 79, 216, 0.0)); }
-}
-
-/* Animation mascot */
-.brand .mascot,
-.brand-stack .mascot {
-  animation: mkw-float 2.8s ease-in-out infinite;
-  transform-origin: 50% 60%;
-}
-
-/* Animation bouton play */
-#playBtn.mkw-btn {
-  animation: mkw-glow 1.8s ease-in-out infinite;
-}
-
-#playBtn.mkw-btn:hover {
-  animation-duration: 1.2s;
-}
-
-#playBtn.mkw-btn:active {
-  animation: none;
-  filter: drop-shadow(0 0 18px rgba(255, 79, 216, 0.55));
-}
-
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+function setShieldAssignments(assignments){
+  localStorage.setItem(STORAGE_PREFIX + "shield-assignments", JSON.stringify(assignments));
+}
+
+function heartSvg(filled){
+  const fill = filled ? "var(--accent)" : "rgba(255,255,255,.14)";
+  const stroke = filled ? "rgba(0,0,0,.25)" : "rgba(255,255,255,.20)";
+  return `<svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.4C.3 8.2 2.2 5.2 5.4 4.5c1.9-.4 3.8.3 5 1.7 1.2-1.4 3.1-2.1 5-1.7 3.2.7 5.1 3.7 3.4 7.1C19.5 16.4 12 21 12 21z" fill="${fill}" stroke="${stroke}" stroke-width="1.2" /></svg>`;
+}
+
+async function loadCharacters(){
+  const res = await fetch("./data/characters.json", {cache:"no-store"});
+  if(!res.ok) throw new Error("Cannot load characters.json");
+  return await res.json();
+}
+
+function t(obj, lang){
+  if(obj == null) return "";
+  if(typeof obj === "string") return obj;
+  return obj[lang] || obj["fr"] || "";
+}
+
+function setLangUI(lang){
+  const sel = qs("#lang");
+  if(sel) sel.value = lang;
+  qsa("[data-i18n]").forEach(el=>{
+    const key = el.getAttribute("data-i18n");
+    const dict = window.__i18n || {};
+    el.textContent = (dict[key] && (dict[key][lang] || dict[key]["fr"])) || el.textContent;
+  });
+}
+
+function bindTopbar(lang){
+  const sel = qs("#lang");
+  if(sel){
+    sel.value = lang;
+    sel.addEventListener("change", ()=>{
+      const v = sel.value;
+      setLang(v);
+      location.reload();
+    });
   }
+}
+
+function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+function renderHP(container, hpCur, hpMax){
+  container.innerHTML = "";
+  const hearts = document.createElement("div");
+  hearts.className = "hearts";
+  for(let i=1;i<=hpMax;i++){
+    const span = document.createElement("span");
+    span.innerHTML = heartIcon(i<=hpCur);
+    hearts.appendChild(span.firstElementChild);
+  }
+  container.appendChild(hearts);
+}
+
+function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = null){
+  if (toggle.type === 'visual_keys') {
+    const keysContainer = document.createElement('div');
+    keysContainer.className = 'toggle-visual-keys';
+    keysContainer.style.cssText = `
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      background: rgba(0,0,0,0.05);
+      border-radius: 8px;
+      margin-bottom: 8px;
+    `;
+
+    const label = document.createElement('label');
+    label.style.cssText = `
+      flex: 1;
+      font-weight: 600;
+      font-size: 14px;
+      min-width: 150px;
+    `;
+    label.textContent = t(toggle.label, lang);
+
+    const keysDisplay = document.createElement('div');
+    keysDisplay.className = 'keys-display';
+    keysDisplay.style.cssText = `
+      display: flex;
+      gap: 8px;
+    `;
+
+    const maxKeys = toggle.maxKeys || 2;
+    const isShield = toggle.id === 'shield';
+    
+    const currentState = isShield ? sharedShields : (Array.isArray(isOn) ? isOn : [isOn, isOn]);
+
+    for (let i = 0; i < maxKeys; i++) {
+      const key = document.createElement('button');
+      key.className = 'key-button';
+      key.type = 'button';
+      const keyState = currentState[i] !== undefined ? currentState[i] : true;
+      key.style.cssText = `
+        width: 40px;
+        height: 40px;
+        border: 2px solid #ccc;
+        border-radius: 6px;
+        cursor: pointer;
+        background: #f5f5f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        padding: 0;
+        background-image: url('./assets/icons/${isShield ? 'shield' : 'key'}_${keyState ? 'on' : 'off'}.svg');
+        background-size: 70%;
+        background-position: center;
+        background-repeat: no-repeat;
+      `;
+      
+      key.dataset.keyIndex = i;
+      key.dataset.toggleId = toggle.id;
+      key.dataset.active = keyState ? 'true' : 'false';
+
+      key.addEventListener('click', function(e) {
+        e.preventDefault();
+        this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true';
+        this.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_${this.dataset.active === 'true' ? 'on' : 'off'}.svg')`;
+        
+        const keysState = [];
+        keysDisplay.querySelectorAll('.key-button').forEach(kb => {
+          keysState.push(kb.dataset.active === 'true');
+        });
+        onChange(keysState);
+      });
+
+      keysDisplay.appendChild(key);
+    }
+
+    keysContainer.appendChild(label);
+    keysContainer.appendChild(keysDisplay);
+    root.appendChild(keysContainer);
+
+  } else {
+    const row = document.createElement('div');
+    row.className = 'toggle';
+    const left = document.createElement('div');
+    left.className = 'lbl';
+    const title = document.createElement('div');
+    title.className = 't';
+    title.textContent = t(toggle.label, lang);
+    const desc = document.createElement('div');
+    desc.className = 'd';
+    desc.textContent = toggle.hint ? t(toggle.hint, lang) : '';
+    left.appendChild(title);
+    left.appendChild(desc);
+
+    const sw = document.createElement('div');
+    sw.className = 'switch' + (isOn ? ' on' : '');
+    sw.setAttribute('role', 'switch');
+    sw.setAttribute('tabindex', '0');
+    sw.setAttribute('aria-checked', isOn ? 'true' : 'false');
+
+    function flip(){
+      isOn = !isOn;
+      sw.className = 'switch' + (isOn ? ' on' : '');
+      sw.setAttribute('aria-checked', isOn ? 'true' : 'false');
+      onChange(isOn);
+    }
+
+    sw.addEventListener('click', flip);
+    sw.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        flip();
+      }
+    });
+
+    row.appendChild(left);
+    row.appendChild(sw);
+    root.appendChild(row);
+  }
+}
+
+function saveToggleState(charId, toggleId, keyIndex, state) {
+  if (toggleId === 'shield') {
+    setSharedShields(state);
+  } else {
+    const savedState = getState(charId) || { hp: null, toggles: {} };
+    
+    if (!savedState.toggles) {
+      savedState.toggles = {};
+    }
+
+    if (keyIndex !== null) {
+      if (!savedState.toggles[toggleId]) {
+        savedState.toggles[toggleId] = [];
+      }
+      savedState.toggles[toggleId][keyIndex] = state;
+    } else {
+      savedState.toggles[toggleId] = state;
+    }
+
+    setState(charId, savedState);
+  }
+}
+
+function urlParam(name){
+  const u = new URL(location.href);
+  return u.searchParams.get(name);
+}
+
+async function initIndex(){
+  const lang = getLang();
+  bindTopbar(lang);
+
+  const list = qs("#charList");
+  if(!list) return;
+
+  const setupCard = qs("#setupCard");
+  const draftCard = qs("#draftCard");
+  const campPick = qs("#campPick");
+  const draftList = qs("#draftList");
+  const draftError = qs("#draftError");
+
+  const changeSetupBtn = qs("#changeSetupBtn");
+  const changeDraftBtn = qs("#changeDraftBtn");
+
+  const chars = await loadCharacters();
+
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const setup = setupRaw ? JSON.parse(setupRaw) : null;
+
+  function saveSetup(obj){
+    localStorage.setItem(STORAGE_PREFIX + "setup", JSON.stringify(obj));
+  }
+
+  function clearSetup(){
+    localStorage.removeItem(STORAGE_PREFIX + "setup");
+    localStorage.removeItem(STORAGE_PREFIX + "draft");
+    localStorage.removeItem(STORAGE_PREFIX + "shields");
+    localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
+    location.reload();
+  }
+
+  if(changeSetupBtn){
+    changeSetupBtn.addEventListener("click", ()=>{
+      localStorage.removeItem(STORAGE_PREFIX + "setup");
+      localStorage.removeItem(STORAGE_PREFIX + "shields");
+      localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
+      location.reload();
+    });
+  }
+
+  if(changeDraftBtn){
+    changeDraftBtn.addEventListener("click", ()=>{
+      localStorage.removeItem(STORAGE_PREFIX + "draft");
+      location.reload();
+    });
+  }
+
+  if(!setup){
+    if(setupCard) setupCard.style.display = "block";
+    if(draftCard) draftCard.style.display = "none";
+    if(changeSetupBtn) changeSetupBtn.style.display = "none";
+    if(changeDraftBtn) changeDraftBtn.style.display = "none";
+    list.innerHTML = "";
+
+    let mode = null;
+    let camp = null;
+    let difficulty = null;
+
+    qs("#modeSingle")?.addEventListener("click", ()=>{
+      mode = "single";
+      showDifficultyPick();
+    });
+    qs("#modeMulti")?.addEventListener("click", ()=>{
+      mode = "multi";
+      if(campPick) campPick.style.display = "block";
+    });
+
+    qs("#campMech")?.addEventListener("click", ()=>{
+      camp = "mechkawaii";
+      showDifficultyPick();
+    });
+    qs("#campProd")?.addEventListener("click", ()=>{
+      camp = "prodrome";
+      showDifficultyPick();
+    });
+
+    qs("#diffNormal")?.addEventListener("click", ()=>{
+      difficulty = "normal";
+      saveSetup({mode, camp, difficulty});
+      location.reload();
+    });
+    qs("#diffExpert")?.addEventListener("click", ()=>{
+      difficulty = "expert";
+      saveSetup({mode, camp, difficulty});
+      location.reload();
+    });
+
+    function showDifficultyPick(){
+      const diffPick = qs("#difficultyPick");
+      if(diffPick) diffPick.style.display = "block";
+    }
+
+    qs("#resetSetupBtn")?.addEventListener("click", clearSetup);
+
+    return;
+  }
+
+  if(changeSetupBtn) changeSetupBtn.style.display = "inline-block";
+  if(changeDraftBtn) changeDraftBtn.style.display = "inline-block";
+
+  let available = chars;
+  if(setup.mode === "multi"){
+    available = chars.filter(c => (c.camp || "mechkawaii") === (setup.camp || "mechkawaii"));
+  }
+
+  const maxPick = (setup.mode === "single") ? 6 : 3;
+  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
+  let draft = draftRaw ? JSON.parse(draftRaw) : null;
+
+  function saveDraft(obj){
+    localStorage.setItem(STORAGE_PREFIX + "draft", JSON.stringify(obj));
+  }
+
+  if(!draft){
+    if(draftCard) draftCard.style.display = "block";
+    if(setupCard) setupCard.style.display = "none";
+    list.innerHTML = "";
+
+    draftList.innerHTML = "";
+    const selected = new Set();
+
+    available.forEach(c=>{
+      const row = document.createElement("div");
+      row.className = "toggle";
+
+      const left = document.createElement("div");
+      left.className = "lbl";
+      left.innerHTML = `<div class="t">${t(c.name, lang)}</div><div class="d">${t(c.class, lang)} — HP ${c.hp?.max ?? "?"}</div>`;
+
+      const sw = document.createElement("div");
+      sw.className = "switch";
+      sw.setAttribute("role","switch");
+      sw.setAttribute("tabindex","0");
+      sw.setAttribute("aria-checked","false");
+
+      function refresh(){
+        const on = selected.has(c.id);
+        sw.className = "switch" + (on ? " on" : "");
+        sw.setAttribute("aria-checked", on ? "true" : "false");
+      }
+
+      function flip(){
+        if(selected.has(c.id)){
+          selected.delete(c.id);
+        }else{
+          if(selected.size >= maxPick){
+            draftError.textContent = (lang === "fr") ? `Tu as déjà ${maxPick} persos sélectionnés.` : `You already selected ${maxPick} characters.`;
+            return;
+          }
+          selected.add(c.id);
+        }
+        draftError.textContent = "";
+        refresh();
+      }
+
+      sw.addEventListener("click", flip);
+      sw.addEventListener("keydown",(e)=>{
+        if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flip(); }
+      });
+
+      row.appendChild(left);
+      row.appendChild(sw);
+      draftList.appendChild(row);
+      refresh();
+    });
+
+    qs("#confirmDraft")?.addEventListener("click", ()=>{
+      if(selected.size !== maxPick){
+        draftError.textContent = (lang === "fr") ? `Sélectionne exactement ${maxPick} persos.` : `Select exactly ${maxPick} characters.`;
+        return;
+      }
+      saveDraft({activeIds:[...selected]});
+      location.reload();
+    });
+
+    qs("#skipDraft")?.addEventListener("click", ()=>{
+      saveDraft({activeIds: null});
+      location.reload();
+    });
+
+    return;
+  }
+
+  let toShow = available;
+  if(Array.isArray(draft.activeIds) && draft.activeIds.length){
+    toShow = available.filter(c => draft.activeIds.includes(c.id));
+  }
+
+  list.innerHTML = "";
+  toShow.forEach(c=>{
+    const a = document.createElement("a");
+    a.className = "char";
+    a.href = `character.html?id=${encodeURIComponent(c.id)}`;
+    a.innerHTML = `
+      <div class="n">${t(c.name, lang)}</div>
+      <div class="m">
+        <span class="badge">${t(c.class, lang)}</span>
+        <span class="badge">HP ${c.hp?.max ?? "?"}</span>
+      </div>
+    `;
+    list.appendChild(a);
+  });
+
+  if(toShow.length === 0){
+    const msg = document.createElement("div");
+    msg.className = "footer-note";
+    msg.style.color = "var(--muted)";
+    msg.textContent = (lang === "fr")
+      ? "Aucun perso disponible pour ce camp (pour l'instant). Change de camp via \"Changer config\"."
+      : "No characters available for this camp (yet). Change camp via \"Change setup\".";
+    list.appendChild(msg);
+  }
+}
+
+async function initCharacter(){
+  const lang = getLang();
+  bindTopbar(lang);
+
+  const id = urlParam("id");
+  if(!id){
+    qs("#error").textContent = "Missing character id.";
+    return;
+  }
+
+  const chars = await loadCharacters();
+  const c = chars.find(x=>x.id === id);
+  if(!c){
+    qs("#error").textContent = "Character not found.";
+    return;
+  }
+
+  const saved = getState(c.id);
   
-  .brand .mascot,
-  .brand-stack .mascot,
-  #playBtn.mkw-btn {
-    animation: none !important;
-  }
-}
-
-/* =====================================================
-   Splash Dismissed State
-   ===================================================== */
-body.has-splash .topbar,
-body.has-splash #setupCard,
-body.has-splash #draftCard,
-body.has-splash #charList,
-body.has-splash .footer-note,
-body.has-splash .controls {
-  visibility: hidden;
-}
-
-html.splash-dismissed body.has-splash #splash,
-html.splash-dismissed body.has-splash .splash-overlay {
-  display: none !important;
-}
-
-html.splash-dismissed body.has-splash .topbar,
-html.splash-dismissed body.has-splash #setupCard,
-html.splash-dismissed body.has-splash #draftCard,
-html.has-splash .footer-note,
-html.splash-dismissed body.has-splash .controls {
-  visibility: visible !important;
-}
-
-/* =====================================================
-   Utilities
-   ===================================================== */
-.footer-note {
-  margin-top: var(--space-lg);
-  color: var(--muted);
-  font-size: 13px;
-  text-align: center;
-}
-
-/* =====================================================
-   Unit Tabs (Bottom Navigation)
-   ===================================================== */
-.unit-tabs-container {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(13, 13, 18, 0.95);
-  backdrop-filter: blur(var(--blur));
-  border-top: 1px solid var(--border);
-  padding: var(--space-md);
-  z-index: 1000;
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.4);
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* Afficher les tabs quand des unités sont sélectionnées */
-.unit-tabs-container.visible {
-  transform: translateY(0);
-}
-
-.unit-tabs {
-  display: flex;
-  gap: var(--space-md);
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 8px 0;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: var(--accent) rgba(255, 255, 255, 0.1);
-}
-
-/* Masquer la scrollbar sur mobile pour un look plus clean */
-.unit-tabs::-webkit-scrollbar {
-  height: 6px;
-}
-
-.unit-tabs::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 3px;
-}
-
-.unit-tabs::-webkit-scrollbar-thumb {
-  background: var(--accent);
-  border-radius: 3px;
-}
-
-.unit-tab {
-  position: relative;
-  flex: 0 0 auto;
-  width: clamp(120px, 25vw, 180px);
-  height: clamp(120px, 25vw, 180px);
-  border-radius: var(--radius);
-  border: 2px solid var(--border);
-  background: rgba(19, 19, 26, 0.85);
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  scroll-snap-align: start;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-sm);
-}
-
-.unit-tab:hover {
-  border-color: rgba(255, 210, 0, 0.5);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-}
-
-.unit-tab:active {
-  transform: translateY(-2px);
-}
-
-.unit-tab.has-shield {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.4);
-}
-
-/* Tab active */
-.unit-tab.active {
-  border-color: var(--accent);
-  background: rgba(255, 210, 0, 0.12);
-  box-shadow: 0 0 20px rgba(255, 210, 0, 0.3);
-}
-
-.unit-tab.active::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--accent);
-  box-shadow: 0 0 10px var(--accent);
-}
-
-/* Contenu du tab */
-.unit-tab-visual {
-  width: 100%;
-  height: 70%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 8px;
-  position: relative;
-  transition: all 0.2s ease;
-}
-
-.unit-tab-visual img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
-}
-
-/* Badge HP sur le tab */
-.unit-tab-hp {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  background: rgba(0, 0, 0, 0.8);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  padding: 4px 8px;
-  font-size: 11px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--ok);
-}
-
-.unit-tab-hp.low {
-  color: var(--danger);
-  border-color: var(--danger);
-}
-
-.unit-tab-info {
-  text-align: center;
-  width: 100%;
-}
-
-.unit-tab-name {
-  font-weight: 800;
-  font-size: clamp(13px, 3vw, 15px);
-  letter-spacing: 0.3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 2px;
-}
-
-.unit-tab-role {
-  font-size: 11px;
-  color: var(--muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Ajuster le padding du container pour que le contenu ne soit pas caché par les tabs */
-body.tabs-visible .container {
-  padding-bottom: clamp(160px, 30vw, 220px);
-}
-
-/* Desktop: tabs plus grandes et plus espacées */
-@media (min-width: 900px) {
-  .unit-tabs-container {
-    padding: var(--space-lg) var(--space-xl);
-  }
+  const defaultToggles = {};
+  (c.toggles || []).forEach(tg => {
+    if (tg.type === 'visual_keys') {
+      defaultToggles[tg.id] = [true, true];
+    } else {
+      defaultToggles[tg.id] = false;
+    }
+  });
   
-  .unit-tab {
-    width: 160px;
-    height: 160px;
+  const state = saved || {
+    hp: c.hp?.max ?? 0,
+    toggles: defaultToggles
+  };
+
+  const sharedShields = getSharedShields();
+  const assignments = getShieldAssignments();
+
+  qs("#charName").textContent = t(c.name, lang);
+  qs("#charClass").textContent = t(c.class, lang);
+  qs("#hpMaxLabel").textContent = `/${c.hp?.max ?? 0}`;
+
+  const hpCurEl = qs("#hpCur");
+  const hpHeartsEl = qs("#hpHearts");
+
+  function refreshHP(){
+    hpCurEl.textContent = String(state.hp);
+    renderHP(hpHeartsEl, state.hp, c.hp?.max ?? 0);
   }
+
+  function updateShieldDisplay(){
+    const allCards = document.querySelectorAll('.card');
+    let hpCard = null;
+    
+    for (let card of allCards) {
+      if (card.textContent.includes('Points de Vie') || card.textContent.includes('Life')) {
+        hpCard = card;
+        break;
+      }
+    }
+    
+    if (hpCard) {
+      if (assignments[c.id]) {
+        hpCard.classList.add('has-shield');
+      } else {
+        hpCard.classList.remove('has-shield');
+      }
+    }
+  }
+
+  qs("#hpMinus").addEventListener("click", ()=>{
+    state.hp = clamp(state.hp - 1, 0, c.hp?.max ?? 0);
+    setState(c.id, state);
+    refreshHP();
+    updateTabHP(c.id, state.hp);
+  });
+
+  qs("#hpPlus").addEventListener("click", ()=>{
+    state.hp = clamp(state.hp + 1, 0, c.hp?.max ?? 0);
+    setState(c.id, state);
+    refreshHP();
+    updateTabHP(c.id, state.hp);
+  });
+
+  refreshHP();
+
+  qs("#classActionTitle").textContent = t(c.texts?.class_action_title, lang);
+  qs("#classActionBody").textContent = t(c.texts?.class_action_body, lang);
+  qs("#ultTitle").textContent = t(c.texts?.ultimate_title, lang);
+  qs("#ultBody").textContent = t(c.texts?.ultimate_body, lang);
+
+  qs("#movementDesc").textContent = t(c.texts?.movement_desc, lang) || "";
+  qs("#attackDesc").textContent = t(c.texts?.attack_desc, lang) || "";
+
+  const shieldsDisplay = qs('#shieldsDisplay');
+  if (shieldsDisplay) {
+    shieldsDisplay.innerHTML = '';
+    const shieldToggle = c.toggles?.find(tg => tg.id === 'shield');
+    if (shieldToggle) {
+      for (let i = 0; i < 3; i++) {
+        if (!sharedShields[i]) continue;
+        
+        const shield = document.createElement('button');
+        shield.className = 'shield-button';
+        shield.type = 'button';
+        shield.style.backgroundImage = 'url(./assets/icons/shield_on.svg)';
+        shield.dataset.shieldIndex = i;
+        shield.textContent = `Bouclier ${i + 1}`;
+        
+        shield.addEventListener('click', function(e) {
+          e.preventDefault();
+          showShieldAssignmentModal(i, c.id, lang, chars, sharedShields, assignments);
+        });
+        
+        shieldsDisplay.appendChild(shield);
+      }
+
+      if (assignments[c.id]) {
+        const removeShield = document.createElement('button');
+        removeShield.className = 'shield-remove-btn';
+        removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove shield';
+        
+        removeShield.addEventListener('click', function(e) {
+          e.preventDefault();
+          delete assignments[c.id];
+          setShieldAssignments(assignments);
+          location.reload();
+        });
+        
+        shieldsDisplay.appendChild(removeShield);
+      }
+    }
+  }
+
+  const togglesRoot = qs('#toggles');
+  togglesRoot.innerHTML = '';
+  (c.toggles || []).forEach(tg=>{
+    if (tg.id === 'shield') return;
+    
+    if (tg.type === 'visual_keys') {
+      const keysState = state.toggles[tg.id];
+      const isOn = keysState && keysState.some(k => k === true);
+      renderToggleRow(togglesRoot, tg, keysState, lang, (v)=>{
+        state.toggles[tg.id] = v;
+        setState(c.id, state);
+      }, sharedShields);
+    } else {
+      const isOn = !!state.toggles[tg.id];
+      renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
+        state.toggles[tg.id] = v;
+        setState(c.id, state);
+      });
+    }
+  });
+
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const setup = setupRaw ? JSON.parse(setupRaw) : null;
+  const difficulty = setup?.difficulty || "normal";
   
-  .unit-tabs {
+  const movImg = qs("#movementImg");
+  const atkImg = qs("#attackImg");
+  
+  if(difficulty === "expert"){
+    movImg.src = c.images?.movement_expert || c.images?.movement || "";
+    atkImg.src = c.images?.attack_expert || c.images?.attack || "";
+  } else {
+    movImg.src = c.images?.movement || "";
+    atkImg.src = c.images?.attack || "";
+  }
+
+  qs("#resetBtn").addEventListener("click", ()=>{
+    const fresh = {
+      hp: c.hp?.max ?? 0,
+      toggles: {...defaultToggles}
+    };
+    setState(c.id, fresh);
+    
+    setSharedShields([true, true, true]);
+    setShieldAssignments({});
+    
+    location.reload();
+  });
+
+  qs("#backBtn").addEventListener("click", ()=>{ location.href = "./index.html"; });
+
+  updateShieldDisplay();
+  initUnitTabs(id, chars, lang);
+}
+
+function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, sharedShields, assignments){
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
     justify-content: center;
-    gap: var(--space-lg);
-  }
-}
+    z-index: 1000;
+  `;
 
-/* État "partie en cours" - verrouille certains choix */
-body.game-active .toggle.locked {
-  opacity: 0.5;
-  pointer-events: none;
-  cursor: not-allowed;
-}
-
-body.game-active .toggle.locked::after {
-  content: "🔒";
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 12px;
-}
-
-/* =====================================================
-   Desktop Optimizations
-   ===================================================== */
-@media (min-width: 900px) {
-  .splash-overlay .hero-ui {
-    overflow-y: auto;
-    gap: var(--space-md);
-    padding: 22px;
-  }
-
-  .brand-stack .logo {
-    width: clamp(260px, 28vw, 420px);
-    max-height: 26vh;
-    object-fit: contain;
-  }
-
-  /* Fix centrage boutons desktop */
-  .splash-overlay .menu {
-    width: 100%;
-    max-width: 500px;
-  }
-
-  .mkw-btn,
-  .mkw-link {
-    width: 100%;
-    max-width: 360px;
-    margin: 0 auto;
-  }
-}
-
-/* =====================================================
-   Print Styles (utile pour imprimer résumé de partie)
-   ===================================================== */
-@media print {
-  body {
+  const content = document.createElement('div');
+  content.style.cssText = `
     background: white;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 400px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
     color: black;
+  `;
+
+  const title = document.createElement('h2');
+  title.textContent = lang === 'fr' ? 'Assigner le bouclier' : 'Assign shield';
+  title.style.marginTop = '0';
+  content.appendChild(title);
+
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const setup = JSON.parse(setupRaw);
+  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
+  const draft = JSON.parse(draftRaw);
+
+  let teamChars = allChars.filter(c => {
+    if (setup.mode === 'single') return draft.activeIds?.includes(c.id);
+    const currentChar = allChars.find(ch => ch.id === currentCharId);
+    return draft.activeIds?.includes(c.id) && (c.camp || "mechkawaii") === (currentChar.camp || "mechkawaii");
+  });
+
+  teamChars.forEach(char => {
+    const btn = document.createElement('button');
+    btn.textContent = t(char.name, lang);
+    btn.style.cssText = `
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      cursor: pointer;
+      background: white;
+      color: black;
+      transition: all 0.2s ease;
+    `;
+    
+    btn.addEventListener('mouseover', () => {
+      btn.style.borderColor = '#3b82f6';
+      btn.style.background = '#eff6ff';
+    });
+    btn.addEventListener('mouseout', () => {
+      btn.style.borderColor = '#ddd';
+      btn.style.background = 'white';
+    });
+    
+    btn.addEventListener('click', () => {
+      const currentAssignments = getShieldAssignments();
+      const currentShields = getSharedShields();
+      
+      currentAssignments[char.id] = shieldIndex;
+      currentShields[shieldIndex] = false;
+      
+      setShieldAssignments(currentAssignments);
+      setSharedShields(currentShields);
+      
+      document.body.removeChild(modal);
+      
+      setTimeout(() => {
+        location.reload();
+      }, 100);
+    });
+    
+    content.appendChild(btn);
+  });
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = lang === 'fr' ? 'Annuler' : 'Cancel';
+  closeBtn.style.cssText = `
+    width: 100%;
+    padding: 10px;
+    margin-top: 16px;
+    border: 2px solid #999;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #f5f5f5;
+    color: black;
+  `;
+  closeBtn.addEventListener('click', () => {
+    document.body.removeChild(modal);
+  });
+  content.appendChild(closeBtn);
+
+  modal.appendChild(content);
+  document.body.appendChild(modal);
+}
+
+function updateShieldsOnAllTabs(){
+  location.reload();
+}
+
+document.addEventListener("DOMContentLoaded", async ()=>{
+
+  const SPLASH_KEY = STORAGE_PREFIX + "splashDismissed";
+  const splashDismissed = localStorage.getItem(SPLASH_KEY) === "1";
+
+  function showSplash(){
+    const splash = document.getElementById("splash");
+    if(splash){ splash.style.display = "block"; }
+  }
+
+  function hideSplash(){
+    const splash = document.getElementById("splash");
+    if(splash){ splash.remove(); }
+    document.body.classList.remove("has-splash");
+  }
+
+  const playBtn = document.getElementById("playBtn");
+  if(playBtn){
+    playBtn.addEventListener("click", ()=>{
+      playPressStart();
+      localStorage.setItem(SPLASH_KEY, "1");
+      document.body.classList.remove('has-splash');
+      hideSplash();
+    });
+  }
+
+  const backToSplash = document.getElementById("backToSplash");
+  if(backToSplash){
+    backToSplash.addEventListener("click", ()=>{
+      localStorage.removeItem(SPLASH_KEY);
+      location.reload();
+    });
+  }
+
+  if(splashDismissed){
+    document.body.classList.remove('has-splash');
+    hideSplash();
+  }
+
+  try{
+    if(document.body.classList.contains("page-index")) await initIndex();
+    if(document.body.classList.contains("page-character")) await initCharacter();
+  }catch(e){
+    console.error(e);
+    const err = qs("#error");
+    if(err) err.textContent = "Erreur de chargement. Vérifie que le site est servi via un lien web (pas en ouvrant le fichier localement).";
+  }
+});
+
+function initUnitTabs(currentCharId, allChars, lang){
+  const tabsContainer = qs("#unitTabs");
+  const unitTabsWrapper = qs(".unit-tabs-container");
+  
+  if(!tabsContainer || !unitTabsWrapper) {
+    return;
+  }
+
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
+  
+  if(!setupRaw || !draftRaw) return;
+  
+  const setup = JSON.parse(setupRaw);
+  const draft = JSON.parse(draftRaw);
+  
+  let tabCharacters = [];
+  
+  if(setup.mode === "single"){
+    if(Array.isArray(draft.activeIds) && draft.activeIds.length){
+      tabCharacters = allChars.filter(c => 
+        draft.activeIds.includes(c.id) && c.id !== currentCharId
+      );
+    }
+  } else {
+    const currentCamp = setup.camp || "mechkawaii";
+    if(Array.isArray(draft.activeIds) && draft.activeIds.length){
+      tabCharacters = allChars.filter(c => 
+        draft.activeIds.includes(c.id) && 
+        c.id !== currentCharId &&
+        (c.camp || "mechkawaii") === currentCamp
+      );
+    }
+  }
+
+  if(tabCharacters.length === 0){
+    unitTabsWrapper.classList.remove('visible');
+    document.body.classList.remove('tabs-visible');
+    return;
+  }
+
+  unitTabsWrapper.classList.add('visible');
+  document.body.classList.add('tabs-visible');
+
+  tabsContainer.innerHTML = '';
+  tabCharacters.forEach(char => {
+    const tab = createCharacterTab(char, lang);
+    tabsContainer.appendChild(tab);
+  });
+}
+
+function createCharacterTab(char, lang){
+  const tab = document.createElement('div');
+  tab.className = 'unit-tab';
+  tab.dataset.charId = char.id;
+
+  const saved = getState(char.id);
+  const hp = saved?.hp ?? (char.hp?.max ?? 0);
+  const maxHp = char.hp?.max ?? 0;
+
+  const hpPercentage = maxHp > 0 ? (hp / maxHp) * 100 : 100;
+  const hpClass = hpPercentage <= 33 ? 'low' : '';
+
+  const assignments = getShieldAssignments();
+  const hasShield = assignments[char.id] ? true : false;
+
+  const visualEl = document.createElement('div');
+  visualEl.className = 'unit-tab-visual';
+  if (hasShield) {
+    visualEl.classList.add('has-shield');
   }
   
-  .splash-overlay,
-  button,
-  .controls {
-    display: none !important;
-  }
+  const charImage = char.images?.portrait || char.images?.character;
   
-  .card {
-    break-inside: avoid;
-    page-break-inside: avoid;
+  if(charImage){
+    const img = document.createElement('img');
+    img.src = charImage;
+    img.alt = t(char.name, lang);
+    img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));';
+    
+    img.onerror = function(){
+      visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
+    };
+    visualEl.appendChild(img);
+  } else {
+    visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
+  }
+
+  const hpBadge = document.createElement('div');
+  hpBadge.className = `unit-tab-hp ${hpClass}`;
+  hpBadge.innerHTML = `<span>❤️</span><span>${hp}/${maxHp}</span>`;
+  visualEl.appendChild(hpBadge);
+
+  const infoEl = document.createElement('div');
+  infoEl.className = 'unit-tab-info';
+  infoEl.innerHTML = `
+    <div class="unit-tab-name">${t(char.name, lang)}</div>
+    <div class="unit-tab-role">${t(char.class, lang)}</div>
+  `;
+
+  tab.appendChild(visualEl);
+  tab.appendChild(infoEl);
+
+  if (hasShield) {
+    tab.classList.add('has-shield');
+  }
+
+  tab.addEventListener('click', () => {
+    location.href = `character.html?id=${encodeURIComponent(char.id)}`;
+  });
+
+  return tab;
+}
+
+function updateTabHP(charId, newHp){
+  const tab = document.querySelector(`.unit-tab[data-char-id="${charId}"]`);
+  if(!tab) return;
+
+  const hpBadge = tab.querySelector('.unit-tab-hp');
+  if(!hpBadge) return;
+
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
+  
+  if(!setupRaw || !draftRaw) return;
+
+  const allChars = window.__cachedChars;
+  if(allChars){
+    const char = allChars.find(c => c.id === charId);
+    const maxHp = char?.hp?.max ?? 0;
+    
+    const hpPercentage = maxHp > 0 ? (newHp / maxHp) * 100 : 100;
+    hpBadge.className = 'unit-tab-hp' + (hpPercentage <= 33 ? ' low' : '');
+    hpBadge.querySelector('span:last-child').textContent = `${newHp}/${maxHp}`;
+
+    tab.style.animation = 'none';
+    setTimeout(() => {
+      tab.style.animation = 'heartShake 0.3s ease';
+    }, 10);
   }
 }
