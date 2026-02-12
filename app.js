@@ -192,7 +192,6 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;
         transition: all 0.2s ease;
         padding: 0;
         background-image: url('./assets/icons/${isShield ? 'shield' : 'key'}_off.svg');
@@ -208,12 +207,6 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
 
       if (isActive) {
         key.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_on.svg')`;
-        key.style.background = '#FFD700';
-        key.style.backgroundSize = '70%';
-        key.style.backgroundPosition = 'center';
-        key.style.backgroundRepeat = 'no-repeat';
-        key.style.borderColor = '#FFC700';
-        key.style.boxShadow = '0 0 8px rgba(255, 215, 0, 0.6)';
       }
 
       key.addEventListener('click', function(e) {
@@ -222,20 +215,8 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
         
         if (this.dataset.active === 'true') {
           this.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_on.svg')`;
-          this.style.background = '#FFD700';
-          this.style.backgroundSize = '70%';
-          this.style.backgroundPosition = 'center';
-          this.style.backgroundRepeat = 'no-repeat';
-          this.style.borderColor = '#FFC700';
-          this.style.boxShadow = '0 0 8px rgba(255, 215, 0, 0.6)';
         } else {
           this.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_off.svg')`;
-          this.style.background = '#f5f5f5';
-          this.style.backgroundSize = '70%';
-          this.style.backgroundPosition = 'center';
-          this.style.backgroundRepeat = 'no-repeat';
-          this.style.borderColor = '#ccc';
-          this.style.boxShadow = 'none';
         }
 
         const keysState = [];
@@ -590,24 +571,46 @@ async function initCharacter(){
   qs("#movementDesc").textContent = t(c.texts?.movement_desc, lang) || "";
   qs("#attackDesc").textContent = t(c.texts?.attack_desc, lang) || "";
 
-  const togglesRoot = qs("#toggles");
-  togglesRoot.innerHTML = "";
-  (c.toggles || []).forEach(tg=>{
-    if (tg.type === 'visual_keys') {
-      if (tg.id === 'shield') {
-        const isOn = sharedShields.some(s => s === true);
-        renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
-          setSharedShields(v);
+  // Rendu des boucliers
+  const shieldsDisplay = qs('#shieldsDisplay');
+  if (shieldsDisplay) {
+    shieldsDisplay.innerHTML = '';
+    const shieldToggle = c.toggles?.find(tg => tg.id === 'shield');
+    if (shieldToggle) {
+      const shields = getSharedShields();
+      for (let i = 0; i < 3; i++) {
+        const shield = document.createElement('button');
+        shield.className = 'shield-button';
+        shield.type = 'button';
+        shield.style.backgroundImage = shields[i] ? "url('./assets/icons/shield_on.svg')" : "url('./assets/icons/shield_off.svg')";
+        shield.dataset.shieldIndex = i;
+        
+        shield.addEventListener('click', function(e) {
+          e.preventDefault();
+          shields[i] = !shields[i];
+          this.style.backgroundImage = shields[i] ? "url('./assets/icons/shield_on.svg')" : "url('./assets/icons/shield_off.svg')";
+          setSharedShields(shields);
           updateShieldsOnAllTabs();
-        }, sharedShields);
-      } else {
-        const keysState = state.toggles[tg.id] || [];
-        const isOn = keysState.some(k => k === true);
-        renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
-          state.toggles[tg.id] = v;
-          setState(c.id, state);
         });
+        
+        shieldsDisplay.appendChild(shield);
       }
+    }
+  }
+
+  // Rendu des toggles (sans le shield)
+  const togglesRoot = qs('#toggles');
+  togglesRoot.innerHTML = '';
+  (c.toggles || []).forEach(tg=>{
+    if (tg.id === 'shield') return;
+    
+    if (tg.type === 'visual_keys') {
+      const keysState = state.toggles[tg.id] || [];
+      const isOn = keysState.some(k => k === true);
+      renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
+        state.toggles[tg.id] = v;
+        setState(c.id, state);
+      });
     } else {
       const isOn = !!state.toggles[tg.id];
       renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
