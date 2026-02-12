@@ -111,13 +111,6 @@ button, a, .toggle, .char {
   width: min(var(--maxw), calc(100% - var(--space-2xl)));
   margin: 0 auto;
   padding: var(--space-xl) 0 64px;
-  transition: border-left 0.2s ease, padding-left 0.2s ease;
-}
-
-/* Effet visuel quand une unité a un bouclier */
-.container.has-shield {
-  border-left: 5px solid var(--shield);
-  padding-left: 15px;
 }
 
 /* =====================================
@@ -242,6 +235,12 @@ button:focus-visible {
   background: rgba(19, 19, 26, 0.72);
   box-shadow: var(--shadow);
   overflow: hidden;
+  transition: background 0.2s ease;
+}
+
+.card.has-shield {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
 .card .card-h {
@@ -252,6 +251,10 @@ button:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.card.has-shield .card-h {
+  background: rgba(59, 130, 246, 0.25);
 }
 
 .card .card-b {
@@ -941,6 +944,11 @@ html.splash-dismissed body.has-splash .controls {
   transform: translateY(-2px);
 }
 
+.unit-tab.has-shield {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
 /* Tab active */
 .unit-tab.active {
   border-color: var(--accent);
@@ -969,13 +977,6 @@ html.splash-dismissed body.has-splash .controls {
   margin-bottom: 8px;
   position: relative;
   transition: all 0.2s ease;
-  border-left: none;
-}
-
-/* Effet visuel bouclier sur les tabs */
-.unit-tab-visual.has-shield {
-  border-left: 4px solid var(--shield);
-  padding-left: 8px;
 }
 
 .unit-tab-visual img {
