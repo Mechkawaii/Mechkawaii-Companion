@@ -66,9 +66,15 @@
           "en": "Repair Keys"
         },
         "hint": {
-          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
-          "en": "🔧 Keys used (0, 1 or 2)"
-        }
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "images": {
+          "inactive": "./assets/icons/key_off.svg",
+          "active": "./assets/icons/key_on.svg"
+        },
+        "maxKeys": 2
       },
       {
         "id": "ultimate_used",
@@ -149,9 +155,15 @@
           "en": "Repair Keys"
         },
         "hint": {
-          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
-          "en": "🔧 Keys used (0, 1 or 2)"
-        }
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "images": {
+          "inactive": "./assets/icons/key_off.svg",
+          "active": "./assets/icons/key_on.svg"
+        },
+        "maxKeys": 2
       },
       {
         "id": "ultimate_used",
@@ -232,9 +244,15 @@
           "en": "Repair Keys"
         },
         "hint": {
-          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
-          "en": "🔧 Keys used (0, 1 or 2)"
-        }
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "images": {
+          "inactive": "./assets/icons/key_off.svg",
+          "active": "./assets/icons/key_on.svg"
+        },
+        "maxKeys": 2
       },
       {
         "id": "ultimate_used",
@@ -315,9 +333,15 @@
           "en": "Repair Keys"
         },
         "hint": {
-          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
-          "en": "🔧 Keys used (0, 1 or 2)"
-        }
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "images": {
+          "inactive": "./assets/icons/key_off.svg",
+          "active": "./assets/icons/key_on.svg"
+        },
+        "maxKeys": 2
       },
       {
         "id": "ultimate_used",
@@ -398,9 +422,15 @@
           "en": "Repair Keys"
         },
         "hint": {
-          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
-          "en": "🔧 Keys used (0, 1 or 2)"
-        }
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "images": {
+          "inactive": "./assets/icons/key_off.svg",
+          "active": "./assets/icons/key_on.svg"
+        },
+        "maxKeys": 2
       },
       {
         "id": "ultimate_used",
@@ -481,9 +511,15 @@
           "en": "Repair Keys"
         },
         "hint": {
-          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
-          "en": "🔧 Keys used (0, 1 or 2)"
-        }
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "images": {
+          "inactive": "./assets/icons/key_off.svg",
+          "active": "./assets/icons/key_on.svg"
+        },
+        "maxKeys": 2
       },
       {
         "id": "ultimate_used",
@@ -564,9 +600,15 @@
           "en": "Repair Keys"
         },
         "hint": {
-          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
-          "en": "🔧 Keys used (0, 1 or 2)"
-        }
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "images": {
+          "inactive": "./assets/icons/key_off.svg",
+          "active": "./assets/icons/key_on.svg"
+        },
+        "maxKeys": 2
       },
       {
         "id": "ultimate_used",
@@ -647,9 +689,15 @@
           "en": "Repair Keys"
         },
         "hint": {
-          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
-          "en": "🔧 Keys used (0, 1 or 2)"
-        }
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "images": {
+          "inactive": "./assets/icons/key_off.svg",
+          "active": "./assets/icons/key_on.svg"
+        },
+        "maxKeys": 2
       },
       {
         "id": "ultimate_used",
@@ -730,9 +778,15 @@
           "en": "Repair Keys"
         },
         "hint": {
-          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
-          "en": "🔧 Keys used (0, 1 or 2)"
-        }
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "images": {
+          "inactive": "./assets/icons/key_off.svg",
+          "active": "./assets/icons/key_on.svg"
+        },
+        "maxKeys": 2
       },
       {
         "id": "ultimate_used",
@@ -813,9 +867,15 @@
           "en": "Repair Keys"
         },
         "hint": {
-          "fr": "🔧 Clés utilisées (0, 1 ou 2)",
-          "en": "🔧 Keys used (0, 1 or 2)"
-        }
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "images": {
+          "inactive": "./assets/icons/key_off.svg",
+          "active": "./assets/icons/key_on.svg"
+        },
+        "maxKeys": 2
       },
       {
         "id": "ultimate_used",
