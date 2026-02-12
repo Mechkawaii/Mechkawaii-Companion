@@ -76,6 +76,19 @@ function setState(charId, state){
   localStorage.setItem(STORAGE_PREFIX + "state:" + charId, JSON.stringify(state));
 }
 
+function getSharedShields(){
+  try{
+    const raw = localStorage.getItem(STORAGE_PREFIX + "shields");
+    if(!raw) return [false, false, false];
+    return JSON.parse(raw);
+  }catch(e){
+    return [false, false, false];
+  }
+}
+function setSharedShields(shields){
+  localStorage.setItem(STORAGE_PREFIX + "shields", JSON.stringify(shields));
+}
+
 function heartSvg(filled){
   const fill = filled ? "var(--accent)" : "rgba(255,255,255,.14)";
   const stroke = filled ? "rgba(0,0,0,.25)" : "rgba(255,255,255,.20)";
@@ -130,7 +143,7 @@ function renderHP(container, hpCur, hpMax){
   container.appendChild(hearts);
 }
 
-function renderToggleRow(root, toggle, isOn, lang, onChange){
+function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = null){
   // Si c'est un toggle visuel pour les clés
   if (toggle.type === 'visual_keys') {
     const keysContainer = document.createElement('div');
@@ -145,7 +158,6 @@ function renderToggleRow(root, toggle, isOn, lang, onChange){
       margin-bottom: 8px;
     `;
 
-    // Label
     const label = document.createElement('label');
     label.style.cssText = `
       flex: 1;
@@ -155,7 +167,6 @@ function renderToggleRow(root, toggle, isOn, lang, onChange){
     `;
     label.textContent = t(toggle.label, lang);
 
-    // Conteneur des clés
     const keysDisplay = document.createElement('div');
     keysDisplay.className = 'keys-display';
     keysDisplay.style.cssText = `
@@ -163,8 +174,10 @@ function renderToggleRow(root, toggle, isOn, lang, onChange){
       gap: 8px;
     `;
 
-    // Créer les clés (jusqu'à maxKeys)
     const maxKeys = toggle.maxKeys || 2;
+    const isShield = toggle.id === 'shield';
+    const currentState = isShield ? sharedShields : (isOn ? [true, true, true] : [false, false, false]);
+
     for (let i = 0; i < maxKeys; i++) {
       const key = document.createElement('button');
       key.className = 'key-button';
@@ -182,35 +195,42 @@ function renderToggleRow(root, toggle, isOn, lang, onChange){
         font-size: 20px;
         transition: all 0.2s ease;
         padding: 0;
-        background-image: url('./assets/icons/key_off.svg');
+        background-image: url('./assets/icons/${isShield ? 'shield' : 'key'}_off.svg');
         background-size: 70%;
         background-position: center;
         background-repeat: no-repeat;
       `;
-      key.innerHTML = '';
+      
+      const isActive = currentState[i] || false;
       key.dataset.keyIndex = i;
       key.dataset.toggleId = toggle.id;
-      key.dataset.active = 'false';
+      key.dataset.active = isActive ? 'true' : 'false';
+
+      if (isActive) {
+        key.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_on.svg')`;
+        key.style.background = '#FFD700';
+        key.style.backgroundSize = '70%';
+        key.style.backgroundPosition = 'center';
+        key.style.backgroundRepeat = 'no-repeat';
+        key.style.borderColor = '#FFC700';
+        key.style.boxShadow = '0 0 8px rgba(255, 215, 0, 0.6)';
+      }
 
       key.addEventListener('click', function(e) {
         e.preventDefault();
-        // Basculer l'état de cette clé
         this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true';
         
-        // Mettre à jour le style
         if (this.dataset.active === 'true') {
-          this.style.backgroundImage = "url('./assets/icons/key_on.svg')";
+          this.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_on.svg')`;
           this.style.background = '#FFD700';
-          this.style.backgroundImage = "url('./assets/icons/key_on.svg')";
           this.style.backgroundSize = '70%';
           this.style.backgroundPosition = 'center';
           this.style.backgroundRepeat = 'no-repeat';
           this.style.borderColor = '#FFC700';
           this.style.boxShadow = '0 0 8px rgba(255, 215, 0, 0.6)';
         } else {
-          this.style.backgroundImage = "url('./assets/icons/key_off.svg')";
+          this.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_off.svg')`;
           this.style.background = '#f5f5f5';
-          this.style.backgroundImage = "url('./assets/icons/key_off.svg')";
           this.style.backgroundSize = '70%';
           this.style.backgroundPosition = 'center';
           this.style.backgroundRepeat = 'no-repeat';
@@ -218,7 +238,6 @@ function renderToggleRow(root, toggle, isOn, lang, onChange){
           this.style.boxShadow = 'none';
         }
 
-        // Appeler le callback onChange
         const keysState = [];
         keysDisplay.querySelectorAll('.key-button').forEach(kb => {
           keysState.push(kb.dataset.active === 'true');
@@ -234,7 +253,6 @@ function renderToggleRow(root, toggle, isOn, lang, onChange){
     root.appendChild(keysContainer);
 
   } else {
-    // Toggle normal (interrupteur classique)
     const row = document.createElement('div');
     row.className = 'toggle';
     const left = document.createElement('div');
@@ -276,24 +294,26 @@ function renderToggleRow(root, toggle, isOn, lang, onChange){
 }
 
 function saveToggleState(charId, toggleId, keyIndex, state) {
-  const savedState = getState(charId) || { hp: null, toggles: {} };
-  
-  if (!savedState.toggles) {
-    savedState.toggles = {};
-  }
-
-  if (keyIndex !== null) {
-    // Pour les clés visuelles
-    if (!savedState.toggles[toggleId]) {
-      savedState.toggles[toggleId] = [];
-    }
-    savedState.toggles[toggleId][keyIndex] = state;
+  if (toggleId === 'shield') {
+    setSharedShields(state);
   } else {
-    // Pour les toggles normaux
-    savedState.toggles[toggleId] = state;
-  }
+    const savedState = getState(charId) || { hp: null, toggles: {} };
+    
+    if (!savedState.toggles) {
+      savedState.toggles = {};
+    }
 
-  setState(charId, savedState);
+    if (keyIndex !== null) {
+      if (!savedState.toggles[toggleId]) {
+        savedState.toggles[toggleId] = [];
+      }
+      savedState.toggles[toggleId][keyIndex] = state;
+    } else {
+      savedState.toggles[toggleId] = state;
+    }
+
+    setState(charId, savedState);
+  }
 }
 
 function urlParam(name){
@@ -328,12 +348,14 @@ async function initIndex(){
   function clearSetup(){
     localStorage.removeItem(STORAGE_PREFIX + "setup");
     localStorage.removeItem(STORAGE_PREFIX + "draft");
+    localStorage.removeItem(STORAGE_PREFIX + "shields");
     location.reload();
   }
 
   if(changeSetupBtn){
     changeSetupBtn.addEventListener("click", ()=>{
       localStorage.removeItem(STORAGE_PREFIX + "setup");
+      localStorage.removeItem(STORAGE_PREFIX + "shields");
       location.reload();
     });
   }
@@ -531,6 +553,8 @@ async function initCharacter(){
     toggles: Object.fromEntries((c.toggles||[]).map(tg => [tg.id, tg.type === 'visual_keys' ? [] : false]))
   };
 
+  const sharedShields = getSharedShields();
+
   qs("#charName").textContent = t(c.name, lang);
   qs("#charClass").textContent = t(c.class, lang);
   qs("#hpMaxLabel").textContent = `/${c.hp?.max ?? 0}`;
@@ -570,15 +594,21 @@ async function initCharacter(){
   togglesRoot.innerHTML = "";
   (c.toggles || []).forEach(tg=>{
     if (tg.type === 'visual_keys') {
-      // Pour les clés visuelles
-      const keysState = state.toggles[tg.id] || [];
-      const isOn = keysState.some(k => k === true);
-      renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
-        state.toggles[tg.id] = v;
-        setState(c.id, state);
-      });
+      if (tg.id === 'shield') {
+        const isOn = sharedShields.some(s => s === true);
+        renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
+          setSharedShields(v);
+          updateShieldsOnAllTabs();
+        }, sharedShields);
+      } else {
+        const keysState = state.toggles[tg.id] || [];
+        const isOn = keysState.some(k => k === true);
+        renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
+          state.toggles[tg.id] = v;
+          setState(c.id, state);
+        });
+      }
     } else {
-      // Pour les toggles normaux
       const isOn = !!state.toggles[tg.id];
       renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
         state.toggles[tg.id] = v;
@@ -614,6 +644,24 @@ async function initCharacter(){
   qs("#backBtn").addEventListener("click", ()=>{ location.href = "./index.html"; });
 
   initUnitTabs(id, chars, lang);
+}
+
+function updateShieldsOnAllTabs(){
+  const tabs = qsa('.unit-tab');
+  tabs.forEach(tab => {
+    const charId = tab.getAttribute('data-char-id');
+    const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+    const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
+    
+    if(setupRaw && draftRaw){
+      const setup = JSON.parse(setupRaw);
+      const draft = JSON.parse(draftRaw);
+      
+      if(setup.mode === "single" || (setup.mode === "multi" && Array.isArray(draft.activeIds))){
+        updateTabHP(charId, getState(charId)?.hp ?? 0);
+      }
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
