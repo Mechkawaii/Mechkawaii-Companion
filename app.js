@@ -535,7 +535,7 @@ async function initCharacter(){
   const saved = getState(c.id);
   const state = saved || {
     hp: c.hp?.max ?? 0,
-    toggles: Object.fromEntries((c.toggles||[]).map(tg => [tg.id, tg.type === 'visual_keys' ? [] : false]))
+    toggles: Object.fromEntries((c.toggles||[]).map(tg => [tg.id, tg.type === 'visual_keys' ? [true, true] : false]))
   };
 
   const sharedShields = getSharedShields();
@@ -554,14 +554,11 @@ async function initCharacter(){
   }
 
   function updateShieldDisplay(){
-    const hasShield = assignments[c.id] ? true : false;
-    const container = qs(".container");
-    if (hasShield) {
-      container.style.borderLeft = "5px solid #3b82f6";
-      container.style.paddingLeft = "15px";
+    const hpCard = document.querySelector('.card');
+    if (assignments[c.id]) {
+      hpCard?.classList.add('has-shield');
     } else {
-      container.style.borderLeft = "none";
-      container.style.paddingLeft = "0";
+      hpCard?.classList.remove('has-shield');
     }
   }
 
@@ -603,24 +600,6 @@ async function initCharacter(){
         shield.style.backgroundImage = `url('./assets/icons/shield_on.svg')`;
         shield.dataset.shieldIndex = i;
         shield.textContent = `Bouclier ${i + 1}`;
-        shield.style.cssText = `
-          width: 100%;
-          padding: 8px 12px;
-          border: 2px solid #ccc;
-          border-radius: 6px;
-          cursor: pointer;
-          background: #f5f5f5;
-          background-image: url('./assets/icons/shield_on.svg');
-          background-size: 20px;
-          background-position: 8px center;
-          background-repeat: no-repeat;
-          padding-left: 36px;
-          text-align: left;
-          font-size: 14px;
-          font-weight: 500;
-          margin-bottom: 6px;
-          transition: all 0.2s ease;
-        `;
         
         shield.addEventListener('click', function(e) {
           e.preventDefault();
@@ -633,19 +612,8 @@ async function initCharacter(){
       // Bouton pour retirer le bouclier de cette unité
       if (assignments[c.id]) {
         const removeShield = document.createElement('button');
+        removeShield.className = 'shield-remove-btn';
         removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove shield';
-        removeShield.style.cssText = `
-          width: 100%;
-          padding: 8px 12px;
-          border: 2px solid #ef4444;
-          border-radius: 6px;
-          cursor: pointer;
-          background: #fee2e2;
-          color: #dc2626;
-          font-weight: 500;
-          margin-top: 8px;
-          transition: all 0.2s ease;
-        `;
         
         removeShield.addEventListener('click', function(e) {
           e.preventDefault();
@@ -927,8 +895,7 @@ function createCharacterTab(char, lang){
   const visualEl = document.createElement('div');
   visualEl.className = 'unit-tab-visual';
   if (hasShield) {
-    visualEl.style.borderLeft = '4px solid #3b82f6';
-    visualEl.style.paddingLeft = '8px';
+    visualEl.classList.add('has-shield');
   }
   
   const charImage = char.images?.portrait || char.images?.character;
