@@ -182,8 +182,12 @@ function renderToggleRow(root, toggle, isOn, lang, onChange){
         font-size: 20px;
         transition: all 0.2s ease;
         padding: 0;
+        background-image: url('./assets/icons/key_off.svg');
+        background-size: 70%;
+        background-position: center;
+        background-repeat: no-repeat;
       `;
-      key.innerHTML = '🔑';
+      key.innerHTML = '';
       key.dataset.keyIndex = i;
       key.dataset.toggleId = toggle.id;
       key.dataset.active = 'false';
@@ -195,11 +199,21 @@ function renderToggleRow(root, toggle, isOn, lang, onChange){
         
         // Mettre à jour le style
         if (this.dataset.active === 'true') {
+          this.style.backgroundImage = "url('./assets/icons/key_on.svg')";
           this.style.background = '#FFD700';
+          this.style.backgroundImage = "url('./assets/icons/key_on.svg')";
+          this.style.backgroundSize = '70%';
+          this.style.backgroundPosition = 'center';
+          this.style.backgroundRepeat = 'no-repeat';
           this.style.borderColor = '#FFC700';
           this.style.boxShadow = '0 0 8px rgba(255, 215, 0, 0.6)';
         } else {
+          this.style.backgroundImage = "url('./assets/icons/key_off.svg')";
           this.style.background = '#f5f5f5';
+          this.style.backgroundImage = "url('./assets/icons/key_off.svg')";
+          this.style.backgroundSize = '70%';
+          this.style.backgroundPosition = 'center';
+          this.style.backgroundRepeat = 'no-repeat';
           this.style.borderColor = '#ccc';
           this.style.boxShadow = 'none';
         }
@@ -714,7 +728,6 @@ function createCharacterTab(char, lang){
   const hpPercentage = maxHp > 0 ? (hp / maxHp) * 100 : 100;
   const hpClass = hpPercentage <= 33 ? 'low' : '';
 
-  // Créer l'élément visual
   const visualEl = document.createElement('div');
   visualEl.className = 'unit-tab-visual';
   
@@ -726,23 +739,19 @@ function createCharacterTab(char, lang){
     img.alt = t(char.name, lang);
     img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));';
     
-    // Fallback si l'image ne charge pas
     img.onerror = function(){
       visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
     };
     visualEl.appendChild(img);
   } else {
-    // Placeholder si pas d'image
     visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
   }
 
-  // Ajouter le badge HP
   const hpBadge = document.createElement('div');
   hpBadge.className = `unit-tab-hp ${hpClass}`;
   hpBadge.innerHTML = `<span>❤️</span><span>${hp}/${maxHp}</span>`;
   visualEl.appendChild(hpBadge);
 
-  // Ajouter les infos
   const infoEl = document.createElement('div');
   infoEl.className = 'unit-tab-info';
   infoEl.innerHTML = `
@@ -772,7 +781,6 @@ function updateTabHP(charId, newHp){
   
   if(!setupRaw || !draftRaw) return;
 
-  // Récupérer le max HP du personnage
   const allChars = window.__cachedChars;
   if(allChars){
     const char = allChars.find(c => c.id === charId);
