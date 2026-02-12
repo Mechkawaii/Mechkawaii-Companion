@@ -188,7 +188,7 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
 
     const maxKeys = toggle.maxKeys || 2;
     const isShield = toggle.id === 'shield';
-    const currentState = isShield ? sharedShields : (isOn ? [true, true, true] : [false, false, false]);
+    const currentState = isShield ? sharedShields : isOn;
 
     for (let i = 0; i < maxKeys; i++) {
       const key = document.createElement('button');
@@ -206,7 +206,7 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
         justify-content: center;
         transition: all 0.2s ease;
         padding: 0;
-        background-image: url('./assets/icons/${isShield ? 'shield' : 'key'}_${currentState[i] ? 'on' : 'off'}.svg');
+        background-image: url('./assets/icons/${isShield ? 'shield' : 'key'}_${(currentState[i] !== undefined ? currentState[i] : true) ? 'on' : 'off'}.svg');
         background-size: 70%;
         background-position: center;
         background-repeat: no-repeat;
@@ -214,7 +214,7 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
       
       key.dataset.keyIndex = i;
       key.dataset.toggleId = toggle.id;
-      key.dataset.active = currentState[i] ? 'true' : 'false';
+      key.dataset.active = (currentState[i] !== undefined ? currentState[i] : true) ? 'true' : 'false';
 
       key.addEventListener('click', function(e) {
         e.preventDefault();
@@ -533,9 +533,20 @@ async function initCharacter(){
   }
 
   const saved = getState(c.id);
+  
+  // Initialiser les toggles par défaut
+  const defaultToggles = {};
+  (c.toggles || []).forEach(tg => {
+    if (tg.type === 'visual_keys') {
+      defaultToggles[tg.id] = [true, true];
+    } else {
+      defaultToggles[tg.id] = false;
+    }
+  });
+  
   const state = saved || {
     hp: c.hp?.max ?? 0,
-    toggles: Object.fromEntries((c.toggles||[]).map(tg => [tg.id, tg.type === 'visual_keys' ? [true, true] : false]))
+    toggles: defaultToggles
   };
 
   const sharedShields = getSharedShields();
@@ -637,12 +648,12 @@ async function initCharacter(){
     if (tg.id === 'shield') return;
     
     if (tg.type === 'visual_keys') {
-      const keysState = state.toggles[tg.id] || [true, true];
-      const isOn = keysState.some(k => k === true);
-      renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
+      const keysState = state.toggles[tg.id];
+      const isOn = keysState && keysState.some(k => k === true);
+      renderToggleRow(togglesRoot, tg, keysState, lang, (v)=>{
         state.toggles[tg.id] = v;
         setState(c.id, state);
-      });
+      }, sharedShields);
     } else {
       const isOn = !!state.toggles[tg.id];
       renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
@@ -670,7 +681,7 @@ async function initCharacter(){
   qs("#resetBtn").addEventListener("click", ()=>{
     const fresh = {
       hp: c.hp?.max ?? 0,
-      toggles: Object.fromEntries((c.toggles||[]).map(tg => [tg.id, tg.type === 'visual_keys' ? [true, true] : false]))
+      toggles: {...defaultToggles}
     };
     setState(c.id, fresh);
     location.reload();
