@@ -131,43 +131,155 @@ function renderHP(container, hpCur, hpMax){
 }
 
 function renderToggleRow(root, toggle, isOn, lang, onChange){
-  const row = document.createElement("div");
-  row.className = "toggle";
-  const left = document.createElement("div");
-  left.className = "lbl";
-  const title = document.createElement("div");
-  title.className = "t";
-  title.textContent = t(toggle.label, lang);
-  const desc = document.createElement("div");
-  desc.className = "d";
-  desc.textContent = toggle.hint ? t(toggle.hint, lang) : "";
-  left.appendChild(title);
-  left.appendChild(desc);
+  // Si c'est un toggle visuel pour les clés
+  if (toggle.type === 'visual_keys') {
+    const keysContainer = document.createElement('div');
+    keysContainer.className = 'toggle-visual-keys';
+    keysContainer.style.cssText = `
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      background: rgba(0,0,0,0.05);
+      border-radius: 8px;
+      margin-bottom: 8px;
+    `;
 
-  const sw = document.createElement("div");
-  sw.className = "switch" + (isOn ? " on" : "");
-  sw.setAttribute("role","switch");
-  sw.setAttribute("tabindex","0");
-  sw.setAttribute("aria-checked", isOn ? "true" : "false");
+    // Label
+    const label = document.createElement('label');
+    label.style.cssText = `
+      flex: 1;
+      font-weight: 600;
+      font-size: 14px;
+      min-width: 150px;
+    `;
+    label.textContent = t(toggle.label, lang);
 
-  function flip(){
-    isOn = !isOn;
-    sw.className = "switch" + (isOn ? " on" : "");
-    sw.setAttribute("aria-checked", isOn ? "true" : "false");
-    onChange(isOn);
+    // Conteneur des clés
+    const keysDisplay = document.createElement('div');
+    keysDisplay.className = 'keys-display';
+    keysDisplay.style.cssText = `
+      display: flex;
+      gap: 8px;
+    `;
+
+    // Créer les clés (jusqu'à maxKeys)
+    const maxKeys = toggle.maxKeys || 2;
+    for (let i = 0; i < maxKeys; i++) {
+      const key = document.createElement('button');
+      key.className = 'key-button';
+      key.type = 'button';
+      key.style.cssText = `
+        width: 40px;
+        height: 40px;
+        border: 2px solid #ccc;
+        border-radius: 6px;
+        cursor: pointer;
+        background: #f5f5f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        transition: all 0.2s ease;
+        padding: 0;
+      `;
+      key.innerHTML = '🔑';
+      key.dataset.keyIndex = i;
+      key.dataset.toggleId = toggle.id;
+      key.dataset.active = 'false';
+
+      key.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Basculer l'état de cette clé
+        this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true';
+        
+        // Mettre à jour le style
+        if (this.dataset.active === 'true') {
+          this.style.background = '#FFD700';
+          this.style.borderColor = '#FFC700';
+          this.style.boxShadow = '0 0 8px rgba(255, 215, 0, 0.6)';
+        } else {
+          this.style.background = '#f5f5f5';
+          this.style.borderColor = '#ccc';
+          this.style.boxShadow = 'none';
+        }
+
+        // Appeler le callback onChange
+        const keysState = [];
+        keysDisplay.querySelectorAll('.key-button').forEach(kb => {
+          keysState.push(kb.dataset.active === 'true');
+        });
+        onChange(keysState);
+      });
+
+      keysDisplay.appendChild(key);
+    }
+
+    keysContainer.appendChild(label);
+    keysContainer.appendChild(keysDisplay);
+    root.appendChild(keysContainer);
+
+  } else {
+    // Toggle normal (interrupteur classique)
+    const row = document.createElement('div');
+    row.className = 'toggle';
+    const left = document.createElement('div');
+    left.className = 'lbl';
+    const title = document.createElement('div');
+    title.className = 't';
+    title.textContent = t(toggle.label, lang);
+    const desc = document.createElement('div');
+    desc.className = 'd';
+    desc.textContent = toggle.hint ? t(toggle.hint, lang) : '';
+    left.appendChild(title);
+    left.appendChild(desc);
+
+    const sw = document.createElement('div');
+    sw.className = 'switch' + (isOn ? ' on' : '');
+    sw.setAttribute('role', 'switch');
+    sw.setAttribute('tabindex', '0');
+    sw.setAttribute('aria-checked', isOn ? 'true' : 'false');
+
+    function flip(){
+      isOn = !isOn;
+      sw.className = 'switch' + (isOn ? ' on' : '');
+      sw.setAttribute('aria-checked', isOn ? 'true' : 'false');
+      onChange(isOn);
+    }
+
+    sw.addEventListener('click', flip);
+    sw.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        flip();
+      }
+    });
+
+    row.appendChild(left);
+    row.appendChild(sw);
+    root.appendChild(row);
+  }
+}
+
+function saveToggleState(charId, toggleId, keyIndex, state) {
+  const savedState = getState(charId) || { hp: null, toggles: {} };
+  
+  if (!savedState.toggles) {
+    savedState.toggles = {};
   }
 
-  sw.addEventListener("click", flip);
-  sw.addEventListener("keydown", (e)=>{
-    if(e.key === "Enter" || e.key === " "){
-      e.preventDefault();
-      flip();
+  if (keyIndex !== null) {
+    // Pour les clés visuelles
+    if (!savedState.toggles[toggleId]) {
+      savedState.toggles[toggleId] = [];
     }
-  });
+    savedState.toggles[toggleId][keyIndex] = state;
+  } else {
+    // Pour les toggles normaux
+    savedState.toggles[toggleId] = state;
+  }
 
-  row.appendChild(left);
-  row.appendChild(sw);
-  root.appendChild(row);
+  setState(charId, savedState);
 }
 
 function urlParam(name){
@@ -402,7 +514,7 @@ async function initCharacter(){
   const saved = getState(c.id);
   const state = saved || {
     hp: c.hp?.max ?? 0,
-    toggles: Object.fromEntries((c.toggles||[]).map(tg => [tg.id, false]))
+    toggles: Object.fromEntries((c.toggles||[]).map(tg => [tg.id, tg.type === 'visual_keys' ? [] : false]))
   };
 
   qs("#charName").textContent = t(c.name, lang);
@@ -443,11 +555,22 @@ async function initCharacter(){
   const togglesRoot = qs("#toggles");
   togglesRoot.innerHTML = "";
   (c.toggles || []).forEach(tg=>{
-    const isOn = !!state.toggles[tg.id];
-    renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
-      state.toggles[tg.id] = v;
-      setState(c.id, state);
-    });
+    if (tg.type === 'visual_keys') {
+      // Pour les clés visuelles
+      const keysState = state.toggles[tg.id] || [];
+      const isOn = keysState.some(k => k === true);
+      renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
+        state.toggles[tg.id] = v;
+        setState(c.id, state);
+      });
+    } else {
+      // Pour les toggles normaux
+      const isOn = !!state.toggles[tg.id];
+      renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
+        state.toggles[tg.id] = v;
+        setState(c.id, state);
+      });
+    }
   });
 
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
@@ -468,7 +591,7 @@ async function initCharacter(){
   qs("#resetBtn").addEventListener("click", ()=>{
     const fresh = {
       hp: c.hp?.max ?? 0,
-      toggles: Object.fromEntries((c.toggles||[]).map(tg => [tg.id, false]))
+      toggles: Object.fromEntries((c.toggles||[]).map(tg => [tg.id, tg.type === 'visual_keys' ? [] : false]))
     };
     setState(c.id, fresh);
     location.reload();
