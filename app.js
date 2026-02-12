@@ -189,7 +189,6 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
     const maxKeys = toggle.maxKeys || 2;
     const isShield = toggle.id === 'shield';
     
-    // For shields, use sharedShields array. For other visual_keys, use the isOn array
     const currentState = isShield ? sharedShields : (Array.isArray(isOn) ? isOn : [isOn, isOn]);
 
     for (let i = 0; i < maxKeys; i++) {
@@ -567,11 +566,22 @@ async function initCharacter(){
   }
 
   function updateShieldDisplay(){
-    const hpCard = document.querySelector('.card');
-    if (assignments[c.id]) {
-      hpCard?.classList.add('has-shield');
-    } else {
-      hpCard?.classList.remove('has-shield');
+    const allCards = document.querySelectorAll('.card');
+    let hpCard = null;
+    
+    for (let card of allCards) {
+      if (card.textContent.includes('Points de Vie') || card.textContent.includes('Life')) {
+        hpCard = card;
+        break;
+      }
+    }
+    
+    if (hpCard) {
+      if (assignments[c.id]) {
+        hpCard.classList.add('has-shield');
+      } else {
+        hpCard.classList.remove('has-shield');
+      }
     }
   }
 
