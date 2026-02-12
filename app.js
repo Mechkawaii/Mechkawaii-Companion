@@ -534,7 +534,6 @@ async function initCharacter(){
 
   const saved = getState(c.id);
   
-  // Initialiser les toggles par défaut
   const defaultToggles = {};
   (c.toggles || []).forEach(tg => {
     if (tg.type === 'visual_keys') {
@@ -596,7 +595,6 @@ async function initCharacter(){
   qs("#movementDesc").textContent = t(c.texts?.movement_desc, lang) || "";
   qs("#attackDesc").textContent = t(c.texts?.attack_desc, lang) || "";
 
-  // Rendu des boucliers
   const shieldsDisplay = qs('#shieldsDisplay');
   if (shieldsDisplay) {
     shieldsDisplay.innerHTML = '';
@@ -620,7 +618,6 @@ async function initCharacter(){
         shieldsDisplay.appendChild(shield);
       }
 
-      // Bouton pour retirer le bouclier de cette unité
       if (assignments[c.id]) {
         const removeShield = document.createElement('button');
         removeShield.className = 'shield-remove-btn';
@@ -638,7 +635,6 @@ async function initCharacter(){
     }
   }
 
-  // Rendu des toggles (sans le shield)
   const togglesRoot = qs('#toggles');
   togglesRoot.innerHTML = '';
   (c.toggles || []).forEach(tg=>{
@@ -681,6 +677,11 @@ async function initCharacter(){
       toggles: {...defaultToggles}
     };
     setState(c.id, fresh);
+    
+    // Réinitialiser tous les boucliers
+    setSharedShields([true, true, true]);
+    setShieldAssignments({});
+    
     location.reload();
   });
 
