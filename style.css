@@ -1,12 +1,12 @@
 
-/* =====================================
+/* =====================================================
    MECHKAWAII COMPANION - Improved Stylesheet
    Game companion app pour suivre les parties
-   ===================================== */
+   ===================================================== */
 
-/* =====================================
+/* =====================================================
    Design Tokens
-   ===================================== */
+   ===================================================== */
 :root {
   /* Colors */
   --bg: #0b0b0e;
@@ -58,9 +58,9 @@
   }
 }
 
-/* =====================================
+/* =====================================================
    Reset & Base
-   ===================================== */
+   ===================================================== */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -104,18 +104,18 @@ button, a, .toggle, .char {
   -webkit-tap-highlight-color: rgba(255, 210, 0, 0.15);
 }
 
-/* =====================================
+/* =====================================================
    Layout
-   ===================================== */
+   ===================================================== */
 .container {
   width: min(var(--maxw), calc(100% - var(--space-2xl)));
   margin: 0 auto;
   padding: var(--space-xl) 0 64px;
 }
 
-/* =====================================
+/* =====================================================
    Topbar
-   ===================================== */
+   ===================================================== */
 .topbar {
   display: flex;
   align-items: center;
@@ -145,9 +145,9 @@ button, a, .toggle, .char {
   font-size: 13px;
 }
 
-/* =====================================
+/* =====================================================
    Controls & Forms
-   ===================================== */
+   ===================================================== */
 .controls {
   display: flex;
   gap: var(--space-sm);
@@ -210,9 +210,9 @@ button:focus-visible {
   background: rgba(255, 77, 77, 0.10);
 }
 
-/* =====================================
+/* =====================================================
    Grid Layout
-   ===================================== */
+   ===================================================== */
 .grid {
   margin-top: var(--space-lg);
   display: grid;
@@ -226,9 +226,9 @@ button:focus-visible {
   }
 }
 
-/* =====================================
+/* =====================================================
    Cards
-   ===================================== */
+   ===================================================== */
 .card {
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -261,9 +261,9 @@ button:focus-visible {
   padding: var(--space-md) var(--space-md);
 }
 
-/* =====================================
+/* =====================================================
    Typography
-   ===================================== */
+   ===================================================== */
 .h1 {
   font-size: clamp(22px, 5vw, 28px);
   margin: 0;
@@ -308,9 +308,9 @@ button:focus-visible {
   font-size: 13px;
 }
 
-/* =====================================
+/* =====================================================
    HP & Shields System
-   ===================================== */
+   ===================================================== */
 .hp-shields-wrapper {
   display: flex;
   flex-direction: column;
@@ -373,31 +373,30 @@ button:focus-visible {
   font-weight: 700;
 }
 
-/* =====================================
+/* =====================================================
    Shields Display
-   ===================================== */
-.shields-display {
+   ===================================================== */
+#shieldsDisplay {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 8px;
+  width: fit-content;
   margin-top: 8px;
 }
 
 .shield-button {
-  width: 100%;
-  padding: 8px 12px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
   border: 2px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   background: #f5f5f5;
-  background-size: 20px;
-  background-position: 8px center;
+  background-size: 70%;
+  background-position: center;
   background-repeat: no-repeat;
-  padding-left: 36px;
-  text-align: left;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text);
+  flex-shrink: 0;
+  font-size: 0;
   transition: all 0.2s ease;
 }
 
@@ -431,9 +430,9 @@ button:focus-visible {
   transform: translateY(1px);
 }
 
-/* =====================================
+/* =====================================================
    Rules & Info Sections
-   ===================================== */
+   ===================================================== */
 .rule {
   margin-top: 12px;
   padding: 12px;
@@ -453,9 +452,9 @@ button:focus-visible {
   line-height: 1.6;
 }
 
-/* =====================================
+/* =====================================================
    Toggle Switches
-   ===================================== */
+   ===================================================== */
 .toggles {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -524,6 +523,7 @@ button:focus-visible {
   background-size: 70%;
   background-position: center;
   background-repeat: no-repeat;
+  flex-shrink: 0;
 }
 
 .key-button:hover {
@@ -569,9 +569,9 @@ button:focus-visible {
   background: rgba(61, 220, 151, 0.95);
 }
 
-/* =====================================
+/* =====================================================
    Pattern/Image Gallery
-   ===================================== */
+   ===================================================== */
 .patterns {
   display: grid;
   grid-template-columns: 1fr;
@@ -609,9 +609,9 @@ button:focus-visible {
   display: block;
 }
 
-/* =====================================
+/* =====================================================
    Character List
-   ===================================== */
+   ===================================================== */
 .list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -663,9 +663,9 @@ button:focus-visible {
   flex-wrap: wrap;
 }
 
-/* =====================================
+/* =====================================================
    Splash Screen
-   ===================================== */
+   ===================================================== */
 .splash-overlay {
   position: fixed;
   inset: 0;
@@ -777,9 +777,9 @@ button:focus-visible {
   transform: translateY(1px);
 }
 
-/* =====================================
+/* =====================================================
    Animations
-   ===================================== */
+   ===================================================== */
 @keyframes mkw-float {
   0% { transform: translateY(0px) rotate(-2deg); }
   50% { transform: translateY(-6px) rotate(2deg); }
@@ -830,9 +830,9 @@ button:focus-visible {
   }
 }
 
-/* =====================================
+/* =====================================================
    Splash Dismissed State
-   ===================================== */
+   ===================================================== */
 body.has-splash .topbar,
 body.has-splash #setupCard,
 body.has-splash #draftCard,
@@ -855,9 +855,9 @@ html.splash-dismissed body.has-splash .controls {
   visibility: visible !important;
 }
 
-/* =====================================
+/* =====================================================
    Utilities
-   ===================================== */
+   ===================================================== */
 .footer-note {
   margin-top: var(--space-lg);
   color: var(--muted);
@@ -865,9 +865,9 @@ html.splash-dismissed body.has-splash .controls {
   text-align: center;
 }
 
-/* =====================================
+/* =====================================================
    Unit Tabs (Bottom Navigation)
-   ===================================== */
+   ===================================================== */
 .unit-tabs-container {
   position: fixed;
   bottom: 0;
@@ -1069,9 +1069,9 @@ body.game-active .toggle.locked::after {
   font-size: 12px;
 }
 
-/* =====================================
+/* =====================================================
    Desktop Optimizations
-   ===================================== */
+   ===================================================== */
 @media (min-width: 900px) {
   .splash-overlay .hero-ui {
     overflow-y: auto;
@@ -1099,9 +1099,9 @@ body.game-active .toggle.locked::after {
   }
 }
 
-/* =====================================
+/* =====================================================
    Print Styles (utile pour imprimer résumé de partie)
-   ===================================== */
+   ===================================================== */
 @media print {
   body {
     background: white;
