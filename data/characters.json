@@ -51,13 +51,15 @@
       {
         "id": "shield",
         "label": {
-          "fr": "Bouclier",
-          "en": "Shield"
+          "fr": "Boucliers",
+          "en": "Shields"
         },
         "hint": {
-          "fr": "🛡️ Bouclier activé",
-          "en": "🛡️ Shield activated"
-        }
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
       },
       {
         "id": "repair_keys",
@@ -70,10 +72,6 @@
           "en": "Keys used (0, 1 or 2)"
         },
         "type": "visual_keys",
-        "images": {
-          "inactive": "./assets/icons/key_off.svg",
-          "active": "./assets/icons/key_on.svg"
-        },
         "maxKeys": 2
       },
       {
@@ -140,13 +138,15 @@
       {
         "id": "shield",
         "label": {
-          "fr": "Bouclier",
-          "en": "Shield"
+          "fr": "Boucliers",
+          "en": "Shields"
         },
         "hint": {
-          "fr": "🛡️ Bouclier activé",
-          "en": "🛡️ Shield activated"
-        }
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
       },
       {
         "id": "repair_keys",
@@ -159,10 +159,6 @@
           "en": "Keys used (0, 1 or 2)"
         },
         "type": "visual_keys",
-        "images": {
-          "inactive": "./assets/icons/key_off.svg",
-          "active": "./assets/icons/key_on.svg"
-        },
         "maxKeys": 2
       },
       {
@@ -229,13 +225,15 @@
       {
         "id": "shield",
         "label": {
-          "fr": "Bouclier",
-          "en": "Shield"
+          "fr": "Boucliers",
+          "en": "Shields"
         },
         "hint": {
-          "fr": "🛡️ Bouclier activé",
-          "en": "🛡️ Shield activated"
-        }
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
       },
       {
         "id": "repair_keys",
@@ -248,10 +246,6 @@
           "en": "Keys used (0, 1 or 2)"
         },
         "type": "visual_keys",
-        "images": {
-          "inactive": "./assets/icons/key_off.svg",
-          "active": "./assets/icons/key_on.svg"
-        },
         "maxKeys": 2
       },
       {
@@ -318,13 +312,15 @@
       {
         "id": "shield",
         "label": {
-          "fr": "Bouclier",
-          "en": "Shield"
+          "fr": "Boucliers",
+          "en": "Shields"
         },
         "hint": {
-          "fr": "🛡️ Bouclier activé",
-          "en": "🛡️ Shield activated"
-        }
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
       },
       {
         "id": "repair_keys",
@@ -337,10 +333,6 @@
           "en": "Keys used (0, 1 or 2)"
         },
         "type": "visual_keys",
-        "images": {
-          "inactive": "./assets/icons/key_off.svg",
-          "active": "./assets/icons/key_on.svg"
-        },
         "maxKeys": 2
       },
       {
@@ -407,13 +399,15 @@
       {
         "id": "shield",
         "label": {
-          "fr": "Bouclier",
-          "en": "Shield"
+          "fr": "Boucliers",
+          "en": "Shields"
         },
         "hint": {
-          "fr": "🛡️ Bouclier activé",
-          "en": "🛡️ Shield activated"
-        }
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
       },
       {
         "id": "repair_keys",
@@ -426,10 +420,6 @@
           "en": "Keys used (0, 1 or 2)"
         },
         "type": "visual_keys",
-        "images": {
-          "inactive": "./assets/icons/key_off.svg",
-          "active": "./assets/icons/key_on.svg"
-        },
         "maxKeys": 2
       },
       {
@@ -496,13 +486,15 @@
       {
         "id": "shield",
         "label": {
-          "fr": "Bouclier",
-          "en": "Shield"
+          "fr": "Boucliers",
+          "en": "Shields"
         },
         "hint": {
-          "fr": "🛡️ Bouclier activé",
-          "en": "🛡️ Shield activated"
-        }
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
       },
       {
         "id": "repair_keys",
@@ -515,10 +507,6 @@
           "en": "Keys used (0, 1 or 2)"
         },
         "type": "visual_keys",
-        "images": {
-          "inactive": "./assets/icons/key_off.svg",
-          "active": "./assets/icons/key_on.svg"
-        },
         "maxKeys": 2
       },
       {
@@ -585,13 +573,15 @@
       {
         "id": "shield",
         "label": {
-          "fr": "Bouclier",
-          "en": "Shield"
+          "fr": "Boucliers",
+          "en": "Shields"
         },
         "hint": {
-          "fr": "🛡️ Bouclier activé",
-          "en": "🛡️ Shield activated"
-        }
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
       },
       {
         "id": "repair_keys",
@@ -604,10 +594,6 @@
           "en": "Keys used (0, 1 or 2)"
         },
         "type": "visual_keys",
-        "images": {
-          "inactive": "./assets/icons/key_off.svg",
-          "active": "./assets/icons/key_on.svg"
-        },
         "maxKeys": 2
       },
       {
@@ -674,13 +660,15 @@
       {
         "id": "shield",
         "label": {
-          "fr": "Bouclier",
-          "en": "Shield"
+          "fr": "Boucliers",
+          "en": "Shields"
         },
         "hint": {
-          "fr": "🛡️ Bouclier activé",
-          "en": "🛡️ Shield activated"
-        }
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
       },
       {
         "id": "repair_keys",
@@ -693,10 +681,6 @@
           "en": "Keys used (0, 1 or 2)"
         },
         "type": "visual_keys",
-        "images": {
-          "inactive": "./assets/icons/key_off.svg",
-          "active": "./assets/icons/key_on.svg"
-        },
         "maxKeys": 2
       },
       {
@@ -763,13 +747,15 @@
       {
         "id": "shield",
         "label": {
-          "fr": "Bouclier",
-          "en": "Shield"
+          "fr": "Boucliers",
+          "en": "Shields"
         },
         "hint": {
-          "fr": "🛡️ Bouclier activé",
-          "en": "🛡️ Shield activated"
-        }
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
       },
       {
         "id": "repair_keys",
@@ -782,10 +768,6 @@
           "en": "Keys used (0, 1 or 2)"
         },
         "type": "visual_keys",
-        "images": {
-          "inactive": "./assets/icons/key_off.svg",
-          "active": "./assets/icons/key_on.svg"
-        },
         "maxKeys": 2
       },
       {
@@ -852,13 +834,15 @@
       {
         "id": "shield",
         "label": {
-          "fr": "Bouclier",
-          "en": "Shield"
+          "fr": "Boucliers",
+          "en": "Shields"
         },
         "hint": {
-          "fr": "🛡️ Bouclier activé",
-          "en": "🛡️ Shield activated"
-        }
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
       },
       {
         "id": "repair_keys",
@@ -871,10 +855,6 @@
           "en": "Keys used (0, 1 or 2)"
         },
         "type": "visual_keys",
-        "images": {
-          "inactive": "./assets/icons/key_off.svg",
-          "active": "./assets/icons/key_on.svg"
-        },
         "maxKeys": 2
       },
       {
