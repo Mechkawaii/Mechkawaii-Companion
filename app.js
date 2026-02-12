@@ -557,9 +557,6 @@ async function initCharacter(){
     toggles: defaultToggles
   };
 
-  const sharedShields = getSharedShields();
-  const assignments = getShieldAssignments();
-
   qs("#charName").textContent = t(c.name, lang);
   qs("#charClass").textContent = t(c.class, lang);
   qs("#hpMaxLabel").textContent = `/${c.hp?.max ?? 0}`;
@@ -585,7 +582,7 @@ async function initCharacter(){
     
     if (hpCard) {
       const freshAssignments = getShieldAssignments();
-      if (freshAssignments[c.id]) {
+      if (freshAssignments[c.id] !== undefined) {
         hpCard.classList.add('has-shield');
       } else {
         hpCard.classList.remove('has-shield');
@@ -643,7 +640,7 @@ async function initCharacter(){
         shieldsDisplay.appendChild(shield);
       }
 
-      if (freshAssignments[c.id]) {
+      if (freshAssignments[c.id] !== undefined) {
         const removeShield = document.createElement('button');
         removeShield.className = 'shield-remove-btn';
         removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove shield';
@@ -669,6 +666,7 @@ async function initCharacter(){
     if (tg.type === 'visual_keys') {
       const keysState = state.toggles[tg.id];
       const isOn = keysState && keysState.some(k => k === true);
+      const sharedShields = getSharedShields();
       renderToggleRow(togglesRoot, tg, keysState, lang, (v)=>{
         state.toggles[tg.id] = v;
         setState(c.id, state);
@@ -785,13 +783,8 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, s
     
     btn.addEventListener('click', () => {
       const currentAssignments = getShieldAssignments();
-      const currentShields = getSharedShields();
-      
       currentAssignments[char.id] = shieldIndex;
-      currentShields[shieldIndex] = false;
-      
       setShieldAssignments(currentAssignments);
-      setSharedShields(currentShields);
       
       document.body.removeChild(modal);
       
@@ -941,7 +934,7 @@ function createCharacterTab(char, lang){
   const hpClass = hpPercentage <= 33 ? 'low' : '';
 
   const assignments = getShieldAssignments();
-  const hasShield = assignments[char.id] ? true : false;
+  const hasShield = assignments[char.id] !== undefined ? true : false;
 
   const visualEl = document.createElement('div');
   visualEl.className = 'unit-tab-visual';
