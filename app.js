@@ -280,6 +280,35 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
   }
 }
 
+function renderInlineToggle(container, toggle, isOn, lang, onChange){
+  const label = document.createElement('label');
+  label.textContent = t(toggle.label, lang);
+
+  const sw = document.createElement('div');
+  sw.className = 'switch' + (isOn ? ' on' : '');
+  sw.setAttribute('role', 'switch');
+  sw.setAttribute('tabindex', '0');
+  sw.setAttribute('aria-checked', isOn ? 'true' : 'false');
+
+  function flip(){
+    isOn = !isOn;
+    sw.className = 'switch' + (isOn ? ' on' : '');
+    sw.setAttribute('aria-checked', isOn ? 'true' : 'false');
+    onChange(isOn);
+  }
+
+  sw.addEventListener('click', flip);
+  sw.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      flip();
+    }
+  });
+
+  container.appendChild(label);
+  container.appendChild(sw);
+}
+
 function saveToggleState(charId, toggleId, keyIndex, state) {
   if (toggleId === 'shield') {
     setSharedShields(state);
@@ -661,11 +690,22 @@ async function initCharacter(){
   }
 
   const togglesRoot = qs('#toggles');
+  const ultToggleContainer = qs('#ultToggleContainer');
   togglesRoot.innerHTML = '';
+  
   (c.toggles || []).forEach(tg=>{
     if (tg.id === 'shield') return;
     
-    if (tg.type === 'visual_keys') {
+    if (tg.id === 'Coup unique' || tg.id === 'coup-unique') {
+      // Render inline in ultimate header
+      if (ultToggleContainer) {
+        const isOn = !!state.toggles[tg.id];
+        renderInlineToggle(ultToggleContainer, tg, isOn, lang, (v)=>{
+          state.toggles[tg.id] = v;
+          setState(c.id, state);
+        });
+      }
+    } else if (tg.type === 'visual_keys') {
       const keysState = state.toggles[tg.id];
       const isOn = keysState && keysState.some(k => k === true);
       const sharedShields = getSharedShields();
