@@ -628,11 +628,8 @@ async function initCharacter(){
         
         removeShield.addEventListener('click', function(e) {
           e.preventDefault();
-          const shieldIndex = assignments[c.id];
           delete assignments[c.id];
           setShieldAssignments(assignments);
-          sharedShields[shieldIndex] = true;
-          setSharedShields(sharedShields);
           location.reload();
         });
         
