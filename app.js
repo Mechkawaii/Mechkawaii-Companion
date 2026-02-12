@@ -584,7 +584,8 @@ async function initCharacter(){
     }
     
     if (hpCard) {
-      if (assignments[c.id]) {
+      const freshAssignments = getShieldAssignments();
+      if (freshAssignments[c.id]) {
         hpCard.classList.add('has-shield');
       } else {
         hpCard.classList.remove('has-shield');
@@ -621,8 +622,11 @@ async function initCharacter(){
     shieldsDisplay.innerHTML = '';
     const shieldToggle = c.toggles?.find(tg => tg.id === 'shield');
     if (shieldToggle) {
+      const freshShields = getSharedShields();
+      const freshAssignments = getShieldAssignments();
+      
       for (let i = 0; i < 3; i++) {
-        if (!sharedShields[i]) continue;
+        if (!freshShields[i]) continue;
         
         const shield = document.createElement('button');
         shield.className = 'shield-button';
@@ -633,21 +637,22 @@ async function initCharacter(){
         
         shield.addEventListener('click', function(e) {
           e.preventDefault();
-          showShieldAssignmentModal(i, c.id, lang, chars, sharedShields, assignments);
+          showShieldAssignmentModal(i, c.id, lang, chars, freshShields, freshAssignments);
         });
         
         shieldsDisplay.appendChild(shield);
       }
 
-      if (assignments[c.id]) {
+      if (freshAssignments[c.id]) {
         const removeShield = document.createElement('button');
         removeShield.className = 'shield-remove-btn';
         removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove shield';
         
         removeShield.addEventListener('click', function(e) {
           e.preventDefault();
-          delete assignments[c.id];
-          setShieldAssignments(assignments);
+          const currentAssignments = getShieldAssignments();
+          delete currentAssignments[c.id];
+          setShieldAssignments(currentAssignments);
           location.reload();
         });
         
@@ -792,7 +797,7 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, s
       
       setTimeout(() => {
         location.reload();
-      }, 100);
+      }, 250);
     });
     
     content.appendChild(btn);
