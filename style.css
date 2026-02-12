@@ -1,12 +1,12 @@
 
-/* =====================================================
+/* =====================================
    MECHKAWAII COMPANION - Improved Stylesheet
    Game companion app pour suivre les parties
-   ===================================================== */
+   ===================================== */
 
-/* =====================================================
+/* =====================================
    Design Tokens
-   ===================================================== */
+   ===================================== */
 :root {
   /* Colors */
   --bg: #0b0b0e;
@@ -20,7 +20,7 @@
   --border: rgba(255, 255, 255, 0.10);
   --shield: #3b82f6;
   
-  /* Spacing (nouvelles variables pour cohérence) */
+  /* Spacing */
   --space-xs: 6px;
   --space-sm: 10px;
   --space-md: 14px;
@@ -41,26 +41,24 @@
   /* Layout */
   --maxw: 980px;
   
-  /* Touch targets (44px minimum recommandé) */
+  /* Touch targets */
   --touch-min: 44px;
   
-  /* Performance: réduire blur sur mobile */
+  /* Performance */
   --blur: 10px;
   
-  /* Misc */
   font-synthesis-weight: none;
 }
 
-/* Mobile: moins de blur pour performance */
 @media (max-width: 768px) {
   :root {
     --blur: 6px;
   }
 }
 
-/* =====================================================
+/* =====================================
    Reset & Base
-   ===================================================== */
+   ===================================== */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -77,18 +75,16 @@ body {
     radial-gradient(1200px 700px at 20% 0%, rgba(255, 210, 0, 0.08), transparent 55%),
     radial-gradient(900px 600px at 80% 10%, rgba(61, 220, 151, 0.07), transparent 50%),
     var(--bg);
-  background-attachment: fixed; /* Évite re-render du gradient au scroll */
+  background-attachment: fixed;
   color: var(--text);
   line-height: 1.6;
 }
 
-/* Bloquer scroll quand splash est visible */
 body.has-splash {
   overflow: hidden;
   height: 100vh;
 }
 
-/* Débloquer scroll quand splash est fermé */
 html.splash-dismissed body.has-splash {
   overflow: auto;
   height: auto;
@@ -99,23 +95,22 @@ a {
   text-decoration: none;
 }
 
-/* Amélioration tap highlight sur mobile */
 button, a, .toggle, .char {
   -webkit-tap-highlight-color: rgba(255, 210, 0, 0.15);
 }
 
-/* =====================================================
+/* =====================================
    Layout
-   ===================================================== */
+   ===================================== */
 .container {
   width: min(var(--maxw), calc(100% - var(--space-2xl)));
   margin: 0 auto;
   padding: var(--space-xl) 0 64px;
 }
 
-/* =====================================================
+/* =====================================
    Topbar
-   ===================================================== */
+   ===================================== */
 .topbar {
   display: flex;
   align-items: center;
@@ -145,9 +140,9 @@ button, a, .toggle, .char {
   font-size: 13px;
 }
 
-/* =====================================================
+/* =====================================
    Controls & Forms
-   ===================================================== */
+   ===================================== */
 .controls {
   display: flex;
   gap: var(--space-sm);
@@ -174,7 +169,7 @@ button {
   border: 1px solid var(--border);
   background: rgba(15, 15, 21, 0.8);
   color: var(--text);
-  padding: 12px 16px; /* Touch-friendly: min 44px */
+  padding: 12px 16px;
   border-radius: var(--radius-md);
   font-weight: 600;
   transition: 
@@ -210,9 +205,9 @@ button:focus-visible {
   background: rgba(255, 77, 77, 0.10);
 }
 
-/* =====================================================
+/* =====================================
    Grid Layout
-   ===================================================== */
+   ===================================== */
 .grid {
   margin-top: var(--space-lg);
   display: grid;
@@ -226,9 +221,9 @@ button:focus-visible {
   }
 }
 
-/* =====================================================
+/* =====================================
    Cards
-   ===================================================== */
+   ===================================== */
 .card {
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -261,9 +256,9 @@ button:focus-visible {
   padding: var(--space-md) var(--space-md);
 }
 
-/* =====================================================
+/* =====================================
    Typography
-   ===================================================== */
+   ===================================== */
 .h1 {
   font-size: clamp(22px, 5vw, 28px);
   margin: 0;
@@ -308,9 +303,9 @@ button:focus-visible {
   font-size: 13px;
 }
 
-/* =====================================================
+/* =====================================
    HP & Shields System
-   ===================================================== */
+   ===================================== */
 .hp-shields-wrapper {
   display: flex;
   flex-direction: column;
@@ -349,7 +344,6 @@ button:focus-visible {
   transition: transform 0.15s ease;
 }
 
-/* Feedback visuel quand HP change */
 .heart.damaged {
   animation: heartShake 0.3s ease;
 }
@@ -373,9 +367,9 @@ button:focus-visible {
   font-weight: 700;
 }
 
-/* =====================================================
+/* =====================================
    Shields Display
-   ===================================================== */
+   ===================================== */
 #shieldsDisplay {
   display: flex;
   flex-wrap: wrap;
@@ -387,7 +381,8 @@ button:focus-visible {
 .shield-button {
   width: 40px;
   height: 40px;
-  padding: 0;
+  padding: 0 !important;
+  margin: 0 !important;
   border: 2px solid var(--border);
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -397,7 +392,13 @@ button:focus-visible {
   background-repeat: no-repeat;
   flex-shrink: 0;
   font-size: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.2s ease;
+  min-height: auto !important;
+  min-width: auto !important;
 }
 
 .shield-button:hover {
@@ -430,9 +431,9 @@ button:focus-visible {
   transform: translateY(1px);
 }
 
-/* =====================================================
+/* =====================================
    Rules & Info Sections
-   ===================================================== */
+   ===================================== */
 .rule {
   margin-top: 12px;
   padding: 12px;
@@ -452,9 +453,9 @@ button:focus-visible {
   line-height: 1.6;
 }
 
-/* =====================================================
+/* =====================================
    Toggle Switches
-   ===================================================== */
+   ===================================== */
 .toggles {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -495,7 +496,6 @@ button:focus-visible {
   font-size: 12px;
 }
 
-/* Visual Keys Toggle */
 .toggle-visual-keys {
   display: flex;
   gap: 12px;
@@ -534,7 +534,6 @@ button:focus-visible {
   transform: translateY(1px);
 }
 
-/* Switch améliorer avec transitions plus smooth */
 .switch {
   width: 46px;
   height: 28px;
@@ -569,9 +568,9 @@ button:focus-visible {
   background: rgba(61, 220, 151, 0.95);
 }
 
-/* =====================================================
+/* =====================================
    Pattern/Image Gallery
-   ===================================================== */
+   ===================================== */
 .patterns {
   display: grid;
   grid-template-columns: 1fr;
@@ -609,9 +608,9 @@ button:focus-visible {
   display: block;
 }
 
-/* =====================================================
+/* =====================================
    Character List
-   ===================================================== */
+   ===================================== */
 .list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -663,9 +662,9 @@ button:focus-visible {
   flex-wrap: wrap;
 }
 
-/* =====================================================
+/* =====================================
    Splash Screen
-   ===================================================== */
+   ===================================== */
 .splash-overlay {
   position: fixed;
   inset: 0;
@@ -736,7 +735,6 @@ button:focus-visible {
   justify-content: center;
 }
 
-/* Boutons splash uniformisés */
 .mkw-btn,
 .mkw-link {
   position: relative;
@@ -777,9 +775,9 @@ button:focus-visible {
   transform: translateY(1px);
 }
 
-/* =====================================================
+/* =====================================
    Animations
-   ===================================================== */
+   ===================================== */
 @keyframes mkw-float {
   0% { transform: translateY(0px) rotate(-2deg); }
   50% { transform: translateY(-6px) rotate(2deg); }
@@ -792,14 +790,12 @@ button:focus-visible {
   100% { filter: drop-shadow(0 0 0 rgba(255, 79, 216, 0.0)); }
 }
 
-/* Animation mascot */
 .brand .mascot,
 .brand-stack .mascot {
   animation: mkw-float 2.8s ease-in-out infinite;
   transform-origin: 50% 60%;
 }
 
-/* Animation bouton play */
 #playBtn.mkw-btn {
   animation: mkw-glow 1.8s ease-in-out infinite;
 }
@@ -813,7 +809,6 @@ button:focus-visible {
   filter: drop-shadow(0 0 18px rgba(255, 79, 216, 0.55));
 }
 
-/* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -830,9 +825,9 @@ button:focus-visible {
   }
 }
 
-/* =====================================================
+/* =====================================
    Splash Dismissed State
-   ===================================================== */
+   ===================================== */
 body.has-splash .topbar,
 body.has-splash #setupCard,
 body.has-splash #draftCard,
@@ -855,9 +850,9 @@ html.splash-dismissed body.has-splash .controls {
   visibility: visible !important;
 }
 
-/* =====================================================
+/* =====================================
    Utilities
-   ===================================================== */
+   ===================================== */
 .footer-note {
   margin-top: var(--space-lg);
   color: var(--muted);
@@ -865,9 +860,9 @@ html.splash-dismissed body.has-splash .controls {
   text-align: center;
 }
 
-/* =====================================================
+/* =====================================
    Unit Tabs (Bottom Navigation)
-   ===================================================== */
+   ===================================== */
 .unit-tabs-container {
   position: fixed;
   bottom: 0;
@@ -883,7 +878,6 @@ html.splash-dismissed body.has-splash .controls {
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Afficher les tabs quand des unités sont sélectionnées */
 .unit-tabs-container.visible {
   transform: translateY(0);
 }
@@ -900,7 +894,6 @@ html.splash-dismissed body.has-splash .controls {
   scrollbar-color: var(--accent) rgba(255, 255, 255, 0.1);
 }
 
-/* Masquer la scrollbar sur mobile pour un look plus clean */
 .unit-tabs::-webkit-scrollbar {
   height: 6px;
 }
@@ -949,7 +942,6 @@ html.splash-dismissed body.has-splash .controls {
   border-color: rgba(59, 130, 246, 0.4);
 }
 
-/* Tab active */
 .unit-tab.active {
   border-color: var(--accent);
   background: rgba(255, 210, 0, 0.12);
@@ -967,7 +959,6 @@ html.splash-dismissed body.has-splash .controls {
   box-shadow: 0 0 10px var(--accent);
 }
 
-/* Contenu du tab */
 .unit-tab-visual {
   width: 100%;
   height: 70%;
@@ -986,7 +977,6 @@ html.splash-dismissed body.has-splash .controls {
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
 }
 
-/* Badge HP sur le tab */
 .unit-tab-hp {
   position: absolute;
   top: 6px;
@@ -1031,12 +1021,10 @@ html.splash-dismissed body.has-splash .controls {
   text-overflow: ellipsis;
 }
 
-/* Ajuster le padding du container pour que le contenu ne soit pas caché par les tabs */
 body.tabs-visible .container {
   padding-bottom: clamp(160px, 30vw, 220px);
 }
 
-/* Desktop: tabs plus grandes et plus espacées */
 @media (min-width: 900px) {
   .unit-tabs-container {
     padding: var(--space-lg) var(--space-xl);
@@ -1053,7 +1041,6 @@ body.tabs-visible .container {
   }
 }
 
-/* État "partie en cours" - verrouille certains choix */
 body.game-active .toggle.locked {
   opacity: 0.5;
   pointer-events: none;
@@ -1069,9 +1056,9 @@ body.game-active .toggle.locked::after {
   font-size: 12px;
 }
 
-/* =====================================================
+/* =====================================
    Desktop Optimizations
-   ===================================================== */
+   ===================================== */
 @media (min-width: 900px) {
   .splash-overlay .hero-ui {
     overflow-y: auto;
@@ -1085,7 +1072,6 @@ body.game-active .toggle.locked::after {
     object-fit: contain;
   }
 
-  /* Fix centrage boutons desktop */
   .splash-overlay .menu {
     width: 100%;
     max-width: 500px;
@@ -1099,9 +1085,9 @@ body.game-active .toggle.locked::after {
   }
 }
 
-/* =====================================================
-   Print Styles (utile pour imprimer résumé de partie)
-   ===================================================== */
+/* =====================================
+   Print Styles
+   ===================================== */
 @media print {
   body {
     background: white;
