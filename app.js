@@ -712,18 +712,17 @@ async function initCharacter(){
   const togglesRoot = qs('#toggles');
   const ultToggleContainer = qs('#ultToggleContainer');
   togglesRoot.innerHTML = '';
+  ultToggleContainer.innerHTML = '';
   
   (c.toggles || []).forEach(tg=>{
     if (tg.id === 'shield') return;
     
     if (tg.id === 'Coup unique' || tg.id === 'coup-unique') {
-      if (ultToggleContainer) {
-        const isOn = !!state.toggles[tg.id];
-        renderToggleRow(ultToggleContainer, tg, isOn, lang, (v)=>{
-          state.toggles[tg.id] = v;
-          setState(c.id, state);
-        });
-      }
+      const isOn = !!state.toggles[tg.id];
+      renderToggleRow(ultToggleContainer, tg, isOn, lang, (v)=>{
+        state.toggles[tg.id] = v;
+        setState(c.id, state);
+      });
     } else if (tg.type === 'visual_keys') {
       const keysState = state.toggles[tg.id];
       const isOn = keysState && keysState.some(k => k === true);
