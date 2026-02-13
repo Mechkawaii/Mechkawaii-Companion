@@ -664,61 +664,68 @@ async function initCharacter(){
   qs("#attackDesc").textContent = t(c.texts?.attack_desc, lang) || "";
 
   const shieldsDisplay = qs('#shieldsDisplay');
-  if (shieldsDisplay) {
-    shieldsDisplay.innerHTML = '';
-    const shieldToggle = c.toggles?.find(tg => tg.id === 'shield');
-    if (shieldToggle) {
-      const freshShields = getSharedShields();
-      const freshAssignments = getShieldAssignments();
-      
-      for (let i = 0; i < 3; i++) {
-        if (!freshShields[i]) continue;
-        
-        const shield = document.createElement('button');
-        shield.className = 'shield-button';
-        shield.type = 'button';
-        shield.style.backgroundImage = 'url(./assets/icons/shield_on.svg)';
-        shield.dataset.shieldIndex = i;
-        shield.textContent = `Bouclier ${i + 1}`;
-        
-        shield.addEventListener('click', function(e) {
-          e.preventDefault();
-          showShieldAssignmentModal(i, c.id, lang, chars, freshShields, freshAssignments);
-        });
-        
-        shieldsDisplay.appendChild(shield);
-      }
+if (shieldsDisplay) {
+  shieldsDisplay.innerHTML = '';
+  const shieldToggle = c.toggles?.find(tg => tg.id === 'shield');
 
-      if (freshAssignments[c.id] !== undefined) {
-        const removeShield = document.createElement('button');
-        removeShield.className = 'shield-remove-btn';
-        removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove shield';
-        
-        removeShield.addEventListener('click', function(e) {
-          e.preventDefault();
-          const currentAssignments = getShieldAssignments();
-          
-          delete currentAssignments[c.id];
-          setShieldAssignments(currentAssignments);
-          
-          location.reload();
-          const repairKeysDisplay = qs("#repairKeysDisplay");
+  if (shieldToggle) {
+    const freshShields = getSharedShields();
+    const freshAssignments = getShieldAssignments();
+
+    for (let i = 0; i < 3; i++) {
+      if (!freshShields[i]) continue;
+
+      const shield = document.createElement('button');
+      shield.className = 'shield-button';
+      shield.type = 'button';
+      shield.style.backgroundImage = 'url(./assets/icons/shield_on.svg)';
+      shield.dataset.shieldIndex = i;
+      shield.textContent = `Bouclier ${i + 1}`;
+
+      shield.addEventListener('click', function (e) {
+        e.preventDefault();
+        showShieldAssignmentModal(i, c.id, lang, chars, freshShields, freshAssignments);
+      });
+
+      shieldsDisplay.appendChild(shield);
+    }
+
+    if (freshAssignments[c.id] !== undefined) {
+      const removeShield = document.createElement('button');
+      removeShield.className = 'shield-remove-btn';
+      removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove shield';
+
+      removeShield.addEventListener('click', function (e) {
+        e.preventDefault();
+        const currentAssignments = getShieldAssignments();
+
+        delete currentAssignments[c.id];
+        setShieldAssignments(currentAssignments);
+
+        location.reload();
+      });
+
+      shieldsDisplay.appendChild(removeShield);
+    }
+  }
+}
+
+/* --- Clés de réparation à côté des PV & boucliers --- */
+const repairKeysDisplay = qs('#repairKeysDisplay');
 if (repairKeysDisplay) {
-  repairKeysDisplay.innerHTML = "";
-  const repairToggle = c.toggles?.find(tg => tg.id === "repair_keys");
+  repairKeysDisplay.innerHTML = '';
 
+  const repairToggle = c.toggles?.find(tg => tg.id === 'repair_keys');
   if (repairToggle) {
     const keysState = state.toggles[repairToggle.id] || [true, true];
 
     renderToggleRow(repairKeysDisplay, repairToggle, keysState, lang, (v) => {
       state.toggles[repairToggle.id] = v;
       setState(c.id, state);
-        });
-        
-        shieldsDisplay.appendChild(removeShield);
-      }
-    }
+    });
   }
+}
+
 
   const togglesRoot = qs('#toggles');
   const ultToggleContainer = qs('#ultToggleContainer');
