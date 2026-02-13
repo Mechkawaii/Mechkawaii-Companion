@@ -319,7 +319,7 @@ button:focus-visible {
   }
 }
 
-.hp-section, .shields-section {
+.hp-section, .shields-section, .repair-section {
   flex: 1;
 }
 
