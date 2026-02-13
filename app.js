@@ -1,6 +1,14 @@
 
 const STORAGE_PREFIX = "mechkawaii:";
 
+// Fonction pour normaliser les noms (supprimer accents et convertir en minuscules)
+function normalizeClassName(className) {
+  if (typeof className === 'string') {
+    return className.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  }
+  return className;
+}
+
 function playPressStart(){
   try{
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -333,17 +341,18 @@ async function initIndex(){
     a.className = "char";
     a.href = `character.html?id=${encodeURIComponent(c.id)}`;
     
-    // Get class name - handle both string and object
-    const className = typeof c.class === 'string' ? c.class : (c.class.fr || c.class.en || c.id);
-    const classImage = `./assets/characters/classe_${className}.png`;
+    // Normaliser le nom de classe (minuscules, sans accents)
+    const classNameDisplay = t(c.class, lang);
+    const classNameNormalized = normalizeClassName(classNameDisplay);
+    const classImage = `./assets/characters/classe_${classNameNormalized}.png`;
     
     a.innerHTML = `
       <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-        <img src="${classImage}" alt="${t(c.class, lang)}" style="width: 24px; height: 24px; object-fit: contain;" onerror="this.style.display='none'">
+        <img src="${classImage}" alt="${classNameDisplay}" style="width: 24px; height: 24px; object-fit: contain;" onerror="this.style.display='none'">
         <div class="n">${t(c.name, lang)}</div>
       </div>
       <div class="m">
-        <span class="badge">${t(c.class, lang)}</span>
+        <span class="badge">${classNameDisplay}</span>
         <span class="badge">HP ${c.hp?.max ?? "?"}</span>
       </div>
     `;
