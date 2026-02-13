@@ -149,36 +149,6 @@
       padding-left: 15px;
     }
 
-    /* Header layout pour Ultimate avec toggle inline */
-    .card-h-flex {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: var(--space-md) var(--space-md);
-      background: rgba(15, 15, 21, 0.65);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .card-h-flex .section-title {
-      margin: 0;
-      flex: 1;
-    }
-
-    .card-h-flex .toggle-inline {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .toggle-inline label {
-      font-weight: 600;
-      font-size: 12px;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
     /* Brand avec portrait */
     .brand-with-portrait {
       display: flex;
@@ -283,12 +253,12 @@
 
     <!-- Ultimate -->
     <div class="card" style="margin-top: 16px;">
-      <div class="card-h-flex" id="ultHeader">
+      <div class="card-h">
         <div class="section-title" id="ultTitle">Ultime</div>
-        <div class="toggle-inline" id="ultToggleContainer"></div>
       </div>
       <div class="card-b">
-        <p class="text" id="ultBody" style="margin: 0;">Description de l'ultime.</p>
+        <p class="text" id="ultBody" style="margin: 0 0 12px 0;"></p>
+        <div id="ultToggleContainer"></div>
       </div>
     </div>
 
