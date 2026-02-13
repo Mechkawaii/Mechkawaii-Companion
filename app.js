@@ -333,7 +333,9 @@ async function initIndex(){
     a.className = "char";
     a.href = `character.html?id=${encodeURIComponent(c.id)}`;
     
-    const classImage = `./assets/characters/classe_${c.class}.png`;
+    // Get class name - handle both string and object
+    const className = typeof c.class === 'string' ? c.class : (c.class.fr || c.class.en || c.id);
+    const classImage = `./assets/characters/classe_${className}.png`;
     
     a.innerHTML = `
       <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
