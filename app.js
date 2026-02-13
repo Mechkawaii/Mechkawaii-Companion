@@ -499,4 +499,4 @@ document.addEventListener("DOMContentLoaded", async ()=>{
     const err = qs("#error");
     if(err) err.textContent = "Erreur de chargement : " + e.message;
   }
-});
+});"Fix: correct app.js paths and normalize class names"
