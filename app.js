@@ -778,35 +778,50 @@ async function initCharacter(){
 
   // --- Toggles (en bas) ---
   const togglesRoot = qs('#toggles');
-  const ultToggleContainer = qs('#ultToggleContainer');
-  if (togglesRoot) togglesRoot.innerHTML = '';
-  if (ultToggleContainer) ultToggleContainer.innerHTML = '';
+const ultToggleContainer = qs('#ultToggleContainer');
+if (togglesRoot) togglesRoot.innerHTML = '';
+if (ultToggleContainer) ultToggleContainer.innerHTML = '';
 
-  (c.toggles || []).forEach(tg=>{
-    if (tg.id === "shield") return;
-    if (tg.id === "repair_keys") return;
+// --- 1) Détecter le toggle "Coup Unique" via son label (plus fiable que tg.id) ---
+const isUltimateToggle = (tg) => {
+  const fr = (t(tg.label, 'fr') || '').toLowerCase();
+  const en = (t(tg.label, 'en') || '').toLowerCase();
+  return fr.includes('coup unique') || en.includes('ultimate');
+};
 
-    if (tg.id === 'Coup unique' || tg.id === 'coup-unique') {
-      const isOn = !!state.toggles[tg.id];
-      renderToggleRow(ultToggleContainer, tg, isOn, lang, (v)=>{
-        state.toggles[tg.id] = v;
-        setState(c.id, state);
-      });
-    } else if (tg.type === 'visual_keys') {
-      const keysState = state.toggles[tg.id];
-      const sharedShields = getSharedShields();
-      renderToggleRow(togglesRoot, tg, keysState, lang, (v)=>{
-        state.toggles[tg.id] = v;
-        setState(c.id, state);
-      }, sharedShields);
-    } else {
-      const isOn = !!state.toggles[tg.id];
-      renderToggleRow(togglesRoot, tg, isOn, lang, (v)=>{
-        state.toggles[tg.id] = v;
-        setState(c.id, state);
-      });
-    }
+const ultimateToggle = (c.toggles || []).find(isUltimateToggle);
+
+// --- 2) Rendre le toggle "Coup Unique" dans la section Coup Unique ---
+if (ultimateToggle && ultToggleContainer) {
+  const isOn = !!state.toggles[ultimateToggle.id];
+  renderToggleRow(ultToggleContainer, ultimateToggle, isOn, lang, (v) => {
+    state.toggles[ultimateToggle.id] = v;
+    setState(c.id, state);
   });
+}
+
+// --- 3) Rendre les autres toggles dans "Options" (en excluant shield/repair_keys/ultimate) ---
+(c.toggles || []).forEach(tg => {
+  if (tg.id === "shield") return;
+  if (tg.id === "repair_keys") return;
+  if (ultimateToggle && tg.id === ultimateToggle.id) return;
+
+  if (tg.type === 'visual_keys') {
+    const keysState = state.toggles[tg.id];
+    const sharedShields = getSharedShields();
+    renderToggleRow(togglesRoot, tg, keysState, lang, (v) => {
+      state.toggles[tg.id] = v;
+      setState(c.id, state);
+    }, sharedShields);
+  } else {
+    const isOn = !!state.toggles[tg.id];
+    renderToggleRow(togglesRoot, tg, isOn, lang, (v) => {
+      state.toggles[tg.id] = v;
+      setState(c.id, state);
+    });
+  }
+});
+
 
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
   const setup = setupRaw ? JSON.parse(setupRaw) : null;
