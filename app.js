@@ -739,7 +739,7 @@ async function initCharacter(){
       if (freshAssignments[c.id] !== undefined) {
   const removeShield = document.createElement('button');
   removeShield.className = 'shield-remove-btn';
-  removeShield.textContent = lang === 'fr' ? 'Consommer le bouclier' : 'Consume shield';
+  removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove the shield';
 
   removeShield.addEventListener('click', function (e) {
     e.preventDefault();
