@@ -590,7 +590,6 @@ async function initCharacter(){
   qs("#charClass").textContent = t(c.class, lang);
   qs("#hpMaxLabel").textContent = `/${c.hp?.max ?? 0}`;
 
-  // Ajouter l'image du personnage
   const charPortrait = qs("#charPortrait");
   if (charPortrait) {
     charPortrait.innerHTML = '';
@@ -720,7 +719,7 @@ async function initCharacter(){
     if (tg.id === 'Coup unique' || tg.id === 'coup-unique') {
       if (ultToggleContainer) {
         const isOn = !!state.toggles[tg.id];
-        renderInlineToggle(ultToggleContainer, tg, isOn, lang, (v)=>{
+        renderToggleRow(ultToggleContainer, tg, isOn, lang, (v)=>{
           state.toggles[tg.id] = v;
           setState(c.id, state);
         });
