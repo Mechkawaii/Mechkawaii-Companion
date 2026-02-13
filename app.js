@@ -737,27 +737,28 @@ async function initCharacter(){
       });
 
       if (freshAssignments[c.id] !== undefined) {
-        const removeShield = document.createElement('button');
-        removeShield.className = 'shield-remove-btn';
-        removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove shield';
+  const removeShield = document.createElement('button');
+  removeShield.className = 'shield-remove-btn';
+  removeShield.textContent = lang === 'fr' ? 'Consommer le bouclier' : 'Consume shield';
 
-        removeShield.addEventListener('click', function (e) {
-          e.preventDefault();
-          const currentAssignments = getShieldAssignments();
-          const currentShields = getSharedShields();
+  removeShield.addEventListener('click', function (e) {
+    e.preventDefault();
 
-          const idx = currentAssignments[c.id];
-          delete currentAssignments[c.id];
-          if (idx !== undefined) currentShields[idx] = true;
+    const currentAssignments = getShieldAssignments();
 
-          setShieldAssignments(currentAssignments);
-          setSharedShields(currentShields);
+    // On retire l'assignation du personnage
+    delete currentAssignments[c.id];
+    setShieldAssignments(currentAssignments);
 
-          location.reload();
-        });
+    // ⚠️ IMPORTANT :
+    // On ne remet PAS le bouclier dans la réserve
+    // Donc on ne modifie PAS getSharedShields()
 
-        shieldsDisplay.appendChild(removeShield);
-      }
+    location.reload();
+  });
+
+  shieldsDisplay.appendChild(removeShield);
+}
     }
   }
 
