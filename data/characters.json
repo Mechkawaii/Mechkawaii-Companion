@@ -708,7 +708,7 @@
     },
     "camp": "prodrome",
     "hp": {
-      "max": 3
+      "max": 2
     },
     "images": {
       "movement": "./assets/patterns/gaoro_movement_normal.png",
