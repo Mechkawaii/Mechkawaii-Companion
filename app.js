@@ -896,7 +896,20 @@ document.addEventListener("DOMContentLoaded", async ()=>{
 
   const backToSplash = document.getElementById("backToSplash");
   if(backToSplash){
-    backToSplash.addEventListener("click", ()=>{
+    backToSplash.addEventListener("click", async ()=>{
+      // Réinitialiser complètement l'application
+      localStorage.removeItem(STORAGE_PREFIX + "setup");
+      localStorage.removeItem(STORAGE_PREFIX + "draft");
+      localStorage.removeItem(STORAGE_PREFIX + "shields");
+      localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
+      
+      // Effacer tous les états des personnages
+      const chars = await loadCharacters();
+      chars.forEach(c => {
+        localStorage.removeItem(STORAGE_PREFIX + "state:" + c.id);
+      });
+      
+      // Revenir à zéro
       localStorage.removeItem(SPLASH_KEY);
       location.reload();
     });
