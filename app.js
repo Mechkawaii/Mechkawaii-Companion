@@ -590,6 +590,26 @@ async function initCharacter(){
   qs("#charClass").textContent = t(c.class, lang);
   qs("#hpMaxLabel").textContent = `/${c.hp?.max ?? 0}`;
 
+// Ajouter l'image du personnage
+const charPortrait = qs("#charPortrait");
+if (charPortrait) {
+  charPortrait.innerHTML = '';
+  const charImage = c.images?.portrait || c.images?.character;
+  
+  if (charImage) {
+    const img = document.createElement('img');
+    img.src = charImage;
+    img.alt = t(c.name, lang);
+    img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
+    
+    img.onerror = function(){
+      charPortrait.innerHTML = ` div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)} /div>`;
+    };
+    charPortrait.appendChild(img);
+  } else {
+    charPortrait.innerHTML = ` div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)} /div>`;
+  }
+}
   const hpCurEl = qs("#hpCur");
   const hpHeartsEl = qs("#hpHearts");
 
