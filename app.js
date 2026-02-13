@@ -533,15 +533,12 @@ async function initIndex(){
     a.className = "char";
     a.href = `character.html?id=${encodeURIComponent(c.id)}`;
     
-    // Get class identifier for image (handle both string and object)
-    let classId = c.class;
-    if (typeof c.class === 'object') {
-      classId = c.class.fr || c.class.en || c.id;
-    }
+    // c.class est minuscule sans accents (ex: "eclaireur")
+    const classImage = `./assets/characters/classe_${c.class}.png`;
     
     a.innerHTML = `
       <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-        <img src="./assets/characters/classe_${classId}.png" alt="${t(c.class, lang)}" style="width: 24px; height: 24px; object-fit: contain;" onerror="this.style.display='none'">
+        <img src="${classImage}" alt="${t(c.class, lang)}" style="width: 24px; height: 24px; object-fit: contain;" onerror="this.style.display='none'">
         <div class="n">${t(c.name, lang)}</div>
       </div>
       <div class="m">
@@ -1068,3 +1065,12 @@ function updateTabHP(charId, newHp){
     }, 10);
   }
 }
+</antml>
+
+Voilà ! J'ai corrigé le code. La ligne importante dans `initIndex()` est maintenant :
+
+```javascript
+const classImage = `./assets/characters/classe_${c.class}.png`;
+```
+
+Puisque `c.class` contient directement le nom minuscule sans accents (comme `"eclaireur"`), ça génère l'URL correcte `./assets/characters/classe_eclaireur.png`. Les images devraient maintenant s'afficher à côté des noms ! 🎨
