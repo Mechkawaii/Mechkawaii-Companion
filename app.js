@@ -136,7 +136,7 @@ function renderHP(container, hpCur, hpMax){
   hearts.className = "hearts";
   for(let i=1;i<=hpMax;i++){
     const span = document.createElement("span");
-    span.innerHTML = `<img src="${i <= hpCur ? './assets/pv.svg' : './assets/pv_off.svg'}" class="heart" alt="PV" />`;
+    span.innerHTML = heartIcon(i<=hpCur);
     hearts.appendChild(span.firstElementChild);
   }
   container.appendChild(hearts);
@@ -305,51 +305,14 @@ async function initIndex(){
   const list = qs("#charList");
   if(!list) return;
 
-  const setupCard = qs("#setupCard");
-  const draftCard = qs("#draftCard");
-  const campPick = qs("#campPick");
-  const draftList = qs("#draftList");
-  const draftError = qs("#draftError");
-
-  const changeSetupBtn = qs("#changeSetupBtn");
-  const changeDraftBtn = qs("#changeDraftBtn");
-
   const chars = await loadCharacters();
-
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
   const setup = setupRaw ? JSON.parse(setupRaw) : null;
 
-  function saveSetup(obj){
-    localStorage.setItem(STORAGE_PREFIX + "setup", JSON.stringify(obj));
-  }
-
-  if(changeSetupBtn){
-    changeSetupBtn.addEventListener("click", ()=>{
-      localStorage.removeItem(STORAGE_PREFIX + "setup");
-      localStorage.removeItem(STORAGE_PREFIX + "shields");
-      localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
-      location.reload();
-    });
-  }
-
-  if(changeDraftBtn){
-    changeDraftBtn.addEventListener("click", ()=>{
-      localStorage.removeItem(STORAGE_PREFIX + "draft");
-      location.reload();
-    });
-  }
-
   if(!setup){
-    if(setupCard) setupCard.style.display = "block";
-    if(draftCard) draftCard.style.display = "none";
-    if(changeSetupBtn) changeSetupBtn.style.display = "none";
-    if(changeDraftBtn) changeDraftBtn.style.display = "none";
     list.innerHTML = "";
     return;
   }
-
-  if(changeSetupBtn) changeSetupBtn.style.display = "inline-block";
-  if(changeDraftBtn) changeDraftBtn.style.display = "inline-block";
 
   let available = chars;
   if(setup.mode === "multi"){
@@ -435,12 +398,14 @@ async function initCharacter(){
     state.hp = clamp(state.hp - 1, 0, c.hp?.max ?? 0);
     setState(c.id, state);
     refreshHP();
+    updateTabHP(c.id, state.hp);
   });
 
   qs("#hpPlus").addEventListener("click", ()=>{
     state.hp = clamp(state.hp + 1, 0, c.hp?.max ?? 0);
     setState(c.id, state);
     refreshHP();
+    updateTabHP(c.id, state.hp);
   });
 
   refreshHP();
@@ -506,6 +471,149 @@ async function initCharacter(){
   });
 
   qs("#backBtn").addEventListener("click", ()=>{ location.href = "./index.html"; });
+
+  initUnitTabs(id, chars, lang);
+}
+
+function initUnitTabs(currentCharId, allChars, lang){
+  const tabsContainer = qs("#unitTabs");
+  const unitTabsWrapper = qs(".unit-tabs-container");
+  
+  if(!tabsContainer || !unitTabsWrapper) {
+    return;
+  }
+
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
+  
+  if(!setupRaw || !draftRaw) return;
+  
+  const setup = JSON.parse(setupRaw);
+  const draft = JSON.parse(draftRaw);
+  
+  let tabCharacters = [];
+  
+  if(setup.mode === "single"){
+    if(Array.isArray(draft.activeIds) && draft.activeIds.length){
+      tabCharacters = allChars.filter(c => 
+        draft.activeIds.includes(c.id) && c.id !== currentCharId
+      );
+    }
+  } else {
+    const currentCamp = setup.camp || "mechkawaii";
+    if(Array.isArray(draft.activeIds) && draft.activeIds.length){
+      tabCharacters = allChars.filter(c => 
+        draft.activeIds.includes(c.id) && 
+        c.id !== currentCharId &&
+        (c.camp || "mechkawaii") === currentCamp
+      );
+    }
+  }
+
+  if(tabCharacters.length === 0){
+    unitTabsWrapper.classList.remove('visible');
+    document.body.classList.remove('tabs-visible');
+    return;
+  }
+
+  unitTabsWrapper.classList.add('visible');
+  document.body.classList.add('tabs-visible');
+
+  tabsContainer.innerHTML = '';
+  tabCharacters.forEach(char => {
+    const tab = createCharacterTab(char, lang);
+    tabsContainer.appendChild(tab);
+  });
+}
+
+function createCharacterTab(char, lang){
+  const tab = document.createElement('div');
+  tab.className = 'unit-tab';
+  tab.dataset.charId = char.id;
+
+  const saved = getState(char.id);
+  const hp = saved?.hp ?? (char.hp?.max ?? 0);
+  const maxHp = char.hp?.max ?? 0;
+
+  const hpPercentage = maxHp > 0 ? (hp / maxHp) * 100 : 100;
+  const hpClass = hpPercentage <= 33 ? 'low' : '';
+
+  const assignments = getShieldAssignments();
+  const hasShield = assignments[char.id] !== undefined ? true : false;
+
+  const visualEl = document.createElement('div');
+  visualEl.className = 'unit-tab-visual';
+  if (hasShield) {
+    visualEl.classList.add('has-shield');
+  }
+  
+  const charImage = char.images?.portrait || char.images?.character;
+  
+  if(charImage){
+    const img = document.createElement('img');
+    img.src = charImage;
+    img.alt = t(char.name, lang);
+    img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));';
+    
+    img.onerror = function(){
+      visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
+    };
+    visualEl.appendChild(img);
+  } else {
+    visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
+  }
+
+  const hpBadge = document.createElement('div');
+  hpBadge.className = `unit-tab-hp ${hpClass}`;
+  hpBadge.innerHTML = `<span>❤️</span><span>${hp}/${maxHp}</span>`;
+  visualEl.appendChild(hpBadge);
+
+  const infoEl = document.createElement('div');
+  infoEl.className = 'unit-tab-info';
+  infoEl.innerHTML = `
+    <div class="unit-tab-name">${t(char.name, lang)}</div>
+    <div class="unit-tab-role">${t(char.class, lang)}</div>
+  `;
+
+  tab.appendChild(visualEl);
+  tab.appendChild(infoEl);
+
+  if (hasShield) {
+    tab.classList.add('has-shield');
+  }
+
+  tab.addEventListener('click', () => {
+    location.href = `character.html?id=${encodeURIComponent(char.id)}`;
+  });
+
+  return tab;
+}
+
+function updateTabHP(charId, newHp){
+  const tab = document.querySelector(`.unit-tab[data-char-id="${charId}"]`);
+  if(!tab) return;
+
+  const hpBadge = tab.querySelector('.unit-tab-hp');
+  if(!hpBadge) return;
+
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
+  
+  if(!setupRaw || !draftRaw) return;
+
+  loadCharacters().then(allChars => {
+    const char = allChars.find(c => c.id === charId);
+    const maxHp = char?.hp?.max ?? 0;
+    
+    const hpPercentage = maxHp > 0 ? (newHp / maxHp) * 100 : 100;
+    hpBadge.className = 'unit-tab-hp' + (hpPercentage <= 33 ? ' low' : '');
+    hpBadge.querySelector('span:last-child').textContent = `${newHp}/${maxHp}`;
+
+    tab.style.animation = 'none';
+    setTimeout(() => {
+      tab.style.animation = 'heartShake 0.3s ease';
+    }, 10);
+  });
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
