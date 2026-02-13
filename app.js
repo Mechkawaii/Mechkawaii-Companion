@@ -683,52 +683,74 @@ async function initCharacter(){
   qs("#attackDesc").textContent = t(c.texts?.attack_desc, lang) || "";
 
   // --- Boucliers (réserve partagée, assignations) ---
-  const shieldsDisplay = qs('#shieldsDisplay');
-  if (shieldsDisplay) {
-    shieldsDisplay.innerHTML = '';
-    const shieldToggle = c.toggles?.find(tg => tg.id === 'shield');
+  // --- Boucliers (même UI que les clés) + assignation ---
+const shieldsDisplay = qs('#shieldsDisplay');
+if (shieldsDisplay) {
+  shieldsDisplay.innerHTML = '';
 
-    if (shieldToggle) {
-      const freshShields = getSharedShields();
-      const freshAssignments = getShieldAssignments();
+  const shieldToggle = (c.toggles || []).find(tg => tg.id === 'shield');
+  if (shieldToggle) {
+    const freshShields = getSharedShields();
+    const freshAssignments = getShieldAssignments();
 
-      for (let i = 0; i < 3; i++) {
-        if (!freshShields[i]) continue;
+    // 1) On rend les 3 boucliers avec le même renderer que les clés
+    renderToggleRow(
+      shieldsDisplay,
+      shieldToggle,
+      freshShields,      // état partagé des 3 boucliers
+      lang,
+      (v) => {            // quand on clique un bouclier (par défaut ça toggle)
+        // On laisse vide exprès : l'assignation se fait via le modal, pas via toggle direct
+        setSharedShields(v);
+      },
+      freshShields
+    );
 
-        const shield = document.createElement('button');
-        shield.className = 'shield-button';
-        shield.type = 'button';
-        shield.style.backgroundImage = 'url(./assets/icons/shield_on.svg)';
-        shield.dataset.shieldIndex = i;
-        shield.textContent = `Bouclier ${i + 1}`;
-
-        shield.addEventListener('click', function (e) {
-          e.preventDefault();
-          showShieldAssignmentModal(i, c.id, lang, chars, freshShields, freshAssignments);
-        });
-
-        shieldsDisplay.appendChild(shield);
+    // 2) Après rendu, on remplace le comportement du clic sur chaque bouton
+    const keyButtons = shieldsDisplay.querySelectorAll('.key-button');
+    keyButtons.forEach((btn, i) => {
+      // Si le bouclier est déjà pris (false), on ne l'affiche pas (comme avant)
+      if (!freshShields[i]) {
+        btn.style.display = 'none';
+        return;
       }
 
-      if (freshAssignments[c.id] !== undefined) {
-        const removeShield = document.createElement('button');
-        removeShield.className = 'shield-remove-btn';
-        removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove shield';
+      // On force l'icône ON (puisqu'il est disponible)
+      btn.dataset.active = 'true';
+      btn.style.backgroundImage = `url('./assets/icons/shield_on.svg')`;
 
-        removeShield.addEventListener('click', function (e) {
-          e.preventDefault();
-          const currentAssignments = getShieldAssignments();
+      // On override le click : ouvrir le modal d'assignation
+      btn.onclick = (e) => {
+        e.preventDefault();
+        showShieldAssignmentModal(i, c.id, lang, chars, freshShields, freshAssignments);
+      };
+    });
 
-          delete currentAssignments[c.id];
-          setShieldAssignments(currentAssignments);
+    // 3) Bouton "Retirer le bouclier" si le perso en a un
+    if (freshAssignments[c.id] !== undefined) {
+      const removeShield = document.createElement('button');
+      removeShield.className = 'shield-remove-btn';
+      removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove shield';
 
-          location.reload();
-        });
+      removeShield.addEventListener('click', function (e) {
+        e.preventDefault();
+        const currentAssignments = getShieldAssignments();
+        const currentShields = getSharedShields();
 
-        shieldsDisplay.appendChild(removeShield);
-      }
+        const idx = currentAssignments[c.id];
+        delete currentAssignments[c.id];
+        if (idx !== undefined) currentShields[idx] = true;
+
+        setShieldAssignments(currentAssignments);
+        setSharedShields(currentShields);
+
+        location.reload();
+      });
+
+      shieldsDisplay.appendChild(removeShield);
     }
   }
+}
 
   // --- Clés de réparation à côté des PV & boucliers ---
   const repairKeysDisplay = qs('#repairKeysDisplay');
