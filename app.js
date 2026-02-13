@@ -146,6 +146,7 @@ function bindTopbar(lang){
 function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
 
 function renderHP(container, hpCur, hpMax){
+  if(!container) return;
   container.innerHTML = "";
   const hearts = document.createElement("div");
   hearts.className = "hearts";
@@ -157,7 +158,13 @@ function renderHP(container, hpCur, hpMax){
   container.appendChild(hearts);
 }
 
+/**
+ * IMPORTANT: cette fonction est maintenant "anti-crash"
+ * si root n'existe pas dans le HTML, elle sort juste sans planter.
+ */
 function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = null){
+  if(!root) return;
+
   if (toggle.type === 'visual_keys') {
     const keysContainer = document.createElement('div');
     keysContainer.className = 'toggle-visual-keys';
@@ -180,7 +187,7 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
     `;
     label.textContent = t(toggle.label, lang);
 
-    // On a déjà un titre dans le HTML pour ces sections → on cache le label interne
+    // ✅ on a déjà un titre dans le HTML pour ces sections
     if (toggle.id === 'repair_keys' || toggle.id === 'shield') {
       label.style.display = 'none';
     }
@@ -195,7 +202,9 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
     const maxKeys = toggle.maxKeys || 2;
     const isShield = toggle.id === 'shield';
 
-    const currentState = isShield ? sharedShields : (Array.isArray(isOn) ? isOn : [isOn, isOn]);
+    const currentState = isShield
+      ? (Array.isArray(sharedShields) ? sharedShields : (Array.isArray(isOn) ? isOn : [true, true, true]))
+      : (Array.isArray(isOn) ? isOn : [isOn, isOn]);
 
     for (let i = 0; i < maxKeys; i++) {
       const key = document.createElement('button');
@@ -285,6 +294,8 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
 }
 
 function renderInlineToggle(container, toggle, isOn, lang, onChange){
+  if(!container) return;
+
   const label = document.createElement('label');
   label.textContent = t(toggle.label, lang);
 
@@ -341,6 +352,9 @@ function urlParam(name){
   return u.searchParams.get(name);
 }
 
+/* ------------------------------
+   INDEX
+------------------------------ */
 async function initIndex(){
   const lang = getLang();
   bindTopbar(lang);
@@ -462,7 +476,7 @@ async function initIndex(){
     if(setupCard) setupCard.style.display = "none";
     list.innerHTML = "";
 
-    draftList.innerHTML = "";
+    if(draftList) draftList.innerHTML = "";
     const selected = new Set();
 
     available.forEach(c=>{
@@ -490,12 +504,12 @@ async function initIndex(){
           selected.delete(c.id);
         }else{
           if(selected.size >= maxPick){
-            draftError.textContent = (lang === "fr") ? `Tu as déjà ${maxPick} persos sélectionnés.` : `You already selected ${maxPick} characters.`;
+            if(draftError) draftError.textContent = (lang === "fr") ? `Tu as déjà ${maxPick} persos sélectionnés.` : `You already selected ${maxPick} characters.`;
             return;
           }
           selected.add(c.id);
         }
-        draftError.textContent = "";
+        if(draftError) draftError.textContent = "";
         refresh();
       }
 
@@ -506,13 +520,13 @@ async function initIndex(){
 
       row.appendChild(left);
       row.appendChild(sw);
-      draftList.appendChild(row);
+      if(draftList) draftList.appendChild(row);
       refresh();
     });
 
     qs("#confirmDraft")?.addEventListener("click", ()=>{
       if(selected.size !== maxPick){
-        draftError.textContent = (lang === "fr") ? `Sélectionne exactement ${maxPick} persos.` : `Select exactly ${maxPick} characters.`;
+        if(draftError) draftError.textContent = (lang === "fr") ? `Sélectionne exactement ${maxPick} persos.` : `Select exactly ${maxPick} characters.`;
         return;
       }
       saveDraft({activeIds:[...selected]});
@@ -558,13 +572,17 @@ async function initIndex(){
   }
 }
 
+/* ------------------------------
+   CHARACTER
+------------------------------ */
 async function initCharacter(){
   const lang = getLang();
   bindTopbar(lang);
 
   const id = urlParam("id");
   if(!id){
-    qs("#error").textContent = "Missing character id.";
+    const err = qs("#error");
+    if(err) err.textContent = "Missing character id.";
     return;
   }
 
@@ -573,7 +591,8 @@ async function initCharacter(){
 
   const c = chars.find(x=>x.id === id);
   if(!c){
-    qs("#error").textContent = "Character not found.";
+    const err = qs("#error");
+    if(err) err.textContent = "Character not found.";
     return;
   }
 
@@ -589,7 +608,7 @@ async function initCharacter(){
     }
   });
 
-  // Merge (important si un ancien state existe sans repair_keys)
+  // merge (important si ancien state)
   const state = saved || { hp: c.hp?.max ?? 0, toggles: {} };
   if (state.hp == null) state.hp = c.hp?.max ?? 0;
   if (!state.toggles) state.toggles = {};
@@ -598,9 +617,13 @@ async function initCharacter(){
   });
   setState(c.id, state);
 
-  qs("#charName").textContent = t(c.name, lang);
-  qs("#charClass").textContent = t(c.class, lang);
-  qs("#hpMaxLabel").textContent = `/${c.hp?.max ?? 0}`;
+  const charName = qs("#charName");
+  const charClass = qs("#charClass");
+  const hpMaxLabel = qs("#hpMaxLabel");
+
+  if(charName) charName.textContent = t(c.name, lang);
+  if(charClass) charClass.textContent = t(c.class, lang);
+  if(hpMaxLabel) hpMaxLabel.textContent = `/${c.hp?.max ?? 0}`;
 
   const charPortrait = qs("#charPortrait");
   if (charPortrait) {
@@ -625,7 +648,7 @@ async function initCharacter(){
   const hpHeartsEl = qs("#hpHearts");
 
   function refreshHP(){
-    hpCurEl.textContent = String(state.hp);
+    if(hpCurEl) hpCurEl.textContent = String(state.hp);
     renderHP(hpHeartsEl, state.hp, c.hp?.max ?? 0);
   }
 
@@ -663,13 +686,20 @@ async function initCharacter(){
 
   refreshHP();
 
-  qs("#classActionTitle").textContent = t(c.texts?.class_action_title, lang);
-  qs("#classActionBody").textContent = t(c.texts?.class_action_body, lang);
-  qs("#ultTitle").textContent = t(c.texts?.ultimate_title, lang);
-  qs("#ultBody").textContent = t(c.texts?.ultimate_body, lang);
+  const classActionTitle = qs("#classActionTitle");
+  const classActionBody = qs("#classActionBody");
+  const ultTitle = qs("#ultTitle");
+  const ultBody = qs("#ultBody");
+  const movementDesc = qs("#movementDesc");
+  const attackDesc = qs("#attackDesc");
 
-  qs("#movementDesc").textContent = t(c.texts?.movement_desc, lang) || "";
-  qs("#attackDesc").textContent = t(c.texts?.attack_desc, lang) || "";
+  if(classActionTitle) classActionTitle.textContent = t(c.texts?.class_action_title, lang);
+  if(classActionBody) classActionBody.textContent = t(c.texts?.class_action_body, lang);
+  if(ultTitle) ultTitle.textContent = t(c.texts?.ultimate_title, lang);
+  if(ultBody) ultBody.textContent = t(c.texts?.ultimate_body, lang);
+
+  if(movementDesc) movementDesc.textContent = t(c.texts?.movement_desc, lang) || "";
+  if(attackDesc) attackDesc.textContent = t(c.texts?.attack_desc, lang) || "";
 
   // --- Boucliers (même UI que les clés) + assignation ---
   const shieldsDisplay = qs('#shieldsDisplay');
@@ -681,7 +711,6 @@ async function initCharacter(){
       const freshShields = getSharedShields();
       const freshAssignments = getShieldAssignments();
 
-      // On rend avec le même renderer que les clés
       renderToggleRow(
         shieldsDisplay,
         shieldToggle,
@@ -691,7 +720,6 @@ async function initCharacter(){
         freshShields
       );
 
-      // On override le comportement des boutons : ouverture du modal + cache les boucliers indispos
       const keyButtons = shieldsDisplay.querySelectorAll('.key-button');
       keyButtons.forEach((btn, i) => {
         if (!freshShields[i]) {
@@ -708,7 +736,6 @@ async function initCharacter(){
         };
       });
 
-      // Bouton retirer si le perso a un bouclier
       if (freshAssignments[c.id] !== undefined) {
         const removeShield = document.createElement('button');
         removeShield.className = 'shield-remove-btn';
@@ -756,7 +783,7 @@ async function initCharacter(){
 
   (c.toggles || []).forEach(tg=>{
     if (tg.id === "shield") return;
-    if (tg.id === "repair_keys") return; // déjà affiché en haut
+    if (tg.id === "repair_keys") return;
 
     if (tg.id === 'Coup unique' || tg.id === 'coup-unique') {
       const isOn = !!state.toggles[tg.id];
@@ -787,12 +814,14 @@ async function initCharacter(){
   const movImg = qs("#movementImg");
   const atkImg = qs("#attackImg");
 
-  if(difficulty === "expert"){
-    movImg.src = c.images?.movement_expert || c.images?.movement || "";
-    atkImg.src = c.images?.attack_expert || c.images?.attack || "";
-  } else {
-    movImg.src = c.images?.movement || "";
-    atkImg.src = c.images?.attack || "";
+  if(movImg && atkImg){
+    if(difficulty === "expert"){
+      movImg.src = c.images?.movement_expert || c.images?.movement || "";
+      atkImg.src = c.images?.attack_expert || c.images?.attack || "";
+    } else {
+      movImg.src = c.images?.movement || "";
+      atkImg.src = c.images?.attack || "";
+    }
   }
 
   qs("#resetBtn")?.addEventListener("click", ()=>{
@@ -814,6 +843,9 @@ async function initCharacter(){
   initUnitTabs(id, chars, lang);
 }
 
+/* ------------------------------
+   MODAL SHIELD
+------------------------------ */
 function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, sharedShields, assignments){
   const modal = document.createElement('div');
   modal.style.cssText = `
@@ -847,14 +879,14 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, s
   content.appendChild(title);
 
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
-  const setup = JSON.parse(setupRaw);
+  const setup = setupRaw ? JSON.parse(setupRaw) : null;
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
-  const draft = JSON.parse(draftRaw);
+  const draft = draftRaw ? JSON.parse(draftRaw) : null;
 
   let teamChars = allChars.filter(c => {
-    if (setup.mode === 'single') return draft.activeIds?.includes(c.id);
+    if (setup?.mode === 'single') return draft?.activeIds?.includes(c.id);
     const currentChar = allChars.find(ch => ch.id === currentCharId);
-    return draft.activeIds?.includes(c.id) && (c.camp || "mechkawaii") === (currentChar.camp || "mechkawaii");
+    return draft?.activeIds?.includes(c.id) && (c.camp || "mechkawaii") === (currentChar?.camp || "mechkawaii");
   });
 
   teamChars.forEach(char => {
@@ -922,19 +954,13 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, s
   document.body.appendChild(modal);
 }
 
-function updateShieldsOnAllTabs(){
-  location.reload();
-}
-
+/* ------------------------------
+   BOOT
+------------------------------ */
 document.addEventListener("DOMContentLoaded", async ()=>{
 
   const SPLASH_KEY = STORAGE_PREFIX + "splashDismissed";
   const splashDismissed = localStorage.getItem(SPLASH_KEY) === "1";
-
-  function showSplash(){
-    const splash = document.getElementById("splash");
-    if(splash){ splash.style.display = "block"; }
-  }
 
   function hideSplash(){
     const splash = document.getElementById("splash");
@@ -987,13 +1013,14 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   }
 });
 
+/* ------------------------------
+   TABS
+------------------------------ */
 function initUnitTabs(currentCharId, allChars, lang){
   const tabsContainer = qs("#unitTabs");
   const unitTabsWrapper = qs(".unit-tabs-container");
 
-  if(!tabsContainer || !unitTabsWrapper) {
-    return;
-  }
+  if(!tabsContainer || !unitTabsWrapper) return;
 
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
@@ -1103,11 +1130,6 @@ function updateTabHP(charId, newHp){
 
   const hpBadge = tab.querySelector('.unit-tab-hp');
   if(!hpBadge) return;
-
-  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
-  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
-
-  if(!setupRaw || !draftRaw) return;
 
   const allChars = window.__cachedChars;
   if(allChars){
