@@ -378,27 +378,39 @@ button:focus-visible {
   margin-top: 8px;
 }
 
-.shield-button {
+.shield-button{
   width: 40px;
   height: 40px;
   padding: 0 !important;
   margin: 0 !important;
+
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+
   border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
+  border-radius: 0 !important;
+
   background: #f5f5f5;
   background-size: 70%;
   background-position: center;
   background-repeat: no-repeat;
-  flex-shrink: 0;
-  font-size: 0;
-  line-height: 1;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-  min-height: auto !important;
-  min-width: auto !important;
+
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+
+  overflow: hidden;
+}
+
+.shield-button::before,
+.shield-button::after{
+  content: none !important;
+  display: none !important;
 }
 
 .shield-button:hover {
