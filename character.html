@@ -274,7 +274,285 @@
           <div class="card-b">
             <p id="movementDesc" class="text" style="margin: 0 0 12px 0;"></p>
             <div class="image-container">
-              <img id="movementImg" src="/api/placeholder/400/300" alt="Movement pattern" />
+              <img id="movementImg" src="https://via.placeholder.com/400x300/cccccc/666666?text=Movement" alt="Movement pattern" />
+            </div>
+          </div
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mechkawaii — Fiche personnage</title>
+  <link rel="stylesheet" href="./style.css" />
+  <style>
+    .image-container {
+      width: 100%;
+      max-width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.05);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      padding: 8px;
+    }
+
+    .image-container img {
+      max-width: 100%;
+      height: auto;
+      width: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
+    @media (max-width: 480px) {
+      .image-container {
+        min-height: 150px;
+      }
+    }
+
+    @media (min-width: 481px) and (max-width: 768px) {
+      .image-container {
+        min-height: 250px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .image-container {
+        min-height: 300px;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .image-container {
+        min-height: 350px;
+      }
+    }
+
+    .patterns-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 769px) {
+      .patterns-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .pattern-card {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pattern-card .card {
+      margin-top: 0;
+    }
+
+    /* Styles pour la section HP/Shields */
+    .hp-shields-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    @media (min-width: 769px) {
+      .hp-shields-wrapper {
+        flex-direction: row;
+        gap: 24px;
+      }
+    }
+
+    .hp-section, .shields-section {
+      flex: 1;
+    }
+
+    .hp {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .shields-display {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .shield-button {
+      width: 100%;
+      padding: 8px 12px;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #f5f5f5;
+      background-size: 20px;
+      background-position: 8px center;
+      background-repeat: no-repeat;
+      padding-left: 36px;
+      text-align: left;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .shield-button:hover {
+      border-color: #3b82f6;
+      background-color: #eff6ff;
+    }
+
+    .shield-remove-btn {
+      width: 100%;
+      padding: 8px 12px;
+      border: 2px solid #ef4444;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #fee2e2;
+      color: #dc2626;
+      font-weight: 500;
+      margin-top: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .shield-remove-btn:hover {
+      background: #fecaca;
+    }
+
+    /* Effet visuel de bouclier actif */
+    .container.has-shield {
+      border-left: 5px solid #3b82f6;
+      padding-left: 15px;
+    }
+
+    /* Header layout pour Ultimate avec toggle inline */
+    .card-h-flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: var(--space-md) var(--space-md);
+      background: rgba(15, 15, 21, 0.65);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-h-flex .section-title {
+      margin: 0;
+      flex: 1;
+    }
+
+    .card-h-flex .toggle-inline {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toggle-inline label {
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body class="page-character">
+  <div class="container">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="brand">
+        <div class="title" id="charName">Personnage</div>
+        <div class="subtitle" id="charClass">Classe</div>
+      </div>
+
+      <div class="controls">
+        <div class="pill">
+          <span class="small">Lang</span>
+          <select id="lang" aria-label="Language">
+            <option value="fr">FR</option>
+            <option value="en">EN</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- HP & Shields Section -->
+    <div class="card" style="margin-top: 16px;">
+      <div class="card-h">
+        <div class="section-title" style="margin: 0;">Points de Vie & Boucliers</div>
+      </div>
+      <div class="card-b">
+        <div class="hp-shields-wrapper">
+          <!-- HP Section -->
+          <div class="hp-section">
+            <div style="font-weight: 600; margin-bottom: 8px;">Points de Vie</div>
+            <div class="hp">
+              <div id="hpHearts" class="hearts"></div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span id="hpCur" style="font-weight: 800; font-size: 18px;">0</span>
+                <span id="hpMaxLabel" style="color: var(--muted);">/ 0</span>
+              </div>
+            </div>
+            <div class="hp-ctl" style="margin-top: 12px;">
+              <button id="hpMinus" aria-label="Diminuer les PV">−</button>
+              <button id="hpPlus" aria-label="Augmenter les PV">+</button>
+            </div>
+          </div>
+
+          <!-- Shields Section -->
+          <div class="shields-section">
+            <div style="font-weight: 600; margin-bottom: 8px;">Boucliers (Réserve partagée)</div>
+            <div class="shields-display" id="shieldsDisplay"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Class Action -->
+    <div class="card" style="margin-top: 16px;">
+      <div class="card-h">
+        <div class="section-title" style="margin: 0;" id="classActionTitle">Action de classe</div>
+      </div>
+      <div class="card-b">
+        <p class="text" id="classActionBody" style="margin: 0;">Description de l'action de classe.</p>
+      </div>
+    </div>
+
+    <!-- Ultimate -->
+    <div class="card" style="margin-top: 16px;">
+      <div class="card-h-flex" id="ultHeader">
+        <div class="section-title" id="ultTitle">Ultime</div>
+        <div class="toggle-inline" id="ultToggleContainer"></div>
+      </div>
+      <div class="card-b">
+        <p class="text" id="ultBody" style="margin: 0;">Description de l'ultime.</p>
+      </div>
+    </div>
+
+    <!-- Toggles Section -->
+    <div class="card" style="margin-top: 16px;" id="togglesCard">
+      <div class="card-h">
+        <div class="section-title" style="margin: 0;">États & Effets</div>
+      </div>
+      <div class="card-b">
+        <div id="toggles" class="toggles"></div>
+      </div>
+    </div>
+
+    <!-- Movement & Attack Patterns - Two Columns -->
+    <div class="patterns-grid" style="margin-top: 16px;">
+      <!-- Movement Patterns -->
+      <div class="pattern-card">
+        <div class="card">
+          <div class="card-h">
+            <div class="section-title" style="margin: 0;">Modèle de déplacement</div>
+          </div>
+          <div class="card-b">
+            <p id="movementDesc" class="text" style="margin: 0 0 12px 0;"></p>
+            <div class="image-container">
+              <img id="movementImg" src="https://via.placeholder.com/400x300/cccccc/666666?text=Movement" alt="Movement pattern" />
             </div>
           </div>
         </div>
@@ -289,7 +567,7 @@
           <div class="card-b">
             <p id="attackDesc" class="text" style="margin: 0 0 12px 0;"></p>
             <div class="image-container">
-              <img id="attackImg" src="/api/placeholder/400/300" alt="Attack pattern" />
+              <img id="attackImg" src="https://via.placeholder.com/400x300/cccccc/666666?text=Attack" alt="Attack pattern" />
             </div>
           </div>
         </div>
@@ -315,3 +593,55 @@
   <script src="./app.js"></script>
 </body>
 </html>
+</antml>
+
+J'ai corrigé le problème ! Les deux changements principaux :
+
+1. **Remplacé `/api/placeholder/400/300`** par `https://via.placeholder.com/400x300` qui fonctionne correctement sur GitHub Pages
+2. **Ajouté du texte descriptif** aux placeholders pour mieux voir ce qu'elles affichent
+
+L'erreur de syntaxe disparaîtra maintenant car les images chargeront correctement. Si tu veux utiliser **tes propres images réelles** au lieu des placeholders, remplace simplement les URLs par les chemins vers tes fichiers (par exemple `./assets/patterns/mouvement_eclaireur.png`).
+
+      <!-- Attack Patterns -->
+      <div class="pattern-card">
+        <div class="card">
+          <div class="card-h">
+            <div class="section-title" style="margin: 0;">Modèle d'attaque</div>
+          </div>
+          <div class="card-b">
+            <p id="attackDesc" class="text" style="margin: 0 0 12px 0;"></p>
+            <div class="image-container">
+              <img id="attackImg" src="https://via.placeholder.com/400x300/cccccc/666666?text=Attack" alt="Attack pattern" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls" style="margin-top: 16px; justify-content: space-between;">
+      <div style="display: flex; gap: 10px;">
+        <button id="resetBtn" class="btn-danger">Réinitialiser</button>
+      </div>
+      <button id="backBtn">← Retour à la liste</button>
+    </div>
+
+    <div id="error" class="footer-note" style="color: var(--danger); margin-top: 16px;"></div>
+  </div>
+
+  <!-- Unit Tabs Navigation (Bottom) -->
+  <div class="unit-tabs-container" id="unitTabsContainer">
+    <div class="unit-tabs" id="unitTabs"></div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
+</antml>
+
+J'ai corrigé le problème ! Les deux changements principaux :
+
+1. **Remplacé `/api/placeholder/400/300`** par `https://via.placeholder.com/400x300` qui fonctionne correctement sur GitHub Pages
+2. **Ajouté du texte descriptif** aux placeholders pour mieux voir ce qu'elles affichent
+
+L'erreur de syntaxe disparaîtra maintenant car les images chargeront correctement. Si tu veux utiliser **tes propres images réelles** au lieu des placeholders, remplace simplement les URLs par les chemins vers tes fichiers (par exemple `./assets/patterns/mouvement_eclaireur.png`).
