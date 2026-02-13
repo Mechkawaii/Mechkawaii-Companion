@@ -1061,7 +1061,7 @@ function updateTabHP(charId, newHp){
     }, 10);
   }
 }
-</antml>
+</html>
 
 Voilà ! J'ai corrigé app.js pour charger les images de pattern avec le bon chemin. La ligne clé dans `initCharacter()` est maintenant :
 
