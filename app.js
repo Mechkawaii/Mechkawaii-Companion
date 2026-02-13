@@ -172,20 +172,25 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
     `;
 
     const label = document.createElement('label');
-    label.style.cssText = `
-      flex: 1;
-      font-weight: 600;
-      font-size: 14px;
-      min-width: 150px;
-    `;
-    label.textContent = t(toggle.label, lang);
+  label.style.cssText = `
+    flex: 1;
+    font-weight: 600;
+    font-size: 14px;
+    min-width: 150px;
+  `;
+  label.textContent = t(toggle.label, lang);
 
-    const keysDisplay = document.createElement('div');
-    keysDisplay.className = 'keys-display';
-    keysDisplay.style.cssText = `
-      display: flex;
-      gap: 8px;
-    `;
+  // On a déjà le titre dans le HTML, donc on cache le label généré
+  if (toggle.id === 'repair_keys') {
+    label.style.display = 'none';
+  }
+
+  const keysDisplay = document.createElement('div');
+  keysDisplay.className = 'keys-display';
+  keysDisplay.style.cssText = `
+    display: flex;
+    gap: 8px;
+  `;
 
     const maxKeys = toggle.maxKeys || 2;
     const isShield = toggle.id === 'shield';
