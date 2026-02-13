@@ -1,4 +1,3 @@
-
 const STORAGE_PREFIX = "mechkawaii:";
 
 function playPressStart(){
@@ -190,7 +189,7 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
 
     const maxKeys = toggle.maxKeys || 2;
     const isShield = toggle.id === 'shield';
-    
+
     const currentState = isShield ? sharedShields : (Array.isArray(isOn) ? isOn : [isOn, isOn]);
 
     for (let i = 0; i < maxKeys; i++) {
@@ -215,7 +214,7 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
         background-position: center;
         background-repeat: no-repeat;
       `;
-      
+
       key.dataset.keyIndex = i;
       key.dataset.toggleId = toggle.id;
       key.dataset.active = keyState ? 'true' : 'false';
@@ -224,7 +223,7 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
         e.preventDefault();
         this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true';
         this.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_${this.dataset.active === 'true' ? 'on' : 'off'}.svg')`;
-        
+
         const keysState = [];
         keysDisplay.querySelectorAll('.key-button').forEach(kb => {
           keysState.push(kb.dataset.active === 'true');
@@ -314,7 +313,7 @@ function saveToggleState(charId, toggleId, keyIndex, state) {
     setSharedShields(state);
   } else {
     const savedState = getState(charId) || { hp: null, toggles: {} };
-    
+
     if (!savedState.toggles) {
       savedState.toggles = {};
     }
@@ -354,6 +353,7 @@ async function initIndex(){
   const changeDraftBtn = qs("#changeDraftBtn");
 
   const chars = await loadCharacters();
+  window.__cachedChars = chars;
 
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
   const setup = setupRaw ? JSON.parse(setupRaw) : null;
@@ -564,6 +564,8 @@ async function initCharacter(){
   }
 
   const chars = await loadCharacters();
+  window.__cachedChars = chars;
+
   const c = chars.find(x=>x.id === id);
   if(!c){
     qs("#error").textContent = "Character not found.";
@@ -571,20 +573,32 @@ async function initCharacter(){
   }
 
   const saved = getState(c.id);
-  
+
   const defaultToggles = {};
   (c.toggles || []).forEach(tg => {
     if (tg.type === 'visual_keys') {
-      defaultToggles[tg.id] = [true, true];
+      // si le JSON définit un maxKeys, on respecte
+      const maxKeys = tg.maxKeys || 2;
+      defaultToggles[tg.id] = Array.from({length: maxKeys}, ()=>true);
     } else {
       defaultToggles[tg.id] = false;
     }
   });
-  
-  const state = saved || {
-    hp: c.hp?.max ?? 0,
-    toggles: defaultToggles
-  };
+
+  // ✅ Merge: on garde le saved mais on ajoute les toggles manquants (ex: repair_keys)
+  const state = saved || { hp: c.hp?.max ?? 0, toggles: {} };
+
+  if (state.hp == null) state.hp = c.hp?.max ?? 0;
+  if (!state.toggles) state.toggles = {};
+
+  Object.keys(defaultToggles).forEach((k) => {
+    if (state.toggles[k] === undefined) {
+      state.toggles[k] = defaultToggles[k];
+    }
+  });
+
+  // (Optionnel mais safe) on persiste la version mergée
+  setState(c.id, state);
 
   qs("#charName").textContent = t(c.name, lang);
   qs("#charClass").textContent = t(c.class, lang);
@@ -594,13 +608,13 @@ async function initCharacter(){
   if (charPortrait) {
     charPortrait.innerHTML = '';
     const charImage = c.images?.portrait || c.images?.character;
-    
+
     if (charImage) {
       const img = document.createElement('img');
       img.src = charImage;
       img.alt = t(c.name, lang);
       img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
-      
+
       img.onerror = function(){
         charPortrait.innerHTML = `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
       };
@@ -621,14 +635,14 @@ async function initCharacter(){
   function updateShieldDisplay(){
     const allCards = document.querySelectorAll('.card');
     let hpCard = null;
-    
+
     for (let card of allCards) {
       if (card.textContent.includes('Points de Vie') || card.textContent.includes('Life')) {
         hpCard = card;
         break;
       }
     }
-    
+
     if (hpCard) {
       const freshAssignments = getShieldAssignments();
       if (freshAssignments[c.id] !== undefined) {
@@ -663,79 +677,80 @@ async function initCharacter(){
   qs("#movementDesc").textContent = t(c.texts?.movement_desc, lang) || "";
   qs("#attackDesc").textContent = t(c.texts?.attack_desc, lang) || "";
 
+  // --- Boucliers (réserve partagée, assignations) ---
   const shieldsDisplay = qs('#shieldsDisplay');
-if (shieldsDisplay) {
-  shieldsDisplay.innerHTML = '';
-  const shieldToggle = c.toggles?.find(tg => tg.id === 'shield');
+  if (shieldsDisplay) {
+    shieldsDisplay.innerHTML = '';
+    const shieldToggle = c.toggles?.find(tg => tg.id === 'shield');
 
-  if (shieldToggle) {
-    const freshShields = getSharedShields();
-    const freshAssignments = getShieldAssignments();
+    if (shieldToggle) {
+      const freshShields = getSharedShields();
+      const freshAssignments = getShieldAssignments();
 
-    for (let i = 0; i < 3; i++) {
-      if (!freshShields[i]) continue;
+      for (let i = 0; i < 3; i++) {
+        if (!freshShields[i]) continue;
 
-      const shield = document.createElement('button');
-      shield.className = 'shield-button';
-      shield.type = 'button';
-      shield.style.backgroundImage = 'url(./assets/icons/shield_on.svg)';
-      shield.dataset.shieldIndex = i;
-      shield.textContent = `Bouclier ${i + 1}`;
+        const shield = document.createElement('button');
+        shield.className = 'shield-button';
+        shield.type = 'button';
+        shield.style.backgroundImage = 'url(./assets/icons/shield_on.svg)';
+        shield.dataset.shieldIndex = i;
+        shield.textContent = `Bouclier ${i + 1}`;
 
-      shield.addEventListener('click', function (e) {
-        e.preventDefault();
-        showShieldAssignmentModal(i, c.id, lang, chars, freshShields, freshAssignments);
-      });
+        shield.addEventListener('click', function (e) {
+          e.preventDefault();
+          showShieldAssignmentModal(i, c.id, lang, chars, freshShields, freshAssignments);
+        });
 
-      shieldsDisplay.appendChild(shield);
-    }
+        shieldsDisplay.appendChild(shield);
+      }
 
-    if (freshAssignments[c.id] !== undefined) {
-      const removeShield = document.createElement('button');
-      removeShield.className = 'shield-remove-btn';
-      removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove shield';
+      if (freshAssignments[c.id] !== undefined) {
+        const removeShield = document.createElement('button');
+        removeShield.className = 'shield-remove-btn';
+        removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove shield';
 
-      removeShield.addEventListener('click', function (e) {
-        e.preventDefault();
-        const currentAssignments = getShieldAssignments();
+        removeShield.addEventListener('click', function (e) {
+          e.preventDefault();
+          const currentAssignments = getShieldAssignments();
 
-        delete currentAssignments[c.id];
-        setShieldAssignments(currentAssignments);
+          delete currentAssignments[c.id];
+          setShieldAssignments(currentAssignments);
 
-        location.reload();
-      });
+          location.reload();
+        });
 
-      shieldsDisplay.appendChild(removeShield);
+        shieldsDisplay.appendChild(removeShield);
+      }
     }
   }
-}
 
-/* --- Clés de réparation à côté des PV & boucliers --- */
-const repairKeysDisplay = qs('#repairKeysDisplay');
-if (repairKeysDisplay) {
-  repairKeysDisplay.innerHTML = '';
+  // --- Clés de réparation à côté des PV & boucliers ---
+  const repairKeysDisplay = qs('#repairKeysDisplay');
+  if (repairKeysDisplay) {
+    repairKeysDisplay.innerHTML = '';
 
-  const repairToggle = c.toggles?.find(tg => tg.id === 'repair_keys');
-  if (repairToggle) {
-    const keysState = state.toggles[repairToggle.id] || [true, true];
+    const repairToggle = (c.toggles || []).find(tg => tg.id === 'repair_keys');
+    if (repairToggle) {
+      const keysState = state.toggles[repairToggle.id] || [true, true];
 
-    renderToggleRow(repairKeysDisplay, repairToggle, keysState, lang, (v) => {
-      state.toggles[repairToggle.id] = v;
-      setState(c.id, state);
-    });
+      renderToggleRow(repairKeysDisplay, repairToggle, keysState, lang, (v) => {
+        state.toggles[repairToggle.id] = v;
+        setState(c.id, state);
+      });
+    }
   }
-}
 
-
+  // --- Toggles (en bas) ---
   const togglesRoot = qs('#toggles');
   const ultToggleContainer = qs('#ultToggleContainer');
-  togglesRoot.innerHTML = '';
-  ultToggleContainer.innerHTML = '';
-  
+  if (togglesRoot) togglesRoot.innerHTML = '';
+  if (ultToggleContainer) ultToggleContainer.innerHTML = '';
+
   (c.toggles || []).forEach(tg=>{
-  if (tg.id === "shield") return;
-  if (tg.id === "repair_keys") return; // <-- on l'affiche déjà en haut
-    
+    if (tg.id === "shield") return;
+    if (tg.id === "repair_keys") return; // ✅ déjà affiché en haut
+
     if (tg.id === 'Coup unique' || tg.id === 'coup-unique') {
       const isOn = !!state.toggles[tg.id];
       renderToggleRow(ultToggleContainer, tg, isOn, lang, (v)=>{
@@ -744,7 +759,6 @@ if (repairKeysDisplay) {
       });
     } else if (tg.type === 'visual_keys') {
       const keysState = state.toggles[tg.id];
-      const isOn = keysState && keysState.some(k => k === true);
       const sharedShields = getSharedShields();
       renderToggleRow(togglesRoot, tg, keysState, lang, (v)=>{
         state.toggles[tg.id] = v;
@@ -762,10 +776,10 @@ if (repairKeysDisplay) {
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
   const setup = setupRaw ? JSON.parse(setupRaw) : null;
   const difficulty = setup?.difficulty || "normal";
-  
+
   const movImg = qs("#movementImg");
   const atkImg = qs("#attackImg");
-  
+
   if(difficulty === "expert"){
     movImg.src = c.images?.movement_expert || c.images?.movement || "";
     atkImg.src = c.images?.attack_expert || c.images?.attack || "";
@@ -780,10 +794,10 @@ if (repairKeysDisplay) {
       toggles: {...defaultToggles}
     };
     setState(c.id, fresh);
-    
+
     setSharedShields([true, true, true]);
     setShieldAssignments({});
-    
+
     location.reload();
   });
 
@@ -850,7 +864,7 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, s
       color: black;
       transition: all 0.2s ease;
     `;
-    
+
     btn.addEventListener('mouseover', () => {
       btn.style.borderColor = '#3b82f6';
       btn.style.background = '#eff6ff';
@@ -859,24 +873,24 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, s
       btn.style.borderColor = '#ddd';
       btn.style.background = 'white';
     });
-    
+
     btn.addEventListener('click', () => {
       const currentAssignments = getShieldAssignments();
       const currentShields = getSharedShields();
-      
+
       currentAssignments[char.id] = shieldIndex;
       currentShields[shieldIndex] = false;
-      
+
       setShieldAssignments(currentAssignments);
       setSharedShields(currentShields);
-      
+
       document.body.removeChild(modal);
-      
+
       setTimeout(() => {
         location.reload();
       }, 250);
     });
-    
+
     content.appendChild(btn);
   });
 
@@ -938,12 +952,12 @@ document.addEventListener("DOMContentLoaded", async ()=>{
       localStorage.removeItem(STORAGE_PREFIX + "draft");
       localStorage.removeItem(STORAGE_PREFIX + "shields");
       localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
-      
+
       const chars = await loadCharacters();
       chars.forEach(c => {
         localStorage.removeItem(STORAGE_PREFIX + "state:" + c.id);
       });
-      
+
       localStorage.removeItem(SPLASH_KEY);
       location.reload();
     });
@@ -967,32 +981,32 @@ document.addEventListener("DOMContentLoaded", async ()=>{
 function initUnitTabs(currentCharId, allChars, lang){
   const tabsContainer = qs("#unitTabs");
   const unitTabsWrapper = qs(".unit-tabs-container");
-  
+
   if(!tabsContainer || !unitTabsWrapper) {
     return;
   }
 
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
-  
+
   if(!setupRaw || !draftRaw) return;
-  
+
   const setup = JSON.parse(setupRaw);
   const draft = JSON.parse(draftRaw);
-  
+
   let tabCharacters = [];
-  
+
   if(setup.mode === "single"){
     if(Array.isArray(draft.activeIds) && draft.activeIds.length){
-      tabCharacters = allChars.filter(c => 
+      tabCharacters = allChars.filter(c =>
         draft.activeIds.includes(c.id) && c.id !== currentCharId
       );
     }
   } else {
     const currentCamp = setup.camp || "mechkawaii";
     if(Array.isArray(draft.activeIds) && draft.activeIds.length){
-      tabCharacters = allChars.filter(c => 
-        draft.activeIds.includes(c.id) && 
+      tabCharacters = allChars.filter(c =>
+        draft.activeIds.includes(c.id) &&
         c.id !== currentCharId &&
         (c.camp || "mechkawaii") === currentCamp
       );
@@ -1035,15 +1049,15 @@ function createCharacterTab(char, lang){
   if (hasShield) {
     visualEl.classList.add('has-shield');
   }
-  
+
   const charImage = char.images?.portrait || char.images?.character;
-  
+
   if(charImage){
     const img = document.createElement('img');
     img.src = charImage;
     img.alt = t(char.name, lang);
     img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));';
-    
+
     img.onerror = function(){
       visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
     };
@@ -1087,14 +1101,14 @@ function updateTabHP(charId, newHp){
 
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
-  
+
   if(!setupRaw || !draftRaw) return;
 
   const allChars = window.__cachedChars;
   if(allChars){
     const char = allChars.find(c => c.id === charId);
     const maxHp = char?.hp?.max ?? 0;
-    
+
     const hpPercentage = maxHp > 0 ? (newHp / maxHp) * 100 : 100;
     hpBadge.className = 'unit-tab-hp' + (hpPercentage <= 33 ? ' low' : '');
     hpBadge.querySelector('span:last-child').textContent = `${newHp}/${maxHp}`;
