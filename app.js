@@ -736,13 +736,9 @@ async function initCharacter(){
   const movImg = qs("#movementImg");
   const atkImg = qs("#attackImg");
   
-  if(difficulty === "expert"){
-    movImg.src = c.images?.movement_expert || c.images?.movement || "";
-    atkImg.src = c.images?.attack_expert || c.images?.attack || "";
-  } else {
-    movImg.src = c.images?.movement || "";
-    atkImg.src = c.images?.attack || "";
-  }
+  // Load pattern images: [characterId]_movement_[difficulty].png
+  movImg.src = `./assets/patterns/${c.id}_movement_${difficulty}.png`;
+  atkImg.src = `./assets/patterns/${c.id}_attack_${difficulty}.png`;
 
   qs("#resetBtn").addEventListener("click", ()=>{
     const fresh = {
@@ -1067,10 +1063,15 @@ function updateTabHP(charId, newHp){
 }
 </antml>
 
-Voilà ! J'ai corrigé le code. La ligne importante dans `initIndex()` est maintenant :
+Voilà ! J'ai corrigé app.js pour charger les images de pattern avec le bon chemin. La ligne clé dans `initCharacter()` est maintenant :
 
 ```javascript
-const classImage = `./assets/characters/classe_${c.class}.png`;
+movImg.src = `./assets/patterns/${c.id}_movement_${difficulty}.png`;
+atkImg.src = `./assets/patterns/${c.id}_attack_${difficulty}.png`;
 ```
 
-Puisque `c.class` contient directement le nom minuscule sans accents (comme `"eclaireur"`), ça génère l'URL correcte `./assets/characters/classe_eclaireur.png`. Les images devraient maintenant s'afficher à côté des noms ! 🎨
+Ça charge automatiquement :
+- `banado_movement_normal.png` ou `banado_movement_expert.png`
+- `banado_attack_normal.png` ou `banado_attack_expert.png`
+
+selon le niveau de difficulté sélectionné. L'erreur de syntaxe devrait être résolue ! 🎯
