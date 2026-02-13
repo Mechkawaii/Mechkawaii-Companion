@@ -178,15 +178,54 @@
       color: var(--muted);
       white-space: nowrap;
     }
+
+    /* Brand avec portrait */
+    .brand-with-portrait {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    #charPortrait {
+      width: 100px;
+      height: 100px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    #charPortrait img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    @media (max-width: 480px) {
+      #charPortrait {
+        width: 80px;
+        height: 80px;
+      }
+
+      .brand-with-portrait {
+        gap: 12px;
+      }
+    }
   </style>
 </head>
 <body class="page-character">
   <div class="container">
     <!-- Topbar -->
     <div class="topbar">
-      <div class="brand">
-        <div class="title" id="charName">Personnage</div>
-        <div class="subtitle" id="charClass">Classe</div>
+      <div class="brand-with-portrait">
+        <div id="charPortrait"></div>
+        <div>
+          <div class="title" id="charName">Personnage</div>
+          <div class="subtitle" id="charClass">Classe</div>
+        </div>
       </div>
 
       <div class="controls">
