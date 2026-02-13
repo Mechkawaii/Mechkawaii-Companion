@@ -532,8 +532,18 @@ async function initIndex(){
     const a = document.createElement("a");
     a.className = "char";
     a.href = `character.html?id=${encodeURIComponent(c.id)}`;
+    
+    // Get class identifier for image (handle both string and object)
+    let classId = c.class;
+    if (typeof c.class === 'object') {
+      classId = c.class.fr || c.class.en || c.id;
+    }
+    
     a.innerHTML = `
-      <div class="n">${t(c.name, lang)}</div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <img src="./assets/characters/classe_${classId}.png" alt="${t(c.class, lang)}" style="width: 24px; height: 24px; object-fit: contain;" onerror="this.style.display='none'">
+        <div class="n">${t(c.name, lang)}</div>
+      </div>
       <div class="m">
         <span class="badge">${t(c.class, lang)}</span>
         <span class="badge">HP ${c.hp?.max ?? "?"}</span>
