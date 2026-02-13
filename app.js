@@ -702,6 +702,17 @@ async function initCharacter(){
           setShieldAssignments(currentAssignments);
           
           location.reload();
+          const repairKeysDisplay = qs("#repairKeysDisplay");
+if (repairKeysDisplay) {
+  repairKeysDisplay.innerHTML = "";
+  const repairToggle = c.toggles?.find(tg => tg.id === "repair_keys");
+
+  if (repairToggle) {
+    const keysState = state.toggles[repairToggle.id] || [true, true];
+
+    renderToggleRow(repairKeysDisplay, repairToggle, keysState, lang, (v) => {
+      state.toggles[repairToggle.id] = v;
+      setState(c.id, state);
         });
         
         shieldsDisplay.appendChild(removeShield);
@@ -715,7 +726,8 @@ async function initCharacter(){
   ultToggleContainer.innerHTML = '';
   
   (c.toggles || []).forEach(tg=>{
-    if (tg.id === 'shield') return;
+  if (tg.id === "shield") return;
+  if (tg.id === "repair_keys") return; // <-- on l'affiche déjà en haut
     
     if (tg.id === 'Coup unique' || tg.id === 'coup-unique') {
       const isOn = !!state.toggles[tg.id];
