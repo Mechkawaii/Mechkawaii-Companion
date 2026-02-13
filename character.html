@@ -80,9 +80,11 @@
       margin-bottom: 12px;
     }
 
+    /* ✅ FIX: "line" n'existe pas → row */
     .shields-display {
       display: flex;
-      flex-direction: line;
+      flex-direction: row;
+      flex-wrap: wrap;
       gap: 8px;
       margin-top: 8px;
     }
@@ -94,38 +96,7 @@
       gap: 8px;
     }
 
-    .shield-button {
-      width: 100%;
-      padding: 8px 12px;
-      border: 2px solid #ccc;
-      border-radius: 0 !important;
-      cursor: pointer;
-      background: #ef4444;
-      background-size: 20px;
-      background-position: 8px center;
-      background-repeat: no-repeat;
-      padding-left: 36px;
-      text-align: left;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      box-sizing: border-box;
-      appearance: none;
-      -webkit-appearance: none;
-      overflow: hidden;
-    }
-
-    .shield-button::before,
-    .shield-button::after {
-      content: none !important;
-      display: none !important;
-    }
-
-    .shield-button:hover {
-      border-color: #3b82f6;
-      background-color: #eff6ff;
-    }
-
+    /* (Optionnel) garde le style du bouton "retirer le bouclier" */
     .shield-remove-btn {
       width: 100%;
       padding: 8px 12px;
@@ -138,7 +109,6 @@
       margin-top: 8px;
       transition: all 0.2s ease;
     }
-
     .shield-remove-btn:hover { background: #fecaca; }
 
     /* Effet visuel de bouclier actif */
@@ -260,7 +230,17 @@
         <div id="ultToggleContainer"></div>
       </div>
     </div>
-  
+
+    <!-- ✅ FIX: container manquant pour les toggles -->
+    <div class="card" style="margin-top: 16px;">
+      <div class="card-h">
+        <div class="section-title" style="margin: 0;">Options</div>
+      </div>
+      <div class="card-b">
+        <div id="toggles" class="toggles"></div>
+      </div>
+    </div>
+
     <!-- Patterns -->
     <div class="patterns-grid" style="margin-top: 16px;">
       <!-- Mouvement -->
