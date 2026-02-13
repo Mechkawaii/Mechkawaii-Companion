@@ -590,26 +590,27 @@ async function initCharacter(){
   qs("#charClass").textContent = t(c.class, lang);
   qs("#hpMaxLabel").textContent = `/${c.hp?.max ?? 0}`;
 
-// Ajouter l'image du personnage
-const charPortrait = qs("#charPortrait");
-if (charPortrait) {
-  charPortrait.innerHTML = '';
-  const charImage = c.images?.portrait || c.images?.character;
-  
-  if (charImage) {
-    const img = document.createElement('img');
-    img.src = charImage;
-    img.alt = t(c.name, lang);
-    img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
+  // Ajouter l'image du personnage
+  const charPortrait = qs("#charPortrait");
+  if (charPortrait) {
+    charPortrait.innerHTML = '';
+    const charImage = c.images?.portrait || c.images?.character;
     
-    img.onerror = function(){
-      charPortrait.innerHTML = ` div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)} /div>`;
-    };
-    charPortrait.appendChild(img);
-  } else {
-    charPortrait.innerHTML = ` div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)} /div>`;
+    if (charImage) {
+      const img = document.createElement('img');
+      img.src = charImage;
+      img.alt = t(c.name, lang);
+      img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
+      
+      img.onerror = function(){
+        charPortrait.innerHTML = `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
+      };
+      charPortrait.appendChild(img);
+    } else {
+      charPortrait.innerHTML = `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
+    }
   }
-}
+
   const hpCurEl = qs("#hpCur");
   const hpHeartsEl = qs("#hpHearts");
 
@@ -717,7 +718,6 @@ if (charPortrait) {
     if (tg.id === 'shield') return;
     
     if (tg.id === 'Coup unique' || tg.id === 'coup-unique') {
-      // Render inline in ultimate header
       if (ultToggleContainer) {
         const isOn = !!state.toggles[tg.id];
         renderInlineToggle(ultToggleContainer, tg, isOn, lang, (v)=>{
@@ -917,19 +917,16 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   const backToSplash = document.getElementById("backToSplash");
   if(backToSplash){
     backToSplash.addEventListener("click", async ()=>{
-      // Réinitialiser complètement l'application
       localStorage.removeItem(STORAGE_PREFIX + "setup");
       localStorage.removeItem(STORAGE_PREFIX + "draft");
       localStorage.removeItem(STORAGE_PREFIX + "shields");
       localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
       
-      // Effacer tous les états des personnages
       const chars = await loadCharacters();
       chars.forEach(c => {
         localStorage.removeItem(STORAGE_PREFIX + "state:" + c.id);
       });
       
-      // Revenir à zéro
       localStorage.removeItem(SPLASH_KEY);
       location.reload();
     });
