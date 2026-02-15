@@ -682,6 +682,12 @@ async function initCharacter(){
   window.__cachedChars = chars;
 
   const c = chars.find(x=>x.id === id);
+
+// ✅ Faction theme (Mechkawaii / Prodrome)
+const camp = (c.camp || "mechkawaii").toLowerCase();
+document.body.classList.remove("faction-mechkawaii", "faction-prodrome");
+document.body.classList.add(camp === "prodrome" ? "faction-prodrome" : "faction-mechkawaii");
+
   if(!c){
     const err = qs("#error");
     if(err) err.textContent = "Character not found.";
@@ -712,13 +718,7 @@ async function initCharacter(){
   const charClass = qs("#charClass");
   const hpMaxLabel = qs("#hpMaxLabel");
 
-    // Camp -> classe sur le <body> (pour styliser juste le titre)
-  document.body.classList.remove('faction-mechkawaii', 'faction-prodrome');
-  const camp = (c.camp || 'mechkawaii').toLowerCase();
-  if (camp.includes('prod')) document.body.classList.add('faction-prodrome');
-  else document.body.classList.add('faction-mechkawaii');
-
-if(charName) charName.textContent = t(c.name, lang);
+  if(charName) charName.textContent = t(c.name, lang);
   if(charClass) charClass.textContent = t(c.class, lang);
   if(hpMaxLabel) hpMaxLabel.textContent = `/${c.hp?.max ?? 0}`;
 
@@ -813,16 +813,6 @@ if(charName) charName.textContent = t(c.name, lang);
     if (shieldToggle) {
       const freshShields = getSharedShields();
       const freshAssignments = getShieldAssignments();
-      const hasShieldForThisChar = (freshAssignments[c.id] !== undefined) || (freshAssignments[String(c.id)] !== undefined);
-
-      // ✅ Glow bouclier : carte PV + portrait
-      const hpCardEl = qs('#hpCard');
-      if (hpCardEl) hpCardEl.classList.toggle('has-shield', hasShieldForThisChar);
-
-      const portraitEl = qs('#charPortrait');
-      if (portraitEl) portraitEl.classList.toggle('has-shield', hasShieldForThisChar);
-
-
 
       renderToggleRow(shieldsDisplay, shieldToggle, freshShields, lang, (v) => setSharedShields(v), freshShields);
 
@@ -864,6 +854,15 @@ if(charName) charName.textContent = t(c.name, lang);
       }
     }
   }
+
+// ✅ Shield glow on this character card + portrait (based on assignments)
+(function applyShieldGlow(){
+  const assignments = getShieldAssignments();
+  const hasShield = assignments[c.id] !== undefined;
+  qs("#hpCard")?.classList.toggle("has-shield", hasShield);
+  qs("#charPortrait")?.classList.toggle("has-shield", hasShield);
+})();
+
 
   // Repair keys
   const repairKeysDisplay = qs('#repairKeysDisplay');

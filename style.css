@@ -1544,128 +1544,63 @@ body.is-ko .topbar{
 }
 
 
-/* =====================================
-   FACTIONS (discret) : couleur uniquement sur le titre
-   + annule les fonds de couleur si présents
-   ===================================== */
-
-.faction-mechkawaii #charName { 
-  color: #FFC392;
-  text-shadow: 0 0 10px rgba(255,195,146,0.25);
-}
-.faction-prodrome #charName { 
-  color: #86F777;
-  text-shadow: 0 0 10px rgba(134,247,119,0.25);
-}
-
-/* Si une ancienne version mettait un fond de camp : on force le thème normal */
-.faction-mechkawaii .card,
-.faction-prodrome .card,
-.faction-mechkawaii .unit-tab,
-.faction-prodrome .unit-tab,
-.faction-mechkawaii .unit-tab-visual,
-.faction-prodrome .unit-tab-visual {
-  background: var(--panel) !important;
-  color: var(--text) !important;
-}
 
 /* =====================================
-   GLOW BOUCLIER (stable) : carte PV + portrait + onglets
+   FACTION LOOK (subtle, background on HP card only)
    ===================================== */
+body.faction-mechkawaii #charName { color: #FFC392; }
+body.faction-prodrome  #charName { color: #86F777; }
 
+/* HP card textured backgrounds (images must be in /assets) */
+body.faction-mechkawaii #hpCard{
+  background:
+    linear-gradient(rgba(11,11,14,0.55), rgba(11,11,14,0.55)),
+    url("./assets/background_mechkawaii.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+body.faction-prodrome #hpCard{
+  background:
+    linear-gradient(rgba(11,11,14,0.55), rgba(11,11,14,0.55)),
+    url("./assets/background_prodrome.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* If older camp background rules exist, neutralize them */
+body.faction-mechkawaii .card,
+body.faction-prodrome .card{
+  /* keep your dark UI by default */
+  color: var(--text);
+}
+
+/* =====================================
+   SHIELD GLOW (robust, not clipped)
+   Applies when #hpCard or #charPortrait has class .has-shield
+   ===================================== */
 #hpCard.has-shield,
-#charPortrait.has-shield,
-.unit-tab-visual.has-shield {
+#charPortrait.has-shield{
   position: relative;
-  overflow: visible;
+  overflow: visible; /* override .card overflow:hidden for the glow */
 }
 
-/* Halo bleu */
 #hpCard.has-shield::after,
-#charPortrait.has-shield::after,
-.unit-tab-visual.has-shield::after {
+#charPortrait.has-shield::after{
   content: "";
   position: absolute;
   inset: -6px;
-  border-radius: 18px;
+  border-radius: calc(var(--radius) + 6px);
   pointer-events: none;
   box-shadow:
-    0 0 10px rgba(59, 130, 246, 0.85),
-    0 0 22px rgba(59, 130, 246, 0.55),
-    0 0 36px rgba(59, 130, 246, 0.35);
+    0 0 10px rgba(59,130,246,0.85),
+    0 0 22px rgba(59,130,246,0.55),
+    0 0 38px rgba(59,130,246,0.35);
 }
 
-/* Portrait souvent rond */
-#charPortrait.has-shield::after { border-radius: 999px; }
-
-/* Header un peu plus bleuté */
-.card.has-shield .card-h {
-  background: rgba(59, 130, 246, 0.25) !important;
+/* Prevent the old blue background override on shield cards from killing the texture */
+#hpCard.has-shield{
+  border-color: rgba(59,130,246,0.45);
 }
-
-
-
-/* =====================================
-   OVERRIDE ANTI-FOND (au cas où une ancienne version est encore là)
-   On force TOUTES les cartes/sections à rester en thème dark.
-   ===================================== */
-
-.faction-mechkawaii .card,
-.faction-prodrome .card,
-.faction-mechkawaii .panel,
-.faction-prodrome .panel,
-.faction-mechkawaii .section,
-.faction-prodrome .section,
-.faction-mechkawaii .unit-tab,
-.faction-prodrome .unit-tab,
-.faction-mechkawaii .unit-tab-visual,
-.faction-prodrome .unit-tab-visual,
-.faction-mechkawaii .tab-btn,
-.faction-prodrome .tab-btn {
-  background: var(--panel) !important;
-  background-color: var(--panel) !important;
-  color: var(--text) !important;
-}
-/* ============================
-   BACKGROUND PAR FACTION (assets/)
-   ============================ */
-
-/* On applique le fond UNIQUEMENT sur la carte PV (hpCard) */
-.faction-mechkawaii #hpCard {
-  background-image: url("assets/background_mechkawaii.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.faction-prodrome #hpCard {
-  background-image: url("assets/background_prodrome.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-/* Option recommandée : voile sombre pour garder la lisibilité */
-.faction-mechkawaii #hpCard,
-.faction-prodrome #hpCard {
-  position: relative;
-  overflow: hidden;
-}
-
-.faction-mechkawaii #hpCard::before,
-.faction-prodrome #hpCard::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.faction-mechkawaii #hpCard > *,
-.faction-prodrome #hpCard > * {
-  position: relative;
-  z-index: 1;
-}
-
-
