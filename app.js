@@ -688,7 +688,19 @@ async function initCharacter(){
     return;
   }
 
-  const saved = getState(c.id);
+  
+  // ------------------------------
+  // Camp / Faction theme (Mechkawaii vs Prodromes)
+  // ------------------------------
+  document.body.classList.remove("camp-mechkawaii", "camp-prodrome");
+  const camp = (c.camp || "mechkawaii").toLowerCase();
+  if (camp === "prodrome" || camp === "prodromes") {
+    document.body.classList.add("camp-prodrome");
+  } else {
+    document.body.classList.add("camp-mechkawaii");
+  }
+
+const saved = getState(c.id);
 
   const defaultToggles = {};
   (c.toggles || []).forEach(tg => {
@@ -807,12 +819,6 @@ async function initCharacter(){
     if (shieldToggle) {
       const freshShields = getSharedShields();
       const freshAssignments = getShieldAssignments();
-
-      // ✅ SHIELD FX (glow bleu) : applique la classe quand CE perso a un bouclier assigné
-      // (CSS cible .card.has-shield et on le met sur #hpCard ; on le met aussi sur le portrait si tu veux un petit effet)
-      const hasShieldForThisChar = freshAssignments[c.id] !== undefined;
-      qs('#hpCard')?.classList.toggle('has-shield', hasShieldForThisChar);
-      qs('#charPortrait')?.classList.toggle('has-shield', hasShieldForThisChar);
 
       renderToggleRow(shieldsDisplay, shieldToggle, freshShields, lang, (v) => setSharedShields(v), freshShields);
 
@@ -1071,6 +1077,15 @@ function initUnitTabs(currentCharId, allChars, lang){
 function createCharacterTab(char, lang){
   const tab = document.createElement('div');
   tab.className = 'unit-tab';
+
+  // Camp color on tabs
+  const camp = (char.camp || 'mechkawaii').toLowerCase();
+  if (camp === 'prodrome' || camp === 'prodromes') {
+    tab.classList.add('camp-prodrome');
+  } else {
+    tab.classList.add('camp-mechkawaii');
+  }
+
   tab.dataset.charId = char.id; // => data-char-id
 
   const saved = getState(char.id);

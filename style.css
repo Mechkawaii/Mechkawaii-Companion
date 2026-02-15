@@ -1186,29 +1186,6 @@ body.game-active .toggle.locked::after {
   }
 }
 
-/* --- Portrait (fiche perso) : petit halo quand le perso a un bouclier --- */
-#charPortrait.has-shield{
-  animation: shieldGlow 1.6s ease-in-out infinite;
-}
-
-#charPortrait.has-shield::before{
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border-radius: 16px;
-  background: radial-gradient(
-    circle at center,
-    rgba(59, 130, 246, 0.55) 0%,
-    rgba(59, 130, 246, 0.22) 60%,
-    transparent 78%
-  );
-  animation: shieldEnergyPulse 1.6s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 0;
-}
-
-#charPortrait.has-shield img{ position: relative; z-index: 1; }
-
 /* ============================= */
 /*  Version pour les tabs du bas */
 /* ============================= */
@@ -1564,4 +1541,66 @@ body.is-ko .topbar{
   .unit-tab.has-shield .unit-tab-visual::before{
     animation: none;
   }
+}
+
+
+/* =====================================
+   Camp / Faction theme colors
+   - Mechkawaii: orange #FFC392
+   - Prodromes : green  #86F777
+   ===================================== */
+
+body.camp-mechkawaii .card{
+  background: #FFC392;
+  color: #0b0b0e;
+  border-color: rgba(0,0,0,0.14);
+}
+body.camp-prodrome .card{
+  background: #86F777;
+  color: #0b0b0e;
+  border-color: rgba(0,0,0,0.14);
+}
+
+/* Ensure text inside cards stays readable */
+body.camp-mechkawaii .card .section-title,
+body.camp-mechkawaii .card .text,
+body.camp-mechkawaii .card .pill,
+body.camp-prodrome .card .section-title,
+body.camp-prodrome .card .text,
+body.camp-prodrome .card .pill{
+  color: #0b0b0e;
+}
+
+body.camp-mechkawaii .card .footer-note,
+body.camp-prodrome .card .footer-note{
+  color: rgba(11,11,14,0.75);
+}
+
+/* Tabs (bottom unit tabs) */
+.unit-tab.camp-mechkawaii{
+  background: #FFC392;
+  border-color: rgba(0,0,0,0.18);
+}
+.unit-tab.camp-prodrome{
+  background: #86F777;
+  border-color: rgba(0,0,0,0.18);
+}
+
+/* Text inside tabs */
+.unit-tab.camp-mechkawaii .unit-tab-name,
+.unit-tab.camp-mechkawaii .unit-tab-role,
+.unit-tab.camp-prodrome .unit-tab-name,
+.unit-tab.camp-prodrome .unit-tab-role{
+  color: #0b0b0e;
+}
+
+/* Keep existing states visible on colored backgrounds */
+.unit-tab.camp-mechkawaii.has-shield,
+.unit-tab.camp-prodrome.has-shield{
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.35), 0 8px 24px rgba(0,0,0,0.45);
+}
+
+.unit-tab.camp-mechkawaii.active,
+.unit-tab.camp-prodrome.active{
+  box-shadow: 0 0 0 3px rgba(255,210,0,0.55), 0 0 22px rgba(255,210,0,0.25);
 }
