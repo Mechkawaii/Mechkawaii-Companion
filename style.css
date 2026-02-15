@@ -1342,3 +1342,96 @@ body.game-active .toggle.locked::after {
   60%  { transform: scale(1.06); opacity: 1.0; }
   100% { transform: scale(1.00); opacity: 1.0; }
 }
+/* ============================= */
+/*   KO / Mort Subite (Option A) */
+/* ============================= */
+
+/* IMPORTANT: assure-toi que #charPortrait est positionné */
+#charPortrait { position: relative; }
+
+#charPortrait img {
+  position: relative;
+  z-index: 1;
+}
+
+#charPortrait.is-ko img {
+  filter: grayscale(1) brightness(0.55) contrast(1.05);
+  opacity: 0.95;
+}
+
+#charPortrait .ko-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;              /* AU-DESSUS du portrait */
+  display: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+#charPortrait.is-ko .ko-overlay { display: flex; }
+
+#charPortrait .ko-overlay img {
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,.45));
+}
+
+/* Bounce 1 fois quand ça tombe KO */
+#charPortrait.ko-pop .ko-overlay { animation: koPop 320ms ease-out; }
+
+@keyframes koPop {
+  0%   { transform: scale(0.85); opacity: 0.0; }
+  60%  { transform: scale(1.06); opacity: 1.0; }
+  100% { transform: scale(1.00); opacity: 1.0; }
+}
+
+/* ============================= */
+/*   KO overlay pour les tabs    */
+/* ============================= */
+
+.unit-tab-visual { position: relative; }
+
+.unit-tab-visual.is-ko img {
+  filter: grayscale(1) brightness(0.55) contrast(1.05);
+  opacity: 0.95;
+}
+
+.unit-tab-visual .ko-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.unit-tab-visual.is-ko .ko-overlay { display: flex; }
+
+.unit-tab-visual .ko-overlay img{
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,.45));
+}
+
+/* ============================= */
+/*  Contour rouge fiche entière  */
+/* ============================= */
+
+body.page-character.is-ko .container {
+  outline: 2px solid rgba(255, 77, 77, 0.55);
+  outline-offset: 6px;
+  border-radius: calc(var(--radius) + 6px);
+  box-shadow: 0 0 26px rgba(255, 77, 77, 0.18);
+}
+
+body.page-character.is-ko .card {
+  border-color: rgba(255, 77, 77, 0.22);
+}
+
+body.page-character.is-ko .topbar {
+  border-color: rgba(255, 77, 77, 0.22);
+}
