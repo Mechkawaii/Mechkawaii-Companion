@@ -1673,3 +1673,84 @@ body.camp-prodrome .brand-with-portrait > *{
 .unit-tab-visual.camp-prodrome{
   background-image: none !important;
 }
+/* =========================================
+   FIX V3 — Header full-bleed + Tabs icon fit
+   ========================================= */
+
+/* 1) HEADER (portrait + nom) : le fond doit remplir toute la zone */
+.brand-with-portrait{
+  /* le fond couvre le bloc entier */
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+
+  /* évite l’effet "cadre" */
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+
+  /* si un fond noir était appliqué ailleurs */
+  background-color: transparent !important;
+}
+
+/* Si le cadre noir vient du conteneur parent (fréquent) */
+.hero,
+.hero-card,
+.header,
+.topbar{
+  background: transparent !important;
+}
+
+/* 2) ONGLET : le fond doit couvrir L’ONGLET ENTIER, pas une sous-partie */
+.unit-tab{
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+
+  /* centrage du contenu */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* On évite que l’élément interne “découpe” le rendu */
+.unit-tab-visual{
+  background: transparent !important;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Voile sombre pour lisibilité (si tu en as déjà un, celui-ci prend le dessus) */
+.unit-tab::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: rgba(0,0,0,0.40);
+  pointer-events:none;
+  z-index:0;
+}
+.unit-tab > *{
+  position: relative;
+  z-index: 1;
+}
+
+/* 3) Icônes dans les onglets : centrées + bien cadrées */
+.unit-tab img,
+.unit-tab-visual img{
+  display: block;
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* BONUS: évite des décalages bizarres dus au line-height */
+.unit-tab, .unit-tab-visual{
+  line-height: 0;
+}
