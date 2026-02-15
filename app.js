@@ -13,6 +13,12 @@ function setLang(lang){
   localStorage.setItem(STORAGE_PREFIX + "lang", lang);
 }
 
+/** Active button helper (UI selection) */
+function setActiveButton(groupButtons, activeBtn, activeClass = "btn-accent") {
+  groupButtons.forEach(b => b.classList.remove(activeClass));
+  if (activeBtn) activeBtn.classList.add(activeClass);
+}
+
 /* ------------------------------
    I18N (UI statique)
 ------------------------------ */
@@ -409,39 +415,59 @@ async function initIndex(){
     let camp = null;
     let difficulty = null;
 
-    qs("#modeSingle")?.addEventListener("click", ()=>{
-      mode = "single";
-      showDifficultyPick();
-    });
-    qs("#modeMulti")?.addEventListener("click", ()=>{
-      mode = "multi";
-      if(campPick) campPick.style.display = "block";
-    });
-
-    qs("#campMech")?.addEventListener("click", ()=>{
-      camp = "mechkawaii";
-      showDifficultyPick();
-    });
-    qs("#campProd")?.addEventListener("click", ()=>{
-      camp = "prodrome";
-      showDifficultyPick();
-    });
-
-    qs("#diffNormal")?.addEventListener("click", ()=>{
-      difficulty = "normal";
-      saveSetup({mode, camp, difficulty});
-      location.reload();
-    });
-    qs("#diffExpert")?.addEventListener("click", ()=>{
-      difficulty = "expert";
-      saveSetup({mode, camp, difficulty});
-      location.reload();
-    });
+    const modeBtns = [qs("#modeSingle"), qs("#modeMulti")].filter(Boolean);
+    const campBtns = [qs("#campMech"), qs("#campProd")].filter(Boolean);
+    const diffBtns = [qs("#diffNormal"), qs("#diffExpert")].filter(Boolean);
 
     function showDifficultyPick(){
       const diffPick = qs("#difficultyPick");
       if(diffPick) diffPick.style.display = "block";
     }
+
+    qs("#modeSingle")?.addEventListener("click", (e)=>{
+      mode = "single";
+      setActiveButton(modeBtns, e.currentTarget);
+
+      // en single, pas besoin de camp
+      if(campPick) campPick.style.display = "none";
+      setActiveButton(campBtns, null); // reset highlight camp
+
+      showDifficultyPick();
+    });
+
+    qs("#modeMulti")?.addEventListener("click", (e)=>{
+      mode = "multi";
+      setActiveButton(modeBtns, e.currentTarget);
+      if(campPick) campPick.style.display = "block";
+      // on attend le choix camp => pas de sélection forcée ici
+      setActiveButton(campBtns, null);
+    });
+
+    qs("#campMech")?.addEventListener("click", (e)=>{
+      camp = "mechkawaii";
+      setActiveButton(campBtns, e.currentTarget);
+      showDifficultyPick();
+    });
+
+    qs("#campProd")?.addEventListener("click", (e)=>{
+      camp = "prodrome";
+      setActiveButton(campBtns, e.currentTarget);
+      showDifficultyPick();
+    });
+
+    qs("#diffNormal")?.addEventListener("click", (e)=>{
+      difficulty = "normal";
+      setActiveButton(diffBtns, e.currentTarget);
+      saveSetup({mode, camp, difficulty});
+      location.reload();
+    });
+
+    qs("#diffExpert")?.addEventListener("click", (e)=>{
+      difficulty = "expert";
+      setActiveButton(diffBtns, e.currentTarget);
+      saveSetup({mode, camp, difficulty});
+      location.reload();
+    });
 
     qs("#resetSetupBtn")?.addEventListener("click", clearSetup);
     return;
