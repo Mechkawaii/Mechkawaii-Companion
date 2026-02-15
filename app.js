@@ -1,53 +1,8 @@
 const STORAGE_PREFIX = "mechkawaii:";
 
-function playPressStart(){
-  try{
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if(!AudioCtx) return;
-    const ctx = new AudioCtx();
-    const master = ctx.createGain();
-    master.gain.value = 0.12;
-    master.connect(ctx.destination);
-
-    const now = ctx.currentTime;
-
-    const osc1 = ctx.createOscillator();
-    const osc2 = ctx.createOscillator();
-    osc1.type = "square";
-    osc2.type = "triangle";
-
-    const g1 = ctx.createGain();
-    const g2 = ctx.createGain();
-    g1.gain.setValueAtTime(0.0001, now);
-    g2.gain.setValueAtTime(0.0001, now);
-
-    osc1.frequency.setValueAtTime(660, now);
-    osc1.frequency.exponentialRampToValueAtTime(990, now + 0.06);
-
-    osc2.frequency.setValueAtTime(330, now);
-    osc2.frequency.exponentialRampToValueAtTime(440, now + 0.08);
-
-    g1.gain.exponentialRampToValueAtTime(0.9, now + 0.01);
-    g1.gain.exponentialRampToValueAtTime(0.0001, now + 0.10);
-
-    g2.gain.exponentialRampToValueAtTime(0.6, now + 0.01);
-    g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
-
-    osc1.connect(g1); g1.connect(master);
-    osc2.connect(g2); g2.connect(master);
-
-    osc1.start(now); osc2.start(now);
-    osc1.stop(now + 0.12);
-    osc2.stop(now + 0.14);
-
-    setTimeout(()=>{ try{ ctx.close(); }catch(e){} }, 250);
-  }catch(e){}
-}
-
-function heartIcon(filled){
-  const src = filled ? "./assets/pv.svg" : "./assets/pv_off.svg";
-  return `<img src="${src}" class="heart" alt="PV" />`;
-}
+/* ------------------------------
+   LANG (Flags on Index)
+------------------------------ */
 
 function qs(sel){ return document.querySelector(sel); }
 function qsa(sel){ return [...document.querySelectorAll(sel)]; }
@@ -59,6 +14,55 @@ function getLang(){
 
 function setLang(lang){
   localStorage.setItem(STORAGE_PREFIX + "lang", lang);
+}
+
+/**
+ * Cache/désactive le select #lang partout (si jamais il existe encore dans le HTML).
+ * La langue se choisit uniquement via les drapeaux sur l'accueil.
+ */
+function bindTopbar(){
+  const sel = qs("#lang");
+  if(sel){
+    sel.value = getLang();
+    sel.disabled = true;
+    sel.style.display = "none";
+    // si le parent "pill" existe, on le cache aussi
+    const pill = sel.closest(".pill");
+    if(pill) pill.style.display = "none";
+  }
+}
+
+/**
+ * Initialise les drapeaux (uniquement sur index.html).
+ * HTML attendu:
+ * <div id="langFlags">
+ *   <button data-lang="fr">🇫🇷</button>
+ *   <button data-lang="en">🇬🇧</button>
+ * </div>
+ */
+function initLangFlags(){
+  const wrap = qs("#langFlags");
+  if(!wrap) return;
+
+  const current = getLang();
+  wrap.querySelectorAll("[data-lang]").forEach(btn=>{
+    const v = btn.getAttribute("data-lang");
+    btn.classList.toggle("active", v === current);
+
+    btn.addEventListener("click", ()=>{
+      setLang(v);
+      location.reload();
+    });
+  });
+}
+
+/* ------------------------------
+   STATE / STORAGE
+------------------------------ */
+
+function heartIcon(filled){
+  const src = filled ? "./assets/pv.svg" : "./assets/pv_off.svg";
+  return `<img src="${src}" class="heart" alt="PV" />`;
 }
 
 function getState(charId){
@@ -121,28 +125,6 @@ function t(obj, lang){
   return obj[lang] || obj["fr"] || "";
 }
 
-function setLangUI(lang){
-  const sel = qs("#lang");
-  if(sel) sel.value = lang;
-  qsa("[data-i18n]").forEach(el=>{
-    const key = el.getAttribute("data-i18n");
-    const dict = window.__i18n || {};
-    el.textContent = (dict[key] && (dict[key][lang] || dict[key]["fr"])) || el.textContent;
-  });
-}
-
-function bindTopbar(lang){
-  const sel = qs("#lang");
-  if(sel){
-    sel.value = lang;
-    sel.addEventListener("change", ()=>{
-      const v = sel.value;
-      setLang(v);
-      location.reload();
-    });
-  }
-}
-
 function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
 
 function renderHP(container, hpCur, hpMax){
@@ -159,8 +141,7 @@ function renderHP(container, hpCur, hpMax){
 }
 
 /**
- * IMPORTANT: cette fonction est maintenant "anti-crash"
- * si root n'existe pas dans le HTML, elle sort juste sans planter.
+ * Anti-crash: si root n'existe pas dans le HTML, on sort sans planter.
  */
 function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = null){
   if(!root) return;
@@ -168,15 +149,6 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
   if (toggle.type === 'visual_keys') {
     const keysContainer = document.createElement('div');
     keysContainer.className = 'toggle-visual-keys';
-    keysContainer.style.cssText = `
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      padding: 12px;
-      background: rgba(0,0,0,0.05);
-      border-radius: 8px;
-      margin-bottom: 8px;
-    `;
 
     const label = document.createElement('label');
     label.style.cssText = `
@@ -187,17 +159,13 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
     `;
     label.textContent = t(toggle.label, lang);
 
-    // ✅ on a déjà un titre dans le HTML pour ces sections
+    // On a déjà un titre dans le HTML pour ces sections
     if (toggle.id === 'repair_keys' || toggle.id === 'shield') {
       label.style.display = 'none';
     }
 
     const keysDisplay = document.createElement('div');
     keysDisplay.className = 'keys-display';
-    keysDisplay.style.cssText = `
-      display: flex;
-      gap: 8px;
-    `;
 
     const maxKeys = toggle.maxKeys || 2;
     const isShield = toggle.id === 'shield';
@@ -210,28 +178,14 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
       const key = document.createElement('button');
       key.className = 'key-button';
       key.type = 'button';
+
       const keyState = currentState[i] !== undefined ? currentState[i] : true;
-      key.style.cssText = `
-        width: 40px;
-        height: 40px;
-        border: 2px solid #ccc;
-        border-radius: 6px;
-        cursor: pointer;
-        background: #f5f5f5;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-        padding: 0;
-        background-image: url('./assets/icons/${isShield ? 'shield' : 'key'}_${keyState ? 'on' : 'off'}.svg');
-        background-size: 70%;
-        background-position: center;
-        background-repeat: no-repeat;
-      `;
 
       key.dataset.keyIndex = i;
       key.dataset.toggleId = toggle.id;
       key.dataset.active = keyState ? 'true' : 'false';
+
+      key.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_${keyState ? 'on' : 'off'}.svg')`;
 
       key.addEventListener('click', function(e) {
         e.preventDefault();
@@ -293,60 +247,6 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
   }
 }
 
-function renderInlineToggle(container, toggle, isOn, lang, onChange){
-  if(!container) return;
-
-  const label = document.createElement('label');
-  label.textContent = t(toggle.label, lang);
-
-  const sw = document.createElement('div');
-  sw.className = 'switch' + (isOn ? ' on' : '');
-  sw.setAttribute('role', 'switch');
-  sw.setAttribute('tabindex', '0');
-  sw.setAttribute('aria-checked', isOn ? 'true' : 'false');
-
-  function flip(){
-    isOn = !isOn;
-    sw.className = 'switch' + (isOn ? ' on' : '');
-    sw.setAttribute('aria-checked', isOn ? 'true' : 'false');
-    onChange(isOn);
-  }
-
-  sw.addEventListener('click', flip);
-  sw.addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter' || e.key === ' '){
-      e.preventDefault();
-      flip();
-    }
-  });
-
-  container.appendChild(label);
-  container.appendChild(sw);
-}
-
-function saveToggleState(charId, toggleId, keyIndex, state) {
-  if (toggleId === 'shield') {
-    setSharedShields(state);
-  } else {
-    const savedState = getState(charId) || { hp: null, toggles: {} };
-
-    if (!savedState.toggles) {
-      savedState.toggles = {};
-    }
-
-    if (keyIndex !== null) {
-      if (!savedState.toggles[toggleId]) {
-        savedState.toggles[toggleId] = [];
-      }
-      savedState.toggles[toggleId][keyIndex] = state;
-    } else {
-      savedState.toggles[toggleId] = state;
-    }
-
-    setState(charId, savedState);
-  }
-}
-
 function urlParam(name){
   const u = new URL(location.href);
   return u.searchParams.get(name);
@@ -357,7 +257,8 @@ function urlParam(name){
 ------------------------------ */
 async function initIndex(){
   const lang = getLang();
-  bindTopbar(lang);
+  bindTopbar();
+  initLangFlags();
 
   const list = qs("#charList");
   if(!list) return;
@@ -577,7 +478,7 @@ async function initIndex(){
 ------------------------------ */
 async function initCharacter(){
   const lang = getLang();
-  bindTopbar(lang);
+  bindTopbar();
 
   const id = urlParam("id");
   if(!id){
@@ -608,7 +509,6 @@ async function initCharacter(){
     }
   });
 
-  // merge (important si ancien state)
   const state = saved || { hp: c.hp?.max ?? 0, toggles: {} };
   if (state.hp == null) state.hp = c.hp?.max ?? 0;
   if (!state.toggles) state.toggles = {};
@@ -737,32 +637,28 @@ async function initCharacter(){
       });
 
       if (freshAssignments[c.id] !== undefined) {
-  const removeShield = document.createElement('button');
-  removeShield.className = 'shield-remove-btn';
-  removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove the shield';
+        const removeShield = document.createElement('button');
+        removeShield.className = 'shield-remove-btn';
+        removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove the shield';
 
-  removeShield.addEventListener('click', function (e) {
-    e.preventDefault();
+        removeShield.addEventListener('click', function (e) {
+          e.preventDefault();
+          const currentAssignments = getShieldAssignments();
 
-    const currentAssignments = getShieldAssignments();
+          // On retire l'assignation du personnage
+          delete currentAssignments[c.id];
+          setShieldAssignments(currentAssignments);
 
-    // On retire l'assignation du personnage
-    delete currentAssignments[c.id];
-    setShieldAssignments(currentAssignments);
+          // ⚠️ On ne remet PAS le bouclier dans la réserve (usage unique)
+          location.reload();
+        });
 
-    // ⚠️ IMPORTANT :
-    // On ne remet PAS le bouclier dans la réserve
-    // Donc on ne modifie PAS getSharedShields()
-
-    location.reload();
-  });
-
-  shieldsDisplay.appendChild(removeShield);
-}
+        shieldsDisplay.appendChild(removeShield);
+      }
     }
   }
 
-  // --- Clés de réparation à côté des PV & boucliers ---
+  // --- Clés de réparation ---
   const repairKeysDisplay = qs('#repairKeysDisplay');
   if (repairKeysDisplay) {
     repairKeysDisplay.innerHTML = '';
@@ -776,52 +672,48 @@ async function initCharacter(){
     }
   }
 
-  // --- Toggles (en bas) ---
+  // --- Toggles ---
   const togglesRoot = qs('#toggles');
-const ultToggleContainer = qs('#ultToggleContainer');
-if (togglesRoot) togglesRoot.innerHTML = '';
-if (ultToggleContainer) ultToggleContainer.innerHTML = '';
+  const ultToggleContainer = qs('#ultToggleContainer');
+  if (togglesRoot) togglesRoot.innerHTML = '';
+  if (ultToggleContainer) ultToggleContainer.innerHTML = '';
 
-// --- 1) Détecter le toggle "Coup Unique" via son label (plus fiable que tg.id) ---
-const isUltimateToggle = (tg) => {
-  const fr = (t(tg.label, 'fr') || '').toLowerCase();
-  const en = (t(tg.label, 'en') || '').toLowerCase();
-  return fr.includes('coup unique') || en.includes('ultimate');
-};
+  const isUltimateToggle = (tg) => {
+    const fr = (t(tg.label, 'fr') || '').toLowerCase();
+    const en = (t(tg.label, 'en') || '').toLowerCase();
+    return fr.includes('coup unique') || en.includes('ultimate');
+  };
 
-const ultimateToggle = (c.toggles || []).find(isUltimateToggle);
+  const ultimateToggle = (c.toggles || []).find(isUltimateToggle);
 
-// --- 2) Rendre le toggle "Coup Unique" dans la section Coup Unique ---
-if (ultimateToggle && ultToggleContainer) {
-  const isOn = !!state.toggles[ultimateToggle.id];
-  renderToggleRow(ultToggleContainer, ultimateToggle, isOn, lang, (v) => {
-    state.toggles[ultimateToggle.id] = v;
-    setState(c.id, state);
-  });
-}
-
-// --- 3) Rendre les autres toggles dans "Options" (en excluant shield/repair_keys/ultimate) ---
-(c.toggles || []).forEach(tg => {
-  if (tg.id === "shield") return;
-  if (tg.id === "repair_keys") return;
-  if (ultimateToggle && tg.id === ultimateToggle.id) return;
-
-  if (tg.type === 'visual_keys') {
-    const keysState = state.toggles[tg.id];
-    const sharedShields = getSharedShields();
-    renderToggleRow(togglesRoot, tg, keysState, lang, (v) => {
-      state.toggles[tg.id] = v;
-      setState(c.id, state);
-    }, sharedShields);
-  } else {
-    const isOn = !!state.toggles[tg.id];
-    renderToggleRow(togglesRoot, tg, isOn, lang, (v) => {
-      state.toggles[tg.id] = v;
+  if (ultimateToggle && ultToggleContainer) {
+    const isOn = !!state.toggles[ultimateToggle.id];
+    renderToggleRow(ultToggleContainer, ultimateToggle, isOn, lang, (v) => {
+      state.toggles[ultimateToggle.id] = v;
       setState(c.id, state);
     });
   }
-});
 
+  (c.toggles || []).forEach(tg => {
+    if (tg.id === "shield") return;
+    if (tg.id === "repair_keys") return;
+    if (ultimateToggle && tg.id === ultimateToggle.id) return;
+
+    if (tg.type === 'visual_keys') {
+      const keysState = state.toggles[tg.id];
+      const sharedShields = getSharedShields();
+      renderToggleRow(togglesRoot, tg, keysState, lang, (v) => {
+        state.toggles[tg.id] = v;
+        setState(c.id, state);
+      }, sharedShields);
+    } else {
+      const isOn = !!state.toggles[tg.id];
+      renderToggleRow(togglesRoot, tg, isOn, lang, (v) => {
+        state.toggles[tg.id] = v;
+        setState(c.id, state);
+      });
+    }
+  });
 
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
   const setup = setupRaw ? JSON.parse(setupRaw) : null;
@@ -940,10 +832,7 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, s
       setSharedShields(currentShields);
 
       document.body.removeChild(modal);
-
-      setTimeout(() => {
-        location.reload();
-      }, 250);
+      setTimeout(() => location.reload(), 150);
     });
 
     content.appendChild(btn);
