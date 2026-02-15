@@ -28,16 +28,17 @@ const KO_TOKEN_SRC = "./assets/jeton-mort-subite.svg";
 function ensureKoOverlay(el){
   if(!el) return null;
 
-  // sécurité : l’overlay doit pouvoir se positionner AU-DESSUS
-  if(!el.style.position) el.style.position = "relative";
-  el.style.overflow = el.style.overflow || "hidden";
+  // le parent doit permettre un overlay au-dessus
+  const cs = getComputedStyle(el);
+  if(cs.position === "static") el.style.position = "relative";
+  if(!el.style.overflow) el.style.overflow = "hidden";
 
   let ov = el.querySelector(".ko-overlay");
   if(!ov){
     ov = document.createElement("div");
     ov.className = "ko-overlay";
 
-    // ✅ inline styles pour garantir “au-dessus” même si le CSS bouge
+    // overlay au-dessus
     ov.style.position = "absolute";
     ov.style.inset = "0";
     ov.style.display = "flex";
@@ -45,6 +46,12 @@ function ensureKoOverlay(el){
     ov.style.justifyContent = "center";
     ov.style.pointerEvents = "none";
     ov.style.zIndex = "50";
+
+    // ✅ caché par défaut (IMPORTANT)
+    ov.style.opacity = "0";
+    ov.style.visibility = "hidden";
+    ov.style.transform = "scale(0.95)";
+    ov.style.transition = "opacity .18s ease, transform .18s ease, visibility .18s ease";
 
     const img = document.createElement("img");
     img.src = KO_TOKEN_SRC;
@@ -55,7 +62,7 @@ function ensureKoOverlay(el){
     img.style.display = "block";
 
     ov.appendChild(img);
-  }
+  }}
 
   // ✅ toujours le remettre en dernier -> toujours au-dessus
   el.appendChild(ov);
@@ -65,15 +72,24 @@ function ensureKoOverlay(el){
 function setKoStateForEl(el, isKo, pop = false){
   if(!el) return;
 
-  ensureKoOverlay(el);
-  el.classList.toggle("is-ko", !!isKo);
+  const ov = ensureKoOverlay(el);
+  const ko = !!isKo;
 
-  if(pop && isKo){
+  el.classList.toggle("is-ko", ko);
+
+  // ✅ show / hide overlay (le vrai fix)
+  if(ov){
+    ov.style.opacity = ko ? "1" : "0";
+    ov.style.visibility = ko ? "visible" : "hidden";
+    ov.style.transform = ko ? "scale(1)" : "scale(0.95)";
+  }
+
+  if(pop && ko){
     el.classList.remove("ko-pop");
     void el.offsetWidth; // relance anim
     el.classList.add("ko-pop");
     setTimeout(()=>el.classList.remove("ko-pop"), 420);
-  } else if(!isKo){
+  } else if(!ko){
     el.classList.remove("ko-pop");
   }
 }
