@@ -249,6 +249,21 @@ function renderHP(container, hpCur, hpMax){
 }
 
 /* ------------------------------
+   ✅ Shield glow helper
+   - Works now (fallback) + future-proof (#hpCard)
+------------------------------ */
+function updateHpShieldGlow(charId){
+  const assignments = getShieldAssignments();
+  const hasShield = assignments && assignments[charId] !== undefined;
+
+  // preferred: dedicated id (we'll add it in character.html later)
+  const hpCard = qs("#hpCard") || qs(".hp-card") || qsa(".card")[0] || null;
+  if(hpCard){
+    hpCard.classList.toggle("has-shield", !!hasShield);
+  }
+}
+
+/* ------------------------------
    Visual keys renderer
 ------------------------------ */
 function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = null){
@@ -739,12 +754,19 @@ async function initCharacter(){
           delete currentAssignments[c.id];
           setShieldAssignments(currentAssignments);
           // usage unique => on ne remet pas le shield dans la réserve
+          updateHpShieldGlow(c.id);
           location.reload();
         });
 
         shieldsDisplay.appendChild(removeShield);
       }
+
+      // ✅ Shield glow: update card class based on assignment
+      updateHpShieldGlow(c.id);
     }
+  } else {
+    // ✅ even if no shields UI, keep glow coherent
+    updateHpShieldGlow(c.id);
   }
 
   // Repair keys
@@ -834,6 +856,9 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
 
       setShieldAssignments(currentAssignments);
       setSharedShields(currentShields);
+
+      // ✅ update glow asap (before reload)
+      updateHpShieldGlow(char.id);
 
       document.body.removeChild(modal);
       setTimeout(()=>location.reload(), 150);
