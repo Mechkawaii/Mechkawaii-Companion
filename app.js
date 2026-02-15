@@ -15,7 +15,7 @@ function setLang(lang){
 
 /** Active button helper (UI selection) */
 function setActiveButton(groupButtons, activeBtn, activeClass = "btn-accent") {
-  groupButtons.forEach(b => b && b.classList.remove(activeClass));
+  groupButtons.forEach(b => b.classList.remove(activeClass));
   if (activeBtn) activeBtn.classList.add(activeClass);
 }
 
@@ -248,21 +248,58 @@ function renderHP(container, hpCur, hpMax){
 }
 
 /* ------------------------------
-   Shield glow: robust helper
+   KO / Mort Subite (Option A)
 ------------------------------ */
-function updateShieldGlowOnCharacterPage(charId){
-  // Target stable element first
-  const hpCard = qs("#hpCard");
-  // Fallback: first card on page (only if hpCard missing)
-  const fallbackCard = qsa(".card")[0] || null;
-  const target = hpCard || fallbackCard;
+function shouldPopKO(charId, newHp) {
+  // pop uniquement quand on passe de >0 à 0
+  const last = localStorage.getItem(STORAGE_PREFIX + "hp-last:" + charId);
+  const wasKo = (last === "0");
+  return (newHp === 0) && !wasKo;
+}
 
-  if(!target) return;
+function setKOVisual(charId, isKo, popOnce = false) {
+  const portrait = qs("#charPortrait");
+  if (!portrait) return;
+
+  // Assure l’overlay
+  let overlay = portrait.querySelector(".ko-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.className = "ko-overlay";
+    overlay.setAttribute("aria-hidden", "true");
+    portrait.appendChild(overlay);
+  }
+
+  if (isKo) {
+    portrait.classList.add("is-ko");
+
+    // ⚠️ Mets le chemin EXACT de ton fichier (attention aux espaces)
+    const KO_SRC = "./assets/Jeton mort subite.svg";
+    overlay.innerHTML = `<img src="${KO_SRC}" alt="" />`;
+
+    if (popOnce) {
+      portrait.classList.add("ko-pop");
+      setTimeout(() => portrait.classList.remove("ko-pop"), 400);
+    }
+  } else {
+    portrait.classList.remove("is-ko");
+    portrait.classList.remove("ko-pop");
+    overlay.innerHTML = "";
+  }
+
+  localStorage.setItem(STORAGE_PREFIX + "hp-last:" + charId, isKo ? "0" : "1");
+}
+
+/* ------------------------------
+   Shield glow on HP card
+------------------------------ */
+function updateHpCardShieldClass(charId){
+  const hpCard = qs("#hpCard");
+  if(!hpCard) return;
 
   const assignments = getShieldAssignments();
-  const hasShield = assignments && assignments[charId] !== undefined;
-
-  target.classList.toggle("has-shield", !!hasShield);
+  if(assignments[charId] !== undefined) hpCard.classList.add("has-shield");
+  else hpCard.classList.remove("has-shield");
 }
 
 /* ------------------------------
@@ -454,7 +491,6 @@ async function initIndex(){
     qs("#modeMulti")?.addEventListener("click", (e)=>{
       mode = "multi";
       setActiveButton(modeBtns, e.currentTarget);
-
       if(campPick) campPick.style.display = "block";
       setActiveButton(campBtns, null);
     });
@@ -661,7 +697,11 @@ async function initCharacter(){
 
   const charPortrait = qs("#charPortrait");
   if (charPortrait) {
-    charPortrait.innerHTML = '';
+    // garde le .ko-overlay si présent
+    const existingOverlay = charPortrait.querySelector(".ko-overlay");
+    charPortrait.innerHTML = "";
+    if(existingOverlay) charPortrait.appendChild(existingOverlay);
+
     const charImage = c.images?.portrait || c.images?.character;
 
     if (charImage) {
@@ -670,11 +710,13 @@ async function initCharacter(){
       img.alt = t(c.name, lang);
       img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
       img.onerror = function(){
-        charPortrait.innerHTML = `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
+        charPortrait.innerHTML = (existingOverlay ? existingOverlay.outerHTML : "") +
+          `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
       };
       charPortrait.appendChild(img);
     } else {
-      charPortrait.innerHTML = `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
+      charPortrait.innerHTML = (existingOverlay ? existingOverlay.outerHTML : "") +
+        `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
     }
   }
 
@@ -686,11 +728,19 @@ async function initCharacter(){
     renderHP(hpHeartsEl, state.hp, c.hp?.max ?? 0);
   }
 
+  refreshHP();
+
+  // KO initial (si on arrive avec HP déjà à 0)
+  setKOVisual(c.id, state.hp === 0, false);
+
   qs("#hpMinus")?.addEventListener("click", ()=>{
     state.hp = clamp(state.hp - 1, 0, c.hp?.max ?? 0);
     setState(c.id, state);
     refreshHP();
     updateTabHP(c.id, state.hp);
+
+    const pop = shouldPopKO(c.id, state.hp);
+    setKOVisual(c.id, state.hp === 0, pop);
   });
 
   qs("#hpPlus")?.addEventListener("click", ()=>{
@@ -698,9 +748,10 @@ async function initCharacter(){
     setState(c.id, state);
     refreshHP();
     updateTabHP(c.id, state.hp);
-  });
 
-  refreshHP();
+    // dès que ça remonte, retour normal immédiat
+    setKOVisual(c.id, state.hp === 0, false);
+  });
 
   const classActionTitle = qs("#classActionTitle");
   const classActionBody = qs("#classActionBody");
@@ -753,6 +804,7 @@ async function initCharacter(){
           const currentAssignments = getShieldAssignments();
           delete currentAssignments[c.id];
           setShieldAssignments(currentAssignments);
+          // usage unique => on ne remet pas le shield dans la réserve
           location.reload();
         });
 
@@ -760,6 +812,9 @@ async function initCharacter(){
       }
     }
   }
+
+  // 🔥 Restore shield glow on the HP card
+  updateHpCardShieldClass(c.id);
 
   // Repair keys
   const repairKeysDisplay = qs('#repairKeysDisplay');
@@ -774,9 +829,6 @@ async function initCharacter(){
       });
     }
   }
-
-  // ✅ IMPORTANT: re-apply glow based on assignments
-  updateShieldGlowOnCharacterPage(c.id);
 
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
   const setup = setupRaw ? JSON.parse(setupRaw) : null;
@@ -800,6 +852,7 @@ async function initCharacter(){
     setState(c.id, fresh);
     setSharedShields([true, true, true]);
     setShieldAssignments({});
+    localStorage.removeItem(STORAGE_PREFIX + "hp-last:" + c.id);
     location.reload();
   });
 
