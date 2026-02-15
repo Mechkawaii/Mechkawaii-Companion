@@ -1590,26 +1590,50 @@ body.faction-mechkawaii #charName{ color: #FFC392; }
 body.faction-prodrome  #charName{ color: #86F777; }
 
 /* ============================
-   BACKGROUND FACTION SUR ONGLET
+   Fond de faction SUR CHAQUE ONGLET
    ============================ */
 
-.faction-mechkawaii .unit-tabs,
-.faction-prodrome .unit-tabs {
+/* Base : chaque onglet prend une image en fond */
+.faction-mechkawaii .unit-tab,
+.faction-prodrome .unit-tab,
+.faction-mechkawaii .unit-tab-visual,
+.faction-prodrome .unit-tab-visual {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   position: relative;
   overflow: hidden;
-  border-radius: 16px;
-  padding: 8px;
 }
 
-/* Image Mechkawaii */
-.faction-mechkawaii .unit-tabs {
-  background-image: url("assets/background_mechkawaii.png");
+/* Image par camp */
+.faction-mechkawaii .unit-tab,
+.faction-mechkawaii .unit-tab-visual {
+  background-image: url("./assets/background_mechkawaii.png");
 }
 
-/* Image Prodrome */
-.faction-prodrome .unit-tabs {
-  background-image: url("assets/background_prodrome.png");
+.faction-prodrome .unit-tab,
+.faction-prodrome .unit-tab-visual {
+  background-image: url("./assets/background_prodrome.png");
+}
+
+/* Voile sombre pour que l’icône/texte reste lisible */
+.faction-mechkawaii .unit-tab::before,
+.faction-prodrome .unit-tab::before,
+.faction-mechkawaii .unit-tab-visual::before,
+.faction-prodrome .unit-tab-visual::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Remet le contenu de l’onglet au-dessus */
+.faction-mechkawaii .unit-tab > *,
+.faction-prodrome .unit-tab > *,
+.faction-mechkawaii .unit-tab-visual > *,
+.faction-prodrome .unit-tab-visual > * {
+  position: relative;
+  z-index: 1;
 }
