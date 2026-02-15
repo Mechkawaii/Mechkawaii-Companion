@@ -1604,3 +1604,53 @@ body.camp-prodrome .card .footer-note{
 .unit-tab.camp-prodrome.active{
   box-shadow: 0 0 0 3px rgba(255,210,0,0.55), 0 0 22px rgba(255,210,0,0.25);
 }
+/* ============================
+   FACTIONS - VERSION DISCRETE
+   ============================ */
+
+/* Reset ancien style si présent */
+.faction-mechkawaii .card,
+.faction-prodrome .card {
+  background: var(--panel);
+  color: var(--text);
+}
+
+/* Bordures par faction */
+.faction-mechkawaii .card {
+  border: 2px solid #FFC392;
+  box-shadow: 0 0 12px rgba(255, 195, 146, 0.15);
+}
+
+.faction-prodrome .card {
+  border: 2px solid #86F777;
+  box-shadow: 0 0 12px rgba(134, 247, 119, 0.15);
+}
+
+/* Onglets */
+.faction-mechkawaii .unit-tab.active {
+  border-bottom: 3px solid #FFC392;
+}
+
+.faction-prodrome .unit-tab.active {
+  border-bottom: 3px solid #86F777;
+}
+
+/* ============================
+   GLOW BOUCLIER (fix définitif)
+   ============================ */
+
+.has-shield {
+  position: relative;
+}
+
+.has-shield::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 16px;
+  pointer-events: none;
+  box-shadow:
+    0 0 8px rgba(59, 130, 246, 0.8),
+    0 0 18px rgba(59, 130, 246, 0.6),
+    0 0 28px rgba(59, 130, 246, 0.4);
+}
