@@ -132,13 +132,13 @@
     <!-- HP / Boucliers / Clés -->
     <div class="card" style="margin-top:16px;">
       <div class="card-h">
-        <div class="section-title" style="margin:0;">Points de Vie / Boucliers / Clés de Réparation</div>
+        <div class="section-title" data-i18n="char_hp_card" style="margin: 0;">Points de Vie / Boucliers / Clés de Réparation</div>
       </div>
       <div class="card-b">
         <div class="hp-shields-wrapper">
           <!-- HP -->
           <div class="hp-section">
-            <div style="font-weight:600; margin-bottom:8px;">Points de Vie</div>
+            <div style="font-weight: 600; margin-bottom: 8px;" data-i18n="char_hp">Points de Vie</div>
 
             <div class="hp">
               <div id="hpHearts" class="hearts"></div>
@@ -157,13 +157,13 @@
 
           <!-- Boucliers -->
           <div class="shields-section">
-            <div style="font-weight:600; margin-bottom:8px;">Boucliers (Réserve partagée)</div>
+            <div style="font-weight: 600; margin-bottom: 8px;" data-i18n="char_shields">Boucliers (Réserve partagée)</div>
             <div class="shields-display" id="shieldsDisplay"></div>
           </div>
 
           <!-- Clés de réparation -->
           <div class="repair-section">
-            <div style="font-weight:600; margin-bottom:8px;">Clés de réparation</div>
+            <div style="font-weight: 600; margin-bottom: 8px;" data-i18n="char_keys">Clés de réparation</div>
             <div id="repairKeysDisplay"></div>
           </div>
         </div>
@@ -195,7 +195,7 @@
     <div class="patterns-grid">
       <div class="card">
         <div class="card-h">
-          <div class="section-title" style="margin:0;">Modèle de déplacement</div>
+          <div class="section-title" data-i18n="char_movement" style="margin: 0;">Déplacement</div>
         </div>
         <div class="card-b">
           <p id="movementDesc" class="text" style="margin:0 0 12px 0;"></p>
@@ -207,7 +207,7 @@
 
       <div class="card">
         <div class="card-h">
-          <div class="section-title" style="margin:0;">Modèle d'attaque</div>
+          <div class="section-title" data-i18n="char_attack" style="margin: 0;">Attaque</div>
         </div>
         <div class="card-b">
           <p id="attackDesc" class="text" style="margin:0 0 12px 0;"></p>
@@ -221,9 +221,9 @@
     <!-- Controls -->
     <div class="controls" style="margin-top:16px; justify-content:space-between;">
       <div style="display:flex; gap:10px;">
-        <button id="resetBtn" class="btn-danger">Réinitialiser</button>
+        <button id="resetBtn" class="btn-danger" data-i18n="reset_char">Réinitialiser</button>
       </div>
-      <button id="backBtn">← Retour à la liste</button>
+      <button id="backBtn" data-i18n="back_list">← Retour à la liste</button>
     </div>
 
     <div id="error" class="footer-note" style="color:var(--danger); margin-top:16px;"></div>
