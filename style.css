@@ -1651,30 +1651,33 @@ body.faction-prodrome .card{
   z-index: 1;
 }
 /* ============================
-   Effet vernis header (version robuste)
+   Vernis visible sur le header (brand-with-portrait)
    ============================ */
 
-.faction-mechkawaii .brand-with-portrait,
-.faction-prodrome .brand-with-portrait {
-  position: relative;
-  overflow: hidden;
+.brand-with-portrait{
+  position: relative;   /* IMPORTANT pour ::after */
+  overflow: hidden;     /* pour couper le reflet proprement */
+  border-radius: 16px;  /* joli arrondi */
 }
 
-/* Reflet lumineux */
-.faction-mechkawaii .brand-with-portrait::after,
-.faction-prodrome .brand-with-portrait::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60%;
+/* Reflet "vernis" */
+.brand-with-portrait::after{
+  content:"";
+  position:absolute;
+  inset:0;
   background: linear-gradient(
     to bottom,
-    rgba(255,255,255,0.18),
-    rgba(255,255,255,0.08),
-    transparent
+    rgba(255,255,255,0.22),
+    rgba(255,255,255,0.10),
+    transparent 60%
   );
-  pointer-events: none;
-  z-index: 5;
+  pointer-events:none;
+  z-index: 3;           /* au-dessus */
 }
+
+/* Assure que le contenu reste lisible (au-dessus du fond, sous le reflet si besoin) */
+.brand-with-portrait > *{
+  position: relative;
+  z-index: 2;
+}
+
