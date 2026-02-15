@@ -7,150 +7,106 @@
   <link rel="stylesheet" href="./style.css" />
 
   <style>
-    .image-container {
-      width: 100%;
-      max-width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: rgba(0, 0, 0, 0.05);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-      padding: 8px;
+    /* ===========================
+       Portrait + Layout specifics
+       =========================== */
+    .brand-with-portrait{
+      display:flex;
+      align-items:center;
+      gap:16px;
     }
 
-    .image-container img {
-      max-width: 100%;
-      height: auto;
-      width: 100%;
-      display: block;
-      object-fit: contain;
+    #charPortrait{
+      width:100px;
+      height:100px;
+      border-radius:12px;
+      overflow:hidden;
+      background:transparent;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-shrink:0;
     }
 
-    @media (max-width: 480px) {
-      .image-container { min-height: 150px; }
-    }
-    @media (min-width: 481px) and (max-width: 768px) {
-      .image-container { min-height: 250px; }
-    }
-    @media (min-width: 769px) {
-      .image-container { min-height: 300px; }
-    }
-    @media (min-width: 1200px) {
-      .image-container { min-height: 350px; }
+    #charPortrait img{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+      display:block;
     }
 
-    .patterns-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
+    @media (max-width:480px){
+      #charPortrait{ width:80px; height:80px; }
+      .brand-with-portrait{ gap:12px; }
     }
 
-    @media (min-width: 769px) {
-      .patterns-grid { grid-template-columns: 1fr 1fr; }
+    /* ===========================
+       Patterns grid + images
+       =========================== */
+    .patterns-grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:16px;
+      margin-top:16px;
+    }
+    @media (min-width:769px){
+      .patterns-grid{ grid-template-columns:1fr 1fr; }
     }
 
-    .pattern-card {
-      display: flex;
-      flex-direction: column;
+    .image-container{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background-color:rgba(0,0,0,0.05);
+      border-radius:var(--radius-md);
+      border:1px solid var(--border);
+      padding:8px;
     }
 
-    .pattern-card .card { margin-top: 0; }
-
-    /* Section HP / Boucliers / Clés */
-    .hp-shields-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+    .image-container img{
+      width:100%;
+      max-width:100%;
+      height:auto;
+      display:block;
+      object-fit:contain;
     }
 
-    @media (min-width: 769px) {
-      .hp-shields-wrapper {
-        flex-direction: row;
-        gap: 24px;
-      }
+    @media (max-width:480px){
+      .image-container{ min-height:150px; }
+    }
+    @media (min-width:481px) and (max-width:768px){
+      .image-container{ min-height:250px; }
+    }
+    @media (min-width:769px){
+      .image-container{ min-height:300px; }
+    }
+    @media (min-width:1200px){
+      .image-container{ min-height:350px; }
     }
 
-    .hp-section, .shields-section, .repair-section { flex: 1; }
-
-    .hp {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
+    /* ===========================
+       Local tiny fixes
+       =========================== */
+    .shields-display{
+      display:flex;
+      flex-direction:row;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:8px;
     }
 
-    /* ✅ FIX: "line" n'existe pas → row */
-    .shields-display {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    /* Si renderToggleRow met des boutons/éléments dans repairKeysDisplay */
-    #repairKeysDisplay {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    /* (Optionnel) garde le style du bouton "retirer le bouclier" */
-    .shield-remove-btn {
-      width: 100%;
-      padding: 8px 12px;
-      border: 2px solid #ef4444;
-      border-radius: 6px;
-      cursor: pointer;
-      background: #fee2e2;
-      color: #dc2626;
-      font-weight: 500;
-      margin-top: 8px;
-      transition: all 0.2s ease;
-    }
-    .shield-remove-btn:hover { background: #fecaca; }
-
-    /* Effet visuel de bouclier actif */
-    .container.has-shield {
-      border-left: 5px solid #3b82f6;
-      padding-left: 15px;
-    }
-
-    /* Brand avec portrait */
-    .brand-with-portrait {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    #charPortrait {
-      width: 100px;
-      height: 100px;
-      border-radius: 12px;
-      overflow: hidden;
-      background: transparent;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    #charPortrait img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
-
-    @media (max-width: 480px) {
-      #charPortrait { width: 80px; height: 80px; }
-      .brand-with-portrait { gap: 12px; }
+    #repairKeysDisplay{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
     }
   </style>
 </head>
 
 <body class="page-character">
   <div class="container">
+
     <!-- Topbar -->
     <div class="topbar">
       <div class="brand-with-portrait">
@@ -161,6 +117,7 @@
         </div>
       </div>
 
+      <!-- Le select existe encore mais app.js le cache + le désactive -->
       <div class="controls">
         <div class="pill">
           <span class="small">Lang</span>
@@ -173,23 +130,26 @@
     </div>
 
     <!-- HP / Boucliers / Clés -->
-    <div class="card" style="margin-top: 16px;">
+    <div class="card" style="margin-top:16px;">
       <div class="card-h">
-        <div class="section-title" style="margin: 0;">Points de Vie / Boucliers / Clés de Réparation</div>
+        <div class="section-title" style="margin:0;">Points de Vie / Boucliers / Clés de Réparation</div>
       </div>
       <div class="card-b">
         <div class="hp-shields-wrapper">
           <!-- HP -->
           <div class="hp-section">
-            <div style="font-weight: 600; margin-bottom: 8px;">Points de Vie</div>
+            <div style="font-weight:600; margin-bottom:8px;">Points de Vie</div>
+
             <div class="hp">
               <div id="hpHearts" class="hearts"></div>
-              <div style="display: flex; align-items: center; gap: 6px;">
-                <span id="hpCur" style="font-weight: 800; font-size: 18px;">0</span>
-                <span id="hpMaxLabel" style="color: var(--muted);">/ 0</span>
+
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span id="hpCur" style="font-weight:800; font-size:18px;">0</span>
+                <span id="hpMaxLabel" style="color:var(--muted);">/ 0</span>
               </div>
             </div>
-            <div class="hp-ctl" style="margin-top: 12px;">
+
+            <div class="hp-ctl" style="margin-top:12px;">
               <button id="hpMinus" aria-label="Diminuer les PV">−</button>
               <button id="hpPlus" aria-label="Augmenter les PV">+</button>
             </div>
@@ -197,13 +157,13 @@
 
           <!-- Boucliers -->
           <div class="shields-section">
-            <div style="font-weight: 600; margin-bottom: 8px;">Boucliers (Réserve partagée)</div>
+            <div style="font-weight:600; margin-bottom:8px;">Boucliers (Réserve partagée)</div>
             <div class="shields-display" id="shieldsDisplay"></div>
           </div>
 
           <!-- Clés de réparation -->
           <div class="repair-section">
-            <div style="font-weight: 600; margin-bottom: 8px;">Clés de réparation</div>
+            <div style="font-weight:600; margin-bottom:8px;">Clés de réparation</div>
             <div id="repairKeysDisplay"></div>
           </div>
         </div>
@@ -211,30 +171,30 @@
     </div>
 
     <!-- Action de classe -->
-    <div class="card" style="margin-top: 16px;">
+    <div class="card" style="margin-top:16px;">
       <div class="card-h">
-        <div class="section-title" style="margin: 0;" id="classActionTitle">Action de classe</div>
+        <div class="section-title" style="margin:0;" id="classActionTitle">Action de classe</div>
       </div>
       <div class="card-b">
-        <p class="text" id="classActionBody" style="margin: 0;">Description de l'action de classe.</p>
+        <p class="text" id="classActionBody" style="margin:0;">Description de l'action de classe.</p>
       </div>
     </div>
 
     <!-- Coup Unique -->
-    <div class="card" style="margin-top: 16px;">
+    <div class="card" style="margin-top:16px;">
       <div class="card-h">
         <div class="section-title" id="ultTitle">Coup Unique</div>
       </div>
       <div class="card-b">
-        <p class="text" id="ultBody" style="margin: 0 0 12px 0;"></p>
+        <p class="text" id="ultBody" style="margin:0 0 12px 0;"></p>
         <div id="ultToggleContainer"></div>
       </div>
     </div>
 
-    <!-- ✅ FIX: container manquant pour les toggles -->
-    <div class="card" style="margin-top: 16px;">
+    <!-- Options -->
+    <div class="card" style="margin-top:16px;">
       <div class="card-h">
-        <div class="section-title" style="margin: 0;">Options</div>
+        <div class="section-title" style="margin:0;">Options</div>
       </div>
       <div class="card-b">
         <div id="toggles" class="toggles"></div>
@@ -242,47 +202,41 @@
     </div>
 
     <!-- Patterns -->
-    <div class="patterns-grid" style="margin-top: 16px;">
-      <!-- Mouvement -->
-      <div class="pattern-card">
-        <div class="card">
-          <div class="card-h">
-            <div class="section-title" style="margin: 0;">Modèle de déplacement</div>
-          </div>
-          <div class="card-b">
-            <p id="movementDesc" class="text" style="margin: 0 0 12px 0;"></p>
-            <div class="image-container">
-              <img id="movementImg" src="/api/placeholder/400/300" alt="Movement pattern" />
-            </div>
+    <div class="patterns-grid">
+      <div class="card">
+        <div class="card-h">
+          <div class="section-title" style="margin:0;">Modèle de déplacement</div>
+        </div>
+        <div class="card-b">
+          <p id="movementDesc" class="text" style="margin:0 0 12px 0;"></p>
+          <div class="image-container">
+            <img id="movementImg" src="/api/placeholder/400/300" alt="Movement pattern" />
           </div>
         </div>
       </div>
 
-      <!-- Attaque -->
-      <div class="pattern-card">
-        <div class="card">
-          <div class="card-h">
-            <div class="section-title" style="margin: 0;">Modèle d'attaque</div>
-          </div>
-          <div class="card-b">
-            <p id="attackDesc" class="text" style="margin: 0 0 12px 0;"></p>
-            <div class="image-container">
-              <img id="attackImg" src="/api/placeholder/400/300" alt="Attack pattern" />
-            </div>
+      <div class="card">
+        <div class="card-h">
+          <div class="section-title" style="margin:0;">Modèle d'attaque</div>
+        </div>
+        <div class="card-b">
+          <p id="attackDesc" class="text" style="margin:0 0 12px 0;"></p>
+          <div class="image-container">
+            <img id="attackImg" src="/api/placeholder/400/300" alt="Attack pattern" />
           </div>
         </div>
       </div>
     </div>
 
     <!-- Controls -->
-    <div class="controls" style="margin-top: 16px; justify-content: space-between;">
-      <div style="display: flex; gap: 10px;">
+    <div class="controls" style="margin-top:16px; justify-content:space-between;">
+      <div style="display:flex; gap:10px;">
         <button id="resetBtn" class="btn-danger">Réinitialiser</button>
       </div>
       <button id="backBtn">← Retour à la liste</button>
     </div>
 
-    <div id="error" class="footer-note" style="color: var(--danger); margin-top: 16px;"></div>
+    <div id="error" class="footer-note" style="color:var(--danger); margin-top:16px;"></div>
   </div>
 
   <!-- Unit Tabs Navigation (Bottom) -->
