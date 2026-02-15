@@ -1602,3 +1602,27 @@ body.is-ko .topbar{
 .card.has-shield .card-h {
   background: rgba(59, 130, 246, 0.25) !important;
 }
+
+
+
+/* =====================================
+   OVERRIDE ANTI-FOND (au cas où une ancienne version est encore là)
+   On force TOUTES les cartes/sections à rester en thème dark.
+   ===================================== */
+
+.faction-mechkawaii .card,
+.faction-prodrome .card,
+.faction-mechkawaii .panel,
+.faction-prodrome .panel,
+.faction-mechkawaii .section,
+.faction-prodrome .section,
+.faction-mechkawaii .unit-tab,
+.faction-prodrome .unit-tab,
+.faction-mechkawaii .unit-tab-visual,
+.faction-prodrome .unit-tab-visual,
+.faction-mechkawaii .tab-btn,
+.faction-prodrome .tab-btn {
+  background: var(--panel) !important;
+  background-color: var(--panel) !important;
+  color: var(--text) !important;
+}

@@ -118,7 +118,7 @@ const I18N = {
     setup_q_difficulty: "3) Choisis la difficulté",
     setup_difficulty_desc: "<strong>Mode Normal :</strong> Patterns de déplacement et d'attaque standard.<br><strong>Mode Expert :</strong> Patterns avancés pour plus de challenge.",
     diff_normal: "⭐ Normal",
-    diff_expert: "⭐⭐ Expert",
+    diff_expert: "💀 Expert",
 
     reset_all: "Tout réinitialiser",
 
@@ -813,7 +813,7 @@ if(charName) charName.textContent = t(c.name, lang);
     if (shieldToggle) {
       const freshShields = getSharedShields();
       const freshAssignments = getShieldAssignments();
-      const hasShieldForThisChar = freshAssignments[c.id] !== undefined;
+      const hasShieldForThisChar = (freshAssignments[c.id] !== undefined) || (freshAssignments[String(c.id)] !== undefined);
 
       // ✅ Glow bouclier : carte PV + portrait
       const hpCardEl = qs('#hpCard');
