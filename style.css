@@ -1604,3 +1604,49 @@ body.faction-prodrome .card{
 #hpCard.has-shield{
   border-color: rgba(59,130,246,0.45);
 }
+/* ============================
+   BACKGROUND PAR FACTION — SUR LE HEADER (nom du perso)
+   ============================ */
+
+/* 1) On enlève le fond faction sur la carte PV (au cas où une ancienne règle traîne) */
+#hpCard{
+  background-image: none !important;
+}
+
+/* 2) On met le fond sur la zone nom + portrait */
+.faction-mechkawaii .brand-with-portrait,
+.faction-prodrome .brand-with-portrait{
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  padding: 10px 12px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Images (dans /assets) */
+.faction-mechkawaii .brand-with-portrait{
+  background-image: url("./assets/background_mechkawaii.png");
+}
+.faction-prodrome .brand-with-portrait{
+  background-image: url("./assets/background_prodrome.png");
+}
+
+/* 3) Voile sombre pour garder le texte lisible */
+.faction-mechkawaii .brand-with-portrait::before,
+.faction-prodrome .brand-with-portrait::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: rgba(0,0,0,0.45);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* 4) Remet le contenu au-dessus du voile */
+.faction-mechkawaii .brand-with-portrait > *,
+.faction-prodrome .brand-with-portrait > *{
+  position: relative;
+  z-index: 1;
+}
