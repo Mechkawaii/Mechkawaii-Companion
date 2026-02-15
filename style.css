@@ -1650,3 +1650,21 @@ body.faction-prodrome .card{
   position: relative;
   z-index: 1;
 }
+/* ============================
+   Effet vernis subtil sur le header faction
+   ============================ */
+
+.faction-mechkawaii .brand-with-portrait::after,
+.faction-prodrome .brand-with-portrait::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.10),
+    rgba(255,255,255,0.04),
+    transparent
+  );
+  pointer-events: none;
+  z-index: 2;
+}
