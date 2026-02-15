@@ -1505,3 +1505,40 @@ body.is-ko .topbar{
     animation: none !important;
   }
 }
+/* ============================= */
+/*  FIX SHIELD FX POUR LES TABS  */
+/*  (compat: .unit-tab.has-shield ou .unit-tab-visual.has-shield) */
+/* ============================= */
+
+.unit-tab.has-shield .unit-tab-visual{
+  position: relative;
+  border-radius: 14px;
+  animation: shieldGlow 1.6s ease-in-out infinite;
+}
+
+.unit-tab.has-shield .unit-tab-visual::before{
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 18px;
+  background: radial-gradient(
+    circle at center,
+    rgba(59, 130, 246, 0.6) 0%,
+    rgba(59, 130, 246, 0.2) 60%,
+    transparent 75%
+  );
+  animation: shieldEnergyPulse 1.6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Accessibilité (même logique que ton bloc existant) */
+@media (prefers-reduced-motion: reduce) {
+  .unit-tab.has-shield .unit-tab-visual{
+    animation: none;
+    box-shadow: 0 0 18px rgba(59, 130, 246, 0.6);
+  }
+  .unit-tab.has-shield .unit-tab-visual::before{
+    animation: none;
+  }
+}
