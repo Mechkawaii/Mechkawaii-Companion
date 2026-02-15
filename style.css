@@ -1543,141 +1543,46 @@ body.is-ko .topbar{
   }
 }
 
-
-
 /* =====================================
-   FACTION LOOK (subtle, background on HP card only)
+   FACTIONS — HEADER TEXTURE + VERNIS (robuste)
+   Place le fond de camp uniquement derrière le NOM + PORTRAIT
    ===================================== */
-body.faction-mechkawaii #charName { color: #FFC392; }
-body.faction-prodrome  #charName { color: #86F777; }
 
-/* HP card textured backgrounds (images must be in /assets) */
-body.faction-mechkawaii #hpCard{
-  background:
-    linear-gradient(rgba(11,11,14,0.55), rgba(11,11,14,0.55)),
-    url("./assets/background_mechkawaii.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
+/* 1) On évite tout fond de camp sur la carte PV (si une ancienne règle existe) */
+#hpCard{ background-image: none !important; }
 
-body.faction-prodrome #hpCard{
-  background:
-    linear-gradient(rgba(11,11,14,0.55), rgba(11,11,14,0.55)),
-    url("./assets/background_prodrome.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-/* If older camp background rules exist, neutralize them */
-body.faction-mechkawaii .card,
-body.faction-prodrome .card{
-  /* keep your dark UI by default */
-  color: var(--text);
-}
-
-/* =====================================
-   SHIELD GLOW (robust, not clipped)
-   Applies when #hpCard or #charPortrait has class .has-shield
-   ===================================== */
-#hpCard.has-shield,
-#charPortrait.has-shield{
-  position: relative;
-  overflow: visible; /* override .card overflow:hidden for the glow */
-}
-
-#hpCard.has-shield::after,
-#charPortrait.has-shield::after{
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border-radius: calc(var(--radius) + 6px);
-  pointer-events: none;
-  box-shadow:
-    0 0 10px rgba(59,130,246,0.85),
-    0 0 22px rgba(59,130,246,0.55),
-    0 0 38px rgba(59,130,246,0.35);
-}
-
-/* Prevent the old blue background override on shield cards from killing the texture */
-#hpCard.has-shield{
-  border-color: rgba(59,130,246,0.45);
-}
-/* ============================
-   BACKGROUND PAR FACTION — SUR LE HEADER (nom du perso)
-   ============================ */
-
-/* 1) On enlève le fond faction sur la carte PV (au cas où une ancienne règle traîne) */
-#hpCard{
-  background-image: none !important;
-}
-
-/* 2) On met le fond sur la zone nom + portrait */
-.faction-mechkawaii .brand-with-portrait,
-.faction-prodrome .brand-with-portrait{
-  position: relative;
-  overflow: hidden;
+/* 2) Base du header */
+.brand-with-portrait{
+  position: relative !important;
+  overflow: hidden !important;
   border-radius: 16px;
   padding: 10px 12px;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
 }
 
-/* Images (dans /assets) */
+/* 3) Fond + voile sombre + vernis EN BACKGROUND LAYERS (pas de ::after) */
 .faction-mechkawaii .brand-with-portrait{
-  background-image: url("./assets/background_mechkawaii.png");
+  background-image:
+    /* vernis (reflet) */
+    linear-gradient(to bottom, rgba(255,255,255,0.22), rgba(255,255,255,0.10), rgba(255,255,255,0) 60%),
+    /* voile sombre */
+    linear-gradient(to bottom, rgba(0,0,0,0.48), rgba(0,0,0,0.48)),
+    /* texture faction */
+    url("./assets/background_mechkawaii.png");
+  background-size: 100% 100%, 100% 100%, cover;
+  background-position: top left, top left, center;
+  background-repeat: no-repeat, no-repeat, no-repeat;
 }
+
 .faction-prodrome .brand-with-portrait{
-  background-image: url("./assets/background_prodrome.png");
+  background-image:
+    linear-gradient(to bottom, rgba(255,255,255,0.22), rgba(255,255,255,0.10), rgba(255,255,255,0) 60%),
+    linear-gradient(to bottom, rgba(0,0,0,0.48), rgba(0,0,0,0.48)),
+    url("./assets/background_prodrome.png");
+  background-size: 100% 100%, 100% 100%, cover;
+  background-position: top left, top left, center;
+  background-repeat: no-repeat, no-repeat, no-repeat;
 }
 
-/* 3) Voile sombre pour garder le texte lisible */
-.faction-mechkawaii .brand-with-portrait::before,
-.faction-prodrome .brand-with-portrait::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: rgba(0,0,0,0.45);
-  pointer-events:none;
-  z-index:0;
-}
-
-/* 4) Remet le contenu au-dessus du voile */
-.faction-mechkawaii .brand-with-portrait > *,
-.faction-prodrome .brand-with-portrait > *{
-  position: relative;
-  z-index: 1;
-}
-/* ============================
-   Vernis visible sur le header (brand-with-portrait)
-   ============================ */
-
-.brand-with-portrait{
-  position: relative;   /* IMPORTANT pour ::after */
-  overflow: hidden;     /* pour couper le reflet proprement */
-  border-radius: 16px;  /* joli arrondi */
-}
-
-/* Reflet "vernis" */
-.brand-with-portrait::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.22),
-    rgba(255,255,255,0.10),
-    transparent 60%
-  );
-  pointer-events:none;
-  z-index: 3;           /* au-dessus */
-}
-
-/* Assure que le contenu reste lisible (au-dessus du fond, sous le reflet si besoin) */
-.brand-with-portrait > *{
-  position: relative;
-  z-index: 2;
-}
-
+/* 4) Couleur du nom (discret) */
+.faction-mechkawaii #charName{ color: #FFC392; }
+.faction-prodrome #charName{ color: #86F777; }
