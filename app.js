@@ -1,26 +1,149 @@
 const STORAGE_PREFIX = "mechkawaii:";
 
 /* ------------------------------
-   DOM helpers
+   Helpers
 ------------------------------ */
 function qs(sel){ return document.querySelector(sel); }
 function qsa(sel){ return [...document.querySelectorAll(sel)]; }
 
-/* ------------------------------
-   LANG (Flags on Index)
------------------------------- */
 function getLang(){
-  const saved = localStorage.getItem(STORAGE_PREFIX + "lang");
-  return saved || "fr";
+  return localStorage.getItem(STORAGE_PREFIX + "lang") || "fr";
 }
-
 function setLang(lang){
   localStorage.setItem(STORAGE_PREFIX + "lang", lang);
 }
 
+/* ------------------------------
+   I18N (UI statique)
+------------------------------ */
+const I18N = {
+  fr: {
+    splash_play: "JOUER",
+    splash_site: "SITE",
+    splash_instagram: "INSTAGRAM",
+
+    index_subtitle: "Choisis ton mode et ton camp.",
+
+    setup_title: "Configuration de la partie",
+    setup_q_devices: "1) Combien d'appareil ?",
+    setup_q_devices_desc: "Si un seul appareil sert à tout le monde, tu verras tous les persos. Sinon, chaque joueur choisit son camp.",
+    setup_mode_single: "Un seul appareil pour la table",
+    setup_mode_multi: "Chaque joueur à son appareil",
+
+    setup_q_camp: "2) Choisis ton camp",
+    camp_mech: "Mechkawaii",
+    camp_prod: "Prodrome",
+
+    setup_q_difficulty: "3) Choisis la difficulté",
+    setup_difficulty_desc: "<strong>Mode Normal :</strong> Patterns de déplacement et d'attaque standard.<br><strong>Mode Expert :</strong> Patterns avancés pour plus de challenge.",
+    diff_normal: "⭐ Normal",
+    diff_expert: "💀 Expert",
+
+    reset_all: "Tout réinitialiser",
+
+    draft_title: "Sélection des unités",
+    draft_subtitle: "Choisis les unités jouées",
+    draft_desc: "Sélectionne uniquement les unités réellement jouées. Les autres ne s’afficheront pas.",
+    draft_confirm: "Valider les {n} unités",
+    draft_show_all: "Afficher tout (pour l’instant)",
+
+    back_to_title: "Écran titre",
+    change_mode: "Changer mode",
+    change_units: "Changer unités",
+
+    char_hp_card: "Points de Vie / Boucliers / Clés de Réparation",
+    char_hp: "Points de Vie",
+    char_shields: "Boucliers (Réserve partagée)",
+    char_keys: "Clés de réparation",
+    char_movement: "Modèle de déplacement",
+    char_attack: "Modèle d'attaque",
+    reset_char: "Réinitialiser",
+    back_list: "← Retour à la liste",
+
+    shield_remove: "Retirer le bouclier",
+    shield_assign: "Assigner le bouclier",
+    cancel: "Annuler",
+  },
+  en: {
+    splash_play: "PLAY",
+    splash_site: "WEBSITE",
+    splash_instagram: "INSTAGRAM",
+
+    index_subtitle: "Choose your mode and your camp.",
+
+    setup_title: "Game setup",
+    setup_q_devices: "1) How many devices?",
+    setup_q_devices_desc: "If one device is used for the table, you’ll see every unit. Otherwise, each player picks a camp.",
+    setup_mode_single: "One device for the table",
+    setup_mode_multi: "Each player has a device",
+
+    setup_q_camp: "2) Pick your camp",
+    camp_mech: "Mechkawaii",
+    camp_prod: "Prodrome",
+
+    setup_q_difficulty: "3) Pick difficulty",
+    setup_difficulty_desc: "<strong>Normal:</strong> Standard movement/attack patterns.<br><strong>Expert:</strong> Advanced patterns for more challenge.",
+    diff_normal: "⭐ Normal",
+    diff_expert: "💀 Expert",
+
+    reset_all: "Reset everything",
+
+    draft_title: "Unit selection",
+    draft_subtitle: "Pick the units played",
+    draft_desc: "Select only the units actually played. The others won’t be shown.",
+    draft_confirm: "Confirm {n} units",
+    draft_show_all: "Show all (for now)",
+
+    back_to_title: "Title screen",
+    change_mode: "Change mode",
+    change_units: "Change units",
+
+    char_hp_card: "HP / Shields / Repair Keys",
+    char_hp: "Hit Points",
+    char_shields: "Shields (shared pool)",
+    char_keys: "Repair keys",
+    char_movement: "Movement pattern",
+    char_attack: "Attack pattern",
+    reset_char: "Reset",
+    back_list: "← Back to list",
+
+    shield_remove: "Remove shield",
+    shield_assign: "Assign shield",
+    cancel: "Cancel",
+  }
+};
+
+function tr(key, vars = null){
+  const lang = getLang();
+  let s = (I18N[lang] && I18N[lang][key]) || (I18N.fr[key]) || key;
+  if(vars){
+    Object.keys(vars).forEach(k => {
+      s = s.replaceAll(`{${k}}`, String(vars[k]));
+    });
+  }
+  return s;
+}
+
 /**
- * Cache/désactive le select #lang partout (si jamais il existe encore dans le HTML).
- * La langue se choisit uniquement via les drapeaux sur l'accueil.
+ * Applique les traductions sur tous les éléments qui ont data-i18n
+ * + support innerHTML si data-i18n-html="1"
+ */
+function applyI18n(){
+  const lang = getLang();
+  qsa("[data-i18n]").forEach(el=>{
+    const key = el.getAttribute("data-i18n");
+    const val = (I18N[lang] && I18N[lang][key]) || (I18N.fr[key]);
+    if(!val) return;
+
+    const isHtml = el.getAttribute("data-i18n-html") === "1";
+    if(isHtml) el.innerHTML = val;
+    else el.textContent = val;
+  });
+}
+
+/**
+ * Cache/désactive le select #lang partout (si jamais il existe encore).
+ * La langue se choisit sur le splash.
  */
 function bindTopbar(){
   const sel = qs("#lang");
@@ -34,15 +157,10 @@ function bindTopbar(){
 }
 
 /**
- * Initialise les drapeaux (uniquement sur index.html).
- * HTML attendu:
- * <div id="langFlags">
- *   <button data-lang="fr">🇫🇷</button>
- *   <button data-lang="en">🇬🇧</button>
- * </div>
+ * Lang flags sur le splash (index uniquement)
  */
-function initLangFlags(){
-  const wrap = qs("#langFlags");
+function initSplashLang(){
+  const wrap = qs("#splashLang");
   if(!wrap) return;
 
   const current = getLang();
@@ -52,29 +170,27 @@ function initLangFlags(){
 
     btn.addEventListener("click", ()=>{
       setLang(v);
-      location.reload();
+      // update UI instantly (no reload needed)
+      wrap.querySelectorAll("[data-lang]").forEach(b=>b.classList.toggle("active", b.getAttribute("data-lang") === v));
+      applyI18n();
     });
   });
 }
 
 /* ------------------------------
-   STATE / STORAGE
+   Storage / State
 ------------------------------ */
 function heartIcon(filled){
   const src = filled ? "./assets/pv.svg" : "./assets/pv_off.svg";
-  return `<img src="${src}" class="heart" alt="PV" />`;
+  return `<img src="${src}" class="heart" alt="HP" />`;
 }
 
 function getState(charId){
   try{
     const raw = localStorage.getItem(STORAGE_PREFIX + "state:" + charId);
-    if(!raw) return null;
-    return JSON.parse(raw);
-  }catch(e){
-    return null;
-  }
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
 }
-
 function setState(charId, state){
   localStorage.setItem(STORAGE_PREFIX + "state:" + charId, JSON.stringify(state));
 }
@@ -82,13 +198,9 @@ function setState(charId, state){
 function getSharedShields(){
   try{
     const raw = localStorage.getItem(STORAGE_PREFIX + "shields");
-    if(!raw) return [true, true, true];
-    return JSON.parse(raw);
-  }catch(e){
-    return [true, true, true];
-  }
+    return raw ? JSON.parse(raw) : [true,true,true];
+  }catch(e){ return [true,true,true]; }
 }
-
 function setSharedShields(shields){
   localStorage.setItem(STORAGE_PREFIX + "shields", JSON.stringify(shields));
 }
@@ -96,13 +208,9 @@ function setSharedShields(shields){
 function getShieldAssignments(){
   try{
     const raw = localStorage.getItem(STORAGE_PREFIX + "shield-assignments");
-    if(!raw) return {};
-    return JSON.parse(raw);
-  }catch(e){
-    return {};
-  }
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
 }
-
 function setShieldAssignments(assignments){
   localStorage.setItem(STORAGE_PREFIX + "shield-assignments", JSON.stringify(assignments));
 }
@@ -116,7 +224,7 @@ async function loadCharacters(){
 function t(obj, lang){
   if(obj == null) return "";
   if(typeof obj === "string") return obj;
-  return obj[lang] || obj["fr"] || "";
+  return obj[lang] || obj.fr || "";
 }
 
 function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
@@ -134,65 +242,50 @@ function renderHP(container, hpCur, hpMax){
   container.appendChild(hearts);
 }
 
-/**
- * Anti-crash : si root n'existe pas dans le HTML, on sort sans planter.
- * visual_keys => rend des boutons "key-button"
- */
+/* ------------------------------
+   Visual keys renderer
+------------------------------ */
 function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = null){
   if(!root) return;
 
-  if (toggle.type === "visual_keys") {
-    const keysContainer = document.createElement("div");
-    keysContainer.className = "toggle-visual-keys";
+  if (toggle.type === 'visual_keys') {
+    const keysContainer = document.createElement('div');
+    keysContainer.className = 'toggle-visual-keys';
 
-    const label = document.createElement("label");
-    label.style.cssText = `
-      flex: 1;
-      font-weight: 600;
-      font-size: 14px;
-      min-width: 150px;
-    `;
+    const label = document.createElement('label');
+    label.style.cssText = `flex: 1; font-weight: 600; font-size: 14px; min-width: 150px;`;
     label.textContent = t(toggle.label, lang);
 
-    // On a déjà un titre dans le HTML pour ces sections
-    if (toggle.id === "repair_keys" || toggle.id === "shield") {
-      label.style.display = "none";
-    }
+    if (toggle.id === 'repair_keys' || toggle.id === 'shield') label.style.display = 'none';
 
-    const keysDisplay = document.createElement("div");
-    keysDisplay.className = "keys-display";
+    const keysDisplay = document.createElement('div');
+    keysDisplay.className = 'keys-display';
 
     const maxKeys = toggle.maxKeys || 2;
-    const isShield = toggle.id === "shield";
+    const isShield = toggle.id === 'shield';
 
     const currentState = isShield
-      ? (Array.isArray(sharedShields) ? sharedShields : (Array.isArray(isOn) ? isOn : [true, true, true]))
+      ? (Array.isArray(sharedShields) ? sharedShields : (Array.isArray(isOn) ? isOn : [true,true,true]))
       : (Array.isArray(isOn) ? isOn : [isOn, isOn]);
 
     for (let i = 0; i < maxKeys; i++) {
-      const key = document.createElement("button");
-      key.className = "key-button";
-      key.type = "button";
+      const key = document.createElement('button');
+      key.className = 'key-button';
+      key.type = 'button';
 
       const keyState = currentState[i] !== undefined ? currentState[i] : true;
-
-      key.dataset.keyIndex = String(i);
+      key.dataset.keyIndex = i;
       key.dataset.toggleId = toggle.id;
-      key.dataset.active = keyState ? "true" : "false";
+      key.dataset.active = keyState ? 'true' : 'false';
+      key.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_${keyState ? 'on' : 'off'}.svg')`;
 
-      key.style.backgroundImage =
-        `url('./assets/icons/${isShield ? "shield" : "key"}_${keyState ? "on" : "off"}.svg')`;
-
-      key.addEventListener("click", function(e){
+      key.addEventListener('click', function(e) {
         e.preventDefault();
-        this.dataset.active = this.dataset.active === "true" ? "false" : "true";
-        this.style.backgroundImage =
-          `url('./assets/icons/${isShield ? "shield" : "key"}_${this.dataset.active === "true" ? "on" : "off"}.svg')`;
+        this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true';
+        this.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_${this.dataset.active === 'true' ? 'on' : 'off'}.svg')`;
 
         const keysState = [];
-        keysDisplay.querySelectorAll(".key-button").forEach(kb=>{
-          keysState.push(kb.dataset.active === "true");
-        });
+        keysDisplay.querySelectorAll('.key-button').forEach(kb => keysState.push(kb.dataset.active === 'true'));
         onChange(keysState);
       });
 
@@ -205,43 +298,40 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
     return;
   }
 
-  // Switch classique
-  const row = document.createElement("div");
-  row.className = "toggle";
+  // (si tu as encore des toggles "switch" ailleurs)
+  const row = document.createElement('div');
+  row.className = 'toggle';
 
-  const left = document.createElement("div");
-  left.className = "lbl";
+  const left = document.createElement('div');
+  left.className = 'lbl';
 
-  const title = document.createElement("div");
-  title.className = "t";
+  const title = document.createElement('div');
+  title.className = 't';
   title.textContent = t(toggle.label, lang);
 
-  const desc = document.createElement("div");
-  desc.className = "d";
-  desc.textContent = toggle.hint ? t(toggle.hint, lang) : "";
+  const desc = document.createElement('div');
+  desc.className = 'd';
+  desc.textContent = toggle.hint ? t(toggle.hint, lang) : '';
 
   left.appendChild(title);
   left.appendChild(desc);
 
-  const sw = document.createElement("div");
-  sw.className = "switch" + (isOn ? " on" : "");
-  sw.setAttribute("role", "switch");
-  sw.setAttribute("tabindex", "0");
-  sw.setAttribute("aria-checked", isOn ? "true" : "false");
+  const sw = document.createElement('div');
+  sw.className = 'switch' + (isOn ? ' on' : '');
+  sw.setAttribute('role', 'switch');
+  sw.setAttribute('tabindex', '0');
+  sw.setAttribute('aria-checked', isOn ? 'true' : 'false');
 
   function flip(){
     isOn = !isOn;
-    sw.className = "switch" + (isOn ? " on" : "");
-    sw.setAttribute("aria-checked", isOn ? "true" : "false");
+    sw.className = 'switch' + (isOn ? ' on' : '');
+    sw.setAttribute('aria-checked', isOn ? 'true' : 'false');
     onChange(isOn);
   }
 
-  sw.addEventListener("click", flip);
-  sw.addEventListener("keydown", (e)=>{
-    if(e.key === "Enter" || e.key === " "){
-      e.preventDefault();
-      flip();
-    }
+  sw.addEventListener('click', flip);
+  sw.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); flip(); }
   });
 
   row.appendChild(left);
@@ -260,7 +350,7 @@ function urlParam(name){
 async function initIndex(){
   const lang = getLang();
   bindTopbar();
-  initLangFlags();
+  applyI18n();
 
   const list = qs("#charList");
   if(!list) return;
@@ -366,8 +456,15 @@ async function initIndex(){
   }
 
   const maxPick = (setup.mode === "single") ? 6 : 3;
+
+  // update label confirmDraft with i18n
+  const confirmBtn = qs("#confirmDraft");
+  if(confirmBtn){
+    confirmBtn.textContent = tr("draft_confirm", { n: maxPick });
+  }
+
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
-  const draft = draftRaw ? JSON.parse(draftRaw) : null;
+  let draft = draftRaw ? JSON.parse(draftRaw) : null;
 
   function saveDraft(obj){
     localStorage.setItem(STORAGE_PREFIX + "draft", JSON.stringify(obj));
@@ -406,8 +503,9 @@ async function initIndex(){
           selected.delete(c.id);
         }else{
           if(selected.size >= maxPick){
-            if(draftError) draftError.textContent =
-              (lang === "fr") ? `Tu as déjà ${maxPick} persos sélectionnés.` : `You already selected ${maxPick} characters.`;
+            if(draftError) draftError.textContent = (lang === "fr")
+              ? `Tu as déjà ${maxPick} unités sélectionnées.`
+              : `You already selected ${maxPick} units.`;
             return;
           }
           selected.add(c.id);
@@ -429,8 +527,9 @@ async function initIndex(){
 
     qs("#confirmDraft")?.addEventListener("click", ()=>{
       if(selected.size !== maxPick){
-        if(draftError) draftError.textContent =
-          (lang === "fr") ? `Sélectionne exactement ${maxPick} persos.` : `Select exactly ${maxPick} characters.`;
+        if(draftError) draftError.textContent = (lang === "fr")
+          ? `Sélectionne exactement ${maxPick} unités.`
+          : `Select exactly ${maxPick} units.`;
         return;
       }
       saveDraft({activeIds:[...selected]});
@@ -464,16 +563,6 @@ async function initIndex(){
     `;
     list.appendChild(a);
   });
-
-  if(toShow.length === 0){
-    const msg = document.createElement("div");
-    msg.className = "footer-note";
-    msg.style.color = "var(--muted)";
-    msg.textContent = (lang === "fr")
-      ? "Aucun perso disponible pour ce camp (pour l'instant). Change de camp via \"Changer config\"."
-      : "No characters available for this camp (yet). Change camp via \"Change setup\".";
-    list.appendChild(msg);
-  }
 }
 
 /* ------------------------------
@@ -482,6 +571,7 @@ async function initIndex(){
 async function initCharacter(){
   const lang = getLang();
   bindTopbar();
+  applyI18n();
 
   const id = urlParam("id");
   if(!id){
@@ -504,7 +594,7 @@ async function initCharacter(){
 
   const defaultToggles = {};
   (c.toggles || []).forEach(tg => {
-    if (tg.type === "visual_keys") {
+    if (tg.type === 'visual_keys') {
       const maxKeys = tg.maxKeys || 2;
       defaultToggles[tg.id] = Array.from({length: maxKeys}, ()=>true);
     } else {
@@ -512,7 +602,6 @@ async function initCharacter(){
     }
   });
 
-  // Merge (important si ancien state)
   const state = saved || { hp: c.hp?.max ?? 0, toggles: {} };
   if (state.hp == null) state.hp = c.hp?.max ?? 0;
   if (!state.toggles) state.toggles = {};
@@ -521,60 +610,39 @@ async function initCharacter(){
   });
   setState(c.id, state);
 
-  // UI header
   const charName = qs("#charName");
   const charClass = qs("#charClass");
   const hpMaxLabel = qs("#hpMaxLabel");
+
   if(charName) charName.textContent = t(c.name, lang);
   if(charClass) charClass.textContent = t(c.class, lang);
   if(hpMaxLabel) hpMaxLabel.textContent = `/${c.hp?.max ?? 0}`;
 
   const charPortrait = qs("#charPortrait");
   if (charPortrait) {
-    charPortrait.innerHTML = "";
+    charPortrait.innerHTML = '';
     const charImage = c.images?.portrait || c.images?.character;
 
     if (charImage) {
-      const img = document.createElement("img");
+      const img = document.createElement('img');
       img.src = charImage;
       img.alt = t(c.name, lang);
-      img.style.cssText = "max-width:100%;max-height:100%;object-fit:contain;";
+      img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
       img.onerror = function(){
-        charPortrait.innerHTML =
-          `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
+        charPortrait.innerHTML = `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
       };
       charPortrait.appendChild(img);
     } else {
-      charPortrait.innerHTML =
-        `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
+      charPortrait.innerHTML = `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
     }
   }
 
-  // HP
   const hpCurEl = qs("#hpCur");
   const hpHeartsEl = qs("#hpHearts");
 
   function refreshHP(){
     if(hpCurEl) hpCurEl.textContent = String(state.hp);
     renderHP(hpHeartsEl, state.hp, c.hp?.max ?? 0);
-  }
-
-  function updateShieldFxOnCard(){
-    // On met l'effet de bouclier sur la card HP (celle qui contient le titre)
-    const cards = document.querySelectorAll(".card");
-    let hpCard = null;
-
-    for (const card of cards) {
-      if (card.textContent.includes("Points de Vie") || card.textContent.includes("Life")) {
-        hpCard = card;
-        break;
-      }
-    }
-    if(!hpCard) return;
-
-    const assignments = getShieldAssignments();
-    if (assignments[c.id] !== undefined) hpCard.classList.add("has-shield");
-    else hpCard.classList.remove("has-shield");
   }
 
   qs("#hpMinus")?.addEventListener("click", ()=>{
@@ -593,66 +661,58 @@ async function initCharacter(){
 
   refreshHP();
 
-  // Texts
-  qs("#classActionTitle") && (qs("#classActionTitle").textContent = t(c.texts?.class_action_title, lang));
-  qs("#classActionBody") && (qs("#classActionBody").textContent = t(c.texts?.class_action_body, lang));
-  qs("#ultTitle") && (qs("#ultTitle").textContent = t(c.texts?.ultimate_title, lang));
-  qs("#ultBody") && (qs("#ultBody").textContent = t(c.texts?.ultimate_body, lang));
-  qs("#movementDesc") && (qs("#movementDesc").textContent = t(c.texts?.movement_desc, lang) || "");
-  qs("#attackDesc") && (qs("#attackDesc").textContent = t(c.texts?.attack_desc, lang) || "");
+  const classActionTitle = qs("#classActionTitle");
+  const classActionBody = qs("#classActionBody");
+  const ultTitle = qs("#ultTitle");
+  const ultBody = qs("#ultBody");
+  const movementDesc = qs("#movementDesc");
+  const attackDesc = qs("#attackDesc");
 
-  // --- Boucliers (même UI que les clés) + assignation ---
-  const shieldsDisplay = qs("#shieldsDisplay");
+  if(classActionTitle) classActionTitle.textContent = t(c.texts?.class_action_title, lang);
+  if(classActionBody) classActionBody.textContent = t(c.texts?.class_action_body, lang);
+  if(ultTitle) ultTitle.textContent = t(c.texts?.ultimate_title, lang);
+  if(ultBody) ultBody.textContent = t(c.texts?.ultimate_body, lang);
+
+  if(movementDesc) movementDesc.textContent = t(c.texts?.movement_desc, lang) || "";
+  if(attackDesc) attackDesc.textContent = t(c.texts?.attack_desc, lang) || "";
+
+  // Shields
+  const shieldsDisplay = qs('#shieldsDisplay');
   if (shieldsDisplay) {
-    shieldsDisplay.innerHTML = "";
+    shieldsDisplay.innerHTML = '';
 
-    const shieldToggle = (c.toggles || []).find(tg => tg.id === "shield");
+    const shieldToggle = (c.toggles || []).find(tg => tg.id === 'shield');
     if (shieldToggle) {
       const freshShields = getSharedShields();
       const freshAssignments = getShieldAssignments();
 
-      // Rend les 3 boutons (type key-button)
-      renderToggleRow(
-        shieldsDisplay,
-        shieldToggle,
-        freshShields,
-        lang,
-        (v)=>{ setSharedShields(v); },
-        freshShields
-      );
+      renderToggleRow(shieldsDisplay, shieldToggle, freshShields, lang, (v) => setSharedShields(v), freshShields);
 
-      // Transforme chaque bouton en "assignation"
-      const keyButtons = shieldsDisplay.querySelectorAll(".key-button");
-      keyButtons.forEach((btn, i)=>{
-        // shield déjà consommé ? => on le cache
+      const keyButtons = shieldsDisplay.querySelectorAll('.key-button');
+      keyButtons.forEach((btn, i) => {
         if (!freshShields[i]) {
-          btn.style.display = "none";
+          btn.style.display = 'none';
           return;
         }
-
-        // toujours visuel "on" tant qu'il est dispo
-        btn.dataset.active = "true";
-        btn.style.backgroundImage = "url('./assets/icons/shield_on.svg')";
-
-        btn.onclick = (e)=>{
+        btn.dataset.active = 'true';
+        btn.style.backgroundImage = `url('./assets/icons/shield_on.svg')`;
+        btn.onclick = (e) => {
           e.preventDefault();
           showShieldAssignmentModal(i, c.id, lang, chars);
         };
       });
 
-      // Si ce perso a un bouclier : bouton retirer (usage unique => ne retourne pas en réserve)
       if (freshAssignments[c.id] !== undefined) {
-        const removeShield = document.createElement("button");
-        removeShield.className = "shield-remove-btn";
-        removeShield.textContent = (lang === "fr") ? "Retirer le bouclier" : "Remove the shield";
+        const removeShield = document.createElement('button');
+        removeShield.className = 'shield-remove-btn';
+        removeShield.textContent = tr("shield_remove");
 
-        removeShield.addEventListener("click", (e)=>{
+        removeShield.addEventListener('click', (e) => {
           e.preventDefault();
-          const assignments = getShieldAssignments();
-          delete assignments[c.id];
-          setShieldAssignments(assignments);
-
-          // ⚠️ On NE touche PAS aux shields (usage unique)
+          const currentAssignments = getShieldAssignments();
+          delete currentAssignments[c.id];
+          setShieldAssignments(currentAssignments);
+          // usage unique => on ne remet pas le shield dans la réserve
           location.reload();
         });
 
@@ -661,40 +721,20 @@ async function initCharacter(){
     }
   }
 
-  // --- Clés de réparation ---
-  const repairKeysDisplay = qs("#repairKeysDisplay");
+  // Repair keys
+  const repairKeysDisplay = qs('#repairKeysDisplay');
   if (repairKeysDisplay) {
-    repairKeysDisplay.innerHTML = "";
-    const repairToggle = (c.toggles || []).find(tg => tg.id === "repair_keys");
+    repairKeysDisplay.innerHTML = '';
+    const repairToggle = (c.toggles || []).find(tg => tg.id === 'repair_keys');
     if (repairToggle) {
       const keysState = state.toggles[repairToggle.id] || [true, true];
-      renderToggleRow(repairKeysDisplay, repairToggle, keysState, lang, (v)=>{
+      renderToggleRow(repairKeysDisplay, repairToggle, keysState, lang, (v) => {
         state.toggles[repairToggle.id] = v;
         setState(c.id, state);
       });
     }
   }
 
-  // --- Coup Unique toggle dans sa section ---
-  const ultToggleContainer = qs("#ultToggleContainer");
-  if (ultToggleContainer) ultToggleContainer.innerHTML = "";
-
-  const isUltimateToggle = (tg)=>{
-    const fr = (t(tg.label, "fr") || "").toLowerCase();
-    const en = (t(tg.label, "en") || "").toLowerCase();
-    return fr.includes("coup unique") || en.includes("ultimate");
-  };
-
-  const ultimateToggle = (c.toggles || []).find(isUltimateToggle);
-  if (ultimateToggle && ultToggleContainer) {
-    const isOn = !!state.toggles[ultimateToggle.id];
-    renderToggleRow(ultToggleContainer, ultimateToggle, isOn, lang, (v)=>{
-      state.toggles[ultimateToggle.id] = v;
-      setState(c.id, state);
-    });
-  }
-
-  // Patterns (normal/expert)
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
   const setup = setupRaw ? JSON.parse(setupRaw) : null;
   const difficulty = setup?.difficulty || "normal";
@@ -713,13 +753,8 @@ async function initCharacter(){
   }
 
   qs("#resetBtn")?.addEventListener("click", ()=>{
-    const fresh = {
-      hp: c.hp?.max ?? 0,
-      toggles: {...defaultToggles}
-    };
+    const fresh = { hp: c.hp?.max ?? 0, toggles: {...defaultToggles} };
     setState(c.id, fresh);
-
-    // reset global shields + assignments
     setSharedShields([true, true, true]);
     setShieldAssignments({});
     location.reload();
@@ -727,41 +762,22 @@ async function initCharacter(){
 
   qs("#backBtn")?.addEventListener("click", ()=>{ location.href = "./index.html"; });
 
-  updateShieldFxOnCard();
   initUnitTabs(id, chars, lang);
 }
 
 /* ------------------------------
-   MODAL SHIELD (assign)
-   - Consomme le bouclier dans la réserve (sharedShields[index]=false)
+   MODAL SHIELD
 ------------------------------ */
 function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
-  const modal = document.createElement("div");
-  modal.style.cssText = `
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  `;
+  const modal = document.createElement('div');
+  modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;`;
 
-  const content = document.createElement("div");
-  content.style.cssText = `
-    background: white;
-    border-radius: 8px;
-    padding: 20px;
-    max-width: 400px;
-    width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
-    color: black;
-  `;
+  const content = document.createElement('div');
+  content.style.cssText = `background:white;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:80vh;overflow-y:auto;color:black;`;
 
-  const title = document.createElement("h2");
-  title.textContent = (lang === "fr") ? "Assigner le bouclier" : "Assign shield";
-  title.style.marginTop = "0";
+  const title = document.createElement('h2');
+  title.textContent = tr("shield_assign");
+  title.style.marginTop = '0';
   content.appendChild(title);
 
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
@@ -769,55 +785,29 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
   const draft = draftRaw ? JSON.parse(draftRaw) : null;
 
-  // équipe : uniquement les persos sélectionnés (draft)
-  let teamChars = allChars.filter(c=>{
-    if (!draft?.activeIds?.includes(c.id)) return false;
-    if (setup?.mode === "single") return true;
-
-    // multi : même camp
-    const currentChar = allChars.find(ch=>ch.id === currentCharId);
-    return (c.camp || "mechkawaii") === (currentChar?.camp || "mechkawaii");
+  const teamChars = allChars.filter(c => {
+    if (setup?.mode === 'single') return draft?.activeIds?.includes(c.id);
+    const currentChar = allChars.find(ch => ch.id === currentCharId);
+    return draft?.activeIds?.includes(c.id) && (c.camp || "mechkawaii") === (currentChar?.camp || "mechkawaii");
   });
 
-  // fallback : si pas de draft, on prend tout le camp
-  if(!teamChars.length){
-    teamChars = allChars;
-  }
-
-  teamChars.forEach(char=>{
-    const btn = document.createElement("button");
+  teamChars.forEach(char => {
+    const btn = document.createElement('button');
     btn.textContent = t(char.name, lang);
-    btn.style.cssText = `
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border: 2px solid #ddd;
-      border-radius: 6px;
-      cursor: pointer;
-      background: white;
-      color: black;
-      transition: all 0.2s ease;
-    `;
+    btn.style.cssText = `width:100%;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:6px;cursor:pointer;background:white;color:black;transition:all .2s ease;`;
 
-    btn.addEventListener("mouseover", ()=>{
-      btn.style.borderColor = "#3b82f6";
-      btn.style.background = "#eff6ff";
-    });
-    btn.addEventListener("mouseout", ()=>{
-      btn.style.borderColor = "#ddd";
-      btn.style.background = "white";
-    });
+    btn.addEventListener('mouseover', ()=>{ btn.style.borderColor='#3b82f6'; btn.style.background='#eff6ff'; });
+    btn.addEventListener('mouseout', ()=>{ btn.style.borderColor='#ddd'; btn.style.background='white'; });
 
-    btn.addEventListener("click", ()=>{
-      const assignments = getShieldAssignments();
-      const shields = getSharedShields();
+    btn.addEventListener('click', ()=>{
+      const currentAssignments = getShieldAssignments();
+      const currentShields = getSharedShields();
 
-      // assigne + consomme le bouclier
-      assignments[char.id] = shieldIndex;
-      shields[shieldIndex] = false;
+      currentAssignments[char.id] = shieldIndex;
+      currentShields[shieldIndex] = false;
 
-      setShieldAssignments(assignments);
-      setSharedShields(shields);
+      setShieldAssignments(currentAssignments);
+      setSharedShields(currentShields);
 
       document.body.removeChild(modal);
       setTimeout(()=>location.reload(), 150);
@@ -826,19 +816,10 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
     content.appendChild(btn);
   });
 
-  const closeBtn = document.createElement("button");
-  closeBtn.textContent = (lang === "fr") ? "Annuler" : "Cancel";
-  closeBtn.style.cssText = `
-    width: 100%;
-    padding: 10px;
-    margin-top: 16px;
-    border: 2px solid #999;
-    border-radius: 6px;
-    cursor: pointer;
-    background: #f5f5f5;
-    color: black;
-  `;
-  closeBtn.addEventListener("click", ()=>document.body.removeChild(modal));
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = tr("cancel");
+  closeBtn.style.cssText = `width:100%;padding:10px;margin-top:16px;border:2px solid #999;border-radius:6px;cursor:pointer;background:#f5f5f5;color:black;`;
+  closeBtn.addEventListener('click', ()=>document.body.removeChild(modal));
   content.appendChild(closeBtn);
 
   modal.appendChild(content);
@@ -849,21 +830,24 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
    BOOT
 ------------------------------ */
 document.addEventListener("DOMContentLoaded", async ()=>{
+  bindTopbar();
+  initSplashLang();
+  applyI18n();
+
   const SPLASH_KEY = STORAGE_PREFIX + "splashDismissed";
   const splashDismissed = localStorage.getItem(SPLASH_KEY) === "1";
 
   function hideSplash(){
     const splash = document.getElementById("splash");
-    if(splash) splash.remove();
+    if(splash){ splash.remove(); }
     document.body.classList.remove("has-splash");
   }
 
-  // ✅ plus de son : juste fermer le splash
   const playBtn = document.getElementById("playBtn");
   if(playBtn){
     playBtn.addEventListener("click", ()=>{
       localStorage.setItem(SPLASH_KEY, "1");
-      document.body.classList.remove("has-splash");
+      document.body.classList.remove('has-splash');
       hideSplash();
     });
   }
@@ -878,10 +862,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
 
       const chars = await loadCharacters();
       window.__cachedChars = chars;
-
-      chars.forEach(c=>{
-        localStorage.removeItem(STORAGE_PREFIX + "state:" + c.id);
-      });
+      chars.forEach(c => localStorage.removeItem(STORAGE_PREFIX + "state:" + c.id));
 
       localStorage.removeItem(SPLASH_KEY);
       location.reload();
@@ -889,7 +870,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   }
 
   if(splashDismissed){
-    document.body.classList.remove("has-splash");
+    document.body.classList.remove('has-splash');
     hideSplash();
   }
 
@@ -899,12 +880,14 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   }catch(e){
     console.error(e);
     const err = qs("#error");
-    if(err) err.textContent = "Erreur de chargement. Vérifie que le site est servi via un lien web (pas en ouvrant le fichier localement).";
+    if(err) err.textContent = (getLang()==="fr")
+      ? "Erreur de chargement. Vérifie que le site est servi via un lien web."
+      : "Loading error. Make sure the site is served from a web URL.";
   }
 });
 
 /* ------------------------------
-   TABS (Bottom)
+   TABS (inchangé)
 ------------------------------ */
 function initUnitTabs(currentCharId, allChars, lang){
   const tabsContainer = qs("#unitTabs");
@@ -919,7 +902,6 @@ function initUnitTabs(currentCharId, allChars, lang){
   const draft = JSON.parse(draftRaw);
 
   let tabCharacters = [];
-
   if(setup.mode === "single"){
     if(Array.isArray(draft.activeIds) && draft.activeIds.length){
       tabCharacters = allChars.filter(c => draft.activeIds.includes(c.id) && c.id !== currentCharId);
@@ -936,24 +918,21 @@ function initUnitTabs(currentCharId, allChars, lang){
   }
 
   if(tabCharacters.length === 0){
-    unitTabsWrapper.classList.remove("visible");
-    document.body.classList.remove("tabs-visible");
+    unitTabsWrapper.classList.remove('visible');
+    document.body.classList.remove('tabs-visible');
     return;
   }
 
-  unitTabsWrapper.classList.add("visible");
-  document.body.classList.add("tabs-visible");
+  unitTabsWrapper.classList.add('visible');
+  document.body.classList.add('tabs-visible');
 
-  tabsContainer.innerHTML = "";
-  tabCharacters.forEach(char=>{
-    const tab = createCharacterTab(char, lang);
-    tabsContainer.appendChild(tab);
-  });
+  tabsContainer.innerHTML = '';
+  tabCharacters.forEach(char => tabsContainer.appendChild(createCharacterTab(char, lang)));
 }
 
 function createCharacterTab(char, lang){
-  const tab = document.createElement("div");
-  tab.className = "unit-tab";
+  const tab = document.createElement('div');
+  tab.className = 'unit-tab';
   tab.dataset.charId = char.id;
 
   const saved = getState(char.id);
@@ -961,38 +940,36 @@ function createCharacterTab(char, lang){
   const maxHp = char.hp?.max ?? 0;
 
   const hpPercentage = maxHp > 0 ? (hp / maxHp) * 100 : 100;
-  const hpClass = hpPercentage <= 33 ? "low" : "";
+  const hpClass = hpPercentage <= 33 ? 'low' : '';
 
   const assignments = getShieldAssignments();
   const hasShield = assignments[char.id] !== undefined;
 
-  const visualEl = document.createElement("div");
-  visualEl.className = "unit-tab-visual";
-  if (hasShield) visualEl.classList.add("has-shield");
+  const visualEl = document.createElement('div');
+  visualEl.className = 'unit-tab-visual';
+  if (hasShield) visualEl.classList.add('has-shield');
 
   const charImage = char.images?.portrait || char.images?.character;
   if(charImage){
-    const img = document.createElement("img");
+    const img = document.createElement('img');
     img.src = charImage;
     img.alt = t(char.name, lang);
-    img.style.cssText = "max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));";
+    img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));';
     img.onerror = function(){
-      visualEl.innerHTML =
-        `<div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
+      visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px,8vw,36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
     };
     visualEl.appendChild(img);
-  } else {
-    visualEl.innerHTML =
-      `<div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
+  }else{
+    visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px,8vw,36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
   }
 
-  const hpBadge = document.createElement("div");
+  const hpBadge = document.createElement('div');
   hpBadge.className = `unit-tab-hp ${hpClass}`;
   hpBadge.innerHTML = `<span>❤️</span><span>${hp}/${maxHp}</span>`;
   visualEl.appendChild(hpBadge);
 
-  const infoEl = document.createElement("div");
-  infoEl.className = "unit-tab-info";
+  const infoEl = document.createElement('div');
+  infoEl.className = 'unit-tab-info';
   infoEl.innerHTML = `
     <div class="unit-tab-name">${t(char.name, lang)}</div>
     <div class="unit-tab-role">${t(char.class, lang)}</div>
@@ -1001,9 +978,9 @@ function createCharacterTab(char, lang){
   tab.appendChild(visualEl);
   tab.appendChild(infoEl);
 
-  if (hasShield) tab.classList.add("has-shield");
+  if (hasShield) tab.classList.add('has-shield');
 
-  tab.addEventListener("click", ()=>{
+  tab.addEventListener('click', () => {
     location.href = `character.html?id=${encodeURIComponent(char.id)}`;
   });
 
@@ -1014,7 +991,7 @@ function updateTabHP(charId, newHp){
   const tab = document.querySelector(`.unit-tab[data-char-id="${charId}"]`);
   if(!tab) return;
 
-  const hpBadge = tab.querySelector(".unit-tab-hp");
+  const hpBadge = tab.querySelector('.unit-tab-hp');
   if(!hpBadge) return;
 
   const allChars = window.__cachedChars;
@@ -1023,10 +1000,10 @@ function updateTabHP(charId, newHp){
     const maxHp = char?.hp?.max ?? 0;
 
     const hpPercentage = maxHp > 0 ? (newHp / maxHp) * 100 : 100;
-    hpBadge.className = "unit-tab-hp" + (hpPercentage <= 33 ? " low" : "");
-    hpBadge.querySelector("span:last-child").textContent = `${newHp}/${maxHp}`;
+    hpBadge.className = 'unit-tab-hp' + (hpPercentage <= 33 ? ' low' : '');
+    hpBadge.querySelector('span:last-child').textContent = `${newHp}/${maxHp}`;
 
-    tab.style.animation = "none";
-    setTimeout(()=>{ tab.style.animation = "heartShake 0.3s ease"; }, 10);
+    tab.style.animation = 'none';
+    setTimeout(() => { tab.style.animation = 'heartShake 0.3s ease'; }, 10);
   }
 }
