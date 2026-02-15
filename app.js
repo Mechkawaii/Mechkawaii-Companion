@@ -62,7 +62,7 @@ function ensureKoOverlay(el){
     img.style.display = "block";
 
     ov.appendChild(img);
-  }}
+  }
 
   // ✅ toujours le remettre en dernier -> toujours au-dessus
   el.appendChild(ov);
