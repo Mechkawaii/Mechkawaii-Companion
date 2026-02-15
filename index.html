@@ -16,6 +16,7 @@
   </script>
   <link rel="stylesheet" href="./style.css" />
 </head>
+
 <body class="page-index has-splash">
   <div class="container">
     <div class="topbar">
@@ -24,13 +25,8 @@
         <div class="subtitle" data-i18n="index_subtitle">Choisis ton mode et ton camp.</div>
       </div>
 
-      <!-- ✅ Langue par drapeaux (à la place du dropdown) -->
+      <!-- ✅ Plus de langue ici : le choix se fait sur l'écran "Jouer" -->
       <div class="controls">
-        <div class="lang-flags" id="langFlags" aria-label="Language">
-          <button class="flag-btn" type="button" data-lang="fr" aria-label="Français" title="Français">🇫🇷</button>
-          <button class="flag-btn" type="button" data-lang="en" aria-label="English" title="English">🇬🇧</button>
-        </div>
-
         <!-- (Optionnel) On garde le select caché au cas où : app.js peut aussi le masquer -->
         <div class="pill" style="display:none;">
           <span class="small">Lang</span>
@@ -49,7 +45,9 @@
       <div class="card-b">
         <div class="rule" style="margin-top:0;">
           <h3 data-i18n="setup_q_devices">1) Combien d'appareil ?</h3>
-          <p class="text" data-i18n="setup_q_devices_desc">Si un seul appareil sert à tout le monde, tu verras tous les persos. Sinon, chaque joueur choisit son camp.</p>
+          <p class="text" data-i18n="setup_q_devices_desc">
+            Si un seul appareil sert à tout le monde, tu verras tous les persos. Sinon, chaque joueur choisit son camp.
+          </p>
           <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
             <button id="modeSingle" class="btn-accent" data-i18n="setup_mode_single">Un seul appareil pour la table</button>
             <button id="modeMulti" data-i18n="setup_mode_multi">Chaque joueur à son appareil</button>
@@ -62,15 +60,20 @@
             <button id="campMech" class="btn-accent" data-i18n="camp_mech">Mechkawaii</button>
             <button id="campProd" data-i18n="camp_prod">Prodrome</button>
           </div>
-          <div class="footer-note">Tu pourras changer plus tard via “Changer Mode”.</div>
+          <div class="footer-note" data-i18n="setup_change_later">
+            Tu pourras changer plus tard via “Changer Mode”.
+          </div>
         </div>
 
         <div id="difficultyPick" class="rule" style="display:none;">
           <h3 data-i18n="setup_q_difficulty">3) Choisis la difficulté</h3>
-          <p class="text" data-i18n="setup_difficulty_desc" data-i18n-html="1"></p>
+
+          <!-- ✅ FIX doublon : UN SEUL <p>, et il contient bien tout le texte -->
+          <p class="text" data-i18n="setup_difficulty_desc">
             <strong>Mode Normal :</strong> Patterns de déplacement et d'attaque standard.<br>
             <strong>Mode Expert :</strong> Patterns avancés pour plus de challenge.
           </p>
+
           <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
             <button id="diffNormal" class="btn-accent" data-i18n="diff_normal">⭐ Normal</button>
             <button id="diffExpert" data-i18n="diff_expert">💀 Expert</button>
@@ -89,7 +92,9 @@
         <div class="small" data-i18n="draft_subtitle">Choisis les unités joués</div>
       </div>
       <div class="card-b">
-        <p class="text" data-i18n="draft_desc" style="margin-top:0;">Sélectionne uniquement les unités réellement jouées. Les autres ne s’afficheront pas.</p>
+        <p class="text" data-i18n="draft_desc" style="margin-top:0;">
+          Sélectionne uniquement les unités réellement jouées. Les autres ne s’afficheront pas.
+        </p>
         <div id="draftList" class="toggles" style="margin-top:12px;"></div>
         <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
           <button id="confirmDraft" class="btn-accent" data-i18n="draft_confirm">Valider les X unités</button>
@@ -111,10 +116,12 @@
         <div class="overlay"></div>
 
         <div class="hero-ui">
+          <!-- ✅ Langue sur le splash -->
           <div class="splash-lang" id="splashLang" aria-label="Language">
-  <button class="flag-btn" type="button" data-lang="fr" aria-label="Français" title="Français">🇫🇷</button>
-  <button class="flag-btn" type="button" data-lang="en" aria-label="English" title="English">🇬🇧</button>
-</div>
+            <button class="flag-btn" type="button" data-lang="fr" aria-label="Français" title="Français">🇫🇷</button>
+            <button class="flag-btn" type="button" data-lang="en" aria-label="English" title="English">🇬🇧</button>
+          </div>
+
           <div class="brand-stack">
             <img src="./assets/heart.png" alt="" class="mascot" />
             <img src="./assets/logo.png" alt="Mechkawaii Companion" class="logo" />
@@ -147,7 +154,6 @@
   </div>
 
   <div id="charList" class="list" aria-live="polite"></div>
-
   <div id="error" class="footer-note" style="color: var(--danger);"></div>
 
   <!-- BARRE DE TABS DES UNITÉS (fixée en bas) -->
