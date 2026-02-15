@@ -1273,3 +1273,29 @@ body.game-active .toggle.locked::after {
   box-shadow: 0 0 0 3px rgba(59,130,246,.25);
   background: rgba(59,130,246,0.10);
 }
+.splash-lang{
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 10px;
+  z-index: 5;
+}
+
+.flag-btn{
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(15, 15, 21, 0.65);
+  backdrop-filter: blur(var(--blur));
+  font-size: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flag-btn.active{
+  border-color: rgba(255, 210, 0, 0.55);
+  box-shadow: 0 0 14px rgba(255, 210, 0, 0.18);
+}
