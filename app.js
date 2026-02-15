@@ -23,7 +23,7 @@ function setActiveButton(groupButtons, activeBtn, activeClass = "btn-accent") {
    KO / Mort Subite (Option A)
 ------------------------------ */
 // ✅ Par défaut on encode les espaces : ça marche même si ton fichier s'appelle "Jeton mort subite.svg"
-const KO_TOKEN_SRC = "./assets/Jeton%20mort%20subite.svg";
+const KO_TOKEN_SRC = "./assets/Jeton-mort-subite.svg";
 
 function ensureKoOverlay(el){
   if(!el) return null;
