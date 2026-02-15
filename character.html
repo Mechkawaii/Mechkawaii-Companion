@@ -26,6 +26,7 @@
       align-items:center;
       justify-content:center;
       flex-shrink:0;
+      position: relative; /* KO overlay */
     }
 
     #charPortrait img{
@@ -72,18 +73,10 @@
       object-fit:contain;
     }
 
-    @media (max-width:480px){
-      .image-container{ min-height:150px; }
-    }
-    @media (min-width:481px) and (max-width:768px){
-      .image-container{ min-height:250px; }
-    }
-    @media (min-width:769px){
-      .image-container{ min-height:300px; }
-    }
-    @media (min-width:1200px){
-      .image-container{ min-height:350px; }
-    }
+    @media (max-width:480px){ .image-container{ min-height:150px; } }
+    @media (min-width:481px) and (max-width:768px){ .image-container{ min-height:250px; } }
+    @media (min-width:769px){ .image-container{ min-height:300px; } }
+    @media (min-width:1200px){ .image-container{ min-height:350px; } }
 
     /* ===========================
        Local tiny fixes
@@ -101,6 +94,16 @@
       flex-wrap:wrap;
       gap:8px;
     }
+
+    /* KO overlay container (display handled by CSS in style.css) */
+    #charPortrait .ko-overlay{
+      position:absolute;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+    }
   </style>
 </head>
 
@@ -110,7 +113,9 @@
     <!-- Topbar -->
     <div class="topbar">
       <div class="brand-with-portrait">
-        <div id="charPortrait"></div>
+        <div id="charPortrait">
+          <div class="ko-overlay" aria-hidden="true"></div>
+        </div>
         <div>
           <div class="title" id="charName">Personnage</div>
           <div class="subtitle" id="charClass">Classe</div>
@@ -130,18 +135,15 @@
     </div>
 
     <!-- HP / Boucliers / Clés -->
-    <!-- ✅ IMPORTANT: id="hpCard" pour le glow bouclier -->
     <div class="card" id="hpCard" style="margin-top:16px;">
       <div class="card-h">
-        <div class="section-title" data-i18n="char_hp_card" style="margin:0;">
-          Points de Vie / Boucliers / Clés de Réparation
-        </div>
+        <div class="section-title" data-i18n="char_hp_card" style="margin: 0;">Points de Vie / Boucliers / Clés de Réparation</div>
       </div>
       <div class="card-b">
         <div class="hp-shields-wrapper">
           <!-- HP -->
           <div class="hp-section">
-            <div style="font-weight:600; margin-bottom:8px;" data-i18n="char_hp">Points de Vie</div>
+            <div style="font-weight: 600; margin-bottom: 8px;" data-i18n="char_hp">Points de Vie</div>
 
             <div class="hp">
               <div id="hpHearts" class="hearts"></div>
@@ -153,20 +155,20 @@
             </div>
 
             <div class="hp-ctl" style="margin-top:12px;">
-              <button id="hpMinus" aria-label="Decrease HP">−</button>
-              <button id="hpPlus" aria-label="Increase HP">+</button>
+              <button id="hpMinus" aria-label="Diminuer les PV">−</button>
+              <button id="hpPlus" aria-label="Augmenter les PV">+</button>
             </div>
           </div>
 
           <!-- Boucliers -->
           <div class="shields-section">
-            <div style="font-weight:600; margin-bottom:8px;" data-i18n="char_shields">Boucliers (Réserve partagée)</div>
+            <div style="font-weight: 600; margin-bottom: 8px;" data-i18n="char_shields">Boucliers (Réserve partagée)</div>
             <div class="shields-display" id="shieldsDisplay"></div>
           </div>
 
           <!-- Clés de réparation -->
           <div class="repair-section">
-            <div style="font-weight:600; margin-bottom:8px;" data-i18n="char_keys">Clés de réparation</div>
+            <div style="font-weight: 600; margin-bottom: 8px;" data-i18n="char_keys">Clés de réparation</div>
             <div id="repairKeysDisplay"></div>
           </div>
         </div>
@@ -194,21 +196,11 @@
       </div>
     </div>
 
-    <!-- ✅ Options (ton app.js peut y injecter les toggles restants) -->
-    <div class="card" style="margin-top:16px;">
-      <div class="card-h">
-        <div class="section-title" style="margin:0;">Options</div>
-      </div>
-      <div class="card-b">
-        <div id="toggles" class="toggles"></div>
-      </div>
-    </div>
-
     <!-- Patterns -->
     <div class="patterns-grid">
       <div class="card">
         <div class="card-h">
-          <div class="section-title" data-i18n="char_movement" style="margin:0;">Déplacement</div>
+          <div class="section-title" data-i18n="char_movement" style="margin: 0;">Déplacement</div>
         </div>
         <div class="card-b">
           <p id="movementDesc" class="text" style="margin:0 0 12px 0;"></p>
@@ -220,7 +212,7 @@
 
       <div class="card">
         <div class="card-h">
-          <div class="section-title" data-i18n="char_attack" style="margin:0;">Attaque</div>
+          <div class="section-title" data-i18n="char_attack" style="margin: 0;">Attaque</div>
         </div>
         <div class="card-b">
           <p id="attackDesc" class="text" style="margin:0 0 12px 0;"></p>
