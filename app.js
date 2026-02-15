@@ -1121,6 +1121,7 @@ function createCharacterTab(char, lang){
 
   // ✅ KO sur l’onglet entier (contour rouge / glow rouge via CSS .unit-tab.is-ko)
   tab.classList.toggle("is-ko", isKo);
+if (hasShield) tab.classList.add('has-shield');
 
   tab.addEventListener('click', () => {
     location.href = `character.html?id=${encodeURIComponent(char.id)}`;
