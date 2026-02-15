@@ -1864,3 +1864,67 @@ body.camp-prodrome .brand-with-portrait::before{
 .unit-tab-visual.camp-prodrome{
   background-image: none !important;
 }
+/* =========================================================
+   ONGLET — Fix final (pas de voile, icône centrée, PV top-right)
+   ========================================================= */
+
+/* 1) Fond image plein, sans couche foncée */
+.unit-tab.camp-mechkawaii,
+.unit-tab.camp-prodrome{
+  background-color: transparent !important; /* enlève le fond sombre */
+}
+
+/* IMPORTANT : supprime la couche foncée (voile) ajoutée par ::before */
+.unit-tab.camp-mechkawaii::before,
+.unit-tab.camp-prodrome::before{
+  content: none !important;
+  display: none !important;
+}
+
+/* 2) Ne pas retinter l’onglet quand il est actif / shield (sinon ça refait une couche sombre) */
+.unit-tab.active{
+  background: transparent !important;
+}
+.unit-tab.has-shield{
+  background: transparent !important;
+}
+
+/* (On garde quand même les bordures d’état) */
+.unit-tab.active{
+  border-color: var(--accent) !important;
+}
+.unit-tab.has-shield{
+  border-color: rgba(59,130,246,0.55) !important;
+}
+
+/* 3) Centrage parfait de l’icône (portrait de classe) */
+.unit-tab{
+  /* on garde ta colonne (visuel + texte), mais on stabilise la structure */
+  justify-content: flex-start !important;
+}
+
+.unit-tab-visual{
+  flex: 1 1 auto;
+  width: 100%;
+  height: auto;          /* pas de 70% qui coupe */
+  margin: 0 !important;  /* enlève le margin-bottom */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.unit-tab-visual img{
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* 4) PV en haut à droite, au-dessus de tout */
+.unit-tab-hp{
+  top: 8px !important;
+  right: 8px !important;
+  z-index: 10 !important;
+  pointer-events: none;
+}
