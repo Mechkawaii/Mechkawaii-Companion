@@ -1588,12 +1588,17 @@ body.is-ko .topbar{
 
 
 /* =========================================================
-   OVERRIDES — Fond de faction sur HEADER + onglets (par perso)
+   OVERRIDES — Fond de faction sur HEADER + onglets (par perso) — v2
    ========================================================= */
 
-/* 1) HEADER (portrait + nom) : fond sur toute la largeur */
+/* 1) HEADER (portrait + nom) : fond sur toute la zone, sans “cadre” */
 .brand-with-portrait{
   width: 100%;
+  margin: 0;
+  border-radius: var(--radius);
+  position: relative;     /* nécessaire pour ::before */
+  overflow: hidden;       /* coupe proprement le fond */
+  background-color: transparent !important;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1601,22 +1606,23 @@ body.is-ko .topbar{
 
 /* Applique l'image selon le camp du perso affiché (body) */
 body.camp-mechkawaii .brand-with-portrait{
-  background-image: url("./assets/background_mechkawaii.png");
+  background-image: url("./assets/background_mechkawaii.png") !important;
 }
 body.camp-prodrome .brand-with-portrait{
-  background-image: url("./assets/background_prodrome.png");
+  background-image: url("./assets/background_prodrome.png") !important;
 }
 
-/* Option : léger voile pour garder la lisibilité (tu peux ajuster 0.35 → 0.55) */
+/* Voile sombre (lisibilité) — ajuster l'opacité si besoin */
 body.camp-mechkawaii .brand-with-portrait::before,
 body.camp-prodrome .brand-with-portrait::before{
   content:"";
   position:absolute;
   inset:0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0,0,0,0.40);
   pointer-events:none;
   z-index:0;
 }
+
 body.camp-mechkawaii .brand-with-portrait > *,
 body.camp-prodrome .brand-with-portrait > *{
   position: relative;
@@ -1624,9 +1630,10 @@ body.camp-prodrome .brand-with-portrait > *{
 }
 
 /* 2) ONGLET : chaque onglet a son fond selon SON camp (classe sur l’onglet) */
-/* Le fond doit couvrir TOUT l’onglet (pas seulement la zone visuelle) */
 .unit-tab.camp-mechkawaii,
 .unit-tab.camp-prodrome{
+  position: relative;      /* nécessaire pour ::before */
+  overflow: hidden;        /* coupe le fond dans l’onglet */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1646,16 +1653,19 @@ body.camp-prodrome .brand-with-portrait > *{
   content:"";
   position:absolute;
   inset:0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0,0,0,0.38);
   pointer-events:none;
   z-index:0;
 }
 
-/* Contenu au-dessus du voile */
-.unit-tab.camp-mechkawaii > *,
-.unit-tab.camp-prodrome > *{
+/* On remet uniquement le “contenu visible” au-dessus (évite les soucis de centrage) */
+.unit-tab.camp-mechkawaii .unit-tab-visual,
+.unit-tab.camp-prodrome .unit-tab-visual{
   position: relative;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* IMPORTANT : neutralise un éventuel background sur la partie .unit-tab-visual */
