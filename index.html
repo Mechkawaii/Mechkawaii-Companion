@@ -24,10 +24,17 @@
         <div class="subtitle">Choisis ton mode et ton camp.</div>
       </div>
 
+      <!-- ✅ Langue par drapeaux (à la place du dropdown) -->
       <div class="controls">
-        <div class="pill">
+        <div class="lang-flags" id="langFlags" aria-label="Language">
+          <button class="flag-btn" type="button" data-lang="fr" aria-label="Français" title="Français">🇫🇷</button>
+          <button class="flag-btn" type="button" data-lang="en" aria-label="English" title="English">🇬🇧</button>
+        </div>
+
+        <!-- (Optionnel) On garde le select caché au cas où : app.js peut aussi le masquer -->
+        <div class="pill" style="display:none;">
           <span class="small">Lang</span>
-          <select id="lang" aria-label="Language">
+          <select id="lang" aria-label="Language" disabled>
             <option value="fr">FR</option>
             <option value="en">EN</option>
           </select>
@@ -35,10 +42,9 @@
       </div>
     </div>
 
-    
     <div id="setupCard" class="card" style="margin-top:16px; display:none;">
       <div class="card-h">
-        <div class="section-title" style="margin:0;">Configuration de la partie</div>        
+        <div class="section-title" style="margin:0;">Configuration de la partie</div>
       </div>
       <div class="card-b">
         <div class="rule" style="margin-top:0;">
@@ -58,6 +64,7 @@
           </div>
           <div class="footer-note">Tu pourras changer plus tard via “Changer Mode”.</div>
         </div>
+
         <div id="difficultyPick" class="rule" style="display:none;">
           <h3>3) Choisis la difficulté</h3>
           <p class="text">
@@ -98,50 +105,46 @@
       <button id="changeDraftBtn">Changer unités</button>
     </div>
 
-  
-  
-  <div id="splash" class="splash splash-overlay">
-    <div class="hero">
-      <img src="./assets/cover.png" alt="Mechkawaii cover" class="hero-bg" />
-      <div class="overlay"></div>
+    <div id="splash" class="splash splash-overlay">
+      <div class="hero">
+        <img src="./assets/cover.png" alt="Mechkawaii cover" class="hero-bg" />
+        <div class="overlay"></div>
 
-      <div class="hero-ui">
-        <div class="brand-stack">
-          <img src="./assets/heart.png" alt="" class="mascot" />
-          <img src="./assets/logo.png" alt="Mechkawaii Companion" class="logo" />
-        </div>
+        <div class="hero-ui">
+          <div class="brand-stack">
+            <img src="./assets/heart.png" alt="" class="mascot" />
+            <img src="./assets/logo.png" alt="Mechkawaii Companion" class="logo" />
+          </div>
 
-        <div class="menu">
-          <button id="playBtn" class="mkw-btn">
-            <img src="./assets/ui/btn_play.svg" alt="" aria-hidden="true">
-            <span class="mkw-label">JOUER</span>
-          </button>
-
-          <a class="mkw-link" href="https://mechkawaii.com" target="_blank" rel="noopener">
-            <div class="mkw-btn">
+          <div class="menu">
+            <button id="playBtn" class="mkw-btn">
               <img src="./assets/ui/btn_play.svg" alt="" aria-hidden="true">
-              <span class="mkw-label">SITE</span>
-            </div>
-          </a>
+              <span class="mkw-label">JOUER</span>
+            </button>
 
-          <a class="mkw-link" href="https://instagram.com/mechkawaii" target="_blank" rel="noopener">
-            <div class="mkw-btn">
-              <img src="./assets/ui/btn_play.svg" alt="" aria-hidden="true">
-              <span class="mkw-label">INSTAGRAM</span>
-            </div>
-          </a>
+            <a class="mkw-link" href="https://mechkawaii.com" target="_blank" rel="noopener">
+              <div class="mkw-btn">
+                <img src="./assets/ui/btn_play.svg" alt="" aria-hidden="true">
+                <span class="mkw-label">SITE</span>
+              </div>
+            </a>
+
+            <a class="mkw-link" href="https://instagram.com/mechkawaii" target="_blank" rel="noopener">
+              <div class="mkw-btn">
+                <img src="./assets/ui/btn_play.svg" alt="" aria-hidden="true">
+                <span class="mkw-label">INSTAGRAM</span>
+              </div>
+            </a>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-
 
   </div>
 
-    <div id="charList" class="list" aria-live="polite"></div>
+  <div id="charList" class="list" aria-live="polite"></div>
 
-    <div id="error" class="footer-note" style="color: var(--danger);"></div>
-  </div>
+  <div id="error" class="footer-note" style="color: var(--danger);"></div>
 
   <!-- BARRE DE TABS DES UNITÉS (fixée en bas) -->
   <div class="unit-tabs-container" id="unitTabsContainer">
