@@ -22,36 +22,55 @@ function setActiveButton(groupButtons, activeBtn, activeClass = "btn-accent") {
 /* ------------------------------
    KO / Mort Subite (Option A)
 ------------------------------ */
-// ✅ Par défaut on encode les espaces : ça marche même si ton fichier s'appelle "Jeton mort subite.svg"
+// ✅ Fichier KO
 const KO_TOKEN_SRC = "./assets/jeton-mort-subite.svg";
 
 function ensureKoOverlay(el){
   if(!el) return null;
+
+  // sécurité : l’overlay doit pouvoir se positionner AU-DESSUS
+  if(!el.style.position) el.style.position = "relative";
+  el.style.overflow = el.style.overflow || "hidden";
+
   let ov = el.querySelector(".ko-overlay");
-  if(ov) return ov;
+  if(!ov){
+    ov = document.createElement("div");
+    ov.className = "ko-overlay";
 
-  ov = document.createElement("div");
-  ov.className = "ko-overlay";
+    // ✅ inline styles pour garantir “au-dessus” même si le CSS bouge
+    ov.style.position = "absolute";
+    ov.style.inset = "0";
+    ov.style.display = "flex";
+    ov.style.alignItems = "center";
+    ov.style.justifyContent = "center";
+    ov.style.pointerEvents = "none";
+    ov.style.zIndex = "50";
 
-  const img = document.createElement("img");
-  img.src = KO_TOKEN_SRC;
-  img.alt = "KO";
+    const img = document.createElement("img");
+    img.src = KO_TOKEN_SRC;
+    img.alt = "KO";
+    img.style.width = "100%";
+    img.style.height = "100%";
+    img.style.objectFit = "contain";
+    img.style.display = "block";
 
-  ov.appendChild(img);
+    ov.appendChild(img);
+  }
+
+  // ✅ toujours le remettre en dernier -> toujours au-dessus
   el.appendChild(ov);
   return ov;
 }
 
 function setKoStateForEl(el, isKo, pop = false){
   if(!el) return;
-  ensureKoOverlay(el);
 
+  ensureKoOverlay(el);
   el.classList.toggle("is-ko", !!isKo);
 
   if(pop && isKo){
     el.classList.remove("ko-pop");
-    // relance l’anim
-    void el.offsetWidth;
+    void el.offsetWidth; // relance anim
     el.classList.add("ko-pop");
     setTimeout(()=>el.classList.remove("ko-pop"), 420);
   } else if(!isKo){
@@ -170,10 +189,6 @@ function tr(key, vars = null){
   return s;
 }
 
-/**
- * Applique les traductions sur tous les éléments qui ont data-i18n
- * + support innerHTML si data-i18n-html="1"
- */
 function applyI18n(){
   const lang = getLang();
   qsa("[data-i18n]").forEach(el=>{
@@ -187,10 +202,6 @@ function applyI18n(){
   });
 }
 
-/**
- * Cache/désactive le select #lang partout (si jamais il existe encore).
- * La langue se choisit sur le splash.
- */
 function bindTopbar(){
   const sel = qs("#lang");
   if(sel){
@@ -202,9 +213,6 @@ function bindTopbar(){
   }
 }
 
-/**
- * Lang flags sur le splash (index uniquement)
- */
 function initSplashLang(){
   const wrap = qs("#splashLang");
   if(!wrap) return;
@@ -216,7 +224,6 @@ function initSplashLang(){
 
     btn.addEventListener("click", ()=>{
       setLang(v);
-      // update UI instantly (no reload needed)
       wrap.querySelectorAll("[data-lang]").forEach(b=>b.classList.toggle("active", b.getAttribute("data-lang") === v));
       applyI18n();
     });
@@ -344,7 +351,6 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
     return;
   }
 
-  // (si tu as encore des toggles "switch" ailleurs)
   const row = document.createElement('div');
   row.className = 'toggle';
 
@@ -468,9 +474,8 @@ async function initIndex(){
       mode = "single";
       setActiveButton(modeBtns, e.currentTarget);
 
-      // en single, pas besoin de camp
       if(campPick) campPick.style.display = "none";
-      setActiveButton(campBtns, null); // reset highlight camp
+      setActiveButton(campBtns, null);
 
       showDifficultyPick();
     });
@@ -522,7 +527,6 @@ async function initIndex(){
 
   const maxPick = (setup.mode === "single") ? 6 : 3;
 
-  // update label confirmDraft with i18n
   const confirmBtn = qs("#confirmDraft");
   if(confirmBtn){
     confirmBtn.textContent = tr("draft_confirm", { n: maxPick });
@@ -695,6 +699,8 @@ async function initCharacter(){
       img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
       img.onerror = function(){
         charPortrait.innerHTML = `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
+        // ✅ remet l’overlay KO au-dessus si besoin
+        setKoStateForEl(charPortrait, state.hp <= 0, false);
       };
       charPortrait.appendChild(img);
     } else {
@@ -711,13 +717,13 @@ async function initCharacter(){
 
     const isKo = state.hp <= 0;
 
-    // overlay + état KO sur le portrait
+    // ✅ overlay + KO sur le portrait (au-dessus)
     setKoStateForEl(charPortrait, isKo, false);
 
-    // contour rouge sur la fiche entière
+    // ✅ contour rouge sur toute la fiche (CSS via body.is-ko)
     document.body.classList.toggle("is-ko", isKo);
 
-    // tabs bas
+    // ✅ tabs bas
     updateTabKO(c.id, isKo);
   }
 
@@ -740,6 +746,8 @@ async function initCharacter(){
   qs("#hpPlus")?.addEventListener("click", ()=>{
     state.hp = clamp(state.hp + 1, 0, c.hp?.max ?? 0);
     setState(c.id, state);
+
+    // ✅ si on repasse à 1 PV, retour normal direct
     refreshHP();
     updateTabHP(c.id, state.hp);
   });
@@ -797,7 +805,6 @@ async function initCharacter(){
           const currentAssignments = getShieldAssignments();
           delete currentAssignments[c.id];
           setShieldAssignments(currentAssignments);
-          // usage unique => on ne remet pas le shield dans la réserve
           location.reload();
         });
 
@@ -1013,12 +1020,16 @@ function initUnitTabs(currentCharId, allChars, lang){
 
   tabsContainer.innerHTML = '';
   tabCharacters.forEach(char => tabsContainer.appendChild(createCharacterTab(char, lang)));
+
+  // ✅ après insertion : on peut marquer l’onglet “actif” si tu veux
+  const activeTab = tabsContainer.querySelector(`.unit-tab[data-char-id="${currentCharId}"]`);
+  if(activeTab) activeTab.classList.add("active");
 }
 
 function createCharacterTab(char, lang){
   const tab = document.createElement('div');
   tab.className = 'unit-tab';
-  tab.dataset.charId = char.id;
+  tab.dataset.charId = char.id; // => data-char-id
 
   const saved = getState(char.id);
   const hp = saved?.hp ?? (char.hp?.max ?? 0);
@@ -1034,10 +1045,6 @@ function createCharacterTab(char, lang){
 
   const visualEl = document.createElement('div');
   visualEl.className = 'unit-tab-visual';
-
-  // ✅ KO overlay on tab visual
-  setKoStateForEl(visualEl, isKo, false);
-
   if (hasShield) visualEl.classList.add('has-shield');
 
   const charImage = char.images?.portrait || char.images?.character;
@@ -1048,19 +1055,21 @@ function createCharacterTab(char, lang){
     img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));';
     img.onerror = function(){
       visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px,8vw,36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
-      // réapplique overlay KO si fallback
+      // ✅ remet KO overlay au-dessus
       setKoStateForEl(visualEl, isKo, false);
     };
     visualEl.appendChild(img);
   }else{
     visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px,8vw,36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
-    setKoStateForEl(visualEl, isKo, false);
   }
 
   const hpBadge = document.createElement('div');
   hpBadge.className = `unit-tab-hp ${hpClass}`;
   hpBadge.innerHTML = `<span>❤️</span><span>${hp}/${maxHp}</span>`;
   visualEl.appendChild(hpBadge);
+
+  // ✅ KO overlay APRES avoir tout ajouté => overlay en dernier => AU-DESSUS
+  setKoStateForEl(visualEl, isKo, false);
 
   const infoEl = document.createElement('div');
   infoEl.className = 'unit-tab-info';
@@ -1073,6 +1082,9 @@ function createCharacterTab(char, lang){
   tab.appendChild(infoEl);
 
   if (hasShield) tab.classList.add('has-shield');
+
+  // ✅ KO sur l’onglet entier (contour rouge / glow rouge via CSS .unit-tab.is-ko)
+  tab.classList.toggle("is-ko", isKo);
 
   tab.addEventListener('click', () => {
     location.href = `character.html?id=${encodeURIComponent(char.id)}`;
@@ -1087,7 +1099,6 @@ function updateTabKO(charId, isKo){
 
   const visual = tab.querySelector(".unit-tab-visual");
   setKoStateForEl(visual, isKo, false);
-
   tab.classList.toggle("is-ko", !!isKo);
 }
 
@@ -1111,6 +1122,6 @@ function updateTabHP(charId, newHp){
     setTimeout(() => { tab.style.animation = 'heartShake 0.3s ease'; }, 10);
   }
 
-  // ✅ KO sync
+  // ✅ KO sync (tabs + overlay)
   updateTabKO(charId, newHp <= 0);
 }
