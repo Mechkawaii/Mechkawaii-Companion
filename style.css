@@ -1643,3 +1643,68 @@ body.camp-prodrome .brand-with-portrait > *{
   z-index: 10;
 }
 
+
+/* =========================================================
+   PATCH — Tabs shield glow + uniform portrait size
+   ========================================================= */
+
+/* 1) Uniformiser la taille du portrait (icône de classe) dans les onglets */
+.unit-tab-visual img{
+  width: clamp(56px, 38%, 84px) !important;
+  height: clamp(56px, 38%, 84px) !important;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* 2) Glow bouclier: version "inside" (ne se fait pas couper par overflow: hidden) */
+.unit-tab.has-shield{
+  position: relative;
+}
+
+/* halo interne + glow visible */
+.unit-tab.has-shield::after{
+  content:"";
+  position:absolute;
+  inset: 6px;
+  border-radius: calc(var(--radius) - 6px);
+  pointer-events:none;
+  z-index: 0;
+  box-shadow:
+    0 0 10px rgba(59,130,246,0.45),
+    0 0 22px rgba(59,130,246,0.35),
+    inset 0 0 18px rgba(59,130,246,0.20);
+  animation: shieldGlow 1.6s ease-in-out infinite;
+}
+
+/* s'assure que le contenu reste au-dessus du halo */
+.unit-tab.has-shield .unit-tab-visual,
+.unit-tab.has-shield .unit-tab-info,
+.unit-tab.has-shield .unit-tab-hp{
+  position: relative;
+  z-index: 1;
+}
+
+/* Si le JS met la classe sur .unit-tab-visual au lieu de .unit-tab */
+.unit-tab-visual.has-shield{
+  position: relative;
+}
+.unit-tab-visual.has-shield::before{
+  content:"";
+  position:absolute;
+  inset: 0;               /* pas de -4px -> pas coupé */
+  border-radius: 14px;
+  pointer-events:none;
+  z-index: 0;             /* au-dessus du fond, sous l'image */
+  background: radial-gradient(
+    circle at center,
+    rgba(59,130,246,0.45) 0%,
+    rgba(59,130,246,0.18) 55%,
+    transparent 75%
+  );
+  animation: shieldEnergyPulse 1.6s ease-in-out infinite;
+}
+.unit-tab-visual.has-shield > *{
+  position: relative;
+  z-index: 1;
+}
+
