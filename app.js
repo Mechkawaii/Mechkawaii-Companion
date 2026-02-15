@@ -118,7 +118,7 @@ const I18N = {
     setup_q_difficulty: "3) Choisis la difficulté",
     setup_difficulty_desc: "<strong>Mode Normal :</strong> Patterns de déplacement et d'attaque standard.<br><strong>Mode Expert :</strong> Patterns avancés pour plus de challenge.",
     diff_normal: "⭐ Normal",
-    diff_expert: "⭐⭐ Expert",
+    diff_expert: "💀 Expert",
 
     reset_all: "Tout réinitialiser",
 
@@ -688,19 +688,7 @@ async function initCharacter(){
     return;
   }
 
-  
-  // ------------------------------
-  // Camp / Faction theme (Mechkawaii vs Prodromes)
-  // ------------------------------
-  document.body.classList.remove("camp-mechkawaii", "camp-prodrome");
-  const camp = (c.camp || "mechkawaii").toLowerCase();
-  if (camp === "prodrome" || camp === "prodromes") {
-    document.body.classList.add("camp-prodrome");
-  } else {
-    document.body.classList.add("camp-mechkawaii");
-  }
-
-const saved = getState(c.id);
+  const saved = getState(c.id);
 
   const defaultToggles = {};
   (c.toggles || []).forEach(tg => {
@@ -724,7 +712,13 @@ const saved = getState(c.id);
   const charClass = qs("#charClass");
   const hpMaxLabel = qs("#hpMaxLabel");
 
-  if(charName) charName.textContent = t(c.name, lang);
+    // Camp -> classe sur le <body> (pour styliser juste le titre)
+  document.body.classList.remove('faction-mechkawaii', 'faction-prodrome');
+  const camp = (c.camp || 'mechkawaii').toLowerCase();
+  if (camp.includes('prod')) document.body.classList.add('faction-prodrome');
+  else document.body.classList.add('faction-mechkawaii');
+
+if(charName) charName.textContent = t(c.name, lang);
   if(charClass) charClass.textContent = t(c.class, lang);
   if(hpMaxLabel) hpMaxLabel.textContent = `/${c.hp?.max ?? 0}`;
 
@@ -819,6 +813,16 @@ const saved = getState(c.id);
     if (shieldToggle) {
       const freshShields = getSharedShields();
       const freshAssignments = getShieldAssignments();
+      const hasShieldForThisChar = freshAssignments[c.id] !== undefined;
+
+      // ✅ Glow bouclier : carte PV + portrait
+      const hpCardEl = qs('#hpCard');
+      if (hpCardEl) hpCardEl.classList.toggle('has-shield', hasShieldForThisChar);
+
+      const portraitEl = qs('#charPortrait');
+      if (portraitEl) portraitEl.classList.toggle('has-shield', hasShieldForThisChar);
+
+
 
       renderToggleRow(shieldsDisplay, shieldToggle, freshShields, lang, (v) => setSharedShields(v), freshShields);
 
@@ -1077,15 +1081,6 @@ function initUnitTabs(currentCharId, allChars, lang){
 function createCharacterTab(char, lang){
   const tab = document.createElement('div');
   tab.className = 'unit-tab';
-
-  // Camp color on tabs
-  const camp = (char.camp || 'mechkawaii').toLowerCase();
-  if (camp === 'prodrome' || camp === 'prodromes') {
-    tab.classList.add('camp-prodrome');
-  } else {
-    tab.classList.add('camp-mechkawaii');
-  }
-
   tab.dataset.charId = char.id; // => data-char-id
 
   const saved = getState(char.id);
