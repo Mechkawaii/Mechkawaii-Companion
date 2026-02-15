@@ -342,16 +342,29 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
       key.className = 'key-button';
       key.type = 'button';
 
+      // ✅ FIX GLOW : les boucliers doivent avoir la classe .shield-button
+      if(isShield) key.classList.add('shield-button');
+
       const keyState = currentState[i] !== undefined ? currentState[i] : true;
       key.dataset.keyIndex = i;
       key.dataset.toggleId = toggle.id;
       key.dataset.active = keyState ? 'true' : 'false';
+
+      // ✅ utile si tu ajoutes un glow via .shield-button.is-on
+      if(isShield) key.classList.toggle('is-on', !!keyState);
+
       key.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_${keyState ? 'on' : 'off'}.svg')`;
 
       key.addEventListener('click', function(e) {
         e.preventDefault();
-        this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true';
-        this.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_${this.dataset.active === 'true' ? 'on' : 'off'}.svg')`;
+
+        this.dataset.active = (this.dataset.active === 'true') ? 'false' : 'true';
+        const nowOn = (this.dataset.active === 'true');
+
+        this.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_${nowOn ? 'on' : 'off'}.svg')`;
+
+        // ✅ FIX GLOW : sync classe .is-on
+        if(isShield) this.classList.toggle('is-on', nowOn);
 
         const keysState = [];
         keysDisplay.querySelectorAll('.key-button').forEach(kb => keysState.push(kb.dataset.active === 'true'));
@@ -799,12 +812,19 @@ async function initCharacter(){
 
       const keyButtons = shieldsDisplay.querySelectorAll('.key-button');
       keyButtons.forEach((btn, i) => {
+        // ✅ s’assure que le style “shield-button” est bien appliqué
+        btn.classList.add('shield-button');
+
         if (!freshShields[i]) {
           btn.style.display = 'none';
           return;
         }
+
+        // ces boutons deviennent des “tokens” à assigner (pas du on/off)
         btn.dataset.active = 'true';
+        btn.classList.add('is-on');
         btn.style.backgroundImage = `url('./assets/icons/shield_on.svg')`;
+
         btn.onclick = (e) => {
           e.preventDefault();
           showShieldAssignmentModal(i, c.id, lang, chars);
