@@ -1543,82 +1543,50 @@ body.is-ko .topbar{
   }
 }
 
-
-/* ============================
-   TABS: fond par perso (camp), indépendant du camp de la page
-   ============================ */
-
-/* On met le fond sur la zone visuelle de l'onglet */
-.unit-tab-visual.camp-mechkawaii,
-.unit-tab-visual.camp-prodrome{
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  border-radius: 14px;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Images */
-.unit-tab-visual.camp-mechkawaii{
-  background-image: url("./assets/background_mechkawaii.png") !important;
-}
-.unit-tab-visual.camp-prodrome{
-  background-image: url("./assets/background_prodrome.png") !important;
-}
-
-/* Voile sombre pour garder l'icône/texte lisible */
-.unit-tab-visual.camp-mechkawaii::before,
-.unit-tab-visual.camp-prodrome::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: rgba(0,0,0,0.45);
-  pointer-events:none;
-  z-index:0;
-}
-
-/* Contenu au-dessus du voile */
-.unit-tab-visual.camp-mechkawaii > *,
-.unit-tab-visual.camp-prodrome > *{
-  position: relative;
-  z-index: 1;
-}
-
-
-
 /* =========================================================
-   OVERRIDES — Fond de faction sur HEADER + onglets (par perso) — v2
+   FACTION BACKGROUNDS — CLEAN & STABLE
+   - Header (portrait + nom) uses body.camp-mechkawaii / body.camp-prodrome
+   - Tabs use per-character classes: .unit-tab.camp-mechkawaii / .unit-tab.camp-prodrome
    ========================================================= */
 
-/* 1) HEADER (portrait + nom) : fond sur toute la zone, sans “cadre” */
-.brand-with-portrait{
+/* ---------- HEADER (portrait + nom) ---------- */
+/* Only on character pages (when a camp class is present on body) */
+body.camp-mechkawaii .topbar,
+body.camp-prodrome .topbar{
+  background: transparent;
+  backdrop-filter: none;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+body.camp-mechkawaii .brand-with-portrait,
+body.camp-prodrome .brand-with-portrait{
   width: 100%;
-  margin: 0;
   border-radius: var(--radius);
-  position: relative;     /* nécessaire pour ::before */
-  overflow: hidden;       /* coupe proprement le fond */
-  background-color: transparent !important;
+  overflow: hidden;
+  position: relative;
+  padding: 14px;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-/* Applique l'image selon le camp du perso affiché (body) */
 body.camp-mechkawaii .brand-with-portrait{
-  background-image: url("./assets/background_mechkawaii.png") !important;
-}
-body.camp-prodrome .brand-with-portrait{
-  background-image: url("./assets/background_prodrome.png") !important;
+  background-image: url("./assets/background_mechkawaii.png");
 }
 
-/* Voile sombre (lisibilité) — ajuster l'opacité si besoin */
+body.camp-prodrome .brand-with-portrait{
+  background-image: url("./assets/background_prodrome.png");
+}
+
+/* subtle dark veil for readability */
 body.camp-mechkawaii .brand-with-portrait::before,
 body.camp-prodrome .brand-with-portrait::before{
   content:"";
   position:absolute;
   inset:0;
-  background: rgba(0,0,0,0.40);
+  background: rgba(0,0,0,0.35);
   pointer-events:none;
   z-index:0;
 }
@@ -1629,302 +1597,49 @@ body.camp-prodrome .brand-with-portrait > *{
   z-index: 1;
 }
 
-/* 2) ONGLET : chaque onglet a son fond selon SON camp (classe sur l’onglet) */
+
+/* ---------- TABS (per character camp) ---------- */
+/* Full-tab background (NO extra dark overlay layer) */
 .unit-tab.camp-mechkawaii,
 .unit-tab.camp-prodrome{
-  position: relative;      /* nécessaire pour ::before */
-  overflow: hidden;        /* coupe le fond dans l’onglet */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-/* Images par camp */
 .unit-tab.camp-mechkawaii{
   background-image: url("./assets/background_mechkawaii.png");
 }
+
 .unit-tab.camp-prodrome{
   background-image: url("./assets/background_prodrome.png");
 }
 
-/* Voile sombre sur l’onglet pour la lisibilité */
-.unit-tab.camp-mechkawaii::before,
-.unit-tab.camp-prodrome::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: rgba(0,0,0,0.38);
-  pointer-events:none;
-  z-index:0;
-}
-
-/* On remet uniquement le “contenu visible” au-dessus (évite les soucis de centrage) */
-.unit-tab.camp-mechkawaii .unit-tab-visual,
-.unit-tab.camp-prodrome .unit-tab-visual{
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* IMPORTANT : neutralise un éventuel background sur la partie .unit-tab-visual */
-.unit-tab-visual.camp-mechkawaii,
-.unit-tab-visual.camp-prodrome{
-  background-image: none !important;
-}
-/* =========================================
-   FIX V3 — Header full-bleed + Tabs icon fit
-   ========================================= */
-
-/* 1) HEADER (portrait + nom) : le fond doit remplir toute la zone */
-.brand-with-portrait{
-  /* le fond couvre le bloc entier */
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-
-  /* évite l’effet "cadre" */
-  width: 100%;
-  border-radius: 16px;
-  overflow: hidden;
-
-  /* si un fond noir était appliqué ailleurs */
-  background-color: transparent !important;
-}
-
-/* Si le cadre noir vient du conteneur parent (fréquent) */
-.hero,
-.hero-card,
-.header,
-.topbar{
-  background: transparent !important;
-}
-
-/* 2) ONGLET : le fond doit couvrir L’ONGLET ENTIER, pas une sous-partie */
-.unit-tab{
-  position: relative;
-  overflow: hidden;
-  border-radius: 14px;
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-
-  /* centrage du contenu */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* On évite que l’élément interne “découpe” le rendu */
-.unit-tab-visual{
-  background: transparent !important;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Voile sombre pour lisibilité (si tu en as déjà un, celui-ci prend le dessus) */
-.unit-tab::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: rgba(0,0,0,0.40);
-  pointer-events:none;
-  z-index:0;
-}
-.unit-tab > *{
-  position: relative;
-  z-index: 1;
-}
-
-/* 3) Icônes dans les onglets : centrées + bien cadrées */
-.unit-tab img,
-.unit-tab-visual img{
-  display: block;
-  width: 70%;
-  height: 70%;
-  object-fit: contain;
-  object-position: center;
-}
-
-/* BONUS: évite des décalages bizarres dus au line-height */
-.unit-tab, .unit-tab-visual{
-  line-height: 0;
-}
-/* =========================================================
-   FINAL FIX — Header full-bleed + Tabs backgrounds per tab
-   (ne casse PAS la mise en page des onglets)
-   ========================================================= */
-
-/* -------------------------
-   HEADER: enlever le "cadre" de la topbar
-   ------------------------- */
-/* Sur la page perso uniquement si tu as cette classe :
-   sinon remplace body.page-character par body (moins propre) */
-body.page-character .topbar{
-  background: transparent !important;
-  backdrop-filter: none !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  padding: 0 !important; /* c’est ça qui créait le cadre */
-}
-
-/* Le header image remplit toute la zone */
-.brand-with-portrait{
-  width: 100%;
-  border-radius: var(--radius);
-  overflow: hidden;
-  position: relative;
-  padding: 14px 14px; /* on remet le "padding" ici plutôt que sur .topbar */
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-}
-
-/* Image selon le camp du perso affiché */
-body.camp-mechkawaii .brand-with-portrait{
-  background-image: url("./assets/background_mechkawaii.png") !important;
-}
-body.camp-prodrome .brand-with-portrait{
-  background-image: url("./assets/background_prodrome.png") !important;
-}
-
-/* voile sombre pour lisibilité */
-body.camp-mechkawaii .brand-with-portrait::before,
-body.camp-prodrome .brand-with-portrait::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: rgba(0,0,0,0.40);
-  pointer-events:none;
-  z-index:0;
-}
-.brand-with-portrait > *{
-  position: relative;
-  z-index: 1;
-}
-
-/* -------------------------
-   TABS: fond par onglet (camp de l’onglet)
-   ------------------------- */
-
-/* IMPORTANT: on met le fond sur .unit-tab (tout l’onglet),
-   mais on NE change PAS display/align/justify (sinon ça casse la colonne) */
-.unit-tab.camp-mechkawaii,
-.unit-tab.camp-prodrome{
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Images */
-.unit-tab.camp-mechkawaii{ background-image: url("./assets/background_mechkawaii.png") !important; }
-.unit-tab.camp-prodrome{  background-image: url("./assets/background_prodrome.png") !important; }
-
-/* voile sombre */
-.unit-tab.camp-mechkawaii::before,
-.unit-tab.camp-prodrome::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: rgba(0,0,0,0.38);
-  pointer-events:none;
-  z-index:0;
-}
-
-/* remet le contenu au-dessus */
-.unit-tab.camp-mechkawaii .unit-tab-visual,
-.unit-tab.camp-prodrome  .unit-tab-visual,
-.unit-tab.camp-mechkawaii .unit-tab-info,
-.unit-tab.camp-prodrome  .unit-tab-info{
-  position: relative;
-  z-index: 1;
-}
-
-/* Icône: bien centrée, bien cadrée (sans casser tes tailles existantes) */
-.unit-tab-visual{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.unit-tab-visual img{
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center;
-}
-
-/* IMPORTANT: on s’assure qu’aucun fond n’est appliqué sur .unit-tab-visual */
-.unit-tab-visual.camp-mechkawaii,
-.unit-tab-visual.camp-prodrome{
-  background-image: none !important;
-}
-/* =========================================================
-   ONGLET — Fix final (pas de voile, icône centrée, PV top-right)
-   ========================================================= */
-
-/* 1) Fond image plein, sans couche foncée */
-.unit-tab.camp-mechkawaii,
-.unit-tab.camp-prodrome{
-  background-color: transparent !important; /* enlève le fond sombre */
-}
-
-/* IMPORTANT : supprime la couche foncée (voile) ajoutée par ::before */
+/* IMPORTANT: remove any experimental overlay on tabs */
 .unit-tab.camp-mechkawaii::before,
 .unit-tab.camp-prodrome::before{
   content: none !important;
   display: none !important;
 }
 
-/* 2) Ne pas retinter l’onglet quand il est actif / shield (sinon ça refait une couche sombre) */
-.unit-tab.active{
-  background: transparent !important;
-}
-.unit-tab.has-shield{
-  background: transparent !important;
-}
-
-/* (On garde quand même les bordures d’état) */
-.unit-tab.active{
-  border-color: var(--accent) !important;
-}
-.unit-tab.has-shield{
-  border-color: rgba(59,130,246,0.55) !important;
-}
-
-/* 3) Centrage parfait de l’icône (portrait de classe) */
-.unit-tab{
-  /* on garde ta colonne (visuel + texte), mais on stabilise la structure */
-  justify-content: flex-start !important;
-}
-
+/* Keep layout intact (visual on top, text below) */
 .unit-tab-visual{
-  flex: 1 1 auto;
-  width: 100%;
-  height: auto;          /* pas de 70% qui coupe */
-  margin: 0 !important;  /* enlève le margin-bottom */
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
 }
 
 .unit-tab-visual img{
-  width: 78%;
-  height: 78%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   object-position: center;
 }
 
-/* 4) PV en haut à droite, au-dessus de tout */
+/* HP badge stays top-right */
 .unit-tab-hp{
-  top: 8px !important;
-  right: 8px !important;
-  z-index: 10 !important;
-  pointer-events: none;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
 }
+
