@@ -20,6 +20,46 @@ function setActiveButton(groupButtons, activeBtn, activeClass = "btn-accent") {
 }
 
 /* ------------------------------
+   KO / Mort Subite (Option A)
+------------------------------ */
+// ✅ Par défaut on encode les espaces : ça marche même si ton fichier s'appelle "Jeton mort subite.svg"
+const KO_TOKEN_SRC = "./assets/Jeton%20mort%20subite.svg";
+
+function ensureKoOverlay(el){
+  if(!el) return null;
+  let ov = el.querySelector(".ko-overlay");
+  if(ov) return ov;
+
+  ov = document.createElement("div");
+  ov.className = "ko-overlay";
+
+  const img = document.createElement("img");
+  img.src = KO_TOKEN_SRC;
+  img.alt = "KO";
+
+  ov.appendChild(img);
+  el.appendChild(ov);
+  return ov;
+}
+
+function setKoStateForEl(el, isKo, pop = false){
+  if(!el) return;
+  ensureKoOverlay(el);
+
+  el.classList.toggle("is-ko", !!isKo);
+
+  if(pop && isKo){
+    el.classList.remove("ko-pop");
+    // relance l’anim
+    void el.offsetWidth;
+    el.classList.add("ko-pop");
+    setTimeout(()=>el.classList.remove("ko-pop"), 420);
+  } else if(!isKo){
+    el.classList.remove("ko-pop");
+  }
+}
+
+/* ------------------------------
    I18N (UI statique)
 ------------------------------ */
 const I18N = {
@@ -176,6 +216,7 @@ function initSplashLang(){
 
     btn.addEventListener("click", ()=>{
       setLang(v);
+      // update UI instantly (no reload needed)
       wrap.querySelectorAll("[data-lang]").forEach(b=>b.classList.toggle("active", b.getAttribute("data-lang") === v));
       applyI18n();
     });
@@ -245,61 +286,6 @@ function renderHP(container, hpCur, hpMax){
     hearts.appendChild(span.firstElementChild);
   }
   container.appendChild(hearts);
-}
-
-/* ------------------------------
-   KO / Mort Subite (Option A)
------------------------------- */
-function shouldPopKO(charId, newHp) {
-  // pop uniquement quand on passe de >0 à 0
-  const last = localStorage.getItem(STORAGE_PREFIX + "hp-last:" + charId);
-  const wasKo = (last === "0");
-  return (newHp === 0) && !wasKo;
-}
-
-function setKOVisual(charId, isKo, popOnce = false) {
-  const portrait = qs("#charPortrait");
-  if (!portrait) return;
-
-  // Assure l’overlay
-  let overlay = portrait.querySelector(".ko-overlay");
-  if (!overlay) {
-    overlay = document.createElement("div");
-    overlay.className = "ko-overlay";
-    overlay.setAttribute("aria-hidden", "true");
-    portrait.appendChild(overlay);
-  }
-
-  if (isKo) {
-    portrait.classList.add("is-ko");
-
-    // ⚠️ Mets le chemin EXACT de ton fichier (attention aux espaces)
-    const KO_SRC = "./assets/Jeton mort subite.svg";
-    overlay.innerHTML = `<img src="${KO_SRC}" alt="" />`;
-
-    if (popOnce) {
-      portrait.classList.add("ko-pop");
-      setTimeout(() => portrait.classList.remove("ko-pop"), 400);
-    }
-  } else {
-    portrait.classList.remove("is-ko");
-    portrait.classList.remove("ko-pop");
-    overlay.innerHTML = "";
-  }
-
-  localStorage.setItem(STORAGE_PREFIX + "hp-last:" + charId, isKo ? "0" : "1");
-}
-
-/* ------------------------------
-   Shield glow on HP card
------------------------------- */
-function updateHpCardShieldClass(charId){
-  const hpCard = qs("#hpCard");
-  if(!hpCard) return;
-
-  const assignments = getShieldAssignments();
-  if(assignments[charId] !== undefined) hpCard.classList.add("has-shield");
-  else hpCard.classList.remove("has-shield");
 }
 
 /* ------------------------------
@@ -482,8 +468,9 @@ async function initIndex(){
       mode = "single";
       setActiveButton(modeBtns, e.currentTarget);
 
+      // en single, pas besoin de camp
       if(campPick) campPick.style.display = "none";
-      setActiveButton(campBtns, null);
+      setActiveButton(campBtns, null); // reset highlight camp
 
       showDifficultyPick();
     });
@@ -535,6 +522,7 @@ async function initIndex(){
 
   const maxPick = (setup.mode === "single") ? 6 : 3;
 
+  // update label confirmDraft with i18n
   const confirmBtn = qs("#confirmDraft");
   if(confirmBtn){
     confirmBtn.textContent = tr("draft_confirm", { n: maxPick });
@@ -697,11 +685,7 @@ async function initCharacter(){
 
   const charPortrait = qs("#charPortrait");
   if (charPortrait) {
-    // garde le .ko-overlay si présent
-    const existingOverlay = charPortrait.querySelector(".ko-overlay");
-    charPortrait.innerHTML = "";
-    if(existingOverlay) charPortrait.appendChild(existingOverlay);
-
+    charPortrait.innerHTML = '';
     const charImage = c.images?.portrait || c.images?.character;
 
     if (charImage) {
@@ -710,13 +694,11 @@ async function initCharacter(){
       img.alt = t(c.name, lang);
       img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
       img.onerror = function(){
-        charPortrait.innerHTML = (existingOverlay ? existingOverlay.outerHTML : "") +
-          `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
+        charPortrait.innerHTML = `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
       };
       charPortrait.appendChild(img);
     } else {
-      charPortrait.innerHTML = (existingOverlay ? existingOverlay.outerHTML : "") +
-        `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
+      charPortrait.innerHTML = `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
     }
   }
 
@@ -726,21 +708,33 @@ async function initCharacter(){
   function refreshHP(){
     if(hpCurEl) hpCurEl.textContent = String(state.hp);
     renderHP(hpHeartsEl, state.hp, c.hp?.max ?? 0);
+
+    const isKo = state.hp <= 0;
+
+    // overlay + état KO sur le portrait
+    setKoStateForEl(charPortrait, isKo, false);
+
+    // contour rouge sur la fiche entière
+    document.body.classList.toggle("is-ko", isKo);
+
+    // tabs bas
+    updateTabKO(c.id, isKo);
   }
 
-  refreshHP();
-
-  // KO initial (si on arrive avec HP déjà à 0)
-  setKOVisual(c.id, state.hp === 0, false);
-
   qs("#hpMinus")?.addEventListener("click", ()=>{
+    const wasKo = state.hp <= 0;
+
     state.hp = clamp(state.hp - 1, 0, c.hp?.max ?? 0);
     setState(c.id, state);
+
+    const isKoNow = state.hp <= 0;
+    if(!wasKo && isKoNow){
+      // KO = pop
+      setKoStateForEl(qs("#charPortrait"), true, true);
+    }
+
     refreshHP();
     updateTabHP(c.id, state.hp);
-
-    const pop = shouldPopKO(c.id, state.hp);
-    setKOVisual(c.id, state.hp === 0, pop);
   });
 
   qs("#hpPlus")?.addEventListener("click", ()=>{
@@ -748,10 +742,9 @@ async function initCharacter(){
     setState(c.id, state);
     refreshHP();
     updateTabHP(c.id, state.hp);
-
-    // dès que ça remonte, retour normal immédiat
-    setKOVisual(c.id, state.hp === 0, false);
   });
+
+  refreshHP();
 
   const classActionTitle = qs("#classActionTitle");
   const classActionBody = qs("#classActionBody");
@@ -813,9 +806,6 @@ async function initCharacter(){
     }
   }
 
-  // 🔥 Restore shield glow on the HP card
-  updateHpCardShieldClass(c.id);
-
   // Repair keys
   const repairKeysDisplay = qs('#repairKeysDisplay');
   if (repairKeysDisplay) {
@@ -852,7 +842,6 @@ async function initCharacter(){
     setState(c.id, fresh);
     setSharedShields([true, true, true]);
     setShieldAssignments({});
-    localStorage.removeItem(STORAGE_PREFIX + "hp-last:" + c.id);
     location.reload();
   });
 
@@ -983,7 +972,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
 });
 
 /* ------------------------------
-   TABS (inchangé)
+   TABS
 ------------------------------ */
 function initUnitTabs(currentCharId, allChars, lang){
   const tabsContainer = qs("#unitTabs");
@@ -1035,6 +1024,8 @@ function createCharacterTab(char, lang){
   const hp = saved?.hp ?? (char.hp?.max ?? 0);
   const maxHp = char.hp?.max ?? 0;
 
+  const isKo = hp <= 0;
+
   const hpPercentage = maxHp > 0 ? (hp / maxHp) * 100 : 100;
   const hpClass = hpPercentage <= 33 ? 'low' : '';
 
@@ -1043,6 +1034,10 @@ function createCharacterTab(char, lang){
 
   const visualEl = document.createElement('div');
   visualEl.className = 'unit-tab-visual';
+
+  // ✅ KO overlay on tab visual
+  setKoStateForEl(visualEl, isKo, false);
+
   if (hasShield) visualEl.classList.add('has-shield');
 
   const charImage = char.images?.portrait || char.images?.character;
@@ -1053,10 +1048,13 @@ function createCharacterTab(char, lang){
     img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));';
     img.onerror = function(){
       visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px,8vw,36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
+      // réapplique overlay KO si fallback
+      setKoStateForEl(visualEl, isKo, false);
     };
     visualEl.appendChild(img);
   }else{
     visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px,8vw,36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
+    setKoStateForEl(visualEl, isKo, false);
   }
 
   const hpBadge = document.createElement('div');
@@ -1083,6 +1081,16 @@ function createCharacterTab(char, lang){
   return tab;
 }
 
+function updateTabKO(charId, isKo){
+  const tab = document.querySelector(`.unit-tab[data-char-id="${charId}"]`);
+  if(!tab) return;
+
+  const visual = tab.querySelector(".unit-tab-visual");
+  setKoStateForEl(visual, isKo, false);
+
+  tab.classList.toggle("is-ko", !!isKo);
+}
+
 function updateTabHP(charId, newHp){
   const tab = document.querySelector(`.unit-tab[data-char-id="${charId}"]`);
   if(!tab) return;
@@ -1102,4 +1110,7 @@ function updateTabHP(charId, newHp){
     tab.style.animation = 'none';
     setTimeout(() => { tab.style.animation = 'heartShake 0.3s ease'; }, 10);
   }
+
+  // ✅ KO sync
+  updateTabKO(charId, newHp <= 0);
 }
