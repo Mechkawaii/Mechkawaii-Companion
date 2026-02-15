@@ -15,7 +15,7 @@ function setLang(lang){
 
 /** Active button helper (UI selection) */
 function setActiveButton(groupButtons, activeBtn, activeClass = "btn-accent") {
-  groupButtons.forEach(b => b.classList.remove(activeClass));
+  groupButtons.forEach(b => b && b.classList.remove(activeClass));
   if (activeBtn) activeBtn.classList.add(activeClass);
 }
 
@@ -176,7 +176,6 @@ function initSplashLang(){
 
     btn.addEventListener("click", ()=>{
       setLang(v);
-      // update UI instantly (no reload needed)
       wrap.querySelectorAll("[data-lang]").forEach(b=>b.classList.toggle("active", b.getAttribute("data-lang") === v));
       applyI18n();
     });
@@ -249,18 +248,21 @@ function renderHP(container, hpCur, hpMax){
 }
 
 /* ------------------------------
-   ✅ Shield glow helper
-   - Works now (fallback) + future-proof (#hpCard)
+   Shield glow: robust helper
 ------------------------------ */
-function updateHpShieldGlow(charId){
+function updateShieldGlowOnCharacterPage(charId){
+  // Target stable element first
+  const hpCard = qs("#hpCard");
+  // Fallback: first card on page (only if hpCard missing)
+  const fallbackCard = qsa(".card")[0] || null;
+  const target = hpCard || fallbackCard;
+
+  if(!target) return;
+
   const assignments = getShieldAssignments();
   const hasShield = assignments && assignments[charId] !== undefined;
 
-  // preferred: dedicated id (we'll add it in character.html later)
-  const hpCard = qs("#hpCard") || qs(".hp-card") || qsa(".card")[0] || null;
-  if(hpCard){
-    hpCard.classList.toggle("has-shield", !!hasShield);
-  }
+  target.classList.toggle("has-shield", !!hasShield);
 }
 
 /* ------------------------------
@@ -443,9 +445,8 @@ async function initIndex(){
       mode = "single";
       setActiveButton(modeBtns, e.currentTarget);
 
-      // en single, pas besoin de camp
       if(campPick) campPick.style.display = "none";
-      setActiveButton(campBtns, null); // reset highlight camp
+      setActiveButton(campBtns, null);
 
       showDifficultyPick();
     });
@@ -453,8 +454,8 @@ async function initIndex(){
     qs("#modeMulti")?.addEventListener("click", (e)=>{
       mode = "multi";
       setActiveButton(modeBtns, e.currentTarget);
+
       if(campPick) campPick.style.display = "block";
-      // on attend le choix camp => pas de sélection forcée ici
       setActiveButton(campBtns, null);
     });
 
@@ -498,7 +499,6 @@ async function initIndex(){
 
   const maxPick = (setup.mode === "single") ? 6 : 3;
 
-  // update label confirmDraft with i18n
   const confirmBtn = qs("#confirmDraft");
   if(confirmBtn){
     confirmBtn.textContent = tr("draft_confirm", { n: maxPick });
@@ -753,20 +753,12 @@ async function initCharacter(){
           const currentAssignments = getShieldAssignments();
           delete currentAssignments[c.id];
           setShieldAssignments(currentAssignments);
-          // usage unique => on ne remet pas le shield dans la réserve
-          updateHpShieldGlow(c.id);
           location.reload();
         });
 
         shieldsDisplay.appendChild(removeShield);
       }
-
-      // ✅ Shield glow: update card class based on assignment
-      updateHpShieldGlow(c.id);
     }
-  } else {
-    // ✅ even if no shields UI, keep glow coherent
-    updateHpShieldGlow(c.id);
   }
 
   // Repair keys
@@ -782,6 +774,9 @@ async function initCharacter(){
       });
     }
   }
+
+  // ✅ IMPORTANT: re-apply glow based on assignments
+  updateShieldGlowOnCharacterPage(c.id);
 
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
   const setup = setupRaw ? JSON.parse(setupRaw) : null;
@@ -856,9 +851,6 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
 
       setShieldAssignments(currentAssignments);
       setSharedShields(currentShields);
-
-      // ✅ update glow asap (before reload)
-      updateHpShieldGlow(char.id);
 
       document.body.removeChild(modal);
       setTimeout(()=>location.reload(), 150);
