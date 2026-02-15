@@ -1186,6 +1186,29 @@ body.game-active .toggle.locked::after {
   }
 }
 
+/* --- Portrait (fiche perso) : petit halo quand le perso a un bouclier --- */
+#charPortrait.has-shield{
+  animation: shieldGlow 1.6s ease-in-out infinite;
+}
+
+#charPortrait.has-shield::before{
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 16px;
+  background: radial-gradient(
+    circle at center,
+    rgba(59, 130, 246, 0.55) 0%,
+    rgba(59, 130, 246, 0.22) 60%,
+    transparent 78%
+  );
+  animation: shieldEnergyPulse 1.6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#charPortrait.has-shield img{ position: relative; z-index: 1; }
+
 /* ============================= */
 /*  Version pour les tabs du bas */
 /* ============================= */

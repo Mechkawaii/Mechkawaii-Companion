@@ -808,6 +808,12 @@ async function initCharacter(){
       const freshShields = getSharedShields();
       const freshAssignments = getShieldAssignments();
 
+      // ✅ SHIELD FX (glow bleu) : applique la classe quand CE perso a un bouclier assigné
+      // (CSS cible .card.has-shield et on le met sur #hpCard ; on le met aussi sur le portrait si tu veux un petit effet)
+      const hasShieldForThisChar = freshAssignments[c.id] !== undefined;
+      qs('#hpCard')?.classList.toggle('has-shield', hasShieldForThisChar);
+      qs('#charPortrait')?.classList.toggle('has-shield', hasShieldForThisChar);
+
       renderToggleRow(shieldsDisplay, shieldToggle, freshShields, lang, (v) => setSharedShields(v), freshShields);
 
       const keyButtons = shieldsDisplay.querySelectorAll('.key-button');
