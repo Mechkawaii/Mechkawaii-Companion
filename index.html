@@ -21,7 +21,7 @@
     <div class="topbar">
       <div class="brand">
         <div class="title">MECHKAWAII COMPANION</div>
-        <div class="subtitle">Choisis ton mode et ton camp.</div>
+        <div class="subtitle" data-i18n="index_subtitle">Choisis ton mode et ton camp.</div>
       </div>
 
       <!-- ✅ Langue par drapeaux (à la place du dropdown) -->
@@ -44,65 +44,65 @@
 
     <div id="setupCard" class="card" style="margin-top:16px; display:none;">
       <div class="card-h">
-        <div class="section-title" style="margin:0;">Configuration de la partie</div>
+        <div class="section-title" data-i18n="setup_title" style="margin:0;">Configuration de la partie</div>
       </div>
       <div class="card-b">
         <div class="rule" style="margin-top:0;">
-          <h3>1) Combien d'appareil ?</h3>
-          <p class="text">Si un seul appareil sert à tout le monde, tu verras tous les persos. Sinon, chaque joueur choisit son camp.</p>
+          <h3 data-i18n="setup_q_devices">1) Combien d'appareil ?</h3>
+          <p class="text" data-i18n="setup_q_devices_desc">Si un seul appareil sert à tout le monde, tu verras tous les persos. Sinon, chaque joueur choisit son camp.</p>
           <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-            <button id="modeSingle" class="btn-accent">Un seul appareil pour la table</button>
-            <button id="modeMulti">Chaque joueur à son appareil</button>
+            <button id="modeSingle" class="btn-accent" data-i18n="setup_mode_single">Un seul appareil pour la table</button>
+            <button id="modeMulti" data-i18n="setup_mode_multi">Chaque joueur à son appareil</button>
           </div>
         </div>
 
         <div id="campPick" class="rule" style="display:none;">
-          <h3>2) Choisis ton camp</h3>
+          <h3 data-i18n="setup_q_camp">2) Choisis ton camp</h3>
           <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-            <button id="campMech" class="btn-accent">Mechkawaii</button>
-            <button id="campProd">Prodrome</button>
+            <button id="campMech" class="btn-accent" data-i18n="camp_mech">Mechkawaii</button>
+            <button id="campProd" data-i18n="camp_prod">Prodrome</button>
           </div>
           <div class="footer-note">Tu pourras changer plus tard via “Changer Mode”.</div>
         </div>
 
         <div id="difficultyPick" class="rule" style="display:none;">
-          <h3>3) Choisis la difficulté</h3>
-          <p class="text">
+          <h3 data-i18n="setup_q_difficulty">3) Choisis la difficulté</h3>
+          <p class="text" data-i18n="setup_difficulty_desc" data-i18n-html="1"></p>
             <strong>Mode Normal :</strong> Patterns de déplacement et d'attaque standard.<br>
             <strong>Mode Expert :</strong> Patterns avancés pour plus de challenge.
           </p>
           <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-            <button id="diffNormal" class="btn-accent">⭐ Normal</button>
-            <button id="diffExpert">💀 Expert</button>
+            <button id="diffNormal" class="btn-accent" data-i18n="diff_normal">⭐ Normal</button>
+            <button id="diffExpert" data-i18n="diff_expert">💀 Expert</button>
           </div>
         </div>
 
         <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-          <button id="resetSetupBtn" class="btn-danger">Tout réinitialiser</button>
+          <button id="resetSetupBtn" class="btn-danger" data-i18n="reset_all">Tout réinitialiser</button>
         </div>
       </div>
     </div>
 
     <div id="draftCard" class="card" style="margin-top:16px; display:none;">
       <div class="card-h">
-        <div class="section-title" style="margin:0;">Sélection des unités</div>
-        <div class="small">Choisis les unités joués</div>
+        <div class="section-title" data-i18n="draft_title" style="margin:0;">Sélection des unités</div>
+        <div class="small" data-i18n="draft_subtitle">Choisis les unités joués</div>
       </div>
       <div class="card-b">
-        <p class="text" style="margin-top:0;">Sélectionne uniquement les unités réellement jouées. Les autres ne s’afficheront pas.</p>
+        <p class="text" data-i18n="draft_desc" style="margin-top:0;">Sélectionne uniquement les unités réellement jouées. Les autres ne s’afficheront pas.</p>
         <div id="draftList" class="toggles" style="margin-top:12px;"></div>
         <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-          <button id="confirmDraft" class="btn-accent">Valider les 3 unités</button>
-          <button id="skipDraft">Afficher tout (pour l’instant)</button>
+          <button id="confirmDraft" class="btn-accent" data-i18n="draft_confirm">Valider les X unités</button>
+          <button id="skipDraft" data-i18n="draft_show_all">Afficher tout (pour l’instant)</button>
         </div>
         <div id="draftError" class="footer-note" style="color: var(--danger);"></div>
       </div>
     </div>
 
     <div class="controls" style="margin-top:16px; display:flex; justify-content:flex-end;">
-      <button id="backToSplash">Écran titre</button>
-      <button id="changeSetupBtn">Changer mode</button>
-      <button id="changeDraftBtn">Changer unités</button>
+      <button id="backToSplash" data-i18n="back_to_title">Écran titre</button>
+      <button id="changeSetupBtn" data-i18n="change_mode">Changer mode</button>
+      <button id="changeDraftBtn" data-i18n="change_units">Changer unités</button>
     </div>
 
     <div id="splash" class="splash splash-overlay">
@@ -111,6 +111,10 @@
         <div class="overlay"></div>
 
         <div class="hero-ui">
+          <div class="splash-lang" id="splashLang" aria-label="Language">
+  <button class="flag-btn" type="button" data-lang="fr" aria-label="Français" title="Français">🇫🇷</button>
+  <button class="flag-btn" type="button" data-lang="en" aria-label="English" title="English">🇬🇧</button>
+</div>
           <div class="brand-stack">
             <img src="./assets/heart.png" alt="" class="mascot" />
             <img src="./assets/logo.png" alt="Mechkawaii Companion" class="logo" />
@@ -119,20 +123,20 @@
           <div class="menu">
             <button id="playBtn" class="mkw-btn">
               <img src="./assets/ui/btn_play.svg" alt="" aria-hidden="true">
-              <span class="mkw-label">JOUER</span>
+              <span class="mkw-label" data-i18n="splash_play">JOUER</span>
             </button>
 
             <a class="mkw-link" href="https://mechkawaii.com" target="_blank" rel="noopener">
               <div class="mkw-btn">
                 <img src="./assets/ui/btn_play.svg" alt="" aria-hidden="true">
-                <span class="mkw-label">SITE</span>
+                <span class="mkw-label" data-i18n="splash_site">SITE</span>
               </div>
             </a>
 
             <a class="mkw-link" href="https://instagram.com/mechkawaii" target="_blank" rel="noopener">
               <div class="mkw-btn">
                 <img src="./assets/ui/btn_play.svg" alt="" aria-hidden="true">
-                <span class="mkw-label">INSTAGRAM</span>
+                <span class="mkw-label" data-i18n="splash_instagram">INSTAGRAM</span>
               </div>
             </a>
           </div>
