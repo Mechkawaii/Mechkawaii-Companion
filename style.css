@@ -1435,3 +1435,73 @@ body.page-character.is-ko .card {
 body.page-character.is-ko .topbar {
   border-color: rgba(255, 77, 77, 0.22);
 }
+/* ============================= */
+/*            KO FX              */
+/* ============================= */
+
+:root{
+  --ko: #ff3b3b;
+}
+
+/* --- FICHE PERSO : contour + glow rouge pulsant --- */
+body.is-ko .container > .topbar,
+body.is-ko .container > .card,
+body.is-ko .container > .patterns-grid > .card {
+  border-color: rgba(255, 59, 59, 0.45) !important;
+  box-shadow:
+    0 0 10px rgba(255, 59, 59, 0.18),
+    0 0 22px rgba(255, 59, 59, 0.14);
+  animation: koGlow 1.35s ease-in-out infinite;
+}
+
+/* Optionnel : rendre le fond un peu plus “alerte” */
+body.is-ko .container > .card {
+  background: rgba(255, 59, 59, 0.06);
+}
+
+/* Un liseré rouge discret sur la topbar */
+body.is-ko .topbar{
+  border-left: 5px solid var(--ko);
+}
+
+/* Glow pulsant rouge */
+@keyframes koGlow {
+  0% {
+    box-shadow:
+      0 0 8px rgba(255, 59, 59, 0.18),
+      0 0 18px rgba(255, 59, 59, 0.14);
+  }
+  50% {
+    box-shadow:
+      0 0 16px rgba(255, 59, 59, 0.45),
+      0 0 36px rgba(255, 59, 59, 0.30);
+  }
+  100% {
+    box-shadow:
+      0 0 8px rgba(255, 59, 59, 0.18),
+      0 0 18px rgba(255, 59, 59, 0.14);
+  }
+}
+
+/* --- TABS BAS : KO = halo rouge + bordure --- */
+.unit-tab.is-ko{
+  border-color: rgba(255, 59, 59, 0.55) !important;
+  background: rgba(255, 59, 59, 0.10);
+  animation: koTabGlow 1.35s ease-in-out infinite;
+}
+
+@keyframes koTabGlow{
+  0% { box-shadow: 0 0 10px rgba(255, 59, 59, 0.20); }
+  50% { box-shadow: 0 0 22px rgba(255, 59, 59, 0.45); }
+  100% { box-shadow: 0 0 10px rgba(255, 59, 59, 0.20); }
+}
+
+/* Accessibilité */
+@media (prefers-reduced-motion: reduce){
+  body.is-ko .container > .topbar,
+  body.is-ko .container > .card,
+  body.is-ko .container > .patterns-grid > .card,
+  .unit-tab.is-ko{
+    animation: none !important;
+  }
+}
