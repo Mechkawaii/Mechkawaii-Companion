@@ -1543,27 +1543,48 @@ body.is-ko .topbar{
   }
 }
 
-/* ============================
-   BACKGROUND HEADER FULL WIDTH
-   ============================ */
 
-/* On force le header à prendre toute la largeur */
-.brand-with-portrait {
+/* =====================================================
+   FACTIONS — BACKGROUND SUR LE HEADER (NOM + PORTRAIT)
+   (Images dans /assets)
+   - Mechkawaii: assets/background_mechkawaii.png
+   - Prodrome:   assets/background_prodrome.png
+   ===================================================== */
+
+/* Sécurité: on force les cartes à rester "dark" même si une ancienne règle traîne */
+body.faction-mechkawaii .card,
+body.faction-prodrome .card{
+  background: var(--panel) !important;
+}
+
+/* Header full-width + image de faction */
+body.faction-mechkawaii .brand-with-portrait,
+body.faction-prodrome .brand-with-portrait{
   width: 100%;
-  margin: 0;
-  padding: 16px;
+  padding: 14px 14px;
   border-radius: 16px;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+
+  /* petit cadre discret */
+  border: 1px solid rgba(255,255,255,0.10);
 }
 
-/* Mechkawaii */
-.faction-mechkawaii .brand-with-portrait {
-  background-image: url("assets/background_mechkawaii.png");
+/* Fond Mechkawaii + voile sombre intégré (lisibilité) */
+body.faction-mechkawaii .brand-with-portrait{
+  background-image:
+    linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.55)),
+    url("./assets/background_mechkawaii.png");
 }
 
-/* Prodrome */
-.faction-prodrome .brand-with-portrait {
-  background-image: url("assets/background_prodrome.png");
+/* Fond Prodrome + voile sombre intégré (lisibilité) */
+body.faction-prodrome .brand-with-portrait{
+  background-image:
+    linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.55)),
+    url("./assets/background_prodrome.png");
 }
+
+/* Optionnel: couleur faction uniquement sur le titre */
+body.faction-mechkawaii #charName{ color: #FFC392; }
+body.faction-prodrome  #charName{ color: #86F777; }

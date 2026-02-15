@@ -1011,17 +1011,6 @@ document.addEventListener("DOMContentLoaded", async ()=>{
       location.reload();
     });
   }
-// ============================
-// Ajout classe faction au body
-// ============================
-
-document.body.classList.remove("faction-mechkawaii", "faction-prodrome");
-
-if (c.camp === "mechkawaii") {
-  document.body.classList.add("faction-mechkawaii");
-} else if (c.camp === "prodrome") {
-  document.body.classList.add("faction-prodrome");
-}
 
   if(splashDismissed){
     document.body.classList.remove('has-splash');
