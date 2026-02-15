@@ -682,12 +682,6 @@ async function initCharacter(){
   window.__cachedChars = chars;
 
   const c = chars.find(x=>x.id === id);
-
-// ✅ Faction theme (Mechkawaii / Prodrome)
-const camp = (c.camp || "mechkawaii").toLowerCase();
-document.body.classList.remove("faction-mechkawaii", "faction-prodrome");
-document.body.classList.add(camp === "prodrome" ? "faction-prodrome" : "faction-mechkawaii");
-
   if(!c){
     const err = qs("#error");
     if(err) err.textContent = "Character not found.";
@@ -854,15 +848,6 @@ document.body.classList.add(camp === "prodrome" ? "faction-prodrome" : "faction-
       }
     }
   }
-
-// ✅ Shield glow on this character card + portrait (based on assignments)
-(function applyShieldGlow(){
-  const assignments = getShieldAssignments();
-  const hasShield = assignments[c.id] !== undefined;
-  qs("#hpCard")?.classList.toggle("has-shield", hasShield);
-  qs("#charPortrait")?.classList.toggle("has-shield", hasShield);
-})();
-
 
   // Repair keys
   const repairKeysDisplay = qs('#repairKeysDisplay');
@@ -1080,6 +1065,10 @@ function initUnitTabs(currentCharId, allChars, lang){
 function createCharacterTab(char, lang){
   const tab = document.createElement('div');
   tab.className = 'unit-tab';
+
+  // Camp (pour styliser chaque onglet individuellement, même en mode "single")
+  const tabCamp = (char.camp || "mechkawaii").toLowerCase();
+  tab.classList.add(tabCamp === "prodrome" ? "camp-prodrome" : "camp-mechkawaii");
   tab.dataset.charId = char.id; // => data-char-id
 
   const saved = getState(char.id);
@@ -1096,6 +1085,7 @@ function createCharacterTab(char, lang){
 
   const visualEl = document.createElement('div');
   visualEl.className = 'unit-tab-visual';
+  visualEl.classList.add(tabCamp === "prodrome" ? "camp-prodrome" : "camp-mechkawaii");
   if (hasShield) visualEl.classList.add('has-shield');
 
   const charImage = char.images?.portrait || char.images?.character;
