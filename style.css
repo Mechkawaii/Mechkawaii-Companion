@@ -1626,3 +1626,39 @@ body.is-ko .topbar{
   background-color: var(--panel) !important;
   color: var(--text) !important;
 }
+/* ============================
+   BACKGROUND PAR FACTION
+   ============================ */
+
+/* On garde la structure dark */
+.faction-mechkawaii .card,
+.faction-prodrome .card {
+  background-color: var(--panel);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.faction-mechkawaii #hpCard,
+.faction-prodrome #hpCard {
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.faction-mechkawaii #hpCard::before,
+.faction-prodrome #hpCard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55); /* voile sombre */
+  z-index: 0;
+}
+
+.faction-mechkawaii #hpCard > *,
+.faction-prodrome #hpCard > * {
+  position: relative;
+  z-index: 1;
+}
+
