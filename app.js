@@ -1,12 +1,14 @@
 const STORAGE_PREFIX = "mechkawaii:";
 
 /* ------------------------------
-   LANG (Flags on Index)
+   DOM helpers
 ------------------------------ */
-
 function qs(sel){ return document.querySelector(sel); }
 function qsa(sel){ return [...document.querySelectorAll(sel)]; }
 
+/* ------------------------------
+   LANG (Flags on Index)
+------------------------------ */
 function getLang(){
   const saved = localStorage.getItem(STORAGE_PREFIX + "lang");
   return saved || "fr";
@@ -26,7 +28,6 @@ function bindTopbar(){
     sel.value = getLang();
     sel.disabled = true;
     sel.style.display = "none";
-    // si le parent "pill" existe, on le cache aussi
     const pill = sel.closest(".pill");
     if(pill) pill.style.display = "none";
   }
@@ -59,7 +60,6 @@ function initLangFlags(){
 /* ------------------------------
    STATE / STORAGE
 ------------------------------ */
-
 function heartIcon(filled){
   const src = filled ? "./assets/pv.svg" : "./assets/pv_off.svg";
   return `<img src="${src}" class="heart" alt="PV" />`;
@@ -107,12 +107,6 @@ function setShieldAssignments(assignments){
   localStorage.setItem(STORAGE_PREFIX + "shield-assignments", JSON.stringify(assignments));
 }
 
-function heartSvg(filled){
-  const fill = filled ? "var(--accent)" : "rgba(255,255,255,.14)";
-  const stroke = filled ? "rgba(0,0,0,.25)" : "rgba(255,255,255,.20)";
-  return `<svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.4C.3 8.2 2.2 5.2 5.4 4.5c1.9-.4 3.8.3 5 1.7 1.2-1.4 3.1-2.1 5-1.7 3.2.7 5.1 3.7 3.4 7.1C19.5 16.4 12 21 12 21z" fill="${fill}" stroke="${stroke}" stroke-width="1.2" /></svg>`;
-}
-
 async function loadCharacters(){
   const res = await fetch("./data/characters.json", {cache:"no-store"});
   if(!res.ok) throw new Error("Cannot load characters.json");
@@ -141,16 +135,17 @@ function renderHP(container, hpCur, hpMax){
 }
 
 /**
- * Anti-crash: si root n'existe pas dans le HTML, on sort sans planter.
+ * Anti-crash : si root n'existe pas dans le HTML, on sort sans planter.
+ * visual_keys => rend des boutons "key-button"
  */
 function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = null){
   if(!root) return;
 
-  if (toggle.type === 'visual_keys') {
-    const keysContainer = document.createElement('div');
-    keysContainer.className = 'toggle-visual-keys';
+  if (toggle.type === "visual_keys") {
+    const keysContainer = document.createElement("div");
+    keysContainer.className = "toggle-visual-keys";
 
-    const label = document.createElement('label');
+    const label = document.createElement("label");
     label.style.cssText = `
       flex: 1;
       font-weight: 600;
@@ -160,41 +155,43 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
     label.textContent = t(toggle.label, lang);
 
     // On a déjà un titre dans le HTML pour ces sections
-    if (toggle.id === 'repair_keys' || toggle.id === 'shield') {
-      label.style.display = 'none';
+    if (toggle.id === "repair_keys" || toggle.id === "shield") {
+      label.style.display = "none";
     }
 
-    const keysDisplay = document.createElement('div');
-    keysDisplay.className = 'keys-display';
+    const keysDisplay = document.createElement("div");
+    keysDisplay.className = "keys-display";
 
     const maxKeys = toggle.maxKeys || 2;
-    const isShield = toggle.id === 'shield';
+    const isShield = toggle.id === "shield";
 
     const currentState = isShield
       ? (Array.isArray(sharedShields) ? sharedShields : (Array.isArray(isOn) ? isOn : [true, true, true]))
       : (Array.isArray(isOn) ? isOn : [isOn, isOn]);
 
     for (let i = 0; i < maxKeys; i++) {
-      const key = document.createElement('button');
-      key.className = 'key-button';
-      key.type = 'button';
+      const key = document.createElement("button");
+      key.className = "key-button";
+      key.type = "button";
 
       const keyState = currentState[i] !== undefined ? currentState[i] : true;
 
-      key.dataset.keyIndex = i;
+      key.dataset.keyIndex = String(i);
       key.dataset.toggleId = toggle.id;
-      key.dataset.active = keyState ? 'true' : 'false';
+      key.dataset.active = keyState ? "true" : "false";
 
-      key.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_${keyState ? 'on' : 'off'}.svg')`;
+      key.style.backgroundImage =
+        `url('./assets/icons/${isShield ? "shield" : "key"}_${keyState ? "on" : "off"}.svg')`;
 
-      key.addEventListener('click', function(e) {
+      key.addEventListener("click", function(e){
         e.preventDefault();
-        this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true';
-        this.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_${this.dataset.active === 'true' ? 'on' : 'off'}.svg')`;
+        this.dataset.active = this.dataset.active === "true" ? "false" : "true";
+        this.style.backgroundImage =
+          `url('./assets/icons/${isShield ? "shield" : "key"}_${this.dataset.active === "true" ? "on" : "off"}.svg')`;
 
         const keysState = [];
-        keysDisplay.querySelectorAll('.key-button').forEach(kb => {
-          keysState.push(kb.dataset.active === 'true');
+        keysDisplay.querySelectorAll(".key-button").forEach(kb=>{
+          keysState.push(kb.dataset.active === "true");
         });
         onChange(keysState);
       });
@@ -205,46 +202,51 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
     keysContainer.appendChild(label);
     keysContainer.appendChild(keysDisplay);
     root.appendChild(keysContainer);
-
-  } else {
-    const row = document.createElement('div');
-    row.className = 'toggle';
-    const left = document.createElement('div');
-    left.className = 'lbl';
-    const title = document.createElement('div');
-    title.className = 't';
-    title.textContent = t(toggle.label, lang);
-    const desc = document.createElement('div');
-    desc.className = 'd';
-    desc.textContent = toggle.hint ? t(toggle.hint, lang) : '';
-    left.appendChild(title);
-    left.appendChild(desc);
-
-    const sw = document.createElement('div');
-    sw.className = 'switch' + (isOn ? ' on' : '');
-    sw.setAttribute('role', 'switch');
-    sw.setAttribute('tabindex', '0');
-    sw.setAttribute('aria-checked', isOn ? 'true' : 'false');
-
-    function flip(){
-      isOn = !isOn;
-      sw.className = 'switch' + (isOn ? ' on' : '');
-      sw.setAttribute('aria-checked', isOn ? 'true' : 'false');
-      onChange(isOn);
-    }
-
-    sw.addEventListener('click', flip);
-    sw.addEventListener('keydown', (e)=>{
-      if(e.key === 'Enter' || e.key === ' '){
-        e.preventDefault();
-        flip();
-      }
-    });
-
-    row.appendChild(left);
-    row.appendChild(sw);
-    root.appendChild(row);
+    return;
   }
+
+  // Switch classique
+  const row = document.createElement("div");
+  row.className = "toggle";
+
+  const left = document.createElement("div");
+  left.className = "lbl";
+
+  const title = document.createElement("div");
+  title.className = "t";
+  title.textContent = t(toggle.label, lang);
+
+  const desc = document.createElement("div");
+  desc.className = "d";
+  desc.textContent = toggle.hint ? t(toggle.hint, lang) : "";
+
+  left.appendChild(title);
+  left.appendChild(desc);
+
+  const sw = document.createElement("div");
+  sw.className = "switch" + (isOn ? " on" : "");
+  sw.setAttribute("role", "switch");
+  sw.setAttribute("tabindex", "0");
+  sw.setAttribute("aria-checked", isOn ? "true" : "false");
+
+  function flip(){
+    isOn = !isOn;
+    sw.className = "switch" + (isOn ? " on" : "");
+    sw.setAttribute("aria-checked", isOn ? "true" : "false");
+    onChange(isOn);
+  }
+
+  sw.addEventListener("click", flip);
+  sw.addEventListener("keydown", (e)=>{
+    if(e.key === "Enter" || e.key === " "){
+      e.preventDefault();
+      flip();
+    }
+  });
+
+  row.appendChild(left);
+  row.appendChild(sw);
+  root.appendChild(row);
 }
 
 function urlParam(name){
@@ -352,7 +354,6 @@ async function initIndex(){
     }
 
     qs("#resetSetupBtn")?.addEventListener("click", clearSetup);
-
     return;
   }
 
@@ -366,7 +367,7 @@ async function initIndex(){
 
   const maxPick = (setup.mode === "single") ? 6 : 3;
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
-  let draft = draftRaw ? JSON.parse(draftRaw) : null;
+  const draft = draftRaw ? JSON.parse(draftRaw) : null;
 
   function saveDraft(obj){
     localStorage.setItem(STORAGE_PREFIX + "draft", JSON.stringify(obj));
@@ -405,7 +406,8 @@ async function initIndex(){
           selected.delete(c.id);
         }else{
           if(selected.size >= maxPick){
-            if(draftError) draftError.textContent = (lang === "fr") ? `Tu as déjà ${maxPick} persos sélectionnés.` : `You already selected ${maxPick} characters.`;
+            if(draftError) draftError.textContent =
+              (lang === "fr") ? `Tu as déjà ${maxPick} persos sélectionnés.` : `You already selected ${maxPick} characters.`;
             return;
           }
           selected.add(c.id);
@@ -427,7 +429,8 @@ async function initIndex(){
 
     qs("#confirmDraft")?.addEventListener("click", ()=>{
       if(selected.size !== maxPick){
-        if(draftError) draftError.textContent = (lang === "fr") ? `Sélectionne exactement ${maxPick} persos.` : `Select exactly ${maxPick} characters.`;
+        if(draftError) draftError.textContent =
+          (lang === "fr") ? `Sélectionne exactement ${maxPick} persos.` : `Select exactly ${maxPick} characters.`;
         return;
       }
       saveDraft({activeIds:[...selected]});
@@ -501,7 +504,7 @@ async function initCharacter(){
 
   const defaultToggles = {};
   (c.toggles || []).forEach(tg => {
-    if (tg.type === 'visual_keys') {
+    if (tg.type === "visual_keys") {
       const maxKeys = tg.maxKeys || 2;
       defaultToggles[tg.id] = Array.from({length: maxKeys}, ()=>true);
     } else {
@@ -509,6 +512,7 @@ async function initCharacter(){
     }
   });
 
+  // Merge (important si ancien state)
   const state = saved || { hp: c.hp?.max ?? 0, toggles: {} };
   if (state.hp == null) state.hp = c.hp?.max ?? 0;
   if (!state.toggles) state.toggles = {};
@@ -517,33 +521,36 @@ async function initCharacter(){
   });
   setState(c.id, state);
 
+  // UI header
   const charName = qs("#charName");
   const charClass = qs("#charClass");
   const hpMaxLabel = qs("#hpMaxLabel");
-
   if(charName) charName.textContent = t(c.name, lang);
   if(charClass) charClass.textContent = t(c.class, lang);
   if(hpMaxLabel) hpMaxLabel.textContent = `/${c.hp?.max ?? 0}`;
 
   const charPortrait = qs("#charPortrait");
   if (charPortrait) {
-    charPortrait.innerHTML = '';
+    charPortrait.innerHTML = "";
     const charImage = c.images?.portrait || c.images?.character;
 
     if (charImage) {
-      const img = document.createElement('img');
+      const img = document.createElement("img");
       img.src = charImage;
       img.alt = t(c.name, lang);
-      img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
+      img.style.cssText = "max-width:100%;max-height:100%;object-fit:contain;";
       img.onerror = function(){
-        charPortrait.innerHTML = `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
+        charPortrait.innerHTML =
+          `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
       };
       charPortrait.appendChild(img);
     } else {
-      charPortrait.innerHTML = `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
+      charPortrait.innerHTML =
+        `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
     }
   }
 
+  // HP
   const hpCurEl = qs("#hpCur");
   const hpHeartsEl = qs("#hpHearts");
 
@@ -552,22 +559,22 @@ async function initCharacter(){
     renderHP(hpHeartsEl, state.hp, c.hp?.max ?? 0);
   }
 
-  function updateShieldDisplay(){
-    const allCards = document.querySelectorAll('.card');
+  function updateShieldFxOnCard(){
+    // On met l'effet de bouclier sur la card HP (celle qui contient le titre)
+    const cards = document.querySelectorAll(".card");
     let hpCard = null;
 
-    for (let card of allCards) {
-      if (card.textContent.includes('Points de Vie') || card.textContent.includes('Life')) {
+    for (const card of cards) {
+      if (card.textContent.includes("Points de Vie") || card.textContent.includes("Life")) {
         hpCard = card;
         break;
       }
     }
+    if(!hpCard) return;
 
-    if (hpCard) {
-      const freshAssignments = getShieldAssignments();
-      if (freshAssignments[c.id] !== undefined) hpCard.classList.add('has-shield');
-      else hpCard.classList.remove('has-shield');
-    }
+    const assignments = getShieldAssignments();
+    if (assignments[c.id] !== undefined) hpCard.classList.add("has-shield");
+    else hpCard.classList.remove("has-shield");
   }
 
   qs("#hpMinus")?.addEventListener("click", ()=>{
@@ -586,70 +593,66 @@ async function initCharacter(){
 
   refreshHP();
 
-  const classActionTitle = qs("#classActionTitle");
-  const classActionBody = qs("#classActionBody");
-  const ultTitle = qs("#ultTitle");
-  const ultBody = qs("#ultBody");
-  const movementDesc = qs("#movementDesc");
-  const attackDesc = qs("#attackDesc");
-
-  if(classActionTitle) classActionTitle.textContent = t(c.texts?.class_action_title, lang);
-  if(classActionBody) classActionBody.textContent = t(c.texts?.class_action_body, lang);
-  if(ultTitle) ultTitle.textContent = t(c.texts?.ultimate_title, lang);
-  if(ultBody) ultBody.textContent = t(c.texts?.ultimate_body, lang);
-
-  if(movementDesc) movementDesc.textContent = t(c.texts?.movement_desc, lang) || "";
-  if(attackDesc) attackDesc.textContent = t(c.texts?.attack_desc, lang) || "";
+  // Texts
+  qs("#classActionTitle") && (qs("#classActionTitle").textContent = t(c.texts?.class_action_title, lang));
+  qs("#classActionBody") && (qs("#classActionBody").textContent = t(c.texts?.class_action_body, lang));
+  qs("#ultTitle") && (qs("#ultTitle").textContent = t(c.texts?.ultimate_title, lang));
+  qs("#ultBody") && (qs("#ultBody").textContent = t(c.texts?.ultimate_body, lang));
+  qs("#movementDesc") && (qs("#movementDesc").textContent = t(c.texts?.movement_desc, lang) || "");
+  qs("#attackDesc") && (qs("#attackDesc").textContent = t(c.texts?.attack_desc, lang) || "");
 
   // --- Boucliers (même UI que les clés) + assignation ---
-  const shieldsDisplay = qs('#shieldsDisplay');
+  const shieldsDisplay = qs("#shieldsDisplay");
   if (shieldsDisplay) {
-    shieldsDisplay.innerHTML = '';
+    shieldsDisplay.innerHTML = "";
 
-    const shieldToggle = (c.toggles || []).find(tg => tg.id === 'shield');
+    const shieldToggle = (c.toggles || []).find(tg => tg.id === "shield");
     if (shieldToggle) {
       const freshShields = getSharedShields();
       const freshAssignments = getShieldAssignments();
 
+      // Rend les 3 boutons (type key-button)
       renderToggleRow(
         shieldsDisplay,
         shieldToggle,
         freshShields,
         lang,
-        (v) => { setSharedShields(v); },
+        (v)=>{ setSharedShields(v); },
         freshShields
       );
 
-      const keyButtons = shieldsDisplay.querySelectorAll('.key-button');
-      keyButtons.forEach((btn, i) => {
+      // Transforme chaque bouton en "assignation"
+      const keyButtons = shieldsDisplay.querySelectorAll(".key-button");
+      keyButtons.forEach((btn, i)=>{
+        // shield déjà consommé ? => on le cache
         if (!freshShields[i]) {
-          btn.style.display = 'none';
+          btn.style.display = "none";
           return;
         }
 
-        btn.dataset.active = 'true';
-        btn.style.backgroundImage = `url('./assets/icons/shield_on.svg')`;
+        // toujours visuel "on" tant qu'il est dispo
+        btn.dataset.active = "true";
+        btn.style.backgroundImage = "url('./assets/icons/shield_on.svg')";
 
-        btn.onclick = (e) => {
+        btn.onclick = (e)=>{
           e.preventDefault();
-          showShieldAssignmentModal(i, c.id, lang, chars, freshShields, freshAssignments);
+          showShieldAssignmentModal(i, c.id, lang, chars);
         };
       });
 
+      // Si ce perso a un bouclier : bouton retirer (usage unique => ne retourne pas en réserve)
       if (freshAssignments[c.id] !== undefined) {
-        const removeShield = document.createElement('button');
-        removeShield.className = 'shield-remove-btn';
-        removeShield.textContent = lang === 'fr' ? 'Retirer le bouclier' : 'Remove the shield';
+        const removeShield = document.createElement("button");
+        removeShield.className = "shield-remove-btn";
+        removeShield.textContent = (lang === "fr") ? "Retirer le bouclier" : "Remove the shield";
 
-        removeShield.addEventListener('click', function (e) {
+        removeShield.addEventListener("click", (e)=>{
           e.preventDefault();
-          const currentAssignments = getShieldAssignments();
+          const assignments = getShieldAssignments();
+          delete assignments[c.id];
+          setShieldAssignments(assignments);
 
-          // On retire l'assignation du personnage
-          delete currentAssignments[c.id];
-          setShieldAssignments(currentAssignments);
-
-          // ⚠️ On ne remet PAS le bouclier dans la réserve (usage unique)
+          // ⚠️ On NE touche PAS aux shields (usage unique)
           location.reload();
         });
 
@@ -659,62 +662,39 @@ async function initCharacter(){
   }
 
   // --- Clés de réparation ---
-  const repairKeysDisplay = qs('#repairKeysDisplay');
+  const repairKeysDisplay = qs("#repairKeysDisplay");
   if (repairKeysDisplay) {
-    repairKeysDisplay.innerHTML = '';
-    const repairToggle = (c.toggles || []).find(tg => tg.id === 'repair_keys');
+    repairKeysDisplay.innerHTML = "";
+    const repairToggle = (c.toggles || []).find(tg => tg.id === "repair_keys");
     if (repairToggle) {
       const keysState = state.toggles[repairToggle.id] || [true, true];
-      renderToggleRow(repairKeysDisplay, repairToggle, keysState, lang, (v) => {
+      renderToggleRow(repairKeysDisplay, repairToggle, keysState, lang, (v)=>{
         state.toggles[repairToggle.id] = v;
         setState(c.id, state);
       });
     }
   }
 
-  // --- Toggles ---
-  const togglesRoot = qs('#toggles');
-  const ultToggleContainer = qs('#ultToggleContainer');
-  if (togglesRoot) togglesRoot.innerHTML = '';
-  if (ultToggleContainer) ultToggleContainer.innerHTML = '';
+  // --- Coup Unique toggle dans sa section ---
+  const ultToggleContainer = qs("#ultToggleContainer");
+  if (ultToggleContainer) ultToggleContainer.innerHTML = "";
 
-  const isUltimateToggle = (tg) => {
-    const fr = (t(tg.label, 'fr') || '').toLowerCase();
-    const en = (t(tg.label, 'en') || '').toLowerCase();
-    return fr.includes('coup unique') || en.includes('ultimate');
+  const isUltimateToggle = (tg)=>{
+    const fr = (t(tg.label, "fr") || "").toLowerCase();
+    const en = (t(tg.label, "en") || "").toLowerCase();
+    return fr.includes("coup unique") || en.includes("ultimate");
   };
 
   const ultimateToggle = (c.toggles || []).find(isUltimateToggle);
-
   if (ultimateToggle && ultToggleContainer) {
     const isOn = !!state.toggles[ultimateToggle.id];
-    renderToggleRow(ultToggleContainer, ultimateToggle, isOn, lang, (v) => {
+    renderToggleRow(ultToggleContainer, ultimateToggle, isOn, lang, (v)=>{
       state.toggles[ultimateToggle.id] = v;
       setState(c.id, state);
     });
   }
 
-  (c.toggles || []).forEach(tg => {
-    if (tg.id === "shield") return;
-    if (tg.id === "repair_keys") return;
-    if (ultimateToggle && tg.id === ultimateToggle.id) return;
-
-    if (tg.type === 'visual_keys') {
-      const keysState = state.toggles[tg.id];
-      const sharedShields = getSharedShields();
-      renderToggleRow(togglesRoot, tg, keysState, lang, (v) => {
-        state.toggles[tg.id] = v;
-        setState(c.id, state);
-      }, sharedShields);
-    } else {
-      const isOn = !!state.toggles[tg.id];
-      renderToggleRow(togglesRoot, tg, isOn, lang, (v) => {
-        state.toggles[tg.id] = v;
-        setState(c.id, state);
-      });
-    }
-  });
-
+  // Patterns (normal/expert)
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
   const setup = setupRaw ? JSON.parse(setupRaw) : null;
   const difficulty = setup?.difficulty || "normal";
@@ -739,29 +719,27 @@ async function initCharacter(){
     };
     setState(c.id, fresh);
 
+    // reset global shields + assignments
     setSharedShields([true, true, true]);
     setShieldAssignments({});
-
     location.reload();
   });
 
   qs("#backBtn")?.addEventListener("click", ()=>{ location.href = "./index.html"; });
 
-  updateShieldDisplay();
+  updateShieldFxOnCard();
   initUnitTabs(id, chars, lang);
 }
 
 /* ------------------------------
-   MODAL SHIELD
+   MODAL SHIELD (assign)
+   - Consomme le bouclier dans la réserve (sharedShields[index]=false)
 ------------------------------ */
-function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, sharedShields, assignments){
-  const modal = document.createElement('div');
+function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
+  const modal = document.createElement("div");
   modal.style.cssText = `
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background: rgba(0,0,0,0.5);
     display: flex;
     align-items: center;
@@ -769,7 +747,7 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, s
     z-index: 1000;
   `;
 
-  const content = document.createElement('div');
+  const content = document.createElement("div");
   content.style.cssText = `
     background: white;
     border-radius: 8px;
@@ -781,9 +759,9 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, s
     color: black;
   `;
 
-  const title = document.createElement('h2');
-  title.textContent = lang === 'fr' ? 'Assigner le bouclier' : 'Assign shield';
-  title.style.marginTop = '0';
+  const title = document.createElement("h2");
+  title.textContent = (lang === "fr") ? "Assigner le bouclier" : "Assign shield";
+  title.style.marginTop = "0";
   content.appendChild(title);
 
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
@@ -791,14 +769,23 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, s
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
   const draft = draftRaw ? JSON.parse(draftRaw) : null;
 
-  let teamChars = allChars.filter(c => {
-    if (setup?.mode === 'single') return draft?.activeIds?.includes(c.id);
-    const currentChar = allChars.find(ch => ch.id === currentCharId);
-    return draft?.activeIds?.includes(c.id) && (c.camp || "mechkawaii") === (currentChar?.camp || "mechkawaii");
+  // équipe : uniquement les persos sélectionnés (draft)
+  let teamChars = allChars.filter(c=>{
+    if (!draft?.activeIds?.includes(c.id)) return false;
+    if (setup?.mode === "single") return true;
+
+    // multi : même camp
+    const currentChar = allChars.find(ch=>ch.id === currentCharId);
+    return (c.camp || "mechkawaii") === (currentChar?.camp || "mechkawaii");
   });
 
-  teamChars.forEach(char => {
-    const btn = document.createElement('button');
+  // fallback : si pas de draft, on prend tout le camp
+  if(!teamChars.length){
+    teamChars = allChars;
+  }
+
+  teamChars.forEach(char=>{
+    const btn = document.createElement("button");
     btn.textContent = t(char.name, lang);
     btn.style.cssText = `
       width: 100%;
@@ -812,34 +799,35 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, s
       transition: all 0.2s ease;
     `;
 
-    btn.addEventListener('mouseover', () => {
-      btn.style.borderColor = '#3b82f6';
-      btn.style.background = '#eff6ff';
+    btn.addEventListener("mouseover", ()=>{
+      btn.style.borderColor = "#3b82f6";
+      btn.style.background = "#eff6ff";
     });
-    btn.addEventListener('mouseout', () => {
-      btn.style.borderColor = '#ddd';
-      btn.style.background = 'white';
+    btn.addEventListener("mouseout", ()=>{
+      btn.style.borderColor = "#ddd";
+      btn.style.background = "white";
     });
 
-    btn.addEventListener('click', () => {
-      const currentAssignments = getShieldAssignments();
-      const currentShields = getSharedShields();
+    btn.addEventListener("click", ()=>{
+      const assignments = getShieldAssignments();
+      const shields = getSharedShields();
 
-      currentAssignments[char.id] = shieldIndex;
-      currentShields[shieldIndex] = false;
+      // assigne + consomme le bouclier
+      assignments[char.id] = shieldIndex;
+      shields[shieldIndex] = false;
 
-      setShieldAssignments(currentAssignments);
-      setSharedShields(currentShields);
+      setShieldAssignments(assignments);
+      setSharedShields(shields);
 
       document.body.removeChild(modal);
-      setTimeout(() => location.reload(), 150);
+      setTimeout(()=>location.reload(), 150);
     });
 
     content.appendChild(btn);
   });
 
-  const closeBtn = document.createElement('button');
-  closeBtn.textContent = lang === 'fr' ? 'Annuler' : 'Cancel';
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = (lang === "fr") ? "Annuler" : "Cancel";
   closeBtn.style.cssText = `
     width: 100%;
     padding: 10px;
@@ -850,9 +838,7 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, s
     background: #f5f5f5;
     color: black;
   `;
-  closeBtn.addEventListener('click', () => {
-    document.body.removeChild(modal);
-  });
+  closeBtn.addEventListener("click", ()=>document.body.removeChild(modal));
   content.appendChild(closeBtn);
 
   modal.appendChild(content);
@@ -863,22 +849,21 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars, s
    BOOT
 ------------------------------ */
 document.addEventListener("DOMContentLoaded", async ()=>{
-
   const SPLASH_KEY = STORAGE_PREFIX + "splashDismissed";
   const splashDismissed = localStorage.getItem(SPLASH_KEY) === "1";
 
   function hideSplash(){
     const splash = document.getElementById("splash");
-    if(splash){ splash.remove(); }
+    if(splash) splash.remove();
     document.body.classList.remove("has-splash");
   }
 
+  // ✅ plus de son : juste fermer le splash
   const playBtn = document.getElementById("playBtn");
   if(playBtn){
     playBtn.addEventListener("click", ()=>{
-      playPressStart();
       localStorage.setItem(SPLASH_KEY, "1");
-      document.body.classList.remove('has-splash');
+      document.body.classList.remove("has-splash");
       hideSplash();
     });
   }
@@ -894,7 +879,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
       const chars = await loadCharacters();
       window.__cachedChars = chars;
 
-      chars.forEach(c => {
+      chars.forEach(c=>{
         localStorage.removeItem(STORAGE_PREFIX + "state:" + c.id);
       });
 
@@ -904,7 +889,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   }
 
   if(splashDismissed){
-    document.body.classList.remove('has-splash');
+    document.body.classList.remove("has-splash");
     hideSplash();
   }
 
@@ -919,17 +904,15 @@ document.addEventListener("DOMContentLoaded", async ()=>{
 });
 
 /* ------------------------------
-   TABS
+   TABS (Bottom)
 ------------------------------ */
 function initUnitTabs(currentCharId, allChars, lang){
   const tabsContainer = qs("#unitTabs");
   const unitTabsWrapper = qs(".unit-tabs-container");
-
   if(!tabsContainer || !unitTabsWrapper) return;
 
   const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
-
   if(!setupRaw || !draftRaw) return;
 
   const setup = JSON.parse(setupRaw);
@@ -939,9 +922,7 @@ function initUnitTabs(currentCharId, allChars, lang){
 
   if(setup.mode === "single"){
     if(Array.isArray(draft.activeIds) && draft.activeIds.length){
-      tabCharacters = allChars.filter(c =>
-        draft.activeIds.includes(c.id) && c.id !== currentCharId
-      );
+      tabCharacters = allChars.filter(c => draft.activeIds.includes(c.id) && c.id !== currentCharId);
     }
   } else {
     const currentCamp = setup.camp || "mechkawaii";
@@ -955,24 +936,24 @@ function initUnitTabs(currentCharId, allChars, lang){
   }
 
   if(tabCharacters.length === 0){
-    unitTabsWrapper.classList.remove('visible');
-    document.body.classList.remove('tabs-visible');
+    unitTabsWrapper.classList.remove("visible");
+    document.body.classList.remove("tabs-visible");
     return;
   }
 
-  unitTabsWrapper.classList.add('visible');
-  document.body.classList.add('tabs-visible');
+  unitTabsWrapper.classList.add("visible");
+  document.body.classList.add("tabs-visible");
 
-  tabsContainer.innerHTML = '';
-  tabCharacters.forEach(char => {
+  tabsContainer.innerHTML = "";
+  tabCharacters.forEach(char=>{
     const tab = createCharacterTab(char, lang);
     tabsContainer.appendChild(tab);
   });
 }
 
 function createCharacterTab(char, lang){
-  const tab = document.createElement('div');
-  tab.className = 'unit-tab';
+  const tab = document.createElement("div");
+  tab.className = "unit-tab";
   tab.dataset.charId = char.id;
 
   const saved = getState(char.id);
@@ -980,38 +961,38 @@ function createCharacterTab(char, lang){
   const maxHp = char.hp?.max ?? 0;
 
   const hpPercentage = maxHp > 0 ? (hp / maxHp) * 100 : 100;
-  const hpClass = hpPercentage <= 33 ? 'low' : '';
+  const hpClass = hpPercentage <= 33 ? "low" : "";
 
   const assignments = getShieldAssignments();
   const hasShield = assignments[char.id] !== undefined;
 
-  const visualEl = document.createElement('div');
-  visualEl.className = 'unit-tab-visual';
-  if (hasShield) visualEl.classList.add('has-shield');
+  const visualEl = document.createElement("div");
+  visualEl.className = "unit-tab-visual";
+  if (hasShield) visualEl.classList.add("has-shield");
 
   const charImage = char.images?.portrait || char.images?.character;
-
   if(charImage){
-    const img = document.createElement('img');
+    const img = document.createElement("img");
     img.src = charImage;
     img.alt = t(char.name, lang);
-    img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));';
-
+    img.style.cssText = "max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));";
     img.onerror = function(){
-      visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
+      visualEl.innerHTML =
+        `<div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
     };
     visualEl.appendChild(img);
   } else {
-    visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
+    visualEl.innerHTML =
+      `<div style="width:70%;height:70%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px, 8vw, 36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
   }
 
-  const hpBadge = document.createElement('div');
+  const hpBadge = document.createElement("div");
   hpBadge.className = `unit-tab-hp ${hpClass}`;
   hpBadge.innerHTML = `<span>❤️</span><span>${hp}/${maxHp}</span>`;
   visualEl.appendChild(hpBadge);
 
-  const infoEl = document.createElement('div');
-  infoEl.className = 'unit-tab-info';
+  const infoEl = document.createElement("div");
+  infoEl.className = "unit-tab-info";
   infoEl.innerHTML = `
     <div class="unit-tab-name">${t(char.name, lang)}</div>
     <div class="unit-tab-role">${t(char.class, lang)}</div>
@@ -1020,9 +1001,9 @@ function createCharacterTab(char, lang){
   tab.appendChild(visualEl);
   tab.appendChild(infoEl);
 
-  if (hasShield) tab.classList.add('has-shield');
+  if (hasShield) tab.classList.add("has-shield");
 
-  tab.addEventListener('click', () => {
+  tab.addEventListener("click", ()=>{
     location.href = `character.html?id=${encodeURIComponent(char.id)}`;
   });
 
@@ -1033,7 +1014,7 @@ function updateTabHP(charId, newHp){
   const tab = document.querySelector(`.unit-tab[data-char-id="${charId}"]`);
   if(!tab) return;
 
-  const hpBadge = tab.querySelector('.unit-tab-hp');
+  const hpBadge = tab.querySelector(".unit-tab-hp");
   if(!hpBadge) return;
 
   const allChars = window.__cachedChars;
@@ -1042,12 +1023,10 @@ function updateTabHP(charId, newHp){
     const maxHp = char?.hp?.max ?? 0;
 
     const hpPercentage = maxHp > 0 ? (newHp / maxHp) * 100 : 100;
-    hpBadge.className = 'unit-tab-hp' + (hpPercentage <= 33 ? ' low' : '');
-    hpBadge.querySelector('span:last-child').textContent = `${newHp}/${maxHp}`;
+    hpBadge.className = "unit-tab-hp" + (hpPercentage <= 33 ? " low" : "");
+    hpBadge.querySelector("span:last-child").textContent = `${newHp}/${maxHp}`;
 
-    tab.style.animation = 'none';
-    setTimeout(() => {
-      tab.style.animation = 'heartShake 0.3s ease';
-    }, 10);
+    tab.style.animation = "none";
+    setTimeout(()=>{ tab.style.animation = "heartShake 0.3s ease"; }, 10);
   }
 }
