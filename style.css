@@ -1627,22 +1627,27 @@ body.is-ko .topbar{
   color: var(--text) !important;
 }
 /* ============================
-   BACKGROUND PAR FACTION
+   BACKGROUND PAR FACTION (assets/)
    ============================ */
 
-/* On garde la structure dark */
-.faction-mechkawaii .card,
-.faction-prodrome .card {
-  background-color: var(--panel);
+/* On applique le fond UNIQUEMENT sur la carte PV (hpCard) */
+.faction-mechkawaii #hpCard {
+  background-image: url("assets/background_mechkawaii.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-.faction-mechkawaii #hpCard,
 .faction-prodrome #hpCard {
+  background-image: url("assets/background_prodrome.png");
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Option recommandée : voile sombre pour garder la lisibilité */
+.faction-mechkawaii #hpCard,
+.faction-prodrome #hpCard {
   position: relative;
   overflow: hidden;
 }
@@ -1652,7 +1657,8 @@ body.is-ko .topbar{
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.55); /* voile sombre */
+  background: rgba(0,0,0,0.55);
+  pointer-events: none;
   z-index: 0;
 }
 
@@ -1661,4 +1667,5 @@ body.is-ko .topbar{
   position: relative;
   z-index: 1;
 }
+
 
