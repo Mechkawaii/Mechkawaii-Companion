@@ -1,4 +1,3 @@
-
 /* =====================================
    MECHKAWAII COMPANION - Improved Stylesheet
    Game companion app pour suivre les parties
@@ -1117,6 +1116,7 @@ body.game-active .toggle.locked::after {
     page-break-inside: avoid;
   }
 }
+
 /* ============================= */
 /*        SHIELD ENERGY FX       */
 /* ============================= */
@@ -1224,6 +1224,7 @@ body.game-active .toggle.locked::after {
     animation: none;
   }
 }
+
 /* ============================= */
 /*     Language Flags (Index)    */
 /* ============================= */
@@ -1273,6 +1274,7 @@ body.game-active .toggle.locked::after {
   box-shadow: 0 0 0 3px rgba(59,130,246,.25);
   background: rgba(59,130,246,0.10);
 }
+
 .splash-lang{
   position: absolute;
   top: 16px;
