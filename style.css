@@ -1584,3 +1584,82 @@ body.is-ko .topbar{
   position: relative;
   z-index: 1;
 }
+
+
+
+/* =========================================================
+   OVERRIDES — Fond de faction sur HEADER + onglets (par perso)
+   ========================================================= */
+
+/* 1) HEADER (portrait + nom) : fond sur toute la largeur */
+.brand-with-portrait{
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Applique l'image selon le camp du perso affiché (body) */
+body.camp-mechkawaii .brand-with-portrait{
+  background-image: url("./assets/background_mechkawaii.png");
+}
+body.camp-prodrome .brand-with-portrait{
+  background-image: url("./assets/background_prodrome.png");
+}
+
+/* Option : léger voile pour garder la lisibilité (tu peux ajuster 0.35 → 0.55) */
+body.camp-mechkawaii .brand-with-portrait::before,
+body.camp-prodrome .brand-with-portrait::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: rgba(0,0,0,0.45);
+  pointer-events:none;
+  z-index:0;
+}
+body.camp-mechkawaii .brand-with-portrait > *,
+body.camp-prodrome .brand-with-portrait > *{
+  position: relative;
+  z-index: 1;
+}
+
+/* 2) ONGLET : chaque onglet a son fond selon SON camp (classe sur l’onglet) */
+/* Le fond doit couvrir TOUT l’onglet (pas seulement la zone visuelle) */
+.unit-tab.camp-mechkawaii,
+.unit-tab.camp-prodrome{
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Images par camp */
+.unit-tab.camp-mechkawaii{
+  background-image: url("./assets/background_mechkawaii.png");
+}
+.unit-tab.camp-prodrome{
+  background-image: url("./assets/background_prodrome.png");
+}
+
+/* Voile sombre sur l’onglet pour la lisibilité */
+.unit-tab.camp-mechkawaii::before,
+.unit-tab.camp-prodrome::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: rgba(0,0,0,0.45);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* Contenu au-dessus du voile */
+.unit-tab.camp-mechkawaii > *,
+.unit-tab.camp-prodrome > *{
+  position: relative;
+  z-index: 1;
+}
+
+/* IMPORTANT : neutralise un éventuel background sur la partie .unit-tab-visual */
+.unit-tab-visual.camp-mechkawaii,
+.unit-tab-visual.camp-prodrome{
+  background-image: none !important;
+}

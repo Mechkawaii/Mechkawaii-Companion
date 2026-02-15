@@ -688,6 +688,12 @@ async function initCharacter(){
     return;
   }
 
+
+// Camp sur le body (pour styliser le header du perso)
+document.body.classList.remove("camp-mechkawaii","camp-prodrome");
+const pageCamp = (c.camp || "mechkawaii").toLowerCase();
+document.body.classList.add(pageCamp === "prodrome" ? "camp-prodrome" : "camp-mechkawaii");
+
   const saved = getState(c.id);
 
   const defaultToggles = {};
