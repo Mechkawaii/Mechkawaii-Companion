@@ -969,8 +969,7 @@ html.splash-dismissed body.has-splash .controls {
   max-height: 100%;
   width: 50%;
   object-fit: contain;
-  object-position: center;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+  object-position: center;  
 }
 
 .unit-tab-hp {
@@ -1298,8 +1297,7 @@ body.game-active .toggle.locked::after {
 #charPortrait .ko-overlay img {
   width: 78%;
   height: 78%;
-  object-fit: contain;
-  filter: drop-shadow(0 10px 20px rgba(0,0,0,.45));
+  object-fit: contain;  
 }
 
 /* Bounce 1 fois quand ça tombe KO */
