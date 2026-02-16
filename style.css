@@ -1525,4 +1525,9 @@ body.camp-prodrome .brand-with-portrait::before{
 }
   background: rgba(59, 130, 246, 0.15);
   border-color: rgba(59, 130, 246, 0.3);
-
+/* Déplacement + Attaque côte à côte (même sur mobile) */
+.patterns-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
