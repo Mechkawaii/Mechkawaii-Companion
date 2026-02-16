@@ -1061,16 +1061,27 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
     return (c.camp || "mechkawaii") === currentCamp;
   });
 
+  // ✅ Empêche bouclier orange si la cible a déjà un bouclier bleu
+  const blueByTarget = getBlueShieldAssignments();
+
 
   teamChars.forEach(char => {
     const btn = document.createElement('button');
+    const hasBlue = (blueByTarget && blueByTarget[char.id] !== undefined);
     btn.textContent = t(char.name, lang);
+    if(hasBlue){
+      btn.disabled = true;
+      btn.textContent = `🔒 ${t(char.name, lang)} (bouclier bleu)`;
+      btn.style.opacity = '0.55';
+      btn.style.cursor = 'not-allowed';
+    }
     btn.style.cssText = `width:100%;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:6px;cursor:pointer;background:white;color:black;transition:all .2s ease;`;
 
     btn.addEventListener('mouseover', ()=>{ btn.style.borderColor='#3b82f6'; btn.style.background='#eff6ff'; });
     btn.addEventListener('mouseout', ()=>{ btn.style.borderColor='#ddd'; btn.style.background='white'; });
 
     btn.addEventListener('click', ()=>{
+      if(hasBlue) return;
       const currentAssignments = getShieldAssignments();
       const currentShields = getSharedShields();
 
@@ -1158,6 +1169,9 @@ function showBlueShieldAssignmentModal(currentTechId, lang, allChars){
     return (ch.camp || "mechkawaii") === techCamp;
   });
 
+  // ✅ Empêche bouclier bleu si la cible a déjà un bouclier orange
+  const orangeAssignments = getShieldAssignments();
+
   const byTarget = getBlueShieldAssignments(); // {targetId: techId}
 
   teamChars.forEach(char => {
@@ -1195,6 +1209,7 @@ function showBlueShieldAssignmentModal(currentTechId, lang, allChars){
     });
 
     btn.addEventListener('click', ()=>{
+      if(hasOrange) return;
       if(btn.disabled) return;
 
       // sécurité : 1 seul bouclier bleu par tech
