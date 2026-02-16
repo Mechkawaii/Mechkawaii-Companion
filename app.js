@@ -880,8 +880,7 @@ if (isTechnicianChar(c)) {
     btn.style.cssText = "display:inline-flex; align-items:center; gap:10px;";
     btn.innerHTML = `
       <img src="./assets/icons/shield_blue_on.svg" alt="Bouclier" style="width:26px;height:26px;display:block;" />
-      <span>Créer un bouclier</span>
-    `;
+      `;
 
     btn.addEventListener("click", (e) => {
       e.preventDefault();
