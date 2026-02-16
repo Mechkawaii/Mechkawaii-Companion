@@ -1551,3 +1551,24 @@ body.camp-prodrome .brand-with-portrait{
   background-repeat: no-repeat !important;
 }
 
+
+/* =========================================================
+   FIX: Character header should match card width
+   The topbar is a flex row; make it a block on character pages
+   so .brand-with-portrait spans full width.
+   ========================================================= */
+body.page-character .topbar{
+  display: block !important;
+  padding: 0 !important;
+}
+
+body.page-character .topbar .controls{
+  display: none !important;
+}
+
+/* Safety: ensure the header fills the container */
+body.page-character .brand-with-portrait{
+  width: 100% !important;
+  flex: 1 1 auto !important;
+  align-self: stretch !important;
+}
