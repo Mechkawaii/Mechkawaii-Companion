@@ -688,6 +688,12 @@ async function initCharacter(){
     return;
   }
 
+
+// Camp sur le body (pour styliser le header du perso)
+document.body.classList.remove("camp-mechkawaii","camp-prodrome");
+const pageCamp = (c.camp || "mechkawaii").toLowerCase();
+document.body.classList.add(pageCamp === "prodrome" ? "camp-prodrome" : "camp-mechkawaii");
+
   const saved = getState(c.id);
 
   const defaultToggles = {};
@@ -740,14 +746,6 @@ async function initCharacter(){
   const hpCurEl = qs("#hpCur");
   const hpHeartsEl = qs("#hpHearts");
 
-  const hpCard = qs("#hpCard");
-  function refreshHpShieldGlow(){
-    const assignments = getShieldAssignments();
-    const hasShield = assignments && assignments[c.id] !== undefined;
-    if(hpCard) hpCard.classList.toggle("has-shield", !!hasShield);
-  }
-
-
   function refreshHP(){
     if(hpCurEl) hpCurEl.textContent = String(state.hp);
     renderHP(hpHeartsEl, state.hp, c.hp?.max ?? 0);
@@ -789,7 +787,6 @@ async function initCharacter(){
     updateTabHP(c.id, state.hp);
   });
 
-  refreshHpShieldGlow();
   refreshHP();
 
   const classActionTitle = qs("#classActionTitle");
@@ -1074,6 +1071,10 @@ function initUnitTabs(currentCharId, allChars, lang){
 function createCharacterTab(char, lang){
   const tab = document.createElement('div');
   tab.className = 'unit-tab';
+
+  // Camp (pour styliser chaque onglet individuellement, même en mode "single")
+  const tabCamp = (char.camp || "mechkawaii").toLowerCase();
+  tab.classList.add(tabCamp === "prodrome" ? "camp-prodrome" : "camp-mechkawaii");
   tab.dataset.charId = char.id; // => data-char-id
 
   const saved = getState(char.id);
@@ -1090,6 +1091,7 @@ function createCharacterTab(char, lang){
 
   const visualEl = document.createElement('div');
   visualEl.className = 'unit-tab-visual';
+  visualEl.classList.add(tabCamp === "prodrome" ? "camp-prodrome" : "camp-mechkawaii");
   if (hasShield) visualEl.classList.add('has-shield');
 
   const charImage = char.images?.portrait || char.images?.character;

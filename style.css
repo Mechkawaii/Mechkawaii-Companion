@@ -1543,54 +1543,168 @@ body.is-ko .topbar{
   }
 }
 
-
 /* =========================================================
-   RESTORE FACTION BACKGROUNDS (Header + Tabs) — definitive
+   FACTION BACKGROUNDS — CLEAN & STABLE
+   - Header (portrait + nom) uses body.camp-mechkawaii / body.camp-prodrome
+   - Tabs use per-character classes: .unit-tab.camp-mechkawaii / .unit-tab.camp-prodrome
    ========================================================= */
 
-/* Header (portrait + nom) */
-.brand-with-portrait{
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
+/* ---------- HEADER (portrait + nom) ---------- */
+/* Only on character pages (when a camp class is present on body) */
+body.camp-mechkawaii .topbar,
+body.camp-prodrome .topbar{
+  background: transparent;
+  backdrop-filter: none;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+body.camp-mechkawaii .brand-with-portrait,
+body.camp-prodrome .brand-with-portrait{
+  width: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+  padding: 14px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 body.camp-mechkawaii .brand-with-portrait{
-  background-image: url("./assets/background_mechkawaii.png") !important;
-}
-body.camp-prodrome .brand-with-portrait{
-  background-image: url("./assets/background_prodrome.png") !important;
+  background-image: url("./assets/background_mechkawaii.png");
 }
 
-/* Tabs: each tab keeps its own camp background */
+body.camp-prodrome .brand-with-portrait{
+  background-image: url("./assets/background_prodrome.png");
+}
+
+/* subtle dark veil for readability */
+body.camp-mechkawaii .brand-with-portrait::before,
+body.camp-prodrome .brand-with-portrait::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: rgba(0,0,0,0.35);
+  pointer-events:none;
+  z-index:0;
+}
+
+body.camp-mechkawaii .brand-with-portrait > *,
+body.camp-prodrome .brand-with-portrait > *{
+  position: relative;
+  z-index: 1;
+}
+
+
+/* ---------- TABS (per character camp) ---------- */
+/* Full-tab background (NO extra dark overlay layer) */
 .unit-tab.camp-mechkawaii,
 .unit-tab.camp-prodrome{
-  background-color: transparent !important;
-  background-image: none; /* default */
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-/* apply correct image */
 .unit-tab.camp-mechkawaii{
-  background-image: url("./assets/background_mechkawaii.png") !important;
-}
-.unit-tab.camp-prodrome{
-  background-image: url("./assets/background_prodrome.png") !important;
+  background-image: url("./assets/background_mechkawaii.png");
 }
 
-/* remove any dark overlay layer on tabs if present */
+.unit-tab.camp-prodrome{
+  background-image: url("./assets/background_prodrome.png");
+}
+
+/* IMPORTANT: remove any experimental overlay on tabs */
 .unit-tab.camp-mechkawaii::before,
 .unit-tab.camp-prodrome::before{
   content: none !important;
   display: none !important;
 }
 
-/* keep image visible even when active / has-shield */
-.unit-tab.active,
+/* Keep layout intact (visual on top, text below) */
+.unit-tab-visual{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.unit-tab-visual img{
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* HP badge stays top-right */
+.unit-tab-hp{
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+}
+
+
+/* =========================================================
+   PATCH — Tabs shield glow + uniform portrait size
+   ========================================================= */
+
+/* 1) Uniformiser la taille du portrait (icône de classe) dans les onglets */
+.unit-tab-visual img{
+  width: clamp(56px, 38%, 84px) !important;
+  height: clamp(56px, 38%, 84px) !important;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* 2) Glow bouclier: version "inside" (ne se fait pas couper par overflow: hidden) */
 .unit-tab.has-shield{
-  background-color: transparent !important;
-  background-image: inherit !important;
+  position: relative;
+}
+
+/* halo interne + glow visible */
+.unit-tab.has-shield::after{
+  content:"";
+  position:absolute;
+  inset: 6px;
+  border-radius: calc(var(--radius) - 6px);
+  pointer-events:none;
+  z-index: 0;
+  box-shadow:
+    0 0 10px rgba(59,130,246,0.45),
+    0 0 22px rgba(59,130,246,0.35),
+    inset 0 0 18px rgba(59,130,246,0.20);
+  animation: shieldGlow 1.6s ease-in-out infinite;
+}
+
+/* s'assure que le contenu reste au-dessus du halo */
+.unit-tab.has-shield .unit-tab-visual,
+.unit-tab.has-shield .unit-tab-info,
+.unit-tab.has-shield .unit-tab-hp{
+  position: relative;
+  z-index: 1;
+}
+
+/* Si le JS met la classe sur .unit-tab-visual au lieu de .unit-tab */
+.unit-tab-visual.has-shield{
+  position: relative;
+}
+.unit-tab-visual.has-shield::before{
+  content:"";
+  position:absolute;
+  inset: 0;               /* pas de -4px -> pas coupé */
+  border-radius: 14px;
+  pointer-events:none;
+  z-index: 0;             /* au-dessus du fond, sous l'image */
+  background: radial-gradient(
+    circle at center,
+    rgba(59,130,246,0.45) 0%,
+    rgba(59,130,246,0.18) 55%,
+    transparent 75%
+  );
+  animation: shieldEnergyPulse 1.6s ease-in-out infinite;
+}
+.unit-tab-visual.has-shield > *{
+  position: relative;
+  z-index: 1;
 }
 
