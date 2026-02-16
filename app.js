@@ -475,6 +475,8 @@ async function initIndex(){
     localStorage.removeItem(STORAGE_PREFIX + "draft");
     localStorage.removeItem(STORAGE_PREFIX + "shields");
     localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
+      localStorage.removeItem(STORAGE_PREFIX + "blue-shield-assignments");
+    localStorage.removeItem(STORAGE_PREFIX + "blue-shield-assignments");
     location.reload();
   }
 
@@ -483,6 +485,8 @@ async function initIndex(){
       localStorage.removeItem(STORAGE_PREFIX + "setup");
       localStorage.removeItem(STORAGE_PREFIX + "shields");
       localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
+      localStorage.removeItem(STORAGE_PREFIX + "blue-shield-assignments");
+    localStorage.removeItem(STORAGE_PREFIX + "blue-shield-assignments");
       location.reload();
     });
   }
@@ -702,23 +706,6 @@ async function initCharacter(){
     if(err) err.textContent = "Character not found.";
     return;
   }
-   const blueAssignments = getBlueShieldAssignments();
-if (blueAssignments[c.id]) {
-  const removeBlue = document.createElement('button');
-  removeBlue.className = 'shield-remove-btn';
-  removeBlue.textContent = "Retirer le bouclier (Technicien)";
-
-  removeBlue.addEventListener('click', (e) => {
-    e.preventDefault();
-    const updated = getBlueShieldAssignments();
-    delete updated[c.id];
-    setBlueShieldAssignments(updated);
-    location.reload();
-  });
-
-  // tu peux l’afficher où tu veux : dans shieldsDisplay ou ailleurs
-  shieldsDisplay.appendChild(removeBlue);
-}
 
 
 
@@ -928,66 +915,6 @@ if (shieldsDisplay) {
       btn.onclick = (e) => {
         e.preventDefault();
         showShieldAssignmentModal(i, c.id, lang, chars);
-         function showBlueShieldAssignmentModal(currentCharId, lang, allChars){
-  const modal = document.createElement('div');
-  modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;`;
-
-  const content = document.createElement('div');
-  content.style.cssText = `background:white;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:80vh;overflow-y:auto;color:black;`;
-
-  const title = document.createElement('h2');
-  title.textContent = "Assigner le bouclier (Technicien)";
-  title.style.marginTop = '0';
-  content.appendChild(title);
-
-  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
-  const setup = setupRaw ? JSON.parse(setupRaw) : null;
-  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
-  const draft = draftRaw ? JSON.parse(draftRaw) : null;
-
-  const currentChar = allChars.find(ch => ch.id === currentCharId);
-  const currentCamp = (currentChar?.camp || "mechkawaii");
-
-  // ✅ uniquement les persos draftés + même camp
-  const teamChars = allChars.filter(c => {
-    if (!draft?.activeIds?.includes(c.id)) return false;
-    return (c.camp || "mechkawaii") === currentCamp;
-  });
-
-  const blueAssignments = getBlueShieldAssignments();
-
-  teamChars.forEach(char => {
-    const btn = document.createElement('button');
-    const already = !!blueAssignments[char.id];
-
-    btn.textContent = already ? `✅ ${t(char.name, lang)}` : t(char.name, lang);
-    btn.style.cssText = `width:100%;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:6px;cursor:pointer;background:white;color:black;transition:all .2s ease;`;
-
-    btn.addEventListener('mouseover', ()=>{ btn.style.borderColor='#3b82f6'; btn.style.background='#eff6ff'; });
-    btn.addEventListener('mouseout', ()=>{ btn.style.borderColor='#ddd'; btn.style.background='white'; });
-
-    btn.addEventListener('click', ()=>{
-      const updated = getBlueShieldAssignments();
-      updated[char.id] = true; // ✅ illimité => pas de stock à consommer
-      setBlueShieldAssignments(updated);
-
-      document.body.removeChild(modal);
-      setTimeout(()=>location.reload(), 120);
-    });
-
-    content.appendChild(btn);
-  });
-
-  const closeBtn = document.createElement('button');
-  closeBtn.textContent = tr("cancel");
-  closeBtn.style.cssText = `width:100%;padding:10px;margin-top:16px;border:2px solid #999;border-radius:6px;cursor:pointer;background:#f5f5f5;color:black;`;
-  closeBtn.addEventListener('click', ()=>document.body.removeChild(modal));
-  content.appendChild(closeBtn);
-
-  modal.appendChild(content);
-  document.body.appendChild(modal);
-}
-
       };
     });
 
@@ -999,12 +926,38 @@ if (shieldsDisplay) {
       removeShield.addEventListener('click', (e) => {
         e.preventDefault();
         const currentAssignments = getShieldAssignments();
-        delete currentAssignments[c.id];
+        const assignedIndex = currentAssignments[c.id];
+
+        // libère le bouclier dans la réserve partagée
+        if (assignedIndex !== undefined) {
+          delete currentAssignments[c.id];
+          const currentShields = getSharedShields();
+          if (currentShields[assignedIndex] === false) currentShields[assignedIndex] = true;
+          setSharedShields(currentShields);
+        }
+
         setShieldAssignments(currentAssignments);
         location.reload();
       });
 
       shieldsDisplay.appendChild(removeShield);
+    }
+
+    // Bouclier bleu (Technicien) : retrait (illimité)
+    if (blueAssignments && blueAssignments[c.id]) {
+      const removeBlue = document.createElement('button');
+      removeBlue.className = 'shield-remove-btn';
+      removeBlue.textContent = (lang === 'fr') ? 'Retirer le bouclier (Technicien)' : 'Remove Shield (Technician)';
+
+      removeBlue.addEventListener('click', (e) => {
+        e.preventDefault();
+        const updated = getBlueShieldAssignments();
+        delete updated[c.id];
+        setBlueShieldAssignments(updated);
+        location.reload();
+      });
+
+      shieldsDisplay.appendChild(removeBlue);
     }
   }
 }
@@ -1046,6 +999,7 @@ if (shieldsDisplay) {
     setState(c.id, fresh);
     setSharedShields([true, true, true]);
     setShieldAssignments({});
+    setBlueShieldAssignments({});
     location.reload();
   });
 
@@ -1122,6 +1076,71 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
 }
 
 /* ------------------------------
+   MODAL BLUE SHIELD (TECHNICIAN)
+------------------------------ */
+function showBlueShieldAssignmentModal(currentCharId, lang, allChars){
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;';
+
+  const content = document.createElement('div');
+  content.style.cssText = 'background:white;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:80vh;overflow-y:auto;color:black;';
+
+  const title = document.createElement('h2');
+  title.textContent = (lang === 'fr') ? 'Assigner le bouclier (Technicien)' : 'Assign Shield (Technician)';
+  title.style.marginTop = '0';
+  content.appendChild(title);
+
+  const draftRaw = localStorage.getItem(STORAGE_PREFIX + 'draft');
+  const draft = draftRaw ? JSON.parse(draftRaw) : null;
+
+  const currentChar = allChars.find(ch => ch.id === currentCharId);
+  const currentCamp = (currentChar?.camp || 'mechkawaii');
+
+  // ✅ uniquement les persos draftés + même camp que le technicien actuel
+  const teamChars = allChars.filter(ch => {
+    if (!draft?.activeIds?.includes(ch.id)) return false;
+    return (ch.camp || 'mechkawaii') === currentCamp;
+  });
+
+  const blueAssignments = getBlueShieldAssignments();
+
+  teamChars.forEach(ch => {
+    const btn = document.createElement('button');
+    const already = !!blueAssignments[ch.id];
+
+    btn.textContent = already
+      ? ((lang === 'fr') ? `✅ ${t(ch.name, lang)}` : `✅ ${t(ch.name, lang)}`)
+      : t(ch.name, lang);
+
+    btn.style.cssText = 'width:100%;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:6px;cursor:pointer;background:white;color:black;transition:all .2s ease;';
+
+    btn.addEventListener('mouseover', ()=>{ btn.style.borderColor='#3b82f6'; btn.style.background='#eff6ff'; });
+    btn.addEventListener('mouseout', ()=>{ btn.style.borderColor='#ddd'; btn.style.background='white'; });
+
+    btn.addEventListener('click', ()=>{
+      const updated = getBlueShieldAssignments();
+      updated[ch.id] = true; // ✅ illimité => pas de stock à consommer
+      setBlueShieldAssignments(updated);
+
+      document.body.removeChild(modal);
+      setTimeout(()=>location.reload(), 120);
+    });
+
+    content.appendChild(btn);
+  });
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = tr('cancel');
+  closeBtn.style.cssText = 'width:100%;padding:10px;margin-top:16px;border:2px solid #999;border-radius:6px;cursor:pointer;background:#f5f5f5;color:black;';
+  closeBtn.addEventListener('click', ()=>document.body.removeChild(modal));
+  content.appendChild(closeBtn);
+
+  modal.appendChild(content);
+  document.body.appendChild(modal);
+}
+
+
+/* ------------------------------
    BOOT
 ------------------------------ */
 document.addEventListener("DOMContentLoaded", async ()=>{
@@ -1154,6 +1173,8 @@ document.addEventListener("DOMContentLoaded", async ()=>{
       localStorage.removeItem(STORAGE_PREFIX + "draft");
       localStorage.removeItem(STORAGE_PREFIX + "shields");
       localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
+      localStorage.removeItem(STORAGE_PREFIX + "blue-shield-assignments");
+    localStorage.removeItem(STORAGE_PREFIX + "blue-shield-assignments");
 
       const chars = await loadCharacters();
       window.__cachedChars = chars;
