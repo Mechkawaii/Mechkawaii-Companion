@@ -1190,6 +1190,9 @@ body.game-active .toggle.locked::after {
   }
 }
 
+}
+
+
 /* ============================= */
 /*     Language Flags (Index)    */
 /* ============================= */
@@ -1520,9 +1523,11 @@ body.camp-prodrome .brand-with-portrait::before{
   border-color: rgba(59, 130, 246, 0.55) !important;
   background-color: transparent !important; /* keep camp bg visible */
 }
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
 /* Déplacement + Attaque côte à côte (même sur mobile) */
 .patterns-grid{
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
