@@ -441,16 +441,16 @@
         "en": "Class Action: Pyrotechnician"
       },
       "class_action_body": {
-        "fr": "Description de l'action de classe du pyrotechnicien.",
-        "en": "Pyrotechnician class action description."
+        "fr": "Tire simultanément sur les 3 terrains 🔥 face à lui. Touche les alliés. Sur un tir manqué, subit 1 PV par retour de flamme.",
+        "en": "Simultaneously fire at the three spaces directly in front of this unit 🔥. All units on those spaces are affected, including allies. For each missed shot, this unit suffers 1 HP due to backlash."
       },
       "ultimate_title": {
-        "fr": "Coup Unique",
-        "en": "Ultimate Ability"
+        "fr": "Coup Unique : Ppoings Corrosifs",
+        "en": "Ultimate Ability : Corrosive Fists"
       },
       "ultimate_body": {
-        "fr": "Description de l'Coup Unique de Goki.",
-        "en": "Goki's Ultimate Ability description."
+        "fr": "Sur une unité un allié : jusqu’à la fin de la partie, ses attaques de mêlée infligent 2 PV même sur les résultats de dé simple. Ce coup unique ne peut pas être réamorcé.",
+        "en": "Choose one allied unit. Until the end of the game, its Melee Attacks deal 2 HP, even on standard hit results. This Ultimate Ability cannot be reactivated."
       },
       "movement_desc": {
         "fr": "Se déplace en avant droit.",
@@ -524,16 +524,16 @@
         "en": "Class Action: Grenadier"
       },
       "class_action_body": {
-        "fr": "Description de l'action de classe du grenadier.",
-        "en": "Grenadier class action description."
+        "fr": "Tirs lobés, sa ligne de mire n’est jamais bloquée par un terrain infranchissable ou une unité.",
+        "en": "Arcing Shots: This unit ignores Line of Sight restrictions caused by impassable terrain or units."
       },
       "ultimate_title": {
-        "fr": "Coup Unique",
-        "en": "Ultimate Ability"
+        "fr": "Coup Unique : Rayon Orbital",
+        "en": "Ultimate Ability : Orbital Beam"
       },
       "ultimate_body": {
-        "fr": "Description de l'Coup Unique de Goryo.",
-        "en": "Goryo's Ultimate Ability description."
+        "fr": "Après un jet de dé de tir réussi, cette unité met HS une unité ennemie. Les boucliers sont ignorés. Ce coup unique ne peut pas être réamorcé.",
+        "en": "After a successful Ranged Attack roll, this unit immediately Disabled the targeted enemy unit. Shields are ignored. This Ultimate Ability cannot be reactivated."
       },
       "movement_desc": {
         "fr": "Se déplace en carré.",
@@ -607,16 +607,16 @@
         "en": "Class Action: Skirmisher"
       },
       "class_action_body": {
-        "fr": "Description de l'action de classe du voltigeur.",
-        "en": "Skirmisher class action description."
+        "fr": "Ignore les terrains infranchissables et les unités pour ses déplacements. Ne subit pas les terrains accidentés.",
+        "en": "When moving, this unit may pass through impassable terrain and units. It is unaffected by the effects of Damaged terrain."
       },
       "ultimate_title": {
-        "fr": "Coup Unique",
-        "en": "Ultimate Ability"
+        "fr": "Coup Unique : Détonation Ionique",
+        "en": "Ultimate Ability : Ionic Detonation"
       },
       "ultimate_body": {
-        "fr": "Description de l'Coup Unique de Gyuki.",
-        "en": "Gyuki's Ultimate Ability description."
+        "fr": "Déclenche une onde explosive. Soufflés par la détonation, les ennemis sont déplacés sur une case adjacente à leur position.",
+        "en": "Trigger an explosive shockwave. All enemy units are pushed to an adjacent space of their choice."
       },
       "movement_desc": {
         "fr": "Se déplace en L.",
@@ -690,16 +690,16 @@
         "en": "Class Action: Scout"
       },
       "class_action_body": {
-        "fr": "Description de l'action de classe de l'éclaireur.",
-        "en": "Scout class action description."
+        "fr": "Contrairement aux autres classes, cette unité rapide comme l’éclair peut se déplacer deux fois durant son tour.",
+        "en": "Unlike other classes, this unit may perform the Move action twice during its activation."
       },
       "ultimate_title": {
-        "fr": "Coup Unique",
-        "en": "Ultimate Ability"
+        "fr": "Coup Unique : Ruée Tactique",
+        "en": "Ultimate Ability : Tactical Rush"
       },
       "ultimate_body": {
-        "fr": "Description de l'Coup Unique de Gaoro.",
-        "en": "Gaoro's Ultimate Ability description."
+        "fr": "L’Éclaireur ouvre la voie. Chaque unité alliée peut se déplacer gratuitement ce tour.",
+        "en": "The Scout leads the way. Each allied unit may perform one Move action for free this turn."
       },
       "movement_desc": {
         "fr": "Se déplace en saut.",
@@ -773,16 +773,16 @@
         "en": "Class Action: Technician"
       },
       "class_action_body": {
-        "fr": "Description de l'action de classe du technicien.",
-        "en": "Technician class action description."
+        "fr": "Crée un bouclier 🛡️ infini qui ne compte pas dans le stock des trois boucliers de la partie.",
+        "en": "Once per turn, you may create 1 Shield 🛡️. This Shield does not count toward the three-Shield limit for the game."
       },
       "ultimate_title": {
-        "fr": "Coup Unique",
-        "en": "Ultimate Ability"
+        "fr": "Coup Unique : Regard Laser",
+        "en": "Ultimate Ability : Laser Gaze"
       },
       "ultimate_body": {
-        "fr": "Description de l'Coup Unique de Genbu.",
-        "en": "Genbu's Ultimate Ability description."
+        "fr": "Les résultats de dé critiques font perdre un seul PV. Applicable sur une unité adverse durant toute la partie. Ce coup unique ne peut pas être réamorcé.",
+        "en": "Choose one enemy unit. For the rest of the game, Critical Hit results against that unit deal only 1 HP instead of 2. This Ultimate Ability cannot be reactivated."
       },
       "movement_desc": {
         "fr": "Se déplace lentement en ligne.",
