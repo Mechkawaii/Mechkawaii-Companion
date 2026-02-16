@@ -1473,10 +1473,20 @@ body.camp-prodrome .brand-with-portrait::before{
   pointer-events:none;
   z-index: 0;
 }
+.page-character .brand-with-portrait::before{
+  width: 100%;
+  height: 100%;
+}
 
 .brand-with-portrait > *{
   position: relative;
   z-index: 1;
+}
+body.camp-mechkawaii .brand-with-portrait,
+body.camp-prodrome .brand-with-portrait{
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
 }
 
 /* --- Tabs: background per character camp (each tab keeps its own camp) --- */
