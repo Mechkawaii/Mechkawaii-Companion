@@ -1543,95 +1543,54 @@ body.is-ko .topbar{
   }
 }
 
+
 /* =========================================================
-   FIX — Restore camp backgrounds + shield glow behavior
+   RESTORE FACTION BACKGROUNDS (Header + Tabs) — definitive
    ========================================================= */
 
-/* ---------- HEADER (portrait + name) background ---------- */
-body.camp-mechkawaii .brand-with-portrait{
-  background-image: url("./assets/background_mechkawaii.png") !important;
-}
-body.camp-prodrome .brand-with-portrait{
-  background-image: url("./assets/background_prodrome.png") !important;
-}
+/* Header (portrait + nom) */
 .brand-with-portrait{
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
 }
 
-/* ---------- Tabs: per-character camp background ---------- */
+body.camp-mechkawaii .brand-with-portrait{
+  background-image: url("./assets/background_mechkawaii.png") !important;
+}
+body.camp-prodrome .brand-with-portrait{
+  background-image: url("./assets/background_prodrome.png") !important;
+}
+
+/* Tabs: each tab keeps its own camp background */
+.unit-tab.camp-mechkawaii,
+.unit-tab.camp-prodrome{
+  background-color: transparent !important;
+  background-image: none; /* default */
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* apply correct image */
 .unit-tab.camp-mechkawaii{
   background-image: url("./assets/background_mechkawaii.png") !important;
 }
 .unit-tab.camp-prodrome{
   background-image: url("./assets/background_prodrome.png") !important;
 }
-.unit-tab.camp-mechkawaii,
-.unit-tab.camp-prodrome{
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-}
 
-/* Keep faction background visible even when active/has-shield */
-.unit-tab.active{ background: transparent !important; }
-.unit-tab.has-shield{ background: transparent !important; }
-
-/* Remove any dark overlay layer on tabs */
+/* remove any dark overlay layer on tabs if present */
 .unit-tab.camp-mechkawaii::before,
 .unit-tab.camp-prodrome::before{
   content: none !important;
   display: none !important;
 }
 
-/* Center and normalize portraits in tabs */
-.unit-tab-visual{
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-}
-.unit-tab-visual img{
-  width: 80% !important;
-  height: 80% !important;
-  object-fit: contain !important;
-  object-position: center !important;
-}
-
-/* HP badge always on top-right */
-.unit-tab-hp{
-  position: absolute !important;
-  top: 8px !important;
-  right: 8px !important;
-  z-index: 20 !important;
-}
-
-/* ---------- Shield glow: OUTER only (tabs) ---------- */
-/* Disable inner/visual glow around the portrait */
-.unit-tab-visual.has-shield{
-  animation: none !important;
-  box-shadow: none !important;
-}
-.unit-tab-visual.has-shield::before,
-.unit-tab-visual.has-shield::after{
-  content: none !important;
-  display: none !important;
-}
-
-/* Keep outer glow on the tab itself */
+/* keep image visible even when active / has-shield */
+.unit-tab.active,
 .unit-tab.has-shield{
-  animation: shieldGlow 1.6s ease-in-out infinite !important;
+  background-color: transparent !important;
+  background-image: inherit !important;
 }
 
-/* ---------- Shield glow on main HP card ---------- */
-/* Ensure the halo is visible above the card background */
-#hpCard.has-shield{
-  position: relative;
-}
-#hpCard.has-shield::before{
-  z-index: 0;
-}
-#hpCard.has-shield > *{
-  position: relative;
-  z-index: 1;
-}

@@ -740,6 +740,14 @@ async function initCharacter(){
   const hpCurEl = qs("#hpCur");
   const hpHeartsEl = qs("#hpHearts");
 
+  const hpCard = qs("#hpCard");
+  function refreshHpShieldGlow(){
+    const assignments = getShieldAssignments();
+    const hasShield = assignments && assignments[c.id] !== undefined;
+    if(hpCard) hpCard.classList.toggle("has-shield", !!hasShield);
+  }
+
+
   function refreshHP(){
     if(hpCurEl) hpCurEl.textContent = String(state.hp);
     renderHP(hpHeartsEl, state.hp, c.hp?.max ?? 0);
@@ -781,6 +789,7 @@ async function initCharacter(){
     updateTabHP(c.id, state.hp);
   });
 
+  refreshHpShieldGlow();
   refreshHP();
 
   const classActionTitle = qs("#classActionTitle");
@@ -807,14 +816,6 @@ async function initCharacter(){
     if (shieldToggle) {
       const freshShields = getSharedShields();
       const freshAssignments = getShieldAssignments();
-
-      // ✅ Shield glow on the main HP card + portrait (current character)
-      const hasShieldForThisChar = (freshAssignments[c.id] !== undefined);
-      const hpCardEl = document.getElementById('hpCard');
-      if(hpCardEl) hpCardEl.classList.toggle('has-shield', hasShieldForThisChar);
-      const portraitEl = document.getElementById('charPortrait');
-      if(portraitEl) portraitEl.classList.toggle('has-shield', hasShieldForThisChar);
-
 
       renderToggleRow(shieldsDisplay, shieldToggle, freshShields, lang, (v) => setSharedShields(v), freshShields);
 
