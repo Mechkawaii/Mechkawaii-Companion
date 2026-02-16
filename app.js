@@ -118,7 +118,7 @@ const I18N = {
     setup_q_difficulty: "3) Choisis la difficulté",
     setup_difficulty_desc: "<strong>Mode Normal :</strong> Patterns de déplacement et d'attaque standard.<br><strong>Mode Expert :</strong> Patterns avancés pour plus de challenge.",
     diff_normal: "⭐ Normal",
-    diff_expert: "💀 Expert",
+    diff_expert: "⭐⭐ Expert",
 
     reset_all: "Tout réinitialiser",
 
@@ -165,7 +165,7 @@ const I18N = {
     setup_q_difficulty: "3) Pick difficulty",
     setup_difficulty_desc: "<strong>Normal:</strong> Standard movement/attack patterns.<br><strong>Expert:</strong> Advanced patterns for more challenge.",
     diff_normal: "⭐ Normal",
-    diff_expert: "💀 Expert",
+    diff_expert: "⭐⭐ Expert",
 
     reset_all: "Reset everything",
 
