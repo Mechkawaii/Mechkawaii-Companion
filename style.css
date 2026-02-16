@@ -1335,8 +1335,7 @@ body.game-active .toggle.locked::after {
 .unit-tab-visual .ko-overlay img{
   width: 72%;
   height: 72%;
-  object-fit: contain;
-  filter: drop-shadow(0 10px 20px rgba(0,0,0,.45));
+  object-fit: contain;  
 }
 
 /* ============================= */
