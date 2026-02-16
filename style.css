@@ -1277,7 +1277,7 @@ body.game-active .toggle.locked::after {
   z-index: 1;
 }
 
-#charPortrait.is-ko img {
+#charPortrait.is-ko > img {
   filter: grayscale(1) brightness(0.55) contrast(1.05);
   opacity: 0.95;
 }
