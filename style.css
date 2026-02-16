@@ -1534,3 +1534,10 @@ body.camp-prodrome .brand-with-portrait::before{
     min-width: 0 !important;
   }
 }
+/* Portrait section full width */
+.page-character .topbar{
+  width: 100vw;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  border-radius: 0;
+}
