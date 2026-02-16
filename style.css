@@ -1523,3 +1523,14 @@ body.camp-prodrome .brand-with-portrait::before{
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
+@media (max-width: 900px){
+  .patterns-grid{
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 12px !important;
+  }
+  .patterns-grid > .card{
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+  }
+}
