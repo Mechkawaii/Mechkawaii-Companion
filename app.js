@@ -310,14 +310,38 @@ function renderHP(container, hpCur, hpMax){
   }
   container.appendChild(hearts);
 }
-function getBlueShieldAssignments(){
+function getBlueShieldByTech(){
+  // { [technicianId]: targetCharId }
   try{
-    const raw = localStorage.getItem(STORAGE_PREFIX + "blue-shield-assignments");
+    const raw = localStorage.getItem(STORAGE_PREFIX + "blue-shield-by-tech");
     return raw ? JSON.parse(raw) : {};
   }catch(e){ return {}; }
 }
-function setBlueShieldAssignments(assignments){
-  localStorage.setItem(STORAGE_PREFIX + "blue-shield-assignments", JSON.stringify(assignments));
+function setBlueShieldByTech(map){
+  localStorage.setItem(STORAGE_PREFIX + "blue-shield-by-tech", JSON.stringify(map));
+}
+
+// Pour le rendu (glow, tabs, etc) on aime aussi une vue "par cible"
+function getBlueShieldAssignments(){
+  // { [targetCharId]: technicianId }
+  const byTech = getBlueShieldByTech();
+  const byTarget = {};
+  Object.keys(byTech).forEach(techId=>{
+    const targetId = byTech[techId];
+    if(targetId) byTarget[targetId] = techId;
+  });
+  return byTarget;
+}
+function removeBlueShieldForTarget(targetCharId){
+  const byTech = getBlueShieldByTech();
+  let changed = false;
+  Object.keys(byTech).forEach(techId=>{
+    if(byTech[techId] === targetCharId){
+      delete byTech[techId];
+      changed = true;
+    }
+  });
+  if(changed) setBlueShieldByTech(byTech);
 }
 
 function isTechnicianChar(c){
@@ -475,8 +499,8 @@ async function initIndex(){
     localStorage.removeItem(STORAGE_PREFIX + "draft");
     localStorage.removeItem(STORAGE_PREFIX + "shields");
     localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
-      localStorage.removeItem(STORAGE_PREFIX + "blue-shield-assignments");
-    localStorage.removeItem(STORAGE_PREFIX + "blue-shield-assignments");
+      localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
+    localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
     location.reload();
   }
 
@@ -485,8 +509,8 @@ async function initIndex(){
       localStorage.removeItem(STORAGE_PREFIX + "setup");
       localStorage.removeItem(STORAGE_PREFIX + "shields");
       localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
-      localStorage.removeItem(STORAGE_PREFIX + "blue-shield-assignments");
-    localStorage.removeItem(STORAGE_PREFIX + "blue-shield-assignments");
+      localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
+    localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
       location.reload();
     });
   }
@@ -951,9 +975,7 @@ if (shieldsDisplay) {
 
       removeBlue.addEventListener('click', (e) => {
         e.preventDefault();
-        const updated = getBlueShieldAssignments();
-        delete updated[c.id];
-        setBlueShieldAssignments(updated);
+        removeBlueShieldForTarget(c.id);
         location.reload();
       });
 
@@ -999,7 +1021,7 @@ if (shieldsDisplay) {
     setState(c.id, fresh);
     setSharedShields([true, true, true]);
     setShieldAssignments({});
-    setBlueShieldAssignments({});
+    setBlueShieldByTech({});
     location.reload();
   });
 
@@ -1078,49 +1100,109 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
 /* ------------------------------
    MODAL BLUE SHIELD (TECHNICIAN)
 ------------------------------ */
-function showBlueShieldAssignmentModal(currentCharId, lang, allChars){
+function showBlueShieldAssignmentModal(currentTechId, lang, allChars){
   const modal = document.createElement('div');
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;';
+  modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;`;
 
   const content = document.createElement('div');
-  content.style.cssText = 'background:white;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:80vh;overflow-y:auto;color:black;';
+  content.style.cssText = `background:white;border-radius:8px;padding:20px;max-width:420px;width:90%;max-height:80vh;overflow-y:auto;color:black;`;
 
   const title = document.createElement('h2');
-  title.textContent = (lang === 'fr') ? 'Assigner le bouclier (Technicien)' : 'Assign Shield (Technician)';
+  title.textContent = (getLang()==="fr") ? "Bouclier du Technicien" : "Technician Shield";
   title.style.marginTop = '0';
   content.appendChild(title);
 
-  const draftRaw = localStorage.getItem(STORAGE_PREFIX + 'draft');
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const setup = setupRaw ? JSON.parse(setupRaw) : null;
+  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
   const draft = draftRaw ? JSON.parse(draftRaw) : null;
 
-  const currentChar = allChars.find(ch => ch.id === currentCharId);
-  const currentCamp = (currentChar?.camp || 'mechkawaii');
+  const techChar = allChars.find(ch => ch.id === currentTechId);
+  const techCamp = (techChar?.camp || "mechkawaii");
 
-  // ✅ uniquement les persos draftés + même camp que le technicien actuel
+  // 1 seul bouclier bleu actif par Technicien
+  const byTech = getBlueShieldByTech();
+  const currentTargetId = byTech[currentTechId] || null;
+
+  const info = document.createElement('div');
+  info.style.cssText = "margin:10px 0 14px; padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#f8fafc; font-size:14px; line-height:1.35;";
+  if(currentTargetId){
+    const targetChar = allChars.find(ch => ch.id === currentTargetId);
+    info.innerHTML = (getLang()==="fr")
+      ? `✅ Bouclier déjà actif sur <strong>${t(targetChar?.name, lang) || currentTargetId}</strong>.<br/>Retire-le pour pouvoir en créer un autre.`
+      : `✅ Shield already active on <strong>${t(targetChar?.name, lang) || currentTargetId}</strong>.<br/>Remove it to create a new one.`;
+  }else{
+    info.textContent = (getLang()==="fr")
+      ? "Choisis un allié pour lui donner un bouclier bleu."
+      : "Pick an ally to grant a blue shield.";
+  }
+  content.appendChild(info);
+
+  if(currentTargetId){
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = tr("shield_remove");
+    removeBtn.style.cssText = `width:100%;padding:10px;margin:0 0 12px;border:2px solid #3b82f6;border-radius:6px;cursor:pointer;background:#eff6ff;color:black;`;
+    removeBtn.addEventListener('click', ()=>{
+      const latest = getBlueShieldByTech();
+      delete latest[currentTechId];
+      setBlueShieldByTech(latest);
+      document.body.removeChild(modal);
+      setTimeout(()=>location.reload(), 120);
+    });
+    content.appendChild(removeBtn);
+  }
+
+  // Persos draftés + même camp
   const teamChars = allChars.filter(ch => {
     if (!draft?.activeIds?.includes(ch.id)) return false;
-    return (ch.camp || 'mechkawaii') === currentCamp;
+    return (ch.camp || "mechkawaii") === techCamp;
   });
 
-  const blueAssignments = getBlueShieldAssignments();
+  const byTarget = getBlueShieldAssignments(); // {targetId: techId}
 
-  teamChars.forEach(ch => {
+  teamChars.forEach(char => {
     const btn = document.createElement('button');
-    const already = !!blueAssignments[ch.id];
 
-    btn.textContent = already
-      ? ((lang === 'fr') ? `✅ ${t(ch.name, lang)}` : `✅ ${t(ch.name, lang)}`)
-      : t(ch.name, lang);
+    const alreadyTech = byTarget[char.id]; // undefined ou techId
+    const isCurrent = currentTargetId === char.id;
+    const isTakenByOther = !!alreadyTech && alreadyTech !== currentTechId;
 
-    btn.style.cssText = 'width:100%;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:6px;cursor:pointer;background:white;color:black;transition:all .2s ease;';
+    btn.textContent = isCurrent ? `✅ ${t(char.name, lang)}` : t(char.name, lang);
+    btn.style.cssText = `width:100%;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:6px;cursor:pointer;background:white;color:black;transition:all .2s ease;`;
 
-    btn.addEventListener('mouseover', ()=>{ btn.style.borderColor='#3b82f6'; btn.style.background='#eff6ff'; });
-    btn.addEventListener('mouseout', ()=>{ btn.style.borderColor='#ddd'; btn.style.background='white'; });
+    if(currentTargetId && !isCurrent){
+      // tech déjà utilisé => pas de nouvel assign
+      btn.disabled = true;
+      btn.style.opacity = "0.55";
+      btn.style.cursor = "not-allowed";
+    }
+    if(isTakenByOther){
+      btn.disabled = true;
+      btn.style.opacity = "0.55";
+      btn.style.cursor = "not-allowed";
+      btn.title = (getLang()==="fr") ? "Déjà protégé par un autre Technicien" : "Already protected by another Technician";
+    }
+
+    btn.addEventListener('mouseover', ()=>{
+      if(btn.disabled) return;
+      btn.style.borderColor='#3b82f6';
+      btn.style.background='#eff6ff';
+    });
+    btn.addEventListener('mouseout', ()=>{
+      if(btn.disabled) return;
+      btn.style.borderColor='#ddd';
+      btn.style.background='white';
+    });
 
     btn.addEventListener('click', ()=>{
-      const updated = getBlueShieldAssignments();
-      updated[ch.id] = true; // ✅ illimité => pas de stock à consommer
-      setBlueShieldAssignments(updated);
+      if(btn.disabled) return;
+
+      // sécurité : 1 seul bouclier bleu par tech
+      const latest = getBlueShieldByTech();
+      if(latest[currentTechId] && latest[currentTechId] !== char.id) return;
+
+      latest[currentTechId] = char.id;
+      setBlueShieldByTech(latest);
 
       document.body.removeChild(modal);
       setTimeout(()=>location.reload(), 120);
@@ -1130,15 +1212,14 @@ function showBlueShieldAssignmentModal(currentCharId, lang, allChars){
   });
 
   const closeBtn = document.createElement('button');
-  closeBtn.textContent = tr('cancel');
-  closeBtn.style.cssText = 'width:100%;padding:10px;margin-top:16px;border:2px solid #999;border-radius:6px;cursor:pointer;background:#f5f5f5;color:black;';
+  closeBtn.textContent = tr("cancel");
+  closeBtn.style.cssText = `width:100%;padding:10px;margin-top:16px;border:2px solid #999;border-radius:6px;cursor:pointer;background:#f5f5f5;color:black;`;
   closeBtn.addEventListener('click', ()=>document.body.removeChild(modal));
   content.appendChild(closeBtn);
 
   modal.appendChild(content);
   document.body.appendChild(modal);
 }
-
 
 /* ------------------------------
    BOOT
@@ -1173,8 +1254,8 @@ document.addEventListener("DOMContentLoaded", async ()=>{
       localStorage.removeItem(STORAGE_PREFIX + "draft");
       localStorage.removeItem(STORAGE_PREFIX + "shields");
       localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
-      localStorage.removeItem(STORAGE_PREFIX + "blue-shield-assignments");
-    localStorage.removeItem(STORAGE_PREFIX + "blue-shield-assignments");
+      localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
+    localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
 
       const chars = await loadCharacters();
       window.__cachedChars = chars;
