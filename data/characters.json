@@ -80,11 +80,7 @@
           "fr": "Coup Unique utilisé",
           "en": "Ultimate used"
         },
-        "hint": {
-          "fr": "⚡ Coup Unique activé",
-          "en": "⚡ Ultimate activated"
         }
-      }
     ]
   },
   {
@@ -167,10 +163,7 @@
           "fr": "Coup Unique utilisé",
           "en": "Ultimate used"
         },
-        "hint": {
-          "fr": "⚡ Coup Unique activé",
-          "en": "⚡ Ultimate activated"
-        }
+        
       }
     ]
   },
@@ -254,10 +247,7 @@
           "fr": "Coup Unique utilisé",
           "en": "Ultimate used"
         },
-        "hint": {
-          "fr": "⚡ Coup Unique activé",
-          "en": "⚡ Ultimate activated"
-        }
+        
       }
     ]
   },
@@ -341,10 +331,7 @@
           "fr": "Coup Unique utilisé",
           "en": "Ultimate used"
         },
-        "hint": {
-          "fr": "⚡ Coup Unique activé",
-          "en": "⚡ Ultimate activated"
-        }
+        
       }
     ]
   },
@@ -428,10 +415,7 @@
           "fr": "Coup Unique utilisé",
           "en": "Ultimate used"
         },
-        "hint": {
-          "fr": "⚡ Coup Unique activé",
-          "en": "⚡ Ultimate activated"
-        }
+        
       }
     ]
   },
@@ -515,10 +499,7 @@
           "fr": "Coup Unique utilisé",
           "en": "Ultimate used"
         },
-        "hint": {
-          "fr": "⚡ Coup Unique activé",
-          "en": "⚡ Ultimate activated"
-        }
+        
       }
     ]
   },
@@ -602,10 +583,7 @@
           "fr": "Coup Unique utilisé",
           "en": "Ultimate used"
         },
-        "hint": {
-          "fr": "⚡ Coup Unique activé",
-          "en": "⚡ Ultimate activated"
-        }
+        
       }
     ]
   },
@@ -689,10 +667,7 @@
           "fr": "Coup Unique utilisé",
           "en": "Ultimate used"
         },
-        "hint": {
-          "fr": "⚡ Coup Unique activé",
-          "en": "⚡ Ultimate activated"
-        }
+        
       }
     ]
   },
@@ -776,10 +751,7 @@
           "fr": "Coup Unique utilisé",
           "en": "Ultimate used"
         },
-        "hint": {
-          "fr": "⚡ Coup Unique activé",
-          "en": "⚡ Ultimate activated"
-        }
+        
       }
     ]
   },
@@ -863,10 +835,7 @@
           "fr": "Coup Unique utilisé",
           "en": "Ultimate used"
         },
-        "hint": {
-          "fr": "⚡ Coup Unique activé",
-          "en": "⚡ Ultimate activated"
-        }
+       
       }
     ]
   }
