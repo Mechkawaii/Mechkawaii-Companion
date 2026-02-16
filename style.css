@@ -1650,8 +1650,7 @@ body.camp-prodrome .brand-with-portrait > *{
 
 /* 1) Uniformiser la taille du portrait (icône de classe) dans les onglets */
 .unit-tab-visual img{
-  width: clamp(56px, 38%, 84px) !important;
-  height: clamp(56px, 38%, 84px) !important;
+  width: 50% !important;
   object-fit: contain;
   object-position: center;
 }
