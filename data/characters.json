@@ -113,8 +113,8 @@
         "en": "Unlike other classes, this unit may perform the Move action twice during its activation."
       },
       "ultimate_title": {
-        "fr": "Coup Unique",
-        "en": "Ultimate Ability"
+        "fr": "Coup Unique : Disruption Visuelle",
+        "en": "Ultimate Ability : Visual Disruption"
       },
       "ultimate_body": {
         "fr": "Rend invisible tous les Mechkawaii pendant 1 tour. Les unités invisibles ne peuvent pas être prises pour cible.",
@@ -189,19 +189,19 @@
     "texts": {
       "class_action_title": {
         "fr": "Action de classe : Grenadier",
-        "en": "Class Action: Grenadier"
+        "en": "Class Action : Grenadier"
       },
       "class_action_body": {
-        "fr": "Description de l'action de classe du grenadier.",
-        "en": "Grenadier class action description."
+        "fr": "Tirs lobés, sa ligne de mire n’est jamais bloquée par un terrain infranchissable ou une unité.",
+        "en": "Arcing Shots: This unit ignores Line of Sight restrictions caused by impassable terrain or units."
       },
       "ultimate_title": {
-        "fr": "Coup Unique",
-        "en": "Ultimate Ability"
+        "fr": "Coup Unique : Correction de Trajectoire",
+        "en": "Ultimate Ability : Trajectory Correction"
       },
       "ultimate_body": {
-        "fr": "Description de l'Coup Unique de Johanna.",
-        "en": "Johanna's Ultimate Ability description."
+        "fr": "Une unité alliée au choix ne peut plus manquer ses tirs pour toute la partie. Les critiques restent applicables. Ce coup unique ne peut pas être réamorcé.",
+        "en": "Choose one allied unit. For the rest of the game, that unit cannot miss its ranged attacks. Critical Hits still apply. This Ultimate Ability cannot be reactivated."
       },
       "movement_desc": {
         "fr": "Se déplace lentement mais peut attaquer de loin.",
@@ -275,16 +275,16 @@
         "en": "Class Action: Skirmisher"
       },
       "class_action_body": {
-        "fr": "Ignore les terrains infranchissables et les unités pour ses déplacements. Ne subit pas les terrains accidentés..",
-        "en": "Skirmisher class action description."
+        "fr": "Ignore les terrains infranchissables et les unités pour ses déplacements. Ne subit pas les terrains accidentés.",
+        "en": "When moving, this unit may pass through impassable terrain and units. It is unaffected by the effects of Damaged terrain."
       },
       "ultimate_title": {
-        "fr": "Coup Unique",
-        "en": "Ultimate Ability"
+        "fr": "Coup Unique : Tempête de Tir",
+        "en": "Ultimate Ability : Firing Storm"
       },
       "ultimate_body": {
-        "fr": "Description de l'Coup Unique de Yamabato.",
-        "en": "Yamabato's Ultimate Ability description."
+        "fr": "Tous les Mechkawaii alliés peuvent tirer une fois gratuitement ce tour.",
+        "en": "This turn, each allied Mechkawaii unit may perform one Ranged Attack without spending Energy Cells."
       },
       "movement_desc": {
         "fr": "Se déplace très rapidement en tous sens.",
@@ -358,16 +358,16 @@
         "en": "Class Action: Pyrotechnician"
       },
       "class_action_body": {
-        "fr": "Description de l'action de classe du pyrotechnicien.",
-        "en": "Pyrotechnician class action description."
+        "fr": "Tire simultanément sur les 3 terrains 🔥 face à lui. Touche les alliés. Sur un tir manqué, subit 1 PV par retour de flamme.",
+        "en": "Simultaneously fire at the three spaces directly in front of this unit 🔥. All units on those spaces are affected, including allies. For each missed shot, this unit suffers 1 HP due to backlash."
       },
       "ultimate_title": {
-        "fr": "Coup Unique",
-        "en": "Ultimate Ability"
+        "fr": "Coup Unique : Réveil enflammé",
+        "en": "Ultimate Ability : Blazing Awakening"
       },
       "ultimate_body": {
-        "fr": "Description de l'Coup Unique de Fuyu.",
-        "en": "Fuyu's Ultimate Ability description."
+        "fr": "De leurs cendres, il rallume l’étincelle. Tous les Mechkawaii HS reviennent avec 2 PV et peuvent jouer immédiatement. Ce coup unique ne peut pas être réamorcé.",
+        "en": "From their ashes, the spark reignites. All Disabled Mechkawaii units return to play with 2 HP and may activate immediately. This Ultimate Ability cannot be reactivated."
       },
       "movement_desc": {
         "fr": "Se déplace en zigzag.",
