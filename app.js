@@ -879,7 +879,8 @@ if (isTechnicianChar(c)) {
     btn.type = "button";
     btn.style.cssText = "display:inline-flex; align-items:center; gap:10px;";
     btn.innerHTML = `
-      <img src="./assets/icons/shield_blue_on.svg" alt="Bouclier" style="width:26px;height:26px;display:block;" />      
+      <img src="./assets/icons/shield_blue_on.svg" alt="Bouclier" style="width:26px;height:26px;display:block;" />
+      <span>Créer un bouclier</span>
     `;
 
     btn.addEventListener("click", (e) => {
@@ -949,17 +950,14 @@ if (shieldsDisplay) {
       removeShield.addEventListener('click', (e) => {
         e.preventDefault();
         const currentAssignments = getShieldAssignments();
-        const assignedIndex = currentAssignments[c.id];
 
-        // libère le bouclier dans la réserve partagée
-        if (assignedIndex !== undefined) {
+        // ✅ IMPORTANT : un bouclier orange consommé ne revient PAS dans la réserve
+        // On retire juste l'assignation au perso.
+        if (currentAssignments[c.id] !== undefined) {
           delete currentAssignments[c.id];
-          const currentShields = getSharedShields();
-          if (currentShields[assignedIndex] === false) currentShields[assignedIndex] = true;
-          setSharedShields(currentShields);
+          setShieldAssignments(currentAssignments);
         }
 
-        setShieldAssignments(currentAssignments);
         location.reload();
       });
 
