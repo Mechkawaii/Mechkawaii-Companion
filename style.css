@@ -1715,20 +1715,6 @@ body.camp-prodrome .brand-with-portrait > *{
   animation: shieldGlow 1.6s ease-in-out infinite;
 }
 
-/* Halo interne (donc jamais coupé par overflow:hidden) */
-.unit-tab.has-shield::after{
-  content:"";
-  position:absolute;
-  inset: 8px;                 /* halo à l'intérieur */
-  border-radius: 12px;
-  pointer-events:none;
-  box-shadow:
-    0 0 10px rgba(59,130,246,0.55),
-    0 0 22px rgba(59,130,246,0.38);
-  opacity: 1;
-  z-index: 2;                  /* au-dessus du fond */
-}
-
 /* S'assure que le contenu reste au-dessus du halo */
 .unit-tab.has-shield .unit-tab-visual,
 .unit-tab.has-shield .unit-tab-info{
