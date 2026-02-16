@@ -310,6 +310,21 @@ function renderHP(container, hpCur, hpMax){
   }
   container.appendChild(hearts);
 }
+function getBlueShieldAssignments(){
+  try{
+    const raw = localStorage.getItem(STORAGE_PREFIX + "blue-shield-assignments");
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+function setBlueShieldAssignments(assignments){
+  localStorage.setItem(STORAGE_PREFIX + "blue-shield-assignments", JSON.stringify(assignments));
+}
+
+function isTechnicianChar(c){
+  const fr = (c.class?.fr || "").toLowerCase();
+  const en = (c.class?.en || "").toLowerCase();
+  return fr.includes("technicien") || en.includes("technician");
+}
 
 /* ------------------------------
    Visual keys renderer
@@ -687,6 +702,24 @@ async function initCharacter(){
     if(err) err.textContent = "Character not found.";
     return;
   }
+   const blueAssignments = getBlueShieldAssignments();
+if (blueAssignments[c.id]) {
+  const removeBlue = document.createElement('button');
+  removeBlue.className = 'shield-remove-btn';
+  removeBlue.textContent = "Retirer le bouclier (Technicien)";
+
+  removeBlue.addEventListener('click', (e) => {
+    e.preventDefault();
+    const updated = getBlueShieldAssignments();
+    delete updated[c.id];
+    setBlueShieldAssignments(updated);
+    location.reload();
+  });
+
+  // tu peux l’afficher où tu veux : dans shieldsDisplay ou ailleurs
+  shieldsDisplay.appendChild(removeBlue);
+}
+
 
 
 // Camp sur le body (pour styliser le header du perso)
@@ -815,66 +848,167 @@ if (ultToggleContainer) {
 
   if(classActionTitle) classActionTitle.textContent = t(c.texts?.class_action_title, lang);
   if(classActionBody) classActionBody.textContent = t(c.texts?.class_action_body, lang);
+   // --- TECHNICIEN : bouton bouclier bleu illimité dans "Action de classe"
+// --- TECHNICIEN : bouton bouclier bleu illimité dans "Action de classe"
+if (isTechnicianChar(c)) {
+  const classCardBody = qs("#classActionBody")?.closest(".card")?.querySelector(".card-b");
+  if (classCardBody) {
+    // évite doublons si reload
+    let techWrap = qs("#techShieldWrap");
+    if (!techWrap) {
+      techWrap = document.createElement("div");
+      techWrap.id = "techShieldWrap";
+      techWrap.style.cssText = "margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;";
+      classCardBody.appendChild(techWrap);
+    } else {
+      techWrap.innerHTML = "";
+    }
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.style.cssText = "display:inline-flex; align-items:center; gap:10px;";
+    btn.innerHTML = `
+      <img src="./assets/icons/shield_blue_on.svg" alt="Bouclier" style="width:26px;height:26px;display:block;" />
+      <span>Créer un bouclier</span>
+    `;
+
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      showBlueShieldAssignmentModal(c.id, lang, chars);
+    });
+
+    techWrap.appendChild(btn);
+  }
+}
+
   if(ultTitle) ultTitle.textContent = t(c.texts?.ultimate_title, lang);
   if(ultBody) ultBody.textContent = t(c.texts?.ultimate_body, lang);
   
   // Shields
-  const shieldsDisplay = qs('#shieldsDisplay');
-  if (shieldsDisplay) {
-    shieldsDisplay.innerHTML = '';
+const shieldsDisplay = qs('#shieldsDisplay');
+if (shieldsDisplay) {
+  shieldsDisplay.innerHTML = '';
 
-    const shieldToggle = (c.toggles || []).find(tg => tg.id === 'shield');
-    if (shieldToggle) {
-      const freshShields = getSharedShields();
-      const freshAssignments = getShieldAssignments();
+  const shieldToggle = (c.toggles || []).find(tg => tg.id === 'shield');
+  if (shieldToggle) {
+    const freshShields = getSharedShields();
+    const freshAssignments = getShieldAssignments();
+    const blueAssignments = getBlueShieldAssignments();
 
-      // ✅ Glow bouclier sur la carte HP: si ce perso a un bouclier assigné
-      const hpCard = qs("#hpCard");
-      if(hpCard){
-        const hasAssignedShield = freshAssignments[c.id] !== undefined;
-        hpCard.classList.toggle("has-shield", hasAssignedShield);
+    // ✅ Glow bouclier sur la carte HP: si ce perso a un bouclier (orange OU bleu)
+    const hpCard = qs("#hpCard");
+    if (hpCard) {
+      const hasAssignedShield =
+        (freshAssignments[c.id] !== undefined) || (blueAssignments[c.id] !== undefined);
+      hpCard.classList.toggle("has-shield", hasAssignedShield);
+    }
+
+    renderToggleRow(
+      shieldsDisplay,
+      shieldToggle,
+      freshShields,
+      lang,
+      (v) => setSharedShields(v),
+      freshShields
+    );
+
+    const keyButtons = shieldsDisplay.querySelectorAll('.key-button');
+    keyButtons.forEach((btn, i) => {
+      btn.classList.add('shield-button');
+
+      if (!freshShields[i]) {
+        btn.style.display = 'none';
+        return;
       }
 
-      renderToggleRow(shieldsDisplay, shieldToggle, freshShields, lang, (v) => setSharedShields(v), freshShields);
+      btn.dataset.active = 'true';
+      btn.classList.add('is-on');
+      btn.style.backgroundImage = `url('./assets/icons/shield_on.svg')`;
 
-      const keyButtons = shieldsDisplay.querySelectorAll('.key-button');
-      keyButtons.forEach((btn, i) => {
-        // ✅ s’assure que le style “shield-button” est bien appliqué
-        btn.classList.add('shield-button');
+      btn.onclick = (e) => {
+        e.preventDefault();
+        showShieldAssignmentModal(i, c.id, lang, chars);
+         function showBlueShieldAssignmentModal(currentCharId, lang, allChars){
+  const modal = document.createElement('div');
+  modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;`;
 
-        if (!freshShields[i]) {
-          btn.style.display = 'none';
-          return;
-        }
+  const content = document.createElement('div');
+  content.style.cssText = `background:white;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:80vh;overflow-y:auto;color:black;`;
 
-        // ces boutons deviennent des “tokens” à assigner (pas du on/off)
-        btn.dataset.active = 'true';
-        btn.classList.add('is-on');
-        btn.style.backgroundImage = `url('./assets/icons/shield_on.svg')`;
+  const title = document.createElement('h2');
+  title.textContent = "Assigner le bouclier (Technicien)";
+  title.style.marginTop = '0';
+  content.appendChild(title);
 
-        btn.onclick = (e) => {
-          e.preventDefault();
-          showShieldAssignmentModal(i, c.id, lang, chars);
-        };
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const setup = setupRaw ? JSON.parse(setupRaw) : null;
+  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
+  const draft = draftRaw ? JSON.parse(draftRaw) : null;
+
+  const currentChar = allChars.find(ch => ch.id === currentCharId);
+  const currentCamp = (currentChar?.camp || "mechkawaii");
+
+  // ✅ uniquement les persos draftés + même camp
+  const teamChars = allChars.filter(c => {
+    if (!draft?.activeIds?.includes(c.id)) return false;
+    return (c.camp || "mechkawaii") === currentCamp;
+  });
+
+  const blueAssignments = getBlueShieldAssignments();
+
+  teamChars.forEach(char => {
+    const btn = document.createElement('button');
+    const already = !!blueAssignments[char.id];
+
+    btn.textContent = already ? `✅ ${t(char.name, lang)}` : t(char.name, lang);
+    btn.style.cssText = `width:100%;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:6px;cursor:pointer;background:white;color:black;transition:all .2s ease;`;
+
+    btn.addEventListener('mouseover', ()=>{ btn.style.borderColor='#3b82f6'; btn.style.background='#eff6ff'; });
+    btn.addEventListener('mouseout', ()=>{ btn.style.borderColor='#ddd'; btn.style.background='white'; });
+
+    btn.addEventListener('click', ()=>{
+      const updated = getBlueShieldAssignments();
+      updated[char.id] = true; // ✅ illimité => pas de stock à consommer
+      setBlueShieldAssignments(updated);
+
+      document.body.removeChild(modal);
+      setTimeout(()=>location.reload(), 120);
+    });
+
+    content.appendChild(btn);
+  });
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = tr("cancel");
+  closeBtn.style.cssText = `width:100%;padding:10px;margin-top:16px;border:2px solid #999;border-radius:6px;cursor:pointer;background:#f5f5f5;color:black;`;
+  closeBtn.addEventListener('click', ()=>document.body.removeChild(modal));
+  content.appendChild(closeBtn);
+
+  modal.appendChild(content);
+  document.body.appendChild(modal);
+}
+
+      };
+    });
+
+    if (freshAssignments[c.id] !== undefined) {
+      const removeShield = document.createElement('button');
+      removeShield.className = 'shield-remove-btn';
+      removeShield.textContent = tr("shield_remove");
+
+      removeShield.addEventListener('click', (e) => {
+        e.preventDefault();
+        const currentAssignments = getShieldAssignments();
+        delete currentAssignments[c.id];
+        setShieldAssignments(currentAssignments);
+        location.reload();
       });
 
-      if (freshAssignments[c.id] !== undefined) {
-        const removeShield = document.createElement('button');
-        removeShield.className = 'shield-remove-btn';
-        removeShield.textContent = tr("shield_remove");
-
-        removeShield.addEventListener('click', (e) => {
-          e.preventDefault();
-          const currentAssignments = getShieldAssignments();
-          delete currentAssignments[c.id];
-          setShieldAssignments(currentAssignments);
-          location.reload();
-        });
-
-        shieldsDisplay.appendChild(removeShield);
-      }
+      shieldsDisplay.appendChild(removeShield);
     }
   }
+}
+
 
   // Repair keys
   const repairKeysDisplay = qs('#repairKeysDisplay');
@@ -1107,15 +1241,12 @@ function createCharacterTab(char, lang){
   const saved = getState(char.id);
   const hp = saved?.hp ?? (char.hp?.max ?? 0);
   const maxHp = char.hp?.max ?? 0;
-
   const isKo = hp <= 0;
-
   const hpPercentage = maxHp > 0 ? (hp / maxHp) * 100 : 100;
   const hpClass = hpPercentage <= 33 ? 'low' : '';
-
   const assignments = getShieldAssignments();
-  const hasShield = assignments[char.id] !== undefined;
-
+  const blueAssignments = getBlueShieldAssignments();
+  const hasShield = (assignments[char.id] !== undefined) || (blueAssignments[char.id] !== undefined);
   const visualEl = document.createElement('div');
   visualEl.className = 'unit-tab-visual';
   visualEl.classList.add(tabCamp === "prodrome" ? "camp-prodrome" : "camp-mechkawaii");
