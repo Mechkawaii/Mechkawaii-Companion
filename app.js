@@ -118,7 +118,7 @@ const I18N = {
     setup_q_difficulty: "3) Choisis la difficulté",
     setup_difficulty_desc: "<strong>Mode Normal :</strong> Patterns de déplacement et d'attaque standard.<br><strong>Mode Expert :</strong> Patterns avancés pour plus de challenge.",
     diff_normal: "⭐ Normal",
-    diff_expert: "💀 Expert",
+    diff_expert: "⭐⭐ Expert",
 
     reset_all: "Tout réinitialiser",
 
@@ -165,7 +165,7 @@ const I18N = {
     setup_q_difficulty: "3) Pick difficulty",
     setup_difficulty_desc: "<strong>Normal:</strong> Standard movement/attack patterns.<br><strong>Expert:</strong> Advanced patterns for more challenge.",
     diff_normal: "⭐ Normal",
-    diff_expert: "💀 Expert",
+    diff_expert: "⭐⭐ Expert",
 
     reset_all: "Reset everything",
 
@@ -800,10 +800,7 @@ document.body.classList.add(pageCamp === "prodrome" ? "camp-prodrome" : "camp-me
   if(classActionBody) classActionBody.textContent = t(c.texts?.class_action_body, lang);
   if(ultTitle) ultTitle.textContent = t(c.texts?.ultimate_title, lang);
   if(ultBody) ultBody.textContent = t(c.texts?.ultimate_body, lang);
-
-  if(movementDesc) movementDesc.textContent = t(c.texts?.movement_desc, lang) || "";
-  if(attackDesc) attackDesc.textContent = t(c.texts?.attack_desc, lang) || "";
-
+  
   // Shields
   const shieldsDisplay = qs('#shieldsDisplay');
   if (shieldsDisplay) {
@@ -813,6 +810,13 @@ document.body.classList.add(pageCamp === "prodrome" ? "camp-prodrome" : "camp-me
     if (shieldToggle) {
       const freshShields = getSharedShields();
       const freshAssignments = getShieldAssignments();
+
+      // ✅ Glow bouclier sur la carte HP: si ce perso a un bouclier assigné
+      const hpCard = qs("#hpCard");
+      if(hpCard){
+        const hasAssignedShield = freshAssignments[c.id] !== undefined;
+        hpCard.classList.toggle("has-shield", hasAssignedShield);
+      }
 
       renderToggleRow(shieldsDisplay, shieldToggle, freshShields, lang, (v) => setSharedShields(v), freshShields);
 

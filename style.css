@@ -1650,8 +1650,7 @@ body.camp-prodrome .brand-with-portrait > *{
 
 /* 1) Uniformiser la taille du portrait (icône de classe) dans les onglets */
 .unit-tab-visual img{
-  width: clamp(56px, 38%, 84px) !important;
-  height: clamp(56px, 38%, 84px) !important;
+  width: 50% !important;
   object-fit: contain;
   object-position: center;
 }
@@ -1707,4 +1706,116 @@ body.camp-prodrome .brand-with-portrait > *{
   position: relative;
   z-index: 1;
 }
+/* =============================
+   FIX: Shield glow tabs (robuste)
+   ============================= */
 
+/* Le glow se met sur l'ONGLET entier (pas derrière) */
+.unit-tab.has-shield{
+  animation: shieldGlow 1.6s ease-in-out infinite;
+}
+
+/* Halo interne (donc jamais coupé par overflow:hidden) */
+.unit-tab.has-shield::after{
+  content:"";
+  position:absolute;
+  inset: 8px;                 /* halo à l'intérieur */
+  border-radius: 12px;
+  pointer-events:none;
+  box-shadow:
+    0 0 10px rgba(59,130,246,0.55),
+    0 0 22px rgba(59,130,246,0.38);
+  opacity: 1;
+  z-index: 2;                  /* au-dessus du fond */
+}
+
+/* S'assure que le contenu reste au-dessus du halo */
+.unit-tab.has-shield .unit-tab-visual,
+.unit-tab.has-shield .unit-tab-info{
+  position: relative;
+  z-index: 3;
+}
+
+/* IMPORTANT: on neutralise l'ancien glow qui était derrière (sinon conflit) */
+.unit-tab-visual.has-shield::before{
+  content: none !important;
+  display: none !important;
+}
+
+
+
+
+/* =========================================================
+   CAMP BACKGROUNDS + SHIELD GLOW (CLEAN OVERRIDES)
+   ========================================================= */
+
+/* --- Header (portrait + nom) background by camp --- */
+.brand-with-portrait{
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  overflow: hidden;
+  position: relative;
+}
+
+body.camp-mechkawaii .brand-with-portrait{
+  background-image: url("./assets/background_mechkawaii.png") !important;
+}
+
+body.camp-prodrome .brand-with-portrait{
+  background-image: url("./assets/background_prodrome.png") !important;
+}
+
+/* Subtle dark veil for readability */
+body.camp-mechkawaii .brand-with-portrait::before,
+body.camp-prodrome .brand-with-portrait::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: rgba(0,0,0,0.28);
+  pointer-events:none;
+  z-index: 0;
+}
+
+.brand-with-portrait > *{
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Tabs: background per character camp (each tab keeps its own camp) --- */
+.unit-tab.camp-mechkawaii{
+  background-image: url("./assets/background_mechkawaii.png") !important;
+}
+.unit-tab.camp-prodrome{
+  background-image: url("./assets/background_prodrome.png") !important;
+}
+.unit-tab.camp-mechkawaii,
+.unit-tab.camp-prodrome{
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Remove any dark overlay layer on tabs */
+.unit-tab.camp-mechkawaii::before,
+.unit-tab.camp-prodrome::before{
+  content: none !important;
+  display: none !important;
+}
+
+/* --- Shield glow on tabs: OUTER ONLY (disable inner glow around image) --- */
+.unit-tab.has-shield .unit-tab-visual{
+  animation: none !important;
+  box-shadow: none !important;
+}
+.unit-tab.has-shield .unit-tab-visual::before{
+  content: none !important;
+  display: none !important;
+}
+
+/* Keep outer shield glow on the whole tab */
+.unit-tab.has-shield{
+  animation: shieldGlow 1.6s ease-in-out infinite;
+  border-color: rgba(59, 130, 246, 0.55) !important;
+  background-color: transparent !important; /* keep camp bg visible */
+}
