@@ -1444,14 +1444,20 @@ body.camp-prodrome .topbar{
   padding: 0;
 }
 
-
 /* --- Header (portrait + nom) background by camp --- */
 .brand-with-portrait{
+  display: block;          /* important si c'est un lien (<a>) ou inline */
+  width: 100%;             /* prend toute la largeur */
+  max-width: 100%;         /* évite toute limitation */
+  box-sizing: border-box;  /* propre avec le padding */
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+  padding: 14px;
+
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
-  overflow: hidden;
-  position: relative;
 }
 
 body.camp-mechkawaii .brand-with-portrait{
