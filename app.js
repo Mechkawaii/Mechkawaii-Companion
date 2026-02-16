@@ -940,11 +940,17 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
   const draft = draftRaw ? JSON.parse(draftRaw) : null;
 
+  const currentChar = allChars.find(ch => ch.id === currentCharId);
+  const currentCamp = (currentChar?.camp || "mechkawaii");
+
   const teamChars = allChars.filter(c => {
-    if (setup?.mode === 'single') return draft?.activeIds?.includes(c.id);
-    const currentChar = allChars.find(ch => ch.id === currentCharId);
-    return draft?.activeIds?.includes(c.id) && (c.camp || "mechkawaii") === (currentChar?.camp || "mechkawaii");
+    // doit être dans les persos sélectionnés (draft)
+    if (!draft?.activeIds?.includes(c.id)) return false;
+
+    // ✅ même camp que le perso actuel (IMPORTANT, même en mode single)
+    return (c.camp || "mechkawaii") === currentCamp;
   });
+
 
   teamChars.forEach(char => {
     const btn = document.createElement('button');
