@@ -10,9 +10,7 @@
       "attack": "./assets/patterns/banado_attack_normal.png",
       "movement_expert": "./assets/patterns/banado_movement_expert.png",
       "attack_expert": "./assets/patterns/banado_attack_expert.png",
-      "portrait": "./assets/characters/classe_technicien.png",
-      "movement_desc": { "fr": "Se déplace lentement mais peut attaquer de loin.", "en": "Moves slowly but can attack from distance." },
-      "attack_desc": { "fr": "Lance des grenades en zone.", "en": "Throws grenades in area." }
+      "portrait": "./assets/characters/classe_technicien.png"
     },
     "texts": {
       "class_action_title": { "fr": "Action de classe : Technicien", "en": "Class Action: Technician" },
@@ -20,12 +18,14 @@
         "fr": "Crée un bouclier 🛡️ infini qui ne compte pas dans le stock des trois boucliers de la partie.",
         "en": "Once per turn, you may create 1 Shield 🛡️. This Shield does not count toward the three-Shield limit for the game."
       },
-      "ultimate_title": { "fr": "Coup Unique : Cœur Mécanique", "en": "Ultimate Ability : Mechanical Heart" },
+      "ultimate_title": { "fr": "Coup Unique : Cœur Mécanique", "en": "Ultimate Ability: Mechanical Heart" },
       "ultimate_body": {
         "fr": "Restaure 1 PV à tous les alliés sur un terrain adjacent au technicien, sans consommer de clés.",
         "en": "Restore 1 HP to all allied units on spaces adjacent to the Technician. This effect does not consume Repair Keys."
       },
-      },
+      "movement_desc": { "fr": "Se déplace lentement mais peut attaquer de loin.", "en": "Moves slowly but can attack from distance." },
+      "attack_desc": { "fr": "Lance des grenades en zone.", "en": "Throws grenades in an area." }
+    },
     "toggles": [
       {
         "id": "shield",
@@ -37,7 +37,7 @@
       {
         "id": "repair_keys",
         "label": { "fr": "Clés de réparation", "en": "Repair Keys" },
-        "hint": { "fr": "Clés utilisées (0, 1 ou 2)", "en": "Keys used (0, 1 or 2)" },
+        "hint": { "fr": "Clés utilisées (0, 1 ou 2)", "en": "Keys used (0, 1, or 2)" },
         "type": "visual_keys",
         "maxKeys": 2
       },
@@ -58,15 +58,21 @@
       "attack": "./assets/patterns/meimei_attack_normal.png",
       "movement_expert": "./assets/patterns/meimei_movement_expert.png",
       "attack_expert": "./assets/patterns/meimei_attack_expert.png",
-      "portrait": "./assets/characters/classe_eclaireur.png",
-      "movement_desc": { "fr": "Se déplace lentement mais peut attaquer de loin.", "en": "Moves slowly but can attack from distance." },
-      "attack_desc": { "fr": "Lance des grenades en zone.", "en": "Throws grenades in area." }
+      "portrait": "./assets/characters/classe_eclaireur.png"
     },
     "texts": {
       "class_action_title": { "fr": "Action de classe : Éclaireur", "en": "Class Action: Scout" },
-      "class_action_body": { "fr": "Contrairement aux autres classes, cette unité rapide comme l’éclair peut se déplacer deux fois durant son tour.", "en": "Unlike other classes, this unit may perform the Move action twice during its activation." },
+      "class_action_body": {
+        "fr": "Contrairement aux autres classes, cette unité rapide comme l’éclair peut se déplacer deux fois durant son tour.",
+        "en": "Unlike other classes, this unit may perform the Move action twice during its activation."
+      },
       "ultimate_title": { "fr": "Coup Unique", "en": "Ultimate Ability" },
-      "ultimate_body": { "fr": "Rend invisible tous les Mechkawaii pendant 1 tour. Les unités invisibles ne peuvent pas être prises pour cible.", "en": "All Mechkawaii units become Invisible until the start of your next turn. Invisible units cannot be targeted by enemy attacks or abilities." },
+      "ultimate_body": {
+        "fr": "Rend invisible tous les Mechkawaii pendant 1 tour. Les unités invisibles ne peuvent pas être prises pour cible.",
+        "en": "All Mechkawaii units become Invisible until the start of your next turn. Invisible units cannot be targeted by enemy attacks or abilities."
+      },
+      "movement_desc": { "fr": "Se déplace lentement mais peut attaquer de loin.", "en": "Moves slowly but can attack from distance." },
+      "attack_desc": { "fr": "Lance des grenades en zone.", "en": "Throws grenades in an area." }
     },
     "toggles": [
       {
@@ -79,7 +85,7 @@
       {
         "id": "repair_keys",
         "label": { "fr": "Clés de réparation", "en": "Repair Keys" },
-        "hint": { "fr": "Clés utilisées (0, 1 ou 2)", "en": "Keys used (0, 1 or 2)" },
+        "hint": { "fr": "Clés utilisées (0, 1 ou 2)", "en": "Keys used (0, 1, or 2)" },
         "type": "visual_keys",
         "maxKeys": 2
       },
@@ -88,6 +94,8 @@
         "label": { "fr": "Coup Unique utilisé", "en": "Ultimate Ability used" }
       }
     ]
+  }
+]
   },
   {
     "id": "johanna",
