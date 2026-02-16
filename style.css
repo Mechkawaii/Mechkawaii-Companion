@@ -1520,16 +1520,9 @@ body.camp-prodrome .brand-with-portrait::before{
   border-color: rgba(59, 130, 246, 0.55) !important;
   background-color: transparent !important; /* keep camp bg visible */
 }
-/* FORCE mobile : Déplacement + Attaque côte à côte */
-@media (max-width: 900px){
-  .patterns-grid{
-    display: flex !important;
-    flex-direction: row !important;
-    gap: 12px !important;
-  }
-
-  .patterns-grid > .card{
-    flex: 1 1 0 !important;
-    min-width: 0 !important;
-  }
+/* Déplacement + Attaque côte à côte (même sur mobile) */
+.patterns-grid{
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px;
 }
