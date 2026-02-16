@@ -180,7 +180,7 @@ const I18N = {
     change_units: "Change units",
 
     char_hp_card: "HP / Shields / Repair Keys",
-    char_hp: "Hit Points",
+    char_hp: "Health Points",
     char_shields: "Shields (shared pool)",
     char_keys: "Repair keys",
     char_movement: "Movement",
