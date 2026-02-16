@@ -1010,7 +1010,7 @@ html.splash-dismissed body.has-splash .controls {
 
 .unit-tab-role {
   font-size: 11px;
-  color: var(--muted);
+  color: #000;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
