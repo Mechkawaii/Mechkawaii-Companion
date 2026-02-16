@@ -1103,7 +1103,7 @@ function createCharacterTab(char, lang){
     const img = document.createElement('img');
     img.src = charImage;
     img.alt = t(char.name, lang);
-    img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));';
+    img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;filter:none;';
     img.onerror = function(){
       visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px,8vw,36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
       // ✅ remet KO overlay au-dessus
