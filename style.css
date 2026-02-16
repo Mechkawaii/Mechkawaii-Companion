@@ -1534,10 +1534,18 @@ body.camp-prodrome .brand-with-portrait::before{
     min-width: 0 !important;
   }
 }
-/* Portrait section full width */
+/* Portrait = même largeur que les autres sections */
 .page-character .topbar{
-  width: 100vw;
-  margin-left: 50%;
-  transform: translateX(-50%);
-  border-radius: 0;
+  width: 100%;
+  margin-left: 0;
+  transform: none;
+  border-radius: inherit; /* ou mets ta valeur habituelle */
+  box-sizing: border-box;
 }
+
+/* Le bloc portrait à l'intérieur doit prendre toute la largeur dispo */
+.page-character .brand-with-portrait{
+  width: 100%;
+  box-sizing: border-box;
+}
+
