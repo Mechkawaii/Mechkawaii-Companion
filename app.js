@@ -345,9 +345,10 @@ function removeBlueShieldForTarget(targetCharId){
 }
 
 function isTechnicianChar(c){
-  const fr = (c.class?.fr || "").toLowerCase();
-  const en = (c.class?.en || "").toLowerCase();
-  return fr.includes("technicien") || en.includes("technician");
+  const fr = (c.class?.fr || "").toLowerCase().trim();
+  const en = (c.class?.en || "").toLowerCase().trim();
+  // IMPORTANT: use word-boundary matching so "Pyrotechnicien/Pyrotechnician" does NOT match.
+  return (/\btechnicien\b/.test(fr)) || (/\btechnician\b/.test(en));
 }
 
 /* ------------------------------
@@ -879,8 +880,7 @@ if (isTechnicianChar(c)) {
     btn.type = "button";
     btn.style.cssText = "display:inline-flex; align-items:center; gap:10px;";
     btn.innerHTML = `
-      <img src="./assets/icons/shield_blue_on.svg" alt="Bouclier" style="width:26px;height:26px;display:block;" />
-      <span>Créer un bouclier</span>
+      <img src="./assets/icons/shield_blue_on.svg" alt="Bouclier" style="width:26px;height:26px;display:block;" />      
     `;
 
     btn.addEventListener("click", (e) => {
@@ -950,14 +950,17 @@ if (shieldsDisplay) {
       removeShield.addEventListener('click', (e) => {
         e.preventDefault();
         const currentAssignments = getShieldAssignments();
+        const assignedIndex = currentAssignments[c.id];
 
-        // ✅ IMPORTANT : un bouclier orange consommé ne revient PAS dans la réserve
-        // On retire juste l'assignation au perso.
-        if (currentAssignments[c.id] !== undefined) {
+        // libère le bouclier dans la réserve partagée
+        if (assignedIndex !== undefined) {
           delete currentAssignments[c.id];
-          setShieldAssignments(currentAssignments);
+          const currentShields = getSharedShields();
+          if (currentShields[assignedIndex] === false) currentShields[assignedIndex] = true;
+          setSharedShields(currentShields);
         }
 
+        setShieldAssignments(currentAssignments);
         location.reload();
       });
 
