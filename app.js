@@ -800,10 +800,7 @@ document.body.classList.add(pageCamp === "prodrome" ? "camp-prodrome" : "camp-me
   if(classActionBody) classActionBody.textContent = t(c.texts?.class_action_body, lang);
   if(ultTitle) ultTitle.textContent = t(c.texts?.ultimate_title, lang);
   if(ultBody) ultBody.textContent = t(c.texts?.ultimate_body, lang);
-
-  if(movementDesc) movementDesc.textContent = t(c.texts?.movement_desc, lang) || "";
-  if(attackDesc) attackDesc.textContent = t(c.texts?.attack_desc, lang) || "";
-
+  
   // Shields
   const shieldsDisplay = qs('#shieldsDisplay');
   if (shieldsDisplay) {
