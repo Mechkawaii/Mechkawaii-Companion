@@ -1543,11 +1543,6 @@ body.camp-prodrome .brand-with-portrait::before{
   box-sizing: border-box;
 }
 
-/* Le bloc portrait à l'intérieur doit prendre toute la largeur dispo */
-.page-character .brand-with-portrait{
-  width: 100%;
-  box-sizing: border-box;
-}
 /* FIX : la bannière portrait doit avoir la même largeur que les cards */
 .page-character .topbar{
   width: 100% !important;
