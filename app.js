@@ -136,8 +136,8 @@ const I18N = {
     char_hp: "Points de Vie",
     char_shields: "Boucliers (Réserve partagée)",
     char_keys: "Clés de réparation",
-    char_movement: "Modèle de déplacement",
-    char_attack: "Modèle d'attaque",
+    char_movement: "Déplacement",
+    char_attack: "Attaque",
     reset_char: "Réinitialiser",
     back_list: "← Retour à la liste",
 
@@ -183,8 +183,8 @@ const I18N = {
     char_hp: "Hit Points",
     char_shields: "Shields (shared pool)",
     char_keys: "Repair keys",
-    char_movement: "Movement pattern",
-    char_attack: "Attack pattern",
+    char_movement: "Movement",
+    char_attack: "Attack",
     reset_char: "Reset",
     back_list: "← Back to list",
 
