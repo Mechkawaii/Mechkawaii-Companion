@@ -1177,21 +1177,14 @@ body.game-active .toggle.locked::after {
       0 0 8px rgba(59, 130, 246, 0.4),
       0 0 18px rgba(59, 130, 246, 0.35);
   }
-
+}
 
 /* Accessibilité (Shield FX) */
 @media (prefers-reduced-motion: reduce) {
   .card.has-shield,
-  .unit-tab.has-shield {
-    animation: none !important;
-  }
-  .card.has-shield::before {
-    animation: none !important;
-  }
+  .unit-tab.has-shield { animation: none !important; }
+  .card.has-shield::before { animation: none !important; }
 }
-
-}
-
 
 /* ============================= */
 /*     Language Flags (Index)    */
