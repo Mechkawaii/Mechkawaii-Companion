@@ -11,6 +11,8 @@
       "movement_expert": "./assets/patterns/banado_movement_expert.png",
       "attack_expert": "./assets/patterns/banado_attack_expert.png",
       "portrait": "./assets/characters/classe_technicien.png"
+      "movement_desc": { "fr": "Se déplace lentement mais peut attaquer de loin.", "en": "Moves slowly but can attack from distance." },
+      "attack_desc": { "fr": "Lance des grenades en zone.", "en": "Throws grenades in area." }
     },
     "texts": {
       "class_action_title": { "fr": "Action de classe : Technicien", "en": "Class Action: Technician" },
@@ -57,6 +59,8 @@
       "movement_expert": "./assets/patterns/meimei_movement_expert.png",
       "attack_expert": "./assets/patterns/meimei_attack_expert.png",
       "portrait": "./assets/characters/classe_eclaireur.png"
+      "movement_desc": { "fr": "Se déplace lentement mais peut attaquer de loin.", "en": "Moves slowly but can attack from distance." },
+      "attack_desc": { "fr": "Lance des grenades en zone.", "en": "Throws grenades in area." }
     },
     "texts": {
       "class_action_title": { "fr": "Action de classe : Éclaireur", "en": "Class Action: Scout" },
