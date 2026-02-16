@@ -1534,26 +1534,10 @@ body.camp-prodrome .brand-with-portrait::before{
     min-width: 0 !important;
   }
 }
-/* Portrait = même largeur que les autres sections */
-.page-character .topbar{
+.page-character .brand-with-portrait{
   width: 100%;
-  margin-left: 0;
-  transform: none;
-  border-radius: inherit; /* ou mets ta valeur habituelle */
-  box-sizing: border-box;
-}
-
-/* FIX : la bannière portrait doit avoir la même largeur que les cards */
-.page-character .topbar{
-  width: 100% !important;
-  max-width: none !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  transform: none !important;
-  box-sizing: border-box;
-}
-/* Si tes cards sont centrées via un container, centre aussi la topbar pareil */
-.page-character .topbar{
-  margin: 0 auto !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
 }
 
