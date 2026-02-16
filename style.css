@@ -1316,8 +1316,8 @@ body.game-active .toggle.locked::after {
 .unit-tab-visual { position: relative; }
 
 .unit-tab-visual.is-ko img {
-  filter: grayscale(1) brightness(0.55) contrast(1.05);
-  opacity: 0.95;
+  filter: none;
+  opacity: 1;
 }
 
 .unit-tab-visual .ko-overlay {
