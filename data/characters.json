@@ -23,9 +23,7 @@
         "fr": "Restaure 1 PV à tous les alliés sur un terrain adjacent au technicien, sans consommer de clés.",
         "en": "Restore 1 HP to all allied units on spaces adjacent to the Technician. This effect does not consume Repair Keys."
       },
-      "movement_desc": { "fr": "Se déplace rapidement en diagonale.", "en": "Moves quickly diagonally." },
-      "attack_desc": { "fr": "Attaque les cases adjacentes.", "en": "Attacks adjacent squares." }
-    },
+      },
     "toggles": [
       {
         "id": "shield",
@@ -43,7 +41,7 @@
       },
       {
         "id": "ultimate_used",
-        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate Ability used" }
       }
     ]
   },
@@ -62,11 +60,9 @@
     },
     "texts": {
       "class_action_title": { "fr": "Action de classe : Éclaireur", "en": "Class Action: Scout" },
-      "class_action_body": { "fr": "Description de l'action de classe de l'éclaireur.", "en": "Scout class action description." },
-      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
-      "ultimate_body": { "fr": "Description de l'ultime de Meimei.", "en": "Meimei's ultimate description." },
-      "movement_desc": { "fr": "Se déplace rapidement en diagonale.", "en": "Moves quickly diagonally." },
-      "attack_desc": { "fr": "Attaque les cases adjacentes.", "en": "Attacks adjacent squares." }
+      "class_action_body": { "fr": "Contrairement aux autres classes, cette unité rapide comme l’éclair peut se déplacer deux fois durant son tour.", "en": "Unlike other classes, this unit may perform the Move action twice during its activation." },
+      "ultimate_title": { "fr": "Coup Unique", "en": "Ultimate Ability" },
+      "ultimate_body": { "fr": "Rend invisible tous les Mechkawaii pendant 1 tour. Les unités invisibles ne peuvent pas être prises pour cible.", "en": "All Mechkawaii units become Invisible until the start of your next turn. Invisible units cannot be targeted by enemy attacks or abilities." },
     },
     "toggles": [
       {
@@ -85,7 +81,7 @@
       },
       {
         "id": "ultimate_used",
-        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate Ability used" }
       }
     ]
   },
@@ -105,8 +101,8 @@
     "texts": {
       "class_action_title": { "fr": "Action de classe : Grenadier", "en": "Class Action: Grenadier" },
       "class_action_body": { "fr": "Description de l'action de classe du grenadier.", "en": "Grenadier class action description." },
-      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
-      "ultimate_body": { "fr": "Description de l'ultime de Johanna.", "en": "Johanna's ultimate description." },
+      "ultimate_title": { "fr": "Coup Unique", "en": "Ultimate Ability" },
+      "ultimate_body": { "fr": "Description de l'Coup Unique de Johanna.", "en": "Johanna's Ultimate Ability description." },
       "movement_desc": { "fr": "Se déplace lentement mais peut attaquer de loin.", "en": "Moves slowly but can attack from distance." },
       "attack_desc": { "fr": "Lance des grenades en zone.", "en": "Throws grenades in area." }
     },
@@ -127,7 +123,7 @@
       },
       {
         "id": "ultimate_used",
-        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate Ability used" }
       }
     ]
   },
@@ -145,10 +141,10 @@
       "portrait": "./assets/characters/classe_voltigeur.png"
     },
     "texts": {
-      "class_action_title": { "fr": "Action de classe : Voltigeur", "en": "Class Action: Skirmisher" },
-      "class_action_body": { "fr": "Description de l'action de classe du voltigeur.", "en": "Skirmisher class action description." },
-      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
-      "ultimate_body": { "fr": "Description de l'ultime de Yamabato.", "en": "Yamabato's ultimate description." },
+      "class_action_title": { "fr": "Action de classe : Voltigeur", "en": "Class Action: Acrobat" },
+      "class_action_body": { "fr": "Ignore les terrains infranchissables et les unités pour ses déplacements. Ne subit pas les terrains accidentés..", "en": "Skirmisher class action description." },
+      "ultimate_title": { "fr": "Coup Unique", "en": "Ultimate Ability" },
+      "ultimate_body": { "fr": "Description de l'Coup Unique de Yamabato.", "en": "Yamabato's Ultimate Ability description." },
       "movement_desc": { "fr": "Se déplace très rapidement en tous sens.", "en": "Moves very quickly in all directions." },
       "attack_desc": { "fr": "Attaque rapide et précise.", "en": "Fast and precise attack." }
     },
@@ -169,7 +165,7 @@
       },
       {
         "id": "ultimate_used",
-        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate Ability used" }
       }
     ]
   },
@@ -189,8 +185,8 @@
     "texts": {
       "class_action_title": { "fr": "Action de classe : Pyrotechnicien", "en": "Class Action: Pyrotechnician" },
       "class_action_body": { "fr": "Description de l'action de classe du pyrotechnicien.", "en": "Pyrotechnician class action description." },
-      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
-      "ultimate_body": { "fr": "Description de l'ultime de Fuyu.", "en": "Fuyu's ultimate description." },
+      "ultimate_title": { "fr": "Coup Unique", "en": "Ultimate Ability" },
+      "ultimate_body": { "fr": "Description de l'Coup Unique de Fuyu.", "en": "Fuyu's Ultimate Ability description." },
       "movement_desc": { "fr": "Se déplace en zigzag.", "en": "Moves in zigzag." },
       "attack_desc": { "fr": "Attaque en spirale de feu.", "en": "Attacks in fire spiral." }
     },
@@ -211,7 +207,7 @@
       },
       {
         "id": "ultimate_used",
-        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate Ability used" }
       }
     ]
   },
@@ -231,8 +227,8 @@
     "texts": {
       "class_action_title": { "fr": "Action de classe : Pyrotechnicien", "en": "Class Action: Pyrotechnician" },
       "class_action_body": { "fr": "Description de l'action de classe du pyrotechnicien.", "en": "Pyrotechnician class action description." },
-      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
-      "ultimate_body": { "fr": "Description de l'ultime de Goki.", "en": "Goki's ultimate description." },
+      "ultimate_title": { "fr": "Coup Unique", "en": "Ultimate Ability" },
+      "ultimate_body": { "fr": "Description de l'Coup Unique de Goki.", "en": "Goki's Ultimate Ability description." },
       "movement_desc": { "fr": "Se déplace en avant droit.", "en": "Moves straight forward." },
       "attack_desc": { "fr": "Attaque tous les ennemis devant lui.", "en": "Attacks all enemies in front." }
     },
@@ -253,7 +249,7 @@
       },
       {
         "id": "ultimate_used",
-        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate Ability used" }
       }
     ]
   },
@@ -273,8 +269,8 @@
     "texts": {
       "class_action_title": { "fr": "Action de classe : Grenadier", "en": "Class Action: Grenadier" },
       "class_action_body": { "fr": "Description de l'action de classe du grenadier.", "en": "Grenadier class action description." },
-      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
-      "ultimate_body": { "fr": "Description de l'ultime de Goryo.", "en": "Goryo's ultimate description." },
+      "ultimate_title": { "fr": "Coup Unique", "en": "Ultimate Ability" },
+      "ultimate_body": { "fr": "Description de l'Coup Unique de Goryo.", "en": "Goryo's Ultimate Ability description." },
       "movement_desc": { "fr": "Se déplace en carré.", "en": "Moves in square pattern." },
       "attack_desc": { "fr": "Attaque en X.", "en": "Attacks in X pattern." }
     },
@@ -295,7 +291,7 @@
       },
       {
         "id": "ultimate_used",
-        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate Ability used" }
       }
     ]
   },
@@ -315,8 +311,8 @@
     "texts": {
       "class_action_title": { "fr": "Action de classe : Voltigeur", "en": "Class Action: Skirmisher" },
       "class_action_body": { "fr": "Description de l'action de classe du voltigeur.", "en": "Skirmisher class action description." },
-      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
-      "ultimate_body": { "fr": "Description de l'ultime de Gyuki.", "en": "Gyuki's ultimate description." },
+      "ultimate_title": { "fr": "Coup Unique", "en": "Ultimate Ability" },
+      "ultimate_body": { "fr": "Description de l'Coup Unique de Gyuki.", "en": "Gyuki's Ultimate Ability description." },
       "movement_desc": { "fr": "Se déplace en L.", "en": "Moves in L shape." },
       "attack_desc": { "fr": "Attaque en T.", "en": "Attacks in T shape." }
     },
@@ -337,7 +333,7 @@
       },
       {
         "id": "ultimate_used",
-        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate Ability used" }
       }
     ]
   },
@@ -357,8 +353,8 @@
     "texts": {
       "class_action_title": { "fr": "Action de classe : Éclaireur", "en": "Class Action: Scout" },
       "class_action_body": { "fr": "Description de l'action de classe de l'éclaireur.", "en": "Scout class action description." },
-      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
-      "ultimate_body": { "fr": "Description de l'ultime de Gaoro.", "en": "Gaoro's ultimate description." },
+      "ultimate_title": { "fr": "Coup Unique", "en": "Ultimate Ability" },
+      "ultimate_body": { "fr": "Description de l'Coup Unique de Gaoro.", "en": "Gaoro's Ultimate Ability description." },
       "movement_desc": { "fr": "Se déplace en saut.", "en": "Moves by jumping." },
       "attack_desc": { "fr": "Attaque à distance.", "en": "Attacks from distance." }
     },
@@ -379,7 +375,7 @@
       },
       {
         "id": "ultimate_used",
-        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate Ability used" }
       }
     ]
   },
@@ -399,8 +395,8 @@
     "texts": {
       "class_action_title": { "fr": "Action de classe : Technicien", "en": "Class Action: Technician" },
       "class_action_body": { "fr": "Description de l'action de classe du technicien.", "en": "Technician class action description." },
-      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
-      "ultimate_body": { "fr": "Description de l'ultime de Genbu.", "en": "Genbu's ultimate description." },
+      "ultimate_title": { "fr": "Coup Unique", "en": "Ultimate Ability" },
+      "ultimate_body": { "fr": "Description de l'Coup Unique de Genbu.", "en": "Genbu's Ultimate Ability description." },
       "movement_desc": { "fr": "Se déplace lentement en ligne.", "en": "Moves slowly in line." },
       "attack_desc": { "fr": "Attaque puissante mais lente.", "en": "Powerful but slow attack." }
     },
@@ -421,7 +417,7 @@
       },
       {
         "id": "ultimate_used",
-        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate Ability used" }
       }
     ]
   }
