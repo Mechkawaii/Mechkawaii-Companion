@@ -714,20 +714,14 @@ document.body.classList.add(pageCamp === "prodrome" ? "camp-prodrome" : "camp-me
   });
   setState(c.id, state);
    
-   // Coup Unique toggle (remet le switch dans la section)
+   // --- Coup Unique : toggle "ultimate_used" dans la section Coup Unique ---
 const ultToggleContainer = qs("#ultToggleContainer");
 if (ultToggleContainer) {
   ultToggleContainer.innerHTML = "";
 
-  // On cherche un toggle dans le JSON (id: "ultimate" ou "ult" ou "unique")
-  const ultToggle =
-    (c.toggles || []).find(tg => tg.id === "ultimate") ||
-    (c.toggles || []).find(tg => tg.id === "ult") ||
-    (c.toggles || []).find(tg => tg.id === "unique") ||
-    (c.toggles || []).find(tg => tg.id === "coup_unique");
+  const ultToggle = (c.toggles || []).find(tg => tg.id === "ultimate_used");
 
   if (ultToggle) {
-    // état sauvegardé
     const isOn = !!state.toggles[ultToggle.id];
 
     renderToggleRow(ultToggleContainer, ultToggle, isOn, lang, (v) => {
@@ -736,7 +730,6 @@ if (ultToggleContainer) {
     });
   }
 }
-
 
   const charName = qs("#charName");
   const charClass = qs("#charClass");
