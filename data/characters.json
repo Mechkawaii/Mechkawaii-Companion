@@ -1,19 +1,10 @@
-
 [
   {
     "id": "banado",
-    "name": {
-      "fr": "Banado",
-      "en": "Banado"
-    },
-    "class": {
-      "fr": "Technicien",
-      "en": "Technician"
-    },
+    "name": { "fr": "Banado", "en": "Banado" },
+    "class": { "fr": "Technicien", "en": "Technician" },
     "camp": "mechkawaii",
-    "hp": {
-      "max": 4
-    },
+    "hp": { "max": 4 },
     "images": {
       "movement": "./assets/patterns/banado_movement_normal.png",
       "attack": "./assets/patterns/banado_attack_normal.png",
@@ -22,81 +13,46 @@
       "portrait": "./assets/characters/classe_technicien.png"
     },
     "texts": {
-      "class_action_title": {
-        "fr": "Action de classe : Technicien",
-        "en": "Class Action: Technician"
-      },
+      "class_action_title": { "fr": "Action de classe : Technicien", "en": "Class Action: Technician" },
       "class_action_body": {
         "fr": "Crée un bouclier 🛡️ infini qui ne compte pas dans le stock des trois boucliers de la partie.",
         "en": "Once per turn, you may create 1 Shield 🛡️. This Shield does not count toward the three-Shield limit for the game."
       },
-      "ultimate_title": {
-        "fr": "Coup Unique : Cœur Mécanique",
-        "en": "Ultimate Ability : Mechanical Heart"
-      },
+      "ultimate_title": { "fr": "Coup Unique : Cœur Mécanique", "en": "Ultimate Ability : Mechanical Heart" },
       "ultimate_body": {
         "fr": "Restaure 1 PV à tous les alliés sur un terrain adjacent au technicien, sans consommer de clés.",
         "en": "Restore 1 HP to all allied units on spaces adjacent to the Technician. This effect does not consume Repair Keys."
       },
-      "movement_desc": {
-        "fr": "Se déplace rapidement en diagonale.",
-        "en": "Moves quickly diagonally."
-      },
-      "attack_desc": {
-        "fr": "Attaque les cases adjacentes.",
-        "en": "Attacks adjacent squares."
-      }
+      "movement_desc": { "fr": "Se déplace rapidement en diagonale.", "en": "Moves quickly diagonally." },
+      "attack_desc": { "fr": "Attaque les cases adjacentes.", "en": "Attacks adjacent squares." }
     },
     "toggles": [
       {
         "id": "shield",
-        "label": {
-          "fr": "Boucliers",
-          "en": "Shields"
-        },
-        "hint": {
-          "fr": "Réserve partagée (0/3)",
-          "en": "Shared reserve (0/3)"
-        },
+        "label": { "fr": "Boucliers", "en": "Shields" },
+        "hint": { "fr": "Réserve partagée (0/3)", "en": "Shared reserve (0/3)" },
         "type": "visual_keys",
         "maxKeys": 3
       },
       {
         "id": "repair_keys",
-        "label": {
-          "fr": "Clés de réparation",
-          "en": "Repair Keys"
-        },
-        "hint": {
-          "fr": "Clés utilisées (0, 1 ou 2)",
-          "en": "Keys used (0, 1 or 2)"
-        },
+        "label": { "fr": "Clés de réparation", "en": "Repair Keys" },
+        "hint": { "fr": "Clés utilisées (0, 1 ou 2)", "en": "Keys used (0, 1 or 2)" },
         "type": "visual_keys",
         "maxKeys": 2
       },
       {
         "id": "ultimate_used",
-        "label": {
-          "fr": "Coup Unique utilisé",
-          "en": "Ultimate used"
-        },
-        }
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
+      }
     ]
   },
   {
     "id": "meimei",
-    "name": {
-      "fr": "Meimei",
-      "en": "Meimei"
-    },
-    "class": {
-      "fr": "Éclaireur",
-      "en": "Scout"
-    },
+    "name": { "fr": "Meimei", "en": "Meimei" },
+    "class": { "fr": "Éclaireur", "en": "Scout" },
     "camp": "mechkawaii",
-    "hp": {
-      "max": 3
-    },
+    "hp": { "max": 3 },
     "images": {
       "movement": "./assets/patterns/meimei_movement_normal.png",
       "attack": "./assets/patterns/meimei_attack_normal.png",
@@ -105,82 +61,40 @@
       "portrait": "./assets/characters/classe_eclaireur.png"
     },
     "texts": {
-      "class_action_title": {
-        "fr": "Action de classe : Éclaireur",
-        "en": "Class Action: Scout"
-      },
-      "class_action_body": {
-        "fr": "Description de l'action de classe de l'éclaireur.",
-        "en": "Scout class action description."
-      },
-      "ultimate_title": {
-        "fr": "Ultime",
-        "en": "Ultimate"
-      },
-      "ultimate_body": {
-        "fr": "Description de l'ultime de Meimei.",
-        "en": "Meimei's ultimate description."
-      },
-      "movement_desc": {
-        "fr": "Se déplace rapidement en diagonale.",
-        "en": "Moves quickly diagonally."
-      },
-      "attack_desc": {
-        "fr": "Attaque les cases adjacentes.",
-        "en": "Attacks adjacent squares."
-      }
+      "class_action_title": { "fr": "Action de classe : Éclaireur", "en": "Class Action: Scout" },
+      "class_action_body": { "fr": "Description de l'action de classe de l'éclaireur.", "en": "Scout class action description." },
+      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
+      "ultimate_body": { "fr": "Description de l'ultime de Meimei.", "en": "Meimei's ultimate description." },
+      "movement_desc": { "fr": "Se déplace rapidement en diagonale.", "en": "Moves quickly diagonally." },
+      "attack_desc": { "fr": "Attaque les cases adjacentes.", "en": "Attacks adjacent squares." }
     },
     "toggles": [
       {
         "id": "shield",
-        "label": {
-          "fr": "Boucliers",
-          "en": "Shields"
-        },
-        "hint": {
-          "fr": "Réserve partagée (0/3)",
-          "en": "Shared reserve (0/3)"
-        },
+        "label": { "fr": "Boucliers", "en": "Shields" },
+        "hint": { "fr": "Réserve partagée (0/3)", "en": "Shared reserve (0/3)" },
         "type": "visual_keys",
         "maxKeys": 3
       },
       {
         "id": "repair_keys",
-        "label": {
-          "fr": "Clés de réparation",
-          "en": "Repair Keys"
-        },
-        "hint": {
-          "fr": "Clés utilisées (0, 1 ou 2)",
-          "en": "Keys used (0, 1 or 2)"
-        },
+        "label": { "fr": "Clés de réparation", "en": "Repair Keys" },
+        "hint": { "fr": "Clés utilisées (0, 1 ou 2)", "en": "Keys used (0, 1 or 2)" },
         "type": "visual_keys",
         "maxKeys": 2
       },
       {
         "id": "ultimate_used",
-        "label": {
-          "fr": "Coup Unique utilisé",
-          "en": "Ultimate used"
-        },
-        
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
       }
     ]
   },
   {
     "id": "johanna",
-    "name": {
-      "fr": "Johanna",
-      "en": "Johanna"
-    },
-    "class": {
-      "fr": "Grenadier",
-      "en": "Grenadier"
-    },
+    "name": { "fr": "Johanna", "en": "Johanna" },
+    "class": { "fr": "Grenadier", "en": "Grenadier" },
     "camp": "mechkawaii",
-    "hp": {
-      "max": 3
-    },
+    "hp": { "max": 3 },
     "images": {
       "movement": "./assets/patterns/johanna_movement_normal.png",
       "attack": "./assets/patterns/johanna_attack_normal.png",
@@ -189,82 +103,40 @@
       "portrait": "./assets/characters/classe_grenadier.png"
     },
     "texts": {
-      "class_action_title": {
-        "fr": "Action de classe : Grenadier",
-        "en": "Class Action: Grenadier"
-      },
-      "class_action_body": {
-        "fr": "Description de l'action de classe du grenadier.",
-        "en": "Grenadier class action description."
-      },
-      "ultimate_title": {
-        "fr": "Ultime",
-        "en": "Ultimate"
-      },
-      "ultimate_body": {
-        "fr": "Description de l'ultime de Johanna.",
-        "en": "Johanna's ultimate description."
-      },
-      "movement_desc": {
-        "fr": "Se déplace lentement mais peut attaquer de loin.",
-        "en": "Moves slowly but can attack from distance."
-      },
-      "attack_desc": {
-        "fr": "Lance des grenades en zone.",
-        "en": "Throws grenades in area."
-      }
+      "class_action_title": { "fr": "Action de classe : Grenadier", "en": "Class Action: Grenadier" },
+      "class_action_body": { "fr": "Description de l'action de classe du grenadier.", "en": "Grenadier class action description." },
+      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
+      "ultimate_body": { "fr": "Description de l'ultime de Johanna.", "en": "Johanna's ultimate description." },
+      "movement_desc": { "fr": "Se déplace lentement mais peut attaquer de loin.", "en": "Moves slowly but can attack from distance." },
+      "attack_desc": { "fr": "Lance des grenades en zone.", "en": "Throws grenades in area." }
     },
     "toggles": [
       {
         "id": "shield",
-        "label": {
-          "fr": "Boucliers",
-          "en": "Shields"
-        },
-        "hint": {
-          "fr": "Réserve partagée (0/3)",
-          "en": "Shared reserve (0/3)"
-        },
+        "label": { "fr": "Boucliers", "en": "Shields" },
+        "hint": { "fr": "Réserve partagée (0/3)", "en": "Shared reserve (0/3)" },
         "type": "visual_keys",
         "maxKeys": 3
       },
       {
         "id": "repair_keys",
-        "label": {
-          "fr": "Clés de réparation",
-          "en": "Repair Keys"
-        },
-        "hint": {
-          "fr": "Clés utilisées (0, 1 ou 2)",
-          "en": "Keys used (0, 1 or 2)"
-        },
+        "label": { "fr": "Clés de réparation", "en": "Repair Keys" },
+        "hint": { "fr": "Clés utilisées (0, 1 ou 2)", "en": "Keys used (0, 1 or 2)" },
         "type": "visual_keys",
         "maxKeys": 2
       },
       {
         "id": "ultimate_used",
-        "label": {
-          "fr": "Coup Unique utilisé",
-          "en": "Ultimate used"
-        },
-        
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
       }
     ]
   },
   {
     "id": "yamabato",
-    "name": {
-      "fr": "Yamabato",
-      "en": "Yamabato"
-    },
-    "class": {
-      "fr": "Voltigeur",
-      "en": "Skirmisher"
-    },
+    "name": { "fr": "Yamabato", "en": "Yamabato" },
+    "class": { "fr": "Voltigeur", "en": "Skirmisher" },
     "camp": "mechkawaii",
-    "hp": {
-      "max": 2
-    },
+    "hp": { "max": 2 },
     "images": {
       "movement": "./assets/patterns/yamabato_movement_normal.png",
       "attack": "./assets/patterns/yamabato_attack_normal.png",
@@ -273,82 +145,40 @@
       "portrait": "./assets/characters/classe_voltigeur.png"
     },
     "texts": {
-      "class_action_title": {
-        "fr": "Action de classe : Voltigeur",
-        "en": "Class Action: Skirmisher"
-      },
-      "class_action_body": {
-        "fr": "Description de l'action de classe du voltigeur.",
-        "en": "Skirmisher class action description."
-      },
-      "ultimate_title": {
-        "fr": "Ultime",
-        "en": "Ultimate"
-      },
-      "ultimate_body": {
-        "fr": "Description de l'ultime de Yamabato.",
-        "en": "Yamabato's ultimate description."
-      },
-      "movement_desc": {
-        "fr": "Se déplace très rapidement en tous sens.",
-        "en": "Moves very quickly in all directions."
-      },
-      "attack_desc": {
-        "fr": "Attaque rapide et précise.",
-        "en": "Fast and precise attack."
-      }
+      "class_action_title": { "fr": "Action de classe : Voltigeur", "en": "Class Action: Skirmisher" },
+      "class_action_body": { "fr": "Description de l'action de classe du voltigeur.", "en": "Skirmisher class action description." },
+      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
+      "ultimate_body": { "fr": "Description de l'ultime de Yamabato.", "en": "Yamabato's ultimate description." },
+      "movement_desc": { "fr": "Se déplace très rapidement en tous sens.", "en": "Moves very quickly in all directions." },
+      "attack_desc": { "fr": "Attaque rapide et précise.", "en": "Fast and precise attack." }
     },
     "toggles": [
       {
         "id": "shield",
-        "label": {
-          "fr": "Boucliers",
-          "en": "Shields"
-        },
-        "hint": {
-          "fr": "Réserve partagée (0/3)",
-          "en": "Shared reserve (0/3)"
-        },
+        "label": { "fr": "Boucliers", "en": "Shields" },
+        "hint": { "fr": "Réserve partagée (0/3)", "en": "Shared reserve (0/3)" },
         "type": "visual_keys",
         "maxKeys": 3
       },
       {
         "id": "repair_keys",
-        "label": {
-          "fr": "Clés de réparation",
-          "en": "Repair Keys"
-        },
-        "hint": {
-          "fr": "Clés utilisées (0, 1 ou 2)",
-          "en": "Keys used (0, 1 or 2)"
-        },
+        "label": { "fr": "Clés de réparation", "en": "Repair Keys" },
+        "hint": { "fr": "Clés utilisées (0, 1 ou 2)", "en": "Keys used (0, 1 or 2)" },
         "type": "visual_keys",
         "maxKeys": 2
       },
       {
         "id": "ultimate_used",
-        "label": {
-          "fr": "Coup Unique utilisé",
-          "en": "Ultimate used"
-        },
-        
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
       }
     ]
   },
   {
     "id": "fuyu",
-    "name": {
-      "fr": "Fuyu",
-      "en": "Fuyu"
-    },
-    "class": {
-      "fr": "Pyrotechnicien",
-      "en": "Pyrotechnician"
-    },
+    "name": { "fr": "Fuyu", "en": "Fuyu" },
+    "class": { "fr": "Pyrotechnicien", "en": "Pyrotechnician" },
     "camp": "mechkawaii",
-    "hp": {
-      "max": 3
-    },
+    "hp": { "max": 3 },
     "images": {
       "movement": "./assets/patterns/fuyu_movement_normal.png",
       "attack": "./assets/patterns/fuyu_attack_normal.png",
@@ -357,82 +187,40 @@
       "portrait": "./assets/characters/classe_pyrotechnicien.png"
     },
     "texts": {
-      "class_action_title": {
-        "fr": "Action de classe : Pyrotechnicien",
-        "en": "Class Action: Pyrotechnician"
-      },
-      "class_action_body": {
-        "fr": "Description de l'action de classe du pyrotechnicien.",
-        "en": "Pyrotechnician class action description."
-      },
-      "ultimate_title": {
-        "fr": "Ultime",
-        "en": "Ultimate"
-      },
-      "ultimate_body": {
-        "fr": "Description de l'ultime de Fuyu.",
-        "en": "Fuyu's ultimate description."
-      },
-      "movement_desc": {
-        "fr": "Se déplace en zigzag.",
-        "en": "Moves in zigzag."
-      },
-      "attack_desc": {
-        "fr": "Attaque en spirale de feu.",
-        "en": "Attacks in fire spiral."
-      }
+      "class_action_title": { "fr": "Action de classe : Pyrotechnicien", "en": "Class Action: Pyrotechnician" },
+      "class_action_body": { "fr": "Description de l'action de classe du pyrotechnicien.", "en": "Pyrotechnician class action description." },
+      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
+      "ultimate_body": { "fr": "Description de l'ultime de Fuyu.", "en": "Fuyu's ultimate description." },
+      "movement_desc": { "fr": "Se déplace en zigzag.", "en": "Moves in zigzag." },
+      "attack_desc": { "fr": "Attaque en spirale de feu.", "en": "Attacks in fire spiral." }
     },
     "toggles": [
       {
         "id": "shield",
-        "label": {
-          "fr": "Boucliers",
-          "en": "Shields"
-        },
-        "hint": {
-          "fr": "Réserve partagée (0/3)",
-          "en": "Shared reserve (0/3)"
-        },
+        "label": { "fr": "Boucliers", "en": "Shields" },
+        "hint": { "fr": "Réserve partagée (0/3)", "en": "Shared reserve (0/3)" },
         "type": "visual_keys",
         "maxKeys": 3
       },
       {
         "id": "repair_keys",
-        "label": {
-          "fr": "Clés de réparation",
-          "en": "Repair Keys"
-        },
-        "hint": {
-          "fr": "Clés utilisées (0, 1 ou 2)",
-          "en": "Keys used (0, 1 or 2)"
-        },
+        "label": { "fr": "Clés de réparation", "en": "Repair Keys" },
+        "hint": { "fr": "Clés utilisées (0, 1 ou 2)", "en": "Keys used (0, 1 or 2)" },
         "type": "visual_keys",
         "maxKeys": 2
       },
       {
         "id": "ultimate_used",
-        "label": {
-          "fr": "Coup Unique utilisé",
-          "en": "Ultimate used"
-        },
-        
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
       }
     ]
   },
   {
     "id": "goki",
-    "name": {
-      "fr": "Goki",
-      "en": "Goki"
-    },
-    "class": {
-      "fr": "Pyrotechnicien",
-      "en": "Pyrotechnician"
-    },
+    "name": { "fr": "Goki", "en": "Goki" },
+    "class": { "fr": "Pyrotechnicien", "en": "Pyrotechnician" },
     "camp": "prodrome",
-    "hp": {
-      "max": 3
-    },
+    "hp": { "max": 3 },
     "images": {
       "movement": "./assets/patterns/goki_movement_normal.png",
       "attack": "./assets/patterns/goki_attack_normal.png",
@@ -441,82 +229,40 @@
       "portrait": "./assets/characters/classe_pyrotechnicien.png"
     },
     "texts": {
-      "class_action_title": {
-        "fr": "Action de classe : Pyrotechnicien",
-        "en": "Class Action: Pyrotechnician"
-      },
-      "class_action_body": {
-        "fr": "Description de l'action de classe du pyrotechnicien.",
-        "en": "Pyrotechnician class action description."
-      },
-      "ultimate_title": {
-        "fr": "Ultime",
-        "en": "Ultimate"
-      },
-      "ultimate_body": {
-        "fr": "Description de l'ultime de Goki.",
-        "en": "Goki's ultimate description."
-      },
-      "movement_desc": {
-        "fr": "Se déplace en avant droit.",
-        "en": "Moves straight forward."
-      },
-      "attack_desc": {
-        "fr": "Attaque tous les ennemis devant lui.",
-        "en": "Attacks all enemies in front."
-      }
+      "class_action_title": { "fr": "Action de classe : Pyrotechnicien", "en": "Class Action: Pyrotechnician" },
+      "class_action_body": { "fr": "Description de l'action de classe du pyrotechnicien.", "en": "Pyrotechnician class action description." },
+      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
+      "ultimate_body": { "fr": "Description de l'ultime de Goki.", "en": "Goki's ultimate description." },
+      "movement_desc": { "fr": "Se déplace en avant droit.", "en": "Moves straight forward." },
+      "attack_desc": { "fr": "Attaque tous les ennemis devant lui.", "en": "Attacks all enemies in front." }
     },
     "toggles": [
       {
         "id": "shield",
-        "label": {
-          "fr": "Boucliers",
-          "en": "Shields"
-        },
-        "hint": {
-          "fr": "Réserve partagée (0/3)",
-          "en": "Shared reserve (0/3)"
-        },
+        "label": { "fr": "Boucliers", "en": "Shields" },
+        "hint": { "fr": "Réserve partagée (0/3)", "en": "Shared reserve (0/3)" },
         "type": "visual_keys",
         "maxKeys": 3
       },
       {
         "id": "repair_keys",
-        "label": {
-          "fr": "Clés de réparation",
-          "en": "Repair Keys"
-        },
-        "hint": {
-          "fr": "Clés utilisées (0, 1 ou 2)",
-          "en": "Keys used (0, 1 or 2)"
-        },
+        "label": { "fr": "Clés de réparation", "en": "Repair Keys" },
+        "hint": { "fr": "Clés utilisées (0, 1 ou 2)", "en": "Keys used (0, 1 or 2)" },
         "type": "visual_keys",
         "maxKeys": 2
       },
       {
         "id": "ultimate_used",
-        "label": {
-          "fr": "Coup Unique utilisé",
-          "en": "Ultimate used"
-        },
-        
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
       }
     ]
   },
   {
     "id": "goryo",
-    "name": {
-      "fr": "Goryo",
-      "en": "Goryo"
-    },
-    "class": {
-      "fr": "Grenadier",
-      "en": "Grenadier"
-    },
+    "name": { "fr": "Goryo", "en": "Goryo" },
+    "class": { "fr": "Grenadier", "en": "Grenadier" },
     "camp": "prodrome",
-    "hp": {
-      "max": 3
-    },
+    "hp": { "max": 3 },
     "images": {
       "movement": "./assets/patterns/goryo_movement_normal.png",
       "attack": "./assets/patterns/goryo_attack_normal.png",
@@ -525,82 +271,40 @@
       "portrait": "./assets/characters/classe_grenadier.png"
     },
     "texts": {
-      "class_action_title": {
-        "fr": "Action de classe : Grenadier",
-        "en": "Class Action: Grenadier"
-      },
-      "class_action_body": {
-        "fr": "Description de l'action de classe du grenadier.",
-        "en": "Grenadier class action description."
-      },
-      "ultimate_title": {
-        "fr": "Ultime",
-        "en": "Ultimate"
-      },
-      "ultimate_body": {
-        "fr": "Description de l'ultime de Goryo.",
-        "en": "Goryo's ultimate description."
-      },
-      "movement_desc": {
-        "fr": "Se déplace en carré.",
-        "en": "Moves in square pattern."
-      },
-      "attack_desc": {
-        "fr": "Attaque en X.",
-        "en": "Attacks in X pattern."
-      }
+      "class_action_title": { "fr": "Action de classe : Grenadier", "en": "Class Action: Grenadier" },
+      "class_action_body": { "fr": "Description de l'action de classe du grenadier.", "en": "Grenadier class action description." },
+      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
+      "ultimate_body": { "fr": "Description de l'ultime de Goryo.", "en": "Goryo's ultimate description." },
+      "movement_desc": { "fr": "Se déplace en carré.", "en": "Moves in square pattern." },
+      "attack_desc": { "fr": "Attaque en X.", "en": "Attacks in X pattern." }
     },
     "toggles": [
       {
         "id": "shield",
-        "label": {
-          "fr": "Boucliers",
-          "en": "Shields"
-        },
-        "hint": {
-          "fr": "Réserve partagée (0/3)",
-          "en": "Shared reserve (0/3)"
-        },
+        "label": { "fr": "Boucliers", "en": "Shields" },
+        "hint": { "fr": "Réserve partagée (0/3)", "en": "Shared reserve (0/3)" },
         "type": "visual_keys",
         "maxKeys": 3
       },
       {
         "id": "repair_keys",
-        "label": {
-          "fr": "Clés de réparation",
-          "en": "Repair Keys"
-        },
-        "hint": {
-          "fr": "Clés utilisées (0, 1 ou 2)",
-          "en": "Keys used (0, 1 or 2)"
-        },
+        "label": { "fr": "Clés de réparation", "en": "Repair Keys" },
+        "hint": { "fr": "Clés utilisées (0, 1 ou 2)", "en": "Keys used (0, 1 or 2)" },
         "type": "visual_keys",
         "maxKeys": 2
       },
       {
         "id": "ultimate_used",
-        "label": {
-          "fr": "Coup Unique utilisé",
-          "en": "Ultimate used"
-        },
-        
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
       }
     ]
   },
   {
     "id": "gyuki",
-    "name": {
-      "fr": "Gyuki",
-      "en": "Gyuki"
-    },
-    "class": {
-      "fr": "Voltigeur",
-      "en": "Skirmisher"
-    },
+    "name": { "fr": "Gyuki", "en": "Gyuki" },
+    "class": { "fr": "Voltigeur", "en": "Skirmisher" },
     "camp": "prodrome",
-    "hp": {
-      "max": 2
-    },
+    "hp": { "max": 2 },
     "images": {
       "movement": "./assets/patterns/gyuki_movement_normal.png",
       "attack": "./assets/patterns/gyuki_attack_normal.png",
@@ -609,82 +313,40 @@
       "portrait": "./assets/characters/classe_voltigeur.png"
     },
     "texts": {
-      "class_action_title": {
-        "fr": "Action de classe : Voltigeur",
-        "en": "Class Action: Skirmisher"
-      },
-      "class_action_body": {
-        "fr": "Description de l'action de classe du voltigeur.",
-        "en": "Skirmisher class action description."
-      },
-      "ultimate_title": {
-        "fr": "Ultime",
-        "en": "Ultimate"
-      },
-      "ultimate_body": {
-        "fr": "Description de l'ultime de Gyuki.",
-        "en": "Gyuki's ultimate description."
-      },
-      "movement_desc": {
-        "fr": "Se déplace en L.",
-        "en": "Moves in L shape."
-      },
-      "attack_desc": {
-        "fr": "Attaque en T.",
-        "en": "Attacks in T shape."
-      }
+      "class_action_title": { "fr": "Action de classe : Voltigeur", "en": "Class Action: Skirmisher" },
+      "class_action_body": { "fr": "Description de l'action de classe du voltigeur.", "en": "Skirmisher class action description." },
+      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
+      "ultimate_body": { "fr": "Description de l'ultime de Gyuki.", "en": "Gyuki's ultimate description." },
+      "movement_desc": { "fr": "Se déplace en L.", "en": "Moves in L shape." },
+      "attack_desc": { "fr": "Attaque en T.", "en": "Attacks in T shape." }
     },
     "toggles": [
       {
         "id": "shield",
-        "label": {
-          "fr": "Boucliers",
-          "en": "Shields"
-        },
-        "hint": {
-          "fr": "Réserve partagée (0/3)",
-          "en": "Shared reserve (0/3)"
-        },
+        "label": { "fr": "Boucliers", "en": "Shields" },
+        "hint": { "fr": "Réserve partagée (0/3)", "en": "Shared reserve (0/3)" },
         "type": "visual_keys",
         "maxKeys": 3
       },
       {
         "id": "repair_keys",
-        "label": {
-          "fr": "Clés de réparation",
-          "en": "Repair Keys"
-        },
-        "hint": {
-          "fr": "Clés utilisées (0, 1 ou 2)",
-          "en": "Keys used (0, 1 or 2)"
-        },
+        "label": { "fr": "Clés de réparation", "en": "Repair Keys" },
+        "hint": { "fr": "Clés utilisées (0, 1 ou 2)", "en": "Keys used (0, 1 or 2)" },
         "type": "visual_keys",
         "maxKeys": 2
       },
       {
         "id": "ultimate_used",
-        "label": {
-          "fr": "Coup Unique utilisé",
-          "en": "Ultimate used"
-        },
-        
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
       }
     ]
   },
   {
     "id": "gaoro",
-    "name": {
-      "fr": "Gaoro",
-      "en": "Gaoro"
-    },
-    "class": {
-      "fr": "Éclaireur",
-      "en": "Scout"
-    },
+    "name": { "fr": "Gaoro", "en": "Gaoro" },
+    "class": { "fr": "Éclaireur", "en": "Scout" },
     "camp": "prodrome",
-    "hp": {
-      "max": 3
-    },
+    "hp": { "max": 3 },
     "images": {
       "movement": "./assets/patterns/gaoro_movement_normal.png",
       "attack": "./assets/patterns/gaoro_attack_normal.png",
@@ -693,82 +355,40 @@
       "portrait": "./assets/characters/classe_eclaireur.png"
     },
     "texts": {
-      "class_action_title": {
-        "fr": "Action de classe : Éclaireur",
-        "en": "Class Action: Scout"
-      },
-      "class_action_body": {
-        "fr": "Description de l'action de classe de l'éclaireur.",
-        "en": "Scout class action description."
-      },
-      "ultimate_title": {
-        "fr": "Ultime",
-        "en": "Ultimate"
-      },
-      "ultimate_body": {
-        "fr": "Description de l'ultime de Gaoro.",
-        "en": "Gaoro's ultimate description."
-      },
-      "movement_desc": {
-        "fr": "Se déplace en saut.",
-        "en": "Moves by jumping."
-      },
-      "attack_desc": {
-        "fr": "Attaque à distance.",
-        "en": "Attacks from distance."
-      }
+      "class_action_title": { "fr": "Action de classe : Éclaireur", "en": "Class Action: Scout" },
+      "class_action_body": { "fr": "Description de l'action de classe de l'éclaireur.", "en": "Scout class action description." },
+      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
+      "ultimate_body": { "fr": "Description de l'ultime de Gaoro.", "en": "Gaoro's ultimate description." },
+      "movement_desc": { "fr": "Se déplace en saut.", "en": "Moves by jumping." },
+      "attack_desc": { "fr": "Attaque à distance.", "en": "Attacks from distance." }
     },
     "toggles": [
       {
         "id": "shield",
-        "label": {
-          "fr": "Boucliers",
-          "en": "Shields"
-        },
-        "hint": {
-          "fr": "Réserve partagée (0/3)",
-          "en": "Shared reserve (0/3)"
-        },
+        "label": { "fr": "Boucliers", "en": "Shields" },
+        "hint": { "fr": "Réserve partagée (0/3)", "en": "Shared reserve (0/3)" },
         "type": "visual_keys",
         "maxKeys": 3
       },
       {
         "id": "repair_keys",
-        "label": {
-          "fr": "Clés de réparation",
-          "en": "Repair Keys"
-        },
-        "hint": {
-          "fr": "Clés utilisées (0, 1 ou 2)",
-          "en": "Keys used (0, 1 or 2)"
-        },
+        "label": { "fr": "Clés de réparation", "en": "Repair Keys" },
+        "hint": { "fr": "Clés utilisées (0, 1 ou 2)", "en": "Keys used (0, 1 or 2)" },
         "type": "visual_keys",
         "maxKeys": 2
       },
       {
         "id": "ultimate_used",
-        "label": {
-          "fr": "Coup Unique utilisé",
-          "en": "Ultimate used"
-        },
-        
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
       }
     ]
   },
   {
     "id": "genbu",
-    "name": {
-      "fr": "Genbu",
-      "en": "Genbu"
-    },
-    "class": {
-      "fr": "Technicien",
-      "en": "Technician"
-    },
+    "name": { "fr": "Genbu", "en": "Genbu" },
+    "class": { "fr": "Technicien", "en": "Technician" },
     "camp": "prodrome",
-    "hp": {
-      "max": 4
-    },
+    "hp": { "max": 4 },
     "images": {
       "movement": "./assets/patterns/genbu_movement_normal.png",
       "attack": "./assets/patterns/genbu_attack_normal.png",
@@ -777,65 +397,31 @@
       "portrait": "./assets/characters/classe_technicien.png"
     },
     "texts": {
-      "class_action_title": {
-        "fr": "Action de classe : Technicien",
-        "en": "Class Action: Technician"
-      },
-      "class_action_body": {
-        "fr": "Description de l'action de classe du technicien.",
-        "en": "Technician class action description."
-      },
-      "ultimate_title": {
-        "fr": "Ultime",
-        "en": "Ultimate"
-      },
-      "ultimate_body": {
-        "fr": "Description de l'ultime de Genbu.",
-        "en": "Genbu's ultimate description."
-      },
-      "movement_desc": {
-        "fr": "Se déplace lentement en ligne.",
-        "en": "Moves slowly in line."
-      },
-      "attack_desc": {
-        "fr": "Attaque puissante mais lente.",
-        "en": "Powerful but slow attack."
-      }
+      "class_action_title": { "fr": "Action de classe : Technicien", "en": "Class Action: Technician" },
+      "class_action_body": { "fr": "Description de l'action de classe du technicien.", "en": "Technician class action description." },
+      "ultimate_title": { "fr": "Ultime", "en": "Ultimate" },
+      "ultimate_body": { "fr": "Description de l'ultime de Genbu.", "en": "Genbu's ultimate description." },
+      "movement_desc": { "fr": "Se déplace lentement en ligne.", "en": "Moves slowly in line." },
+      "attack_desc": { "fr": "Attaque puissante mais lente.", "en": "Powerful but slow attack." }
     },
     "toggles": [
       {
         "id": "shield",
-        "label": {
-          "fr": "Boucliers",
-          "en": "Shields"
-        },
-        "hint": {
-          "fr": "Réserve partagée (0/3)",
-          "en": "Shared reserve (0/3)"
-        },
+        "label": { "fr": "Boucliers", "en": "Shields" },
+        "hint": { "fr": "Réserve partagée (0/3)", "en": "Shared reserve (0/3)" },
         "type": "visual_keys",
         "maxKeys": 3
       },
       {
         "id": "repair_keys",
-        "label": {
-          "fr": "Clés de réparation",
-          "en": "Repair Keys"
-        },
-        "hint": {
-          "fr": "Clés utilisées (0, 1 ou 2)",
-          "en": "Keys used (0, 1 or 2)"
-        },
+        "label": { "fr": "Clés de réparation", "en": "Repair Keys" },
+        "hint": { "fr": "Clés utilisées (0, 1 ou 2)", "en": "Keys used (0, 1 or 2)" },
         "type": "visual_keys",
         "maxKeys": 2
       },
       {
         "id": "ultimate_used",
-        "label": {
-          "fr": "Coup Unique utilisé",
-          "en": "Ultimate used"
-        },
-       
+        "label": { "fr": "Coup Unique utilisé", "en": "Ultimate used" }
       }
     ]
   }
