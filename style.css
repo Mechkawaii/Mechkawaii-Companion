@@ -1000,6 +1000,7 @@ html.splash-dismissed body.has-splash .controls {
 
 .unit-tab-name {
   font-weight: 800;
+  color: #000;
   font-size: clamp(13px, 3vw, 15px);
   letter-spacing: 0.3px;
   white-space: nowrap;
