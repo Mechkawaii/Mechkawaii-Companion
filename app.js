@@ -880,7 +880,8 @@ if (isTechnicianChar(c)) {
     btn.style.cssText = "display:inline-flex; align-items:center; gap:10px;";
     btn.innerHTML = `
       <img src="./assets/icons/shield_blue_on.svg" alt="Bouclier" style="width:26px;height:26px;display:block;" />
-      `;
+      <span>Créer un bouclier</span>
+    `;
 
     btn.addEventListener("click", (e) => {
       e.preventDefault();
@@ -1060,7 +1061,7 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
     return (c.camp || "mechkawaii") === currentCamp;
   });
 
-  // ✅ Empêche bouclier orange si la cible a déjà un bouclier bleu
+  // Prevent orange shield if target already has a blue technician shield
   const blueByTarget = getBlueShieldAssignments();
 
 
@@ -1070,9 +1071,9 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
     btn.textContent = t(char.name, lang);
     if(hasBlue){
       btn.disabled = true;
-      btn.textContent = `🔒 ${t(char.name, lang)} (bouclier bleu)`;
       btn.style.opacity = '0.55';
       btn.style.cursor = 'not-allowed';
+      btn.title = (getLang()==='fr') ? 'Déjà protégé par un bouclier bleu' : 'Already protected by a blue shield';
     }
     btn.style.cssText = `width:100%;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:6px;cursor:pointer;background:white;color:black;transition:all .2s ease;`;
 
@@ -1168,13 +1169,12 @@ function showBlueShieldAssignmentModal(currentTechId, lang, allChars){
     return (ch.camp || "mechkawaii") === techCamp;
   });
 
-  // ✅ Empêche bouclier bleu si la cible a déjà un bouclier orange
   const orangeAssignments = getShieldAssignments();
-
   const byTarget = getBlueShieldAssignments(); // {targetId: techId}
 
   teamChars.forEach(char => {
     const btn = document.createElement('button');
+    const hasOrange = (orangeAssignments && orangeAssignments[char.id] !== undefined);
 
     const alreadyTech = byTarget[char.id]; // undefined ou techId
     const isCurrent = currentTargetId === char.id;
@@ -1194,6 +1194,13 @@ function showBlueShieldAssignmentModal(currentTechId, lang, allChars){
       btn.style.opacity = "0.55";
       btn.style.cursor = "not-allowed";
       btn.title = (getLang()==="fr") ? "Déjà protégé par un autre Technicien" : "Already protected by another Technician";
+    }
+
+    if(hasOrange){
+      btn.disabled = true;
+      btn.style.opacity = '0.55';
+      btn.style.cursor = 'not-allowed';
+      btn.title = (getLang()==='fr') ? 'Ce perso a déjà un bouclier orange' : 'This unit already has an orange shield';
     }
 
     btn.addEventListener('mouseover', ()=>{
