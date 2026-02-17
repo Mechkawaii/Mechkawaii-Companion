@@ -1454,255 +1454,264 @@ function updateTabHP(charId, newHp){
   // ✅ KO sync (tabs + overlay)
   updateTabKO(charId, newHp <= 0);
 }
-// ===============================
-// Navigation vers Générateur
-// ===============================
 
-const terrainBtn = document.getElementById("terrainBtn");
-const terrainPage = document.getElementById("terrainPage");
-const terrainBackBtn = document.getElementById("terrainBackBtn");
-const splash = document.getElementById("splash");
 
-terrainBtn?.addEventListener("click", () => {
-  // ✅ Important : rend visibles topbar/cards malgré body.has-splash
-  document.documentElement.classList.add("splash-dismissed");
-
-  splash.style.display = "none";
-  terrainPage.classList.remove("hidden");
-});
-
-terrainBackBtn?.addEventListener("click", () => {
-  terrainPage.classList.add("hidden");
-  splash.style.display = "block";
-
-  // ✅ On revient au comportement normal du splash
-  document.documentElement.classList.remove("splash-dismissed");
-});
-// ===============================
-// Création grille 7x7
-// ===============================
-
-function createEmptyGrid(){
-  const grid = document.getElementById("terrainGrid");
-  if(!grid) return;
-
-  grid.innerHTML = "";
-
-  const letters = ["A","B","C","D","E","F","G"];
-
-  // Coin vide en haut à gauche
-  grid.appendChild(document.createElement("div"));
-
-  // Lettres en haut
-  letters.forEach(letter => {
-    const div = document.createElement("div");
-    div.className = "coord";
-    div.textContent = letter;
-    grid.appendChild(div);
-  });
-
-  for(let row=1; row<=7; row++){
-
-    // Numéro à gauche
-    const rowLabel = document.createElement("div");
-    rowLabel.className = "coord";
-    rowLabel.textContent = row;
-    grid.appendChild(rowLabel);
-
-    for(let col=0; col<7; col++){
-      const tile = document.createElement("div");
-      tile.className = "tile";
-      tile.dataset.x = letters[col];
-      tile.dataset.y = row;
-      grid.appendChild(tile);
-    }
-  }
-}
-
-// Initialisation au chargement de la page terrain
-terrainBtn?.addEventListener("click", () => {
-  createEmptyGrid();
-
-  // Si tu veux voir directement une map (avec flip), on génère une base
-  // (Localisation A1 + Événement D4). Les règles avancées arrivent ensuite.
-  try { generateBaseMap(); } catch(e) {}
-});
-// ===============================
-// Terrain Model
-// ===============================
-
-const TERRAIN_TYPES = {
-  VIERGE: "vierge",
-  VILLE: "ville",
-  ACCIDENTE: "accidente",
-  ROUTE_DROITE: "route_droite",
-  ROUTE_ANGLE: "route_angle",
-  ROUTE_CROISEMENT: "route_croisement",
-  EVENEMENT: "evenement",
-  LOCALISATION: "localisation"
-};
-
-let terrainModel = [];
-
-// --- Terrain Generator helpers (positions + shuffle) ---
-function getAvailablePositions(){
-  const positions = [];
-  for(let y = 0; y < 7; y++){
-    for(let x = 0; x < 7; x++){
-      // Zone d'atterrissage (ligne 1 et ligne 7) = vierge (sauf A1 localisation)
-      if(y === 0 || y === 6) continue;
-
-      // A1 (0,0) est la localisation (déjà fixée)
-      if(x === 0 && y === 0) continue;
-
-      // D4 (3,3) est l'événement (déjà fixé)
-      if(x === 3 && y === 3) continue;
-
-      positions.push({x, y});
-    }
-  }
-  return positions;
-}
-
-function shuffle(array){
-  for(let i = array.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
-
-function generateBaseMap(){
-
-  // 1) Base : matrice 7x7 remplie de vierge
-  terrainModel = Array.from({length:7}, () =>
-    Array.from({length:7}, () => TERRAIN_TYPES.VIERGE)
-  );
-
-  // 2) Tuiles fixes
-  // Localisation en A1 (0,0)
-  terrainModel[0][0] = TERRAIN_TYPES.LOCALISATION;
-
-  // Événement en D4 (3,3)
-  terrainModel[3][3] = TERRAIN_TYPES.EVENEMENT;
-
-  // 3) Positions disponibles (hors lignes 1 & 7 + hors A1/D4)
-  let positions = getAvailablePositions();
-  shuffle(positions);
-
-  function place(type, count){
-    for(let i = 0; i < count; i++){
-      const pos = positions.pop();
-      if(!pos) break;
-      terrainModel[pos.y][pos.x] = type;
-    }
-  }
-
-  // 4) Quantités exactes
-  place(TERRAIN_TYPES.ACCIDENTE, 6);
-  place(TERRAIN_TYPES.VILLE, 8);
-  place(TERRAIN_TYPES.ROUTE_DROITE, 2);
-  place(TERRAIN_TYPES.ROUTE_ANGLE, 2);
-  place(TERRAIN_TYPES.ROUTE_CROISEMENT, 2);
-
-  renderTerrain();
-}
-
-// ===============================
-// Terrain assets helper (fallbacks)
-// ===============================
-function getTileImgSrc(type){
-  // Candidates in order. We try terrain folder first, then root assets.
-  const baseCandidates = [
-    `${type}.png`,
-  ];
-
-  // Common accented legacy filenames (if you didn't rename files)
-  if(type === "evenement") baseCandidates.push("événement.png", "evenement.png");
-  if(type === "accidente") baseCandidates.push("accidenté.png", "accidente.png");
-  if(type === "route_droite") baseCandidates.push("Droite.png", "route_droite.png");
-  if(type === "route_angle") baseCandidates.push("angle.png", "route_angle.png");
-  if(type === "route_croisement") baseCandidates.push("croisement.png", "route_croisement.png");
-
-  const candidates = [];
-  baseCandidates.forEach(fn => {
-    candidates.push(`./assets/terrain/${fn}`);
-    candidates.push(`./assets/${fn}`);
-  });
-
-  return candidates;
-}
-
-function renderTerrain(){
-
-  const grid = document.getElementById("terrainGrid");
-  if(!grid) return;
-
-  const letters = ["A","B","C","D","E","F","G"];
-  const tiles = grid.querySelectorAll(".tile");
-
-  tiles.forEach((tile) => {
-
-    const x = letters.indexOf(tile.dataset.x);
-    const y = parseInt(tile.dataset.y, 10) - 1;
-    const type = terrainModel[y][x];
-
-    // Reset
-    tile.classList.remove("flipped");
-    tile.innerHTML = "";
-
-    // Structure
-    const inner = document.createElement("div");
-    inner.className = "tile-inner";
-
-    const front = document.createElement("div");
-    front.className = "tile-face tile-front";
-
-    const back = document.createElement("div");
-    back.className = "tile-face tile-back";
-
-    const img = document.createElement("img");
-    img.src = `./assets/terrain/${type}.png`;
-    img.alt = type;
-
-    back.appendChild(img);
-    inner.appendChild(front);
-    inner.appendChild(back);
-    tile.appendChild(inner);
-
-    const delay = (x + y) * 45;
-    tile.style.setProperty("--delay", `${delay}ms`);
-  });
-
-  // ⚠️ Important : déclenche le flip APRÈS que tout soit injecté
-  setTimeout(() => {
-    tiles.forEach(tile => tile.classList.add("flipped"));
-  }, 20);
-}
-
-// ===============================
-// Bind UI buttons (robuste)
-// ===============================
-(function bindTerrainUI(){
-  const tryBind = (ids, fn) => {
-    for(const id of ids){
-      const el = document.getElementById(id);
-      if(el){
-        el.addEventListener("click", fn);
-        return true;
-      }
-    }
-    return false;
+/* =========================================================
+   TERRAIN GENERATOR (Mechkawaii Companion)
+   - 7×7 grid + coordinates
+   - Fixed: localisation A1, evenement D4
+   - Landing rows: row 1 & row 7 are always "vierge" (row index 0 and 6)
+   - Exact counts:
+     accidente x6, ville x8,
+     routes: droite x2, angle x2, croisement x2,
+     evenement x1, localisation x1, vierge x27
+   - Variants:
+     accidente: 3, ville: 4, vierge: 4
+   - Random rotation (0/90/180/270) for all tiles (roads included)
+   - Flip animation (requires CSS already added in style.css)
+   ========================================================= */
+(function TG_module(){
+  const TG = {
+    SIZE: 7,
+    letters: ["A","B","C","D","E","F","G"],
+    TYPES: {
+      VIERGE: "vierge",
+      VILLE: "ville",
+      ACCIDENTE: "accidente",
+      ROUTE_DROITE: "route_droite",
+      ROUTE_ANGLE: "route_angle",
+      ROUTE_CROISEMENT: "route_croisement",
+      EVENEMENT: "evenement",
+      LOCALISATION: "localisation"
+    },
+    VARIANTS: {
+      vierge: 4,
+      ville: 4,
+      accidente: 3
+    },
+    model: [] // 7x7 of {type, variant, rot}
   };
 
-  // Bouton "Générer une map"
-  tryBind(["generateMapBtn","tgGenerate","terrainGenerate","btnGenerateMap"], () => {
-    createEmptyGrid();
-    generateBaseMap();
-  });
+  // ---------- helpers ----------
+  const $ = (id) => document.getElementById(id);
 
-  // Bouton "Maps préconstruites" (sera implémenté à l'étape suivante)
-  tryBind(["presetMapBtn","tgPresets","terrainPresets","btnPresetMap"], () => {
-    alert("Maps préconstruites : bientôt 👀");
-  });
+  function randRot(){
+    const r = Math.floor(Math.random() * 4);
+    return r * 90;
+  }
+  function randVariant(type){
+    const n = TG.VARIANTS[type];
+    if(!n) return 0;
+    return 1 + Math.floor(Math.random() * n);
+  }
+
+  function makeCell(type){
+    return { type, variant: randVariant(type), rot: randRot() };
+  }
+
+  function shuffle(arr){
+    for(let i = arr.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function getAvailablePositions(){
+    const pos = [];
+    for(let y=0; y<TG.SIZE; y++){
+      for(let x=0; x<TG.SIZE; x++){
+        // landing rows (row 0 and row 6) are reserved as vierge (except A1 already localisation)
+        if(y === 0 || y === TG.SIZE - 1) continue;
+        // centre D4 (3,3) reserved for evenement
+        if(x === 3 && y === 3) continue;
+        pos.push({x,y});
+      }
+    }
+    return pos;
+  }
+
+  // ---------- grid UI ----------
+  function TG_createEmptyGrid(){
+    const grid = $("terrainGrid");
+    if(!grid) return;
+
+    grid.innerHTML = "";
+
+    // Top-left empty corner
+    grid.appendChild(document.createElement("div"));
+
+    // Column letters header
+    TG.letters.forEach(letter => {
+      const d = document.createElement("div");
+      d.className = "coord";
+      d.textContent = letter;
+      grid.appendChild(d);
+    });
+
+    // Rows with left numbers + tiles
+    for(let row=1; row<=TG.SIZE; row++){
+      const rowLabel = document.createElement("div");
+      rowLabel.className = "coord";
+      rowLabel.textContent = row;
+      grid.appendChild(rowLabel);
+
+      for(let col=0; col<TG.SIZE; col++){
+        const tile = document.createElement("div");
+        tile.className = "tile";
+        tile.dataset.x = TG.letters[col];
+        tile.dataset.y = String(row);
+        grid.appendChild(tile);
+      }
+    }
+  }
+
+  // ---------- map generation ----------
+  function TG_generateFullMap(){
+    // start as vierge everywhere (with variants + rotations)
+    TG.model = Array.from({length: TG.SIZE}, () =>
+      Array.from({length: TG.SIZE}, () => makeCell(TG.TYPES.VIERGE))
+    );
+
+    // fixed tiles
+    TG.model[0][0] = makeCell(TG.TYPES.LOCALISATION); // A1
+    TG.model[3][3] = makeCell(TG.TYPES.EVENEMENT);    // D4
+
+    // landing rows forced to vierge (keep A1 localisation)
+    for(let x=0; x<TG.SIZE; x++){
+      if(!(x === 0 && 0 === 0)) TG.model[0][x] = makeCell(TG.TYPES.VIERGE);
+      TG.model[TG.SIZE-1][x] = makeCell(TG.TYPES.VIERGE);
+    }
+    TG.model[0][0] = makeCell(TG.TYPES.LOCALISATION); // re-apply
+
+    // place required tiles on allowed positions
+    let positions = shuffle(getAvailablePositions());
+
+    function place(type, count){
+      for(let i=0; i<count; i++){
+        const p = positions.pop();
+        if(!p) break;
+        TG.model[p.y][p.x] = makeCell(type);
+      }
+    }
+
+    place(TG.TYPES.ACCIDENTE, 6);
+    place(TG.TYPES.VILLE, 8);
+    place(TG.TYPES.ROUTE_DROITE, 2);
+    place(TG.TYPES.ROUTE_ANGLE, 2);
+    place(TG.TYPES.ROUTE_CROISEMENT, 2);
+
+    TG_render();
+  }
+
+  // ---------- image resolver (variants + fallback) ----------
+  function srcFor(type, variant){
+    // try variant file first if exists
+    if(variant && variant > 0){
+      return `./assets/terrain/${type}_${variant}.png`;
+    }
+    return `./assets/terrain/${type}.png`;
+  }
+
+  function TG_render(){
+    const grid = $("terrainGrid");
+    if(!grid) return;
+
+    const tiles = grid.querySelectorAll(".tile");
+    tiles.forEach(tile => {
+      const x = TG.letters.indexOf(tile.dataset.x);
+      const y = parseInt(tile.dataset.y, 10) - 1;
+
+      const cell = TG.model?.[y]?.[x] || makeCell(TG.TYPES.VIERGE);
+      const type = cell.type || TG.TYPES.VIERGE;
+      const variant = cell.variant || 0;
+      const rot = Number.isFinite(cell.rot) ? cell.rot : 0;
+
+      tile.classList.remove("flipped");
+      tile.innerHTML = "";
+
+      const inner = document.createElement("div");
+      inner.className = "tile-inner";
+
+      const front = document.createElement("div");
+      front.className = "tile-face tile-front";
+
+      const back = document.createElement("div");
+      back.className = "tile-face tile-back";
+
+      const img = document.createElement("img");
+      // variant first, then fallback to base
+      const first = (TG.VARIANTS[type] ? srcFor(type, variant) : srcFor(type, 0));
+      const fallback = srcFor(type, 0);
+      img.src = first;
+      img.alt = type;
+      img.style.transform = `rotate(${rot}deg)`;
+
+      img.addEventListener("error", () => {
+        // if variant missing, fallback to base
+        if(img.src.indexOf("_") !== -1 && img.src !== fallback){
+          img.src = fallback;
+        }
+      }, { once: true });
+
+      back.appendChild(img);
+      inner.appendChild(front);
+      inner.appendChild(back);
+      tile.appendChild(inner);
+
+      const delay = (x + y) * 45;
+      tile.style.setProperty("--delay", `${delay}ms`);
+
+      // iOS/Safari: force reflow so transition triggers reliably
+      void inner.offsetWidth;
+
+      requestAnimationFrame(() => tile.classList.add("flipped"));
+    });
+  }
+
+  // ---------- navigation / bindings ----------
+  function TG_open(){
+    const splash = $("splash");
+    const terrainPage = $("terrainPage");
+    if(!terrainPage) return;
+
+    // allow content to be visible even if body.has-splash hides .topbar etc.
+    document.documentElement.classList.add("splash-dismissed");
+
+    if(splash) splash.style.display = "none";
+    terrainPage.classList.remove("hidden");
+
+    TG_createEmptyGrid();
+    TG_generateFullMap();
+  }
+
+  function TG_close(){
+    const splash = $("splash");
+    const terrainPage = $("terrainPage");
+    if(!terrainPage) return;
+
+    terrainPage.classList.add("hidden");
+    if(splash) splash.style.display = "block";
+
+    document.documentElement.classList.remove("splash-dismissed");
+  }
+
+  function TG_bind(){
+    $("terrainBtn")?.addEventListener("click", TG_open);
+    $("terrainBackBtn")?.addEventListener("click", TG_close);
+
+    // Buttons inside terrain page
+    $("generateMapBtn")?.addEventListener("click", () => {
+      TG_createEmptyGrid();
+      TG_generateFullMap();
+    });
+
+    // Presets hook (we'll implement next)
+    $("presetMapBtn")?.addEventListener("click", () => {
+      alert("Maps préconstruites : prochaine étape 😄");
+    });
+  }
+
+  // init
+  TG_bind();
 })();
