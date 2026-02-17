@@ -1901,3 +1901,58 @@ body.page-character .brand-with-portrait{
   font-size: 14px;
   color: var(--muted);
 }
+/* =============================
+   PRESET PAGE
+============================= */
+
+.preset-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap:16px;
+  margin-top:24px;
+}
+
+.preset-card{
+  background: rgba(255,255,255,0.05);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:14px;
+  cursor:pointer;
+  transition:.2s ease;
+}
+
+.preset-card:hover{
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+
+.preset-card img{
+  width:100%;
+  border-radius:12px;
+  margin-bottom:10px;
+}
+
+.preset-card h3{
+  margin:0 0 6px 0;
+}
+
+.preset-card p{
+  font-size:14px;
+  color:var(--muted);
+}
+
+.preset-detail{
+  margin-top:30px;
+  padding:20px;
+  border:1px solid var(--border);
+  border-radius:16px;
+  background:rgba(255,255,255,0.04);
+}
+
+.preset-image{
+  width:100%;
+  max-width:600px;
+  display:block;
+  margin:16px auto;
+  border-radius:12px;
+}
