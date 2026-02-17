@@ -1478,4 +1478,49 @@ terrainBackBtn?.addEventListener("click", () => {
   // ✅ On revient au comportement normal du splash
   document.documentElement.classList.remove("splash-dismissed");
 });
+// ===============================
+// Création grille 7x7
+// ===============================
+
+function createEmptyGrid(){
+  const grid = document.getElementById("terrainGrid");
+  if(!grid) return;
+
+  grid.innerHTML = "";
+
+  const letters = ["A","B","C","D","E","F","G"];
+
+  // Coin vide en haut à gauche
+  grid.appendChild(document.createElement("div"));
+
+  // Lettres en haut
+  letters.forEach(letter => {
+    const div = document.createElement("div");
+    div.className = "coord";
+    div.textContent = letter;
+    grid.appendChild(div);
+  });
+
+  for(let row=1; row<=7; row++){
+
+    // Numéro à gauche
+    const rowLabel = document.createElement("div");
+    rowLabel.className = "coord";
+    rowLabel.textContent = row;
+    grid.appendChild(rowLabel);
+
+    for(let col=0; col<7; col++){
+      const tile = document.createElement("div");
+      tile.className = "tile";
+      tile.dataset.x = letters[col];
+      tile.dataset.y = row;
+      grid.appendChild(tile);
+    }
+  }
+}
+
+// Initialisation au chargement de la page terrain
+terrainBtn?.addEventListener("click", () => {
+  createEmptyGrid();
+});
 
