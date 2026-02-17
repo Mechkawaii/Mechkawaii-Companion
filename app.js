@@ -948,21 +948,21 @@ if (shieldsDisplay) {
       removeShield.textContent = tr("shield_remove");
 
       removeShield.addEventListener('click', (e) => {
-        e.preventDefault();
-        const currentAssignments = getShieldAssignments();
-        const assignedIndex = currentAssignments[c.id];
+  e.preventDefault();
+  const currentAssignments = getShieldAssignments();
+  const assignedIndex = currentAssignments[c.id];
 
-        // libère le bouclier dans la réserve partagée
-        if (assignedIndex !== undefined) {
-          delete currentAssignments[c.id];
-          const currentShields = getSharedShields();
-          if (currentShields[assignedIndex] === false) currentShields[assignedIndex] = true;
-          setSharedShields(currentShields);
-        }
+  // 🟠 Bouclier ORANGE = usage unique :
+  // on retire l'affectation, mais on NE remet PAS le bouclier dans la réserve partagée.
+  if (assignedIndex !== undefined) {
+    delete currentAssignments[c.id];
+    // Important: on laisse l'état du bouclier (false) dans sharedShields pour qu'il reste "consommé".
+  }
 
-        setShieldAssignments(currentAssignments);
-        location.reload();
-      });
+  setShieldAssignments(currentAssignments);
+  location.reload();
+});
+
 
       shieldsDisplay.appendChild(removeShield);
     }
