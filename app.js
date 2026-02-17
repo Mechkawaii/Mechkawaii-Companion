@@ -1528,10 +1528,11 @@ terrainBtn?.addEventListener("click", () => {
   try { generateBaseMap(); } catch(e) {}
 });
 // ===============================
-// Terrain Model
+// TERRAIN GENERATOR (advanced)
 // ===============================
 
-const TERRAIN_TYPES = {
+// Types / assets (expects assets/terrain/*.png)
+const TG_TYPES = {
   VIERGE: "vierge",
   VILLE: "ville",
   ACCIDENTE: "accidente",
@@ -1542,34 +1543,334 @@ const TERRAIN_TYPES = {
   LOCALISATION: "localisation"
 };
 
-let terrainModel = [];
-function generateBaseMap(){
+const TG_VARIANTS = { vierge: 4, ville: 4, accidente: 3 };
+const TG_SIZE = 7;
+const TG_LETTERS = ["A","B","C","D","E","F","G"];
 
-  // Crée matrice 7x7 remplie de vierge
-  terrainModel = Array.from({length:7}, () =>
-    Array.from({length:7}, () => TERRAIN_TYPES.VIERGE)
+// Model: 7x7 of {type, variant, rot}
+let tgModel = [];
+
+// ---------- helpers ----------
+function tgKey(x,y){ return `${x},${y}`; }
+function tgInBounds(x,y){ return x>=0 && y>=0 && x<TG_SIZE && y<TG_SIZE; }
+function tgRandInt(n){ return Math.floor(Math.random() * n); }
+function tgRandRot(){ return tgRandInt(4) * 90; }
+
+function tgShuffle(arr){
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function tgMakeCell(type, variant=0, rot=null){
+  return { type, variant, rot: (rot === null ? tgRandRot() : rot) };
+}
+
+function tgBuildVariantPool(type, total){
+  const n = TG_VARIANTS[type] || 0;
+  if(!n) return Array(total).fill(0);
+  const pool = [];
+  for(let i=0; i<total; i++) pool.push(1 + (i % n));
+  return tgShuffle(pool);
+}
+
+// Exact pools per your rules
+function tgPoolsExact(){
+  return {
+    ville: tgShuffle([1,1,2,2,3,3,4,4]),         // 8
+    accidente: tgShuffle([1,1,2,2,3,3]),          // 6
+    vierge: tgBuildVariantPool("vierge", 27)      // 27 spread across 1..4
+  };
+}
+
+function tgGetAvailablePositions(){
+  const pos = [];
+  for(let y=0; y<TG_SIZE; y++){
+    for(let x=0; x<TG_SIZE; x++){
+      // landing rows (1 and 7) are reserved as vierge
+      if(y === 0 || y === TG_SIZE - 1) continue;
+      // event tile fixed (D4)
+      if(x === 3 && y === 3) continue;
+      pos.push({x,y});
+    }
+  }
+  return pos;
+}
+
+// ---------- roads (6 tiles total, 1–3 groups) ----------
+function tgGenerateRoadCells(){
+  // forbid roads on landing rows + event tile
+  function isForbidden(x,y){
+    return (y === 0 || y === TG_SIZE - 1) || (x === 3 && y === 3);
+  }
+
+  const all = tgGetAvailablePositions();
+  const groupsCount = 1 + tgRandInt(3);
+
+  // sizes sum to 6
+  let remaining = 6;
+  const sizes = [];
+  for(let g=0; g<groupsCount; g++){
+    const left = groupsCount - g;
+    const minForRest = left - 1;
+    const maxHere = remaining - minForRest;
+    const sizeHere = (g === groupsCount-1) ? remaining : (1 + tgRandInt(maxHere));
+    sizes.push(sizeHere);
+    remaining -= sizeHere;
+  }
+  tgShuffle(sizes);
+
+  const taken = new Set();
+  const groups = [];
+
+  function neighbors(x,y){
+    return [
+      {x:x+1,y}, {x:x-1,y}, {x,y:y+1}, {x,y:y-1}
+    ].filter(p => tgInBounds(p.x,p.y) && !isForbidden(p.x,p.y));
+  }
+
+  function pickStart(){
+    const candidates = tgShuffle(all.slice());
+    for(const p of candidates){
+      if(isForbidden(p.x,p.y)) continue;
+      const k = tgKey(p.x,p.y);
+      if(taken.has(k)) continue;
+      return p;
+    }
+    return null;
+  }
+
+  for(const size of sizes){
+    const start = pickStart();
+    if(!start) break;
+
+    const group = [start];
+    taken.add(tgKey(start.x,start.y));
+
+    let safety = 2000;
+    while(group.length < size && safety-- > 0){
+      const base = group[tgRandInt(group.length)];
+      const opts = tgShuffle(neighbors(base.x, base.y)).filter(p => !taken.has(tgKey(p.x,p.y)));
+      if(!opts.length) continue;
+      const nxt = opts[0];
+      taken.add(tgKey(nxt.x,nxt.y));
+      group.push(nxt);
+    }
+    groups.push(group);
+  }
+
+  // fill leftover by attaching near existing roads
+  let total = groups.reduce((s,g)=>s+g.length,0);
+  let safety = 3000;
+  while(total < 6 && safety-- > 0){
+    const flat = groups.flat();
+    const base = flat.length ? flat[tgRandInt(flat.length)] : pickStart();
+    if(!base) break;
+    const opts = tgShuffle(neighbors(base.x, base.y)).filter(p => !taken.has(tgKey(p.x,p.y)));
+    if(!opts.length) continue;
+    const nxt = opts[0];
+    taken.add(tgKey(nxt.x,nxt.y));
+    if(!groups.length) groups.push([]);
+    groups[tgRandInt(groups.length)].push(nxt);
+    total++;
+  }
+
+  return groups.flat().slice(0,6);
+}
+
+function tgRoadAdjacency(roadSet){
+  const need = new Map();
+  const dirs = [
+    {dx:0,dy:-1,k:"N"},
+    {dx:1,dy:0,k:"E"},
+    {dx:0,dy:1,k:"S"},
+    {dx:-1,dy:0,k:"W"}
+  ];
+  for(const k0 of roadSet){
+    const [x,y] = k0.split(",").map(Number);
+    const obj = {N:false,E:false,S:false,W:false};
+    for(const d of dirs){
+      const k1 = tgKey(x+d.dx, y+d.dy);
+      if(roadSet.has(k1)) obj[d.k] = true;
+    }
+    need.set(k0, obj);
+  }
+  return need;
+}
+
+function tgReqDirs(obj){
+  return ["N","E","S","W"].filter(k => obj[k]);
+}
+function tgCountTrue(obj){
+  return ["N","E","S","W"].reduce((s,k)=>s+(obj[k]?1:0),0);
+}
+
+// Solve road tiles with rotations (best effort, keeps continuity)
+function tgSolveRoadTiles(roadCells){
+  const roadSet = new Set(roadCells.map(p => tgKey(p.x,p.y)));
+  const need = tgRoadAdjacency(roadSet);
+
+  // pick 2 junction candidates (highest degree)
+  const ranked = [...roadSet].sort((a,b)=>tgCountTrue(need.get(b)) - tgCountTrue(need.get(a)));
+  const junctionKeys = new Set(ranked.slice(0,2));
+
+  let straightLeft = 2, cornerLeft = 2, junctionLeft = 2;
+  const solved = new Map();
+
+  const rotDir = (dir, rot) => {
+    const order = ["N","E","S","W"];
+    const idx = order.indexOf(dir);
+    const steps = (rot/90) % 4;
+    return order[(idx + steps) % 4];
+  };
+
+  const patterns = {
+    straight: (rot) => new Set([rotDir("N",rot), rotDir("S",rot)]),
+    corner: (rot) => new Set([rotDir("N",rot), rotDir("E",rot)]),
+    junction: (_rot) => new Set(["N","E","S","W"])
+  };
+
+  function bestFit(reqDirs, allowTypes){
+    let best = null;
+    for(const t of allowTypes){
+      for(const rot of [0,90,180,270]){
+        const conns = patterns[t](rot);
+        if(!reqDirs.every(d => conns.has(d))) continue;
+        const extra = [...conns].filter(d => !reqDirs.includes(d)).length;
+        if(!best || extra < best.extra) best = {t, rot, extra};
+      }
+    }
+    return best;
+  }
+
+  for(const k0 of roadSet){
+    const req = tgReqDirs(need.get(k0));
+    const deg = req.length;
+
+    let allow = [];
+    if(deg >= 3 && junctionLeft > 0){
+      allow = ["junction"];
+    } else {
+      if(junctionKeys.has(k0) && junctionLeft > 0) allow.push("junction");
+      if(cornerLeft > 0) allow.push("corner");
+      if(straightLeft > 0) allow.push("straight");
+      if(!allow.length) allow = ["junction","corner","straight"];
+    }
+
+    const fit = bestFit(req, allow) || bestFit(req, ["junction","corner","straight"]) || {t:"junction", rot:0, extra:0};
+
+    // consume (best effort)
+    if(fit.t === "junction" && junctionLeft > 0) junctionLeft--;
+    else if(fit.t === "corner" && cornerLeft > 0) cornerLeft--;
+    else if(fit.t === "straight" && straightLeft > 0) straightLeft--;
+    else { fit.t = "junction"; fit.rot = 0; }
+
+    const type =
+      fit.t === "junction" ? TG_TYPES.ROUTE_CROISEMENT :
+      fit.t === "corner" ? TG_TYPES.ROUTE_ANGLE :
+      TG_TYPES.ROUTE_DROITE;
+
+    solved.set(k0, {type, rot: fit.rot});
+  }
+
+  return solved;
+}
+
+// ---------- generation ----------
+function tgGenerateMap(){
+  const pools = tgPoolsExact();
+
+  // init
+  tgModel = Array.from({length: TG_SIZE}, () =>
+    Array.from({length: TG_SIZE}, () => tgMakeCell(TG_TYPES.VIERGE, 1, tgRandRot()))
   );
 
-  // Localisation en A1 (0,0)
-  terrainModel[0][0] = TERRAIN_TYPES.LOCALISATION;
+  // fixed (NO rotation)
+  tgModel[0][0] = tgMakeCell(TG_TYPES.LOCALISATION, 0, 0); // A1
+  tgModel[3][3] = tgMakeCell(TG_TYPES.EVENEMENT, 0, 0);    // D4
 
-  // Événement en D4 (3,3)
-  terrainModel[3][3] = TERRAIN_TYPES.EVENEMENT;
+  // roads
+  const roadCells = tgGenerateRoadCells();
+  const roadSolved = tgSolveRoadTiles(roadCells);
+  const roadSet = new Set(roadCells.map(p => tgKey(p.x,p.y)));
 
-  renderTerrain();
+  for(const p of roadCells){
+    const solved = roadSolved.get(tgKey(p.x,p.y));
+    if(!solved) continue;
+    tgModel[p.y][p.x] = tgMakeCell(solved.type, 0, solved.rot);
+  }
+
+  // landing rows are vierge (consume from pool), A1 excluded
+  function placeViergeAt(x,y){
+    const v = pools.vierge.pop() || 1;
+    tgModel[y][x] = tgMakeCell(TG_TYPES.VIERGE, v, tgRandRot());
+  }
+
+  for(let x=0; x<TG_SIZE; x++){
+    if(!(x===0 && 0===0)) placeViergeAt(x,0);
+    placeViergeAt(x,TG_SIZE-1);
+  }
+  tgModel[0][0] = tgMakeCell(TG_TYPES.LOCALISATION, 0, 0); // reapply
+
+  // fill remaining (excluding fixed, roads, landing rows)
+  const positions = [];
+  for(let y=0; y<TG_SIZE; y++){
+    for(let x=0; x<TG_SIZE; x++){
+      const k0 = tgKey(x,y);
+      if(y === 0 || y === TG_SIZE-1) continue;
+      if(k0 === tgKey(0,0) || k0 === tgKey(3,3)) continue;
+      if(roadSet.has(k0)) continue;
+      positions.push({x,y});
+    }
+  }
+  tgShuffle(positions);
+
+  // villes: 8 (each variant twice)
+  for(let i=0; i<8 && positions.length; i++){
+    const p = positions.pop();
+    const v = pools.ville.pop() || 1;
+    tgModel[p.y][p.x] = tgMakeCell(TG_TYPES.VILLE, v, tgRandRot());
+  }
+
+  // accidentes: 6 (each variant twice)
+  for(let i=0; i<6 && positions.length; i++){
+    const p = positions.pop();
+    const v = pools.accidente.pop() || 1;
+    tgModel[p.y][p.x] = tgMakeCell(TG_TYPES.ACCIDENTE, v, tgRandRot());
+  }
+
+  // rest: vierge (to reach total 27)
+  while(positions.length){
+    const p = positions.pop();
+    const v = pools.vierge.pop() || 1;
+    tgModel[p.y][p.x] = tgMakeCell(TG_TYPES.VIERGE, v, tgRandRot());
+  }
+
+  tgRender();
 }
-function renderTerrain(){
+
+// ---------- rendering (flip batch) ----------
+function tgSrcFor(type, variant){
+  if(variant && variant > 0) return `./assets/terrain/${type}_${variant}.png`;
+  return `./assets/terrain/${type}.png`;
+}
+
+function tgRender(){
   const grid = document.getElementById("terrainGrid");
   if(!grid) return;
 
-  const letters = ["A","B","C","D","E","F","G"];
-  const tiles = grid.querySelectorAll(".tile"); // 👈 uniquement les cases du générateur
+  const tiles = grid.querySelectorAll(".tile");
 
-  tiles.forEach((tile) => {
-    const x = letters.indexOf(tile.dataset.x);
+  tiles.forEach(tile => {
+    const x = TG_LETTERS.indexOf(tile.dataset.x);
     const y = parseInt(tile.dataset.y, 10) - 1;
 
-    const type = terrainModel?.[y]?.[x] || "vierge";
+    const cell = tgModel?.[y]?.[x] || tgMakeCell(TG_TYPES.VIERGE, 1, 0);
+    const type = cell.type || TG_TYPES.VIERGE;
+    const variant = cell.variant || 0;
+    const rot = Number.isFinite(cell.rot) ? cell.rot : 0;
 
     tile.classList.remove("flipped");
     tile.innerHTML = "";
@@ -1584,8 +1885,13 @@ function renderTerrain(){
     back.className = "tile-face tile-back";
 
     const img = document.createElement("img");
-    img.src = `./assets/terrain/${type}.png`;
+    const first = (TG_VARIANTS[type] ? tgSrcFor(type, variant) : tgSrcFor(type, 0));
+    const fallback = tgSrcFor(type, 0);
+
+    img.src = first;
     img.alt = type;
+    img.style.transform = `rotate(${rot}deg)`;
+    img.addEventListener("error", () => { if(img.src !== fallback) img.src = fallback; }, { once:true });
 
     back.appendChild(img);
     inner.appendChild(front);
@@ -1595,42 +1901,28 @@ function renderTerrain(){
     const delay = (x + y) * 45;
     tile.style.setProperty("--delay", `${delay}ms`);
 
-    // force reflow (important)
     void inner.offsetWidth;
-    // flip triggered after full render
-});
-
-  // Trigger flip in one batch (reliable)
-  setTimeout(() => {
-    tiles.forEach(t => t.classList.add("flipped"));
-  }, 30);
-}
-
-
-
-// ===============================
-// Bind UI buttons (robuste)
-// ===============================
-(function bindTerrainUI(){
-  const tryBind = (ids, fn) => {
-    for(const id of ids){
-      const el = document.getElementById(id);
-      if(el){
-        el.addEventListener("click", fn);
-        return true;
-      }
-    }
-    return false;
-  };
-
-  // Bouton "Générer une map"
-  tryBind(["generateMapBtn","tgGenerate","terrainGenerate","btnGenerateMap"], () => {
-    createEmptyGrid();
-    generateBaseMap();
   });
 
-  // Bouton "Maps préconstruites" (sera implémenté à l'étape suivante)
-  tryBind(["presetMapBtn","tgPresets","terrainPresets","btnPresetMap"], () => {
-    alert("Maps préconstruites : bientôt 👀");
+  // flip all at once (reliable)
+  setTimeout(() => {
+    tiles.forEach(t => t.classList.add("flipped"));
+  }, 25);
+}
+
+// ---------- bindings ----------
+(function tgBind(){
+  // When opening terrain page (your existing nav already hides splash)
+  document.getElementById("terrainBtn")?.addEventListener("click", () => {
+    try{
+      createEmptyGrid();
+      tgGenerateMap();
+    }catch(e){}
+  });
+
+  // Generate button
+  document.getElementById("generateMapBtn")?.addEventListener("click", () => {
+    createEmptyGrid();
+    tgGenerateMap();
   });
 })();
