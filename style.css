@@ -1671,3 +1671,74 @@ body.page-character .brand-with-portrait{
     filter: none !important;
   }
 }
+/* ============================= */
+/*     Terrain flip animation    */
+/* ============================= */
+
+.tile{
+  position: relative;
+  perspective: 900px;
+  background: transparent; /* l'intérieur gère le visuel */
+  border: none;            /* option: on garde le border sur les faces */
+}
+
+.tile-inner{
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 420ms cubic-bezier(0.2, 1.2, 0.2, 1);
+  transition-delay: var(--delay, 0ms);
+}
+
+.tile-face{
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  backface-visibility: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.tile-front{
+  /* Dos de carte (simple, style “panel”) */
+  background:
+    radial-gradient(220px 140px at 20% 10%, rgba(255, 210, 0, 0.10), transparent 60%),
+    radial-gradient(220px 140px at 80% 20%, rgba(61, 220, 151, 0.08), transparent 60%),
+    rgba(255,255,255,0.04);
+}
+
+.tile-front::after{
+  content: "MKW";
+  font-weight: 900;
+  letter-spacing: 3px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.35);
+  text-shadow: 0 2px 10px rgba(0,0,0,0.45);
+}
+
+.tile-back{
+  transform: rotateY(180deg);
+  background: rgba(255,255,255,0.05);
+}
+
+.tile-back img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* état retourné */
+.tile.flipped .tile-inner{
+  transform: rotateY(180deg);
+}
+
+/* accessibilité */
+@media (prefers-reduced-motion: reduce){
+  .tile-inner{
+    transition: none !important;
+  }
+}
