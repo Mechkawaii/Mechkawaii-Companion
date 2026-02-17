@@ -1931,10 +1931,9 @@ function renderTerrain(){
     );
 
     // fixed tiles
-    TG.model[0][0] = makeCell(TG.TYPES.LOCALISATION, 0, randRot());
-    TG.model[3][3] = makeCell(TG.TYPES.EVENEMENT, 0, randRot());
-
-    // roads
+    TG.model[0][0] = makeCell(TG.TYPES.LOCALISATION, 0, 0);
+TG.model[3][3] = makeCell(TG.TYPES.EVENEMENT, 0, 0);
+// roads
     const roadCells = generateRoadCells();
     const roadSolved = solveRoadTiles(roadCells);
     const roadSet = new Set(roadCells.map(p => key(p.x,p.y)));
@@ -1955,7 +1954,8 @@ function renderTerrain(){
       if(!(x===0 && 0===0)) placeViergeAt(x,0);
       placeViergeAt(x,TG.SIZE-1);
     }
-    TG.model[0][0] = makeCell(TG.TYPES.LOCALISATION, 0, randRot()); // reapply
+    TG.model[0][0] = makeCell(TG.TYPES.LOCALISATION, 0, 0);
+// reapply
 
     // fill remaining positions (excluding fixed, roads, landing rows)
     const positions = [];
