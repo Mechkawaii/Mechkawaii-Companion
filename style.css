@@ -1894,3 +1894,17 @@ body.page-character .brand-with-portrait{
   border: 1px solid var(--border);
   box-shadow: 0 18px 50px rgba(0,0,0,0.25);
 }
+
+
+/* Hard fix: ensure preset overlay always covers screen (iOS/Safari safe) */
+.preset-overlay{
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 20000 !important;
+}
