@@ -178,6 +178,18 @@
         <button id="terrainBackBtn" data-i18n="terrain_back">← Retour</button>
       </div>
     </div>
+<!-- Overlay presets -->
+<div id="presetOverlay" class="preset-overlay hidden" role="dialog" aria-modal="true">
+  <div class="preset-modal">
+    <div class="preset-modal-head">
+      <div class="preset-modal-title">Maps préconstruites</div>
+      <button id="presetCloseBtn" class="btn-danger">✕</button>
+    </div>
+
+    <div id="presetCarousel" class="preset-carousel" aria-label="Preset maps"></div>
+    <div class="preset-hint">Fais défiler → puis clique sur une carte pour afficher la map.</div>
+  </div>
+</div>
 
     <div id="terrainApp" class="terrain-wrapper">
 
@@ -185,9 +197,20 @@
     <button id="generateMapBtn" class="btn-accent" data-i18n="terrain_generate">Générer un terrain</button>
 <button id="presetMapBtn" data-i18n="terrain_presets">Terrain préconstruits</button>
   </div>
-
+<!-- Preset info (titre + lore) -->
+<div id="presetInfo" class="preset-info hidden">
+  <div class="preset-info-head">
+    <div>
+      <div id="presetTitle" class="preset-title"></div>
+      <div id="presetLore" class="preset-lore"></div>
+    </div>
+    <button id="closePresetView" class="btn-danger">✕</button>
+  </div>
+</div>
   <div class="terrain-grid-wrapper">
     <div id="terrainGrid" class="terrain-grid"></div>
+<img id="presetMapImg" class="preset-map-img hidden" alt="Preset map">
+
   </div>
 
   <div class="terrain-legend">
