@@ -2220,3 +2220,64 @@ function renderTerrain(){
 
   TG_bind();
 })();
+/* =============================
+   PRESET PAGE LOGIC
+============================= */
+
+const presetPage = document.getElementById("presetPage");
+const presetBackBtn = document.getElementById("presetBackBtn");
+const presetGrid = document.getElementById("presetGrid");
+const presetDetail = document.getElementById("presetDetail");
+const presetTitle = document.getElementById("presetTitle");
+const presetLore = document.getElementById("presetLore");
+const presetImage = document.getElementById("presetImage");
+const presetCloseDetail = document.getElementById("presetCloseDetail");
+
+const presets = [
+  {
+    title: "Giga Centrale Électrique",
+    lore: "Source principale d'énergie des grandes villes Mechkawaii.",
+    image: "./assets/presets/01_Giga_centrale.png"
+  },
+  {
+    title: "Grande Route Logistique",
+    lore: "Acheminement stratégique des ressources vitales.",
+    image: "./assets/presets/02_Grande_route.png"
+  }
+];
+
+document.getElementById("presetMapBtn")?.addEventListener("click", () => {
+  presetPage.classList.remove("hidden");
+  document.body.classList.add("has-splash");
+  renderPresets();
+});
+
+presetBackBtn?.addEventListener("click", () => {
+  presetPage.classList.add("hidden");
+  presetDetail.classList.add("hidden");
+  document.body.classList.remove("has-splash");
+});
+
+presetCloseDetail?.addEventListener("click", () => {
+  presetDetail.classList.add("hidden");
+});
+
+function renderPresets(){
+  presetGrid.innerHTML = "";
+  presets.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "preset-card";
+    card.innerHTML = `
+      <img src="${p.image}">
+      <h3>${p.title}</h3>
+      <p>${p.lore}</p>
+    `;
+    card.addEventListener("click", () => {
+      presetTitle.textContent = p.title;
+      presetLore.textContent = p.lore;
+      presetImage.src = p.image;
+      presetDetail.classList.remove("hidden");
+    });
+    presetGrid.appendChild(card);
+  });
+}
