@@ -1522,6 +1522,10 @@ function createEmptyGrid(){
 // Initialisation au chargement de la page terrain
 terrainBtn?.addEventListener("click", () => {
   createEmptyGrid();
+
+  // Si tu veux voir directement une map (avec flip), on génère une base
+  // (Localisation A1 + Événement D4). Les règles avancées arrivent ensuite.
+  try { generateBaseMap(); } catch(e) {}
 });
 // ===============================
 // Terrain Model
@@ -1597,3 +1601,31 @@ function renderTerrain(){
     requestAnimationFrame(() => tile.classList.add("flipped"));
   });
 }
+
+
+// ===============================
+// Bind UI buttons (robuste)
+// ===============================
+(function bindTerrainUI(){
+  const tryBind = (ids, fn) => {
+    for(const id of ids){
+      const el = document.getElementById(id);
+      if(el){
+        el.addEventListener("click", fn);
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // Bouton "Générer une map"
+  tryBind(["generateMapBtn","tgGenerate","terrainGenerate","btnGenerateMap"], () => {
+    createEmptyGrid();
+    generateBaseMap();
+  });
+
+  // Bouton "Maps préconstruites" (sera implémenté à l'étape suivante)
+  tryBind(["presetMapBtn","tgPresets","terrainPresets","btnPresetMap"], () => {
+    alert("Maps préconstruites : bientôt 👀");
+  });
+})();
