@@ -1543,18 +1543,67 @@ const TERRAIN_TYPES = {
 };
 
 let terrainModel = [];
+
+// --- Terrain Generator helpers (positions + shuffle) ---
+function getAvailablePositions(){
+  const positions = [];
+  for(let y = 0; y < 7; y++){
+    for(let x = 0; x < 7; x++){
+      // Zone d'atterrissage (ligne 1 et ligne 7) = vierge (sauf A1 localisation)
+      if(y === 0 || y === 6) continue;
+
+      // A1 (0,0) est la localisation (déjà fixée)
+      if(x === 0 && y === 0) continue;
+
+      // D4 (3,3) est l'événement (déjà fixé)
+      if(x === 3 && y === 3) continue;
+
+      positions.push({x, y});
+    }
+  }
+  return positions;
+}
+
+function shuffle(array){
+  for(let i = array.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
 function generateBaseMap(){
 
-  // Crée matrice 7x7 remplie de vierge
+  // 1) Base : matrice 7x7 remplie de vierge
   terrainModel = Array.from({length:7}, () =>
     Array.from({length:7}, () => TERRAIN_TYPES.VIERGE)
   );
 
+  // 2) Tuiles fixes
   // Localisation en A1 (0,0)
   terrainModel[0][0] = TERRAIN_TYPES.LOCALISATION;
 
   // Événement en D4 (3,3)
   terrainModel[3][3] = TERRAIN_TYPES.EVENEMENT;
+
+  // 3) Positions disponibles (hors lignes 1 & 7 + hors A1/D4)
+  let positions = getAvailablePositions();
+  shuffle(positions);
+
+  function place(type, count){
+    for(let i = 0; i < count; i++){
+      const pos = positions.pop();
+      if(!pos) break;
+      terrainModel[pos.y][pos.x] = type;
+    }
+  }
+
+  // 4) Quantités exactes
+  place(TERRAIN_TYPES.ACCIDENTE, 6);
+  place(TERRAIN_TYPES.VILLE, 8);
+  place(TERRAIN_TYPES.ROUTE_DROITE, 2);
+  place(TERRAIN_TYPES.ROUTE_ANGLE, 2);
+  place(TERRAIN_TYPES.ROUTE_CROISEMENT, 2);
 
   renderTerrain();
 }
