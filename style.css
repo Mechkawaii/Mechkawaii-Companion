@@ -1956,3 +1956,9 @@ body.page-character .brand-with-portrait{
   margin:16px auto;
   border-radius:12px;
 }
+.terrain-controls{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin: 14px 0 10px;
+}
