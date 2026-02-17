@@ -1555,19 +1555,21 @@ function generateBaseMap(){
   renderTerrain();
 }
 function renderTerrain(){
-  const letters = ["A","B","C","D","E","F","G"];
+  const grid = document.getElementById("terrainGrid");
+  if(!grid) return;
 
-  document.querySelectorAll(".tile").forEach((tile) => {
+  const letters = ["A","B","C","D","E","F","G"];
+  const tiles = grid.querySelectorAll(".tile"); // 👈 uniquement les cases du générateur
+
+  tiles.forEach((tile) => {
     const x = letters.indexOf(tile.dataset.x);
     const y = parseInt(tile.dataset.y, 10) - 1;
 
-    const type = terrainModel[y][x];
+    const type = terrainModel?.[y]?.[x] || "vierge";
 
-    // reset
     tile.classList.remove("flipped");
     tile.innerHTML = "";
 
-    // structure flip
     const inner = document.createElement("div");
     inner.className = "tile-inner";
 
@@ -1586,14 +1588,12 @@ function renderTerrain(){
     inner.appendChild(back);
     tile.appendChild(inner);
 
-    // cascade
     const delay = (x + y) * 45;
     tile.style.setProperty("--delay", `${delay}ms`);
 
-    // 🔧 important : force un reflow pour que Safari déclenche bien la transition
+    // force reflow (important)
     void inner.offsetWidth;
 
-    // déclenche flip
     requestAnimationFrame(() => tile.classList.add("flipped"));
   });
 }
