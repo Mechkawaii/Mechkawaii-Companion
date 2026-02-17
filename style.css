@@ -1866,3 +1866,38 @@ body.page-character .brand-with-portrait{
     );
   opacity: 0.9;
 }
+/* =============================
+   Terrain Legend (images)
+============================= */
+
+.terrain-legend{
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.legend-item{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255,255,255,0.05);
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.legend-item img{
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.legend-item p{
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
