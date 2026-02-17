@@ -180,7 +180,31 @@
       </div>
     </div>
 
-    <div id="terrainApp" style="margin-top:20px;"></div>
+    <div id="terrainApp" class="terrain-wrapper">
+
+  <div class="terrain-controls">
+    <button id="generateMapBtn" class="btn-accent">Générer une map</button>
+    <button id="presetMapBtn">Maps préconstruites</button>
+  </div>
+
+  <div class="terrain-grid-wrapper">
+    <div id="terrainGrid" class="terrain-grid"></div>
+  </div>
+
+  <div class="terrain-legend">
+    <h3>Fonctions des terrains</h3>
+    <ul>
+      <li><b>Vierge</b> : terrain neutre</li>
+      <li><b>Accidenté</b> : déplacement ralenti</li>
+      <li><b>Ville</b> : infranchissable</li>
+      <li><b>Route</b> : déplacement optimisé</li>
+      <li><b>Événement</b> : déclenche un effet</li>
+      <li><b>Localisation</b> : objectif spécial</li>
+    </ul>
+  </div>
+
+</div>
+
   </div>
 </div>
 
