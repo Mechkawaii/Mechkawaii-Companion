@@ -1555,24 +1555,31 @@ function generateBaseMap(){
   renderTerrain();
 }
 function renderTerrain(){
-
   const letters = ["A","B","C","D","E","F","G"];
 
-  document.querySelectorAll(".tile").forEach(tile => {
-
+  document.querySelectorAll(".tile").forEach((tile, i) => {
     const x = letters.indexOf(tile.dataset.x);
     const y = parseInt(tile.dataset.y) - 1;
 
     const type = terrainModel[y][x];
 
+    // reset + contenu
+    tile.classList.remove("tile-appear");
     tile.innerHTML = "";
 
     const img = document.createElement("img");
     img.src = `./assets/terrain/${type}.png`;
     tile.appendChild(img);
 
+    // cascade: délai basé sur la position (diagonale)
+    const delay = (x + y) * 35; // ajuste 25–60ms selon ton goût
+    tile.style.setProperty("--delay", `${delay}ms`);
+
+    // déclenche l'apparition (au prochain frame)
+    requestAnimationFrame(() => tile.classList.add("tile-appear"));
   });
 }
+
 document.getElementById("generateMapBtn")?.addEventListener("click", () => {
   generateBaseMap();
 });
