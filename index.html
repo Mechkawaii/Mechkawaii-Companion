@@ -181,12 +181,7 @@
 
     <div id="terrainApp" class="terrain-wrapper">
 
-  <div class="terrain-controls">
-    <button id="generateMapBtn" class="btn-accent" data-i18n="terrain_generate">Générer un terrain</button>
-<button id="presetMapBtn" data-i18n="terrain_presets">Terrain préconstruits</button>
-  </div>
-
-  <div class="terrain-grid-wrapper">
+    <div class="terrain-grid-wrapper">
     <div id="terrainGrid" class="terrain-grid"></div>
   </div>
 
@@ -231,7 +226,31 @@
 
   </div>
 </div>
+<!-- ============================= -->
+<!-- PAGE TERRAINS PRÉCONSTRUITS -->
+<!-- ============================= -->
+<div id="presetPage" class="terrain-page hidden">
+  <div class="container">
+    <div class="topbar">
+      <div class="brand">
+        <div class="title" data-i18n="terrain_presets">TERRAINS PRÉCONSTRUITS</div>
+      </div>
+      <div class="controls">
+        <button id="presetBackBtn">← Retour</button>
+      </div>
+    </div>
 
-  <script src="./app.js"></script>
+    <div class="preset-grid" id="presetGrid"></div>
+
+    <div id="presetDetail" class="preset-detail hidden">
+      <h2 id="presetTitle"></h2>
+      <p id="presetLore"></p>
+      <img id="presetImage" class="preset-image" />
+      <button id="presetCloseDetail" class="btn-danger">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script src="./app.js"></script>
 </body>
 </html>
