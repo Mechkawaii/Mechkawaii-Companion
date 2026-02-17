@@ -2007,63 +2007,63 @@ TG.model[3][3] = makeCell(TG.TYPES.EVENEMENT, 0, 0);
   }
 
   // ---------- render (flip + rotation) ----------
-  function TG_render(){
-    const grid = $("terrainGrid");
-    if(!grid) return;
+function TG_render(){
+  const grid = $("terrainGrid");
+  if(!grid) return;
 
-    const tiles = grid.querySelectorAll(".tile");
+  const tiles = grid.querySelectorAll(".tile");
 
-    tiles.forEach(tile => {
-      const x = TG.letters.indexOf(tile.dataset.x);
-      const y = parseInt(tile.dataset.y, 10) - 1;
+  tiles.forEach(tile => {
+    const x = TG.letters.indexOf(tile.dataset.x);
+    const y = parseInt(tile.dataset.y, 10) - 1;
 
-      const cell = TG.model?.[y]?.[x] || makeCell(TG.TYPES.VIERGE, 1, 0);
-      const type = cell.type || TG.TYPES.VIERGE;
-      const variant = cell.variant || 0;
-      const rot = Number.isFinite(cell.rot) ? cell.rot : 0;
+    const cell = TG.model?.[y]?.[x] || makeCell(TG.TYPES.VIERGE, 1, 0);
+    const type = cell.type || TG.TYPES.VIERGE;
+    const variant = cell.variant || 0;
+    const rot = Number.isFinite(cell.rot) ? cell.rot : 0;
 
-      tile.classList.remove("flipped");
-      tile.innerHTML = "";
+    tile.classList.remove("flipped");
+    tile.innerHTML = "";
 
-      const inner = document.createElement("div");
-      inner.className = "tile-inner";
+    const inner = document.createElement("div");
+    inner.className = "tile-inner";
 
-      const front = document.createElement("div");
-      front.className = "tile-face tile-front";
+    const front = document.createElement("div");
+    front.className = "tile-face tile-front";
 
-      const back = document.createElement("div");
-      back.className = "tile-face tile-back";
+    const back = document.createElement("div");
+    back.className = "tile-face tile-back";
 
-      const img = document.createElement("img");
-      const first = (TG.VARIANTS[type] ? srcFor(type, variant) : srcFor(type, 0));
-      const fallback = srcFor(type, 0);
+    const img = document.createElement("img");
+    const first = (TG.VARIANTS[type] ? srcFor(type, variant) : srcFor(type, 0));
+    const fallback = srcFor(type, 0);
 
-      img.src = first;
-      img.alt = type;
+    img.src = first;
+    img.alt = type;
 
-      // ✅ rotate tile image (random for non-roads, solved for roads)
-      img.style.transform = `rotate(${rot}deg)`;
+    // rotate tile image (random for non-roads, solved for roads)
+    img.style.transform = `rotate(${rot}deg)`;
 
-      img.addEventListener("error", () => {
-        if(img.src !== fallback) img.src = fallback;
-      }, { once: true });
+    img.addEventListener("error", () => {
+      if(img.src !== fallback) img.src = fallback;
+    }, { once: true });
 
-      back.appendChild(img);
-      inner.appendChild(front);
-      inner.appendChild(back);
-      tile.appendChild(inner);
+    back.appendChild(img);
+    inner.appendChild(front);
+    inner.appendChild(back);
+    tile.appendChild(inner);
 
-      const delay = (x + y) * 45;
-      tile.style.setProperty("--delay", `${delay}ms`);
+    const delay = (x + y) * 45;
+    tile.style.setProperty("--delay", `${delay}ms`);
 
-      void inner.offsetWidth;
-      // flip will be triggered in batch after render
-});
-  
-    // Trigger flip in one batch (reliable)
-    setTimeout(() => {
-      tiles.forEach(t => t.classList.add(\"flipped\"));
-    }, 20);
+    // iOS/Safari: force reflow so transition triggers reliably
+    void inner.offsetWidth;
+  });
+
+  // Trigger flip in one batch (reliable)
+  setTimeout(() => {
+    tiles.forEach(t => t.classList.add("flipped"));
+  }, 20);
 }
 
   // ---------- navigation / bindings ----------
