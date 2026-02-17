@@ -62,17 +62,16 @@
             <button id="campMech" class="btn-accent" data-i18n="camp_mech">Mechkawaii</button>
             <button id="campProd" data-i18n="camp_prod">Prodrome</button>
           </div>
-         </div>
+        </div>
 
         <div id="difficultyPick" class="rule" style="display:none;">
           <h3 data-i18n="setup_q_difficulty">3) Choisis la difficulté</h3>
 
           <!-- ✅ FIX doublon : UN SEUL <p>, et il contient bien tout le texte -->
           <p class="text"
-   data-i18n="setup_difficulty_desc"
-   data-i18n-html="1">
-</p>
-
+             data-i18n="setup_difficulty_desc"
+             data-i18n-html="1">
+          </p>
 
           <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
             <button id="diffNormal" class="btn-accent" data-i18n="diff_normal">⭐ Normal</button>
@@ -132,10 +131,10 @@
               <img src="./assets/ui/btn_play.svg" alt="" aria-hidden="true">
               <span class="mkw-label" data-i18n="splash_play">JOUER</span>
             </button>
-            
+
             <button id="terrainBtn" class="mkw-btn">
-               <img src="./assets/ui/btn_play.svg" alt="" aria-hidden="true">
-               <span class="mkw-label" data-i18n="splash_terrain">TERRAIN</span>
+              <img src="./assets/ui/btn_play.svg" alt="" aria-hidden="true">
+              <span class="mkw-label" data-i18n="splash_terrain">TERRAIN</span>
             </button>
 
             <a class="mkw-link" href="https://mechkawaii.com" target="_blank" rel="noopener">
@@ -165,95 +164,98 @@
   <div class="unit-tabs-container" id="unitTabsContainer">
     <div class="unit-tabs" id="unitTabs"></div>
   </div>
-<!-- ============================= -->
-<!-- PAGE GENERATEUR TERRAIN -->
-<!-- ============================= -->
-<div id="terrainPage" class="terrain-page hidden">
-  <div class="container">
-    <div class="topbar">
-      <div class="brand">
-        <div class="title" data-i18n="terrain_title">GÉNÉRATEUR DE TERRAIN</div>
+
+  <!-- ============================= -->
+  <!-- PAGE GENERATEUR TERRAIN -->
+  <!-- ============================= -->
+  <div id="terrainPage" class="terrain-page hidden">
+    <div class="container">
+      <div class="topbar">
+        <div class="brand">
+          <div class="title" data-i18n="terrain_title">GÉNÉRATEUR DE TERRAIN</div>
+        </div>
+        <div class="controls">
+          <button id="terrainBackBtn" data-i18n="terrain_back">← Retour</button>
+        </div>
       </div>
-      <div class="controls">
-        <button id="terrainBackBtn" data-i18n="terrain_back">← Retour</button>
+
+      <div id="terrainApp" class="terrain-wrapper">
+
+        <div class="terrain-controls">
+          <button id="generateMapBtn" class="btn-accent" data-i18n="terrain_generate">Générer un terrain</button>
+          <button id="presetMapBtn" data-i18n="terrain_presets">Terrains préconstruits</button>
+        </div>
+
+        <!-- Preset info (titre + lore) -->
+        <div id="presetInfo" class="preset-info hidden">
+          <div class="preset-info-head">
+            <div>
+              <div id="presetTitle" class="preset-title"></div>
+              <div id="presetLore" class="preset-lore"></div>
+            </div>
+            <button id="closePresetView" class="btn-danger">✕</button>
+          </div>
+        </div>
+
+        <div class="terrain-grid-wrapper">
+          <div id="terrainGrid" class="terrain-grid"></div>
+          <img id="presetMapImg" class="preset-map-img hidden" alt="Preset map">
+        </div>
+
+        <div class="terrain-legend">
+          <h3 data-i18n="terrain_legend_title">Fonctions des terrains</h3>
+
+          <div class="legend-item">
+            <img src="./assets/terrain/vierge.png" alt="Terrain vierge">
+            <div>
+              <b data-i18n="terrain_type_vierge">Vierge</b>
+              <p data-i18n="terrain_desc_vierge">Mouvements et tirs normaux lorsqu’une unité se trouve dessus.</p>
+            </div>
+          </div>
+
+          <div class="legend-item">
+            <img src="./assets/terrain/accidente.png" alt="Terrain accidenté">
+            <div>
+              <b data-i18n="terrain_type_accidente">Accidenté</b>
+              <p data-i18n="terrain_desc_accidente">Les tirs à distance sont interdits. Le corps-à-corps est possible.</p>
+            </div>
+          </div>
+
+          <div class="legend-item">
+            <img src="./assets/terrain/ville.png" alt="Ville">
+            <div>
+              <b data-i18n="terrain_type_ville">Ville</b>
+              <p data-i18n="terrain_desc_ville">Les villes doivent être contournées, bloquent la ligne de mire des tirs à distance.</p>
+            </div>
+          </div>
+
+          <div class="legend-item">
+            <img src="./assets/terrain/route_croisement.png" alt="Route">
+            <div>
+              <b data-i18n="terrain_type_route">Route</b>
+              <p data-i18n="terrain_desc_route">Quand une unité se trouve sur un terrain route, elle a un déplacement gratuit au tour suivant en plus de son action. La forme de la route n’influe pas la direction des déplacements.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overlay presets (DOIT être dans #terrainApp) -->
+        <div id="presetOverlay" class="preset-overlay hidden" role="dialog" aria-modal="true">
+          <div class="preset-modal">
+            <div class="preset-modal-head">
+              <div class="preset-modal-title" data-i18n="terrain_presets_title">Maps préconstruites</div>
+              <button id="presetCloseBtn" class="btn-danger">✕</button>
+            </div>
+
+            <div id="presetCarousel" class="preset-carousel" aria-label="Preset maps"></div>
+            <div class="preset-hint" data-i18n="terrain_presets_hint">
+              Fais défiler → puis clique sur une carte pour afficher la map.
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
-<!-- Overlay presets -->
-<div id="presetOverlay" class="preset-overlay hidden" role="dialog" aria-modal="true">
-  <div class="preset-modal">
-    <div class="preset-modal-head">
-      <div class="preset-modal-title">Maps préconstruites</div>
-      <button id="presetCloseBtn" class="btn-danger">✕</button>
-    </div>
-
-    <div id="presetCarousel" class="preset-carousel" aria-label="Preset maps"></div>
-    <div class="preset-hint">Fais défiler → puis clique sur une carte pour afficher la map.</div>
   </div>
-</div>
-
-    <div id="terrainApp" class="terrain-wrapper">
-
-  <div class="terrain-controls">
-    <button id="generateMapBtn" class="btn-accent" data-i18n="terrain_generate">Générer un terrain</button>
-<button id="presetMapBtn" data-i18n="terrain_presets">Terrain préconstruits</button>
-  </div>
-<!-- Preset info (titre + lore) -->
-<div id="presetInfo" class="preset-info hidden">
-  <div class="preset-info-head">
-    <div>
-      <div id="presetTitle" class="preset-title"></div>
-      <div id="presetLore" class="preset-lore"></div>
-    </div>
-    <button id="closePresetView" class="btn-danger">✕</button>
-  </div>
-</div>
-  <div class="terrain-grid-wrapper">
-    <div id="terrainGrid" class="terrain-grid"></div>
-<img id="presetMapImg" class="preset-map-img hidden" alt="Preset map">
-
-  </div>
-
-  <div class="terrain-legend">
-  <h3 data-i18n="terrain_legend_title">Fonctions des terrains</h3>
-  <div class="legend-item">
-    <img src="./assets/terrain/vierge.png" alt="Terrain vierge">
-    <div>
-      <b data-i18n="terrain_type_vierge">Vierge</b>
-      <p data-i18n="terrain_desc_vierge">Mouvements et tirs normaux lorsqu’une unité se trouve dessus.</p>
-    </div>
-  </div>
-
-  <div class="legend-item">
-    <img src="./assets/terrain/accidente.png" alt="Terrain accidenté">
-    <div>
-      <b data-i18n="terrain_type_accidente">Accidenté</b>
-      <p data-i18n="terrain_desc_accidente">Les tirs à distance sont interdits. Le corps-à-corps est possible.</p>
-    </div>
-  </div>
-
-  <div class="legend-item">
-    <img src="./assets/terrain/ville.png" alt="Ville">
-    <div>
-      <b data-i18n="terrain_type_ville">Ville</b>
-      <p data-i18n="terrain_desc_ville">Les villes doivent être contournées, bloquent la ligne de mire des tirs à distance.</p>
-    </div>
-  </div>
-
-  <div class="legend-item">
-    <img src="./assets/terrain/route_croisement.png" alt="Route">
-    <div>
-      <b data-i18n="terrain_type_route">Route</b>
-      <p data-i18n="terrain_desc_route">Quand une unité se trouve sur un terrain route, elle a un déplacement gratuit au tour suivant en plus de son action. La forme de la route n’influe pas la direction des déplacements.</p>
-    </div>
-  </div>
-</div>
-
-  </div>
-
-</div>
-
-  </div>
-</div>
 
   <script src="./app.js"></script>
 </body>
