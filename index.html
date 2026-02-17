@@ -193,12 +193,39 @@
 
   <div class="terrain-legend">
     <h3>Fonctions des terrains</h3>
-    <ul>
-      <li><b>Vierge</b> : Mouvements et tirs normaux lorsqu’une unité se trouve dessus.</li>
-      <li><b>Accidenté</b> : Les tirs à distance sont interdits. Le corps-à-corps est possible.</li>
-      <li><b>Ville</b> : Villes doivent être contournés, bloquent la ligne de mire des tirs à distance.</li>
-      <li><b>Route</b> : Quand une unité se trouve sur un terrain route, elle a un déplacement gratuit au tour suivant en plus de son action. La forme de la route n’influe pas la direction des déplacements.</li>
-    </ul>
+    <div class="legend-grid" role="list">
+      <div class="legend-item" role="listitem">
+        <div class="terrain-sample sample-blank" aria-hidden="true"></div>
+        <div class="legend-txt">
+          <div class="legend-title">Vierge</div>
+          <div class="legend-desc">Mouvements et tirs normaux lorsqu’une unité se trouve dessus.</div>
+        </div>
+      </div>
+
+      <div class="legend-item" role="listitem">
+        <div class="terrain-sample sample-rough" aria-hidden="true"></div>
+        <div class="legend-txt">
+          <div class="legend-title">Accidenté</div>
+          <div class="legend-desc">Les tirs à distance sont interdits. Le corps-à-corps est possible.</div>
+        </div>
+      </div>
+
+      <div class="legend-item" role="listitem">
+        <div class="terrain-sample sample-city" aria-hidden="true"></div>
+        <div class="legend-txt">
+          <div class="legend-title">Ville</div>
+          <div class="legend-desc">Villes doivent être contournés, bloquent la ligne de mire des tirs à distance.</div>
+        </div>
+      </div>
+
+      <div class="legend-item" role="listitem">
+        <div class="terrain-sample sample-road" aria-hidden="true"></div>
+        <div class="legend-txt">
+          <div class="legend-title">Route</div>
+          <div class="legend-desc">Quand une unité se trouve sur un terrain route, elle a un déplacement gratuit au tour suivant en plus de son action. La forme de la route n’influe pas la direction des déplacements.</div>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>
