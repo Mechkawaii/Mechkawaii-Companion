@@ -1602,7 +1602,7 @@ function renderTerrain(){
 
   // Trigger flip in one batch (reliable)
   setTimeout(() => {
-    tiles.forEach(t => t.classList.add(\"flipped\"));
+    tiles.forEach(t => t.classList.add("flipped"));
   }, 30);
 }
 
