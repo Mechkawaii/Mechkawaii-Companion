@@ -1842,3 +1842,11 @@ body.page-character .brand-with-portrait{
     -webkit-transition: none !important;
   }
 }
+/* --- HARD OVERRIDE: terrain images must be visible --- */
+#terrainGrid .tile-back img{
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  transform: none !important;
+  filter: none !important;
+}
