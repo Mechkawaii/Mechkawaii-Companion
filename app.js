@@ -1454,3 +1454,21 @@ function updateTabHP(charId, newHp){
   // ✅ KO sync (tabs + overlay)
   updateTabKO(charId, newHp <= 0);
 }
+// ===============================
+// Navigation vers Générateur
+// ===============================
+
+const terrainBtn = document.getElementById("terrainBtn");
+const terrainPage = document.getElementById("terrainPage");
+const terrainBackBtn = document.getElementById("terrainBackBtn");
+const splash = document.getElementById("splash");
+
+terrainBtn?.addEventListener("click", () => {
+  splash.style.display = "none";
+  terrainPage.classList.remove("hidden");
+});
+
+terrainBackBtn?.addEventListener("click", () => {
+  terrainPage.classList.add("hidden");
+  splash.style.display = "block";
+});
