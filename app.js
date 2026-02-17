@@ -1559,7 +1559,7 @@ function renderTerrain(){
 
   document.querySelectorAll(".tile").forEach((tile) => {
     const x = letters.indexOf(tile.dataset.x);
-    const y = parseInt(tile.dataset.y) - 1;
+    const y = parseInt(tile.dataset.y, 10) - 1;
 
     const type = terrainModel[y][x];
 
@@ -1586,12 +1586,14 @@ function renderTerrain(){
     inner.appendChild(back);
     tile.appendChild(inner);
 
-    // cascade (diagonale)
-    const delay = (x + y) * 45; // ajuste 25–70ms selon ton goût
+    // cascade
+    const delay = (x + y) * 45;
     tile.style.setProperty("--delay", `${delay}ms`);
 
-    // déclenche flip au prochain frame
+    // 🔧 important : force un reflow pour que Safari déclenche bien la transition
+    void inner.offsetWidth;
+
+    // déclenche flip
     requestAnimationFrame(() => tile.classList.add("flipped"));
   });
 }
-
