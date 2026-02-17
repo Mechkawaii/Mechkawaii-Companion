@@ -1728,7 +1728,7 @@ function renderTerrain(){
     overlay.addEventListener("click", (e) => {
       if(e.target === overlay) overlay.classList.add("hidden");
     });
-  })();
+  });
 
   // Close preset view (back to grid)
   tryBind(["closePresetView"], () => clearPresetView());
@@ -1738,7 +1738,7 @@ function renderTerrain(){
     openPresetOverlay();
   });
   });
-})();
+});
 
 /* =========================================================
    TERRAIN GENERATOR (Mechkawaii Companion) — v8 CLEAN
