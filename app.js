@@ -1597,9 +1597,8 @@ function renderTerrain(){
 
     // force reflow (important)
     void inner.offsetWidth;
-
-    requestAnimationFrame(() => tile.classList.add("flipped"));
-  });
+      // flip will be triggered in batch after render
+});
 }
 
 
@@ -2058,9 +2057,14 @@ TG.model[3][3] = makeCell(TG.TYPES.EVENEMENT, 0, 0);
       tile.style.setProperty("--delay", `${delay}ms`);
 
       void inner.offsetWidth;
-      requestAnimationFrame(() => tile.classList.add("flipped"));
-    });
-  }
+      // flip will be triggered in batch after render
+});
+  
+    // Trigger flip in one batch (reliable)
+    setTimeout(() => {
+      tiles.forEach(t => t.classList.add(\"flipped\"));
+    }, 20);
+}
 
   // ---------- navigation / bindings ----------
   function TG_open(){
