@@ -1746,6 +1746,10 @@ function renderTerrain(){
 
   // ---------- road generation (1–3 groups, 6 tiles total) ----------
   function generateRoadCells(){
+    // forbid roads on landing rows and on the fixed event tile (D4)
+    function isRoadForbidden(x,y){
+      return (y === 0 || y === TG.SIZE - 1) || (x === 3 && y === 3);
+    }
     const all = getAvailablePositions();
     const groupsCount = 1 + randInt(3);
 
@@ -1767,13 +1771,14 @@ function renderTerrain(){
 
     function neighbors(x,y){
       return [
-        {x:x+1,y},{x:x-1,y},{x,y:y+1},{x,y:y-1}
-      ].filter(p => inBounds(p.x,p.y));
+        {x:x+1,y}, {x:x-1,y}, {x,y:y+1}, {x,y:y-1}
+      ].filter(p => inBounds(p.x,p.y) && !isRoadForbidden(p.x,p.y));
     }
 
     function pickStart(){
       const candidates = shuffle(all.slice());
       for(const p of candidates){
+        if(isRoadForbidden(p.x,p.y)) continue;
         const k0 = key(p.x,p.y);
         if(taken.has(k0)) continue;
         return p;
