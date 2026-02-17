@@ -22,13 +22,11 @@ function setActiveButton(groupButtons, activeBtn, activeClass = "btn-accent") {
 /* ------------------------------
    KO / Mort Subite (Option A)
 ------------------------------ */
-// ✅ Fichier KO
 const KO_TOKEN_SRC = "./assets/jeton-mort-subite.svg";
 
 function ensureKoOverlay(el){
   if(!el) return null;
 
-  // le parent doit permettre un overlay au-dessus
   const cs = getComputedStyle(el);
   if(cs.position === "static") el.style.position = "relative";
   if(!el.style.overflow) el.style.overflow = "hidden";
@@ -38,7 +36,6 @@ function ensureKoOverlay(el){
     ov = document.createElement("div");
     ov.className = "ko-overlay";
 
-    // overlay au-dessus
     ov.style.position = "absolute";
     ov.style.inset = "0";
     ov.style.display = "flex";
@@ -47,7 +44,6 @@ function ensureKoOverlay(el){
     ov.style.pointerEvents = "none";
     ov.style.zIndex = "50";
 
-    // ✅ caché par défaut (IMPORTANT)
     ov.style.opacity = "0";
     ov.style.visibility = "hidden";
     ov.style.transform = "scale(0.95)";
@@ -64,7 +60,6 @@ function ensureKoOverlay(el){
     ov.appendChild(img);
   }
 
-  // ✅ toujours le remettre en dernier -> toujours au-dessus
   el.appendChild(ov);
   return ov;
 }
@@ -77,7 +72,6 @@ function setKoStateForEl(el, isKo, pop = false){
 
   el.classList.toggle("is-ko", ko);
 
-  // ✅ show / hide overlay (le vrai fix)
   if(ov){
     ov.style.opacity = ko ? "1" : "0";
     ov.style.visibility = ko ? "visible" : "hidden";
@@ -86,7 +80,7 @@ function setKoStateForEl(el, isKo, pop = false){
 
   if(pop && ko){
     el.classList.remove("ko-pop");
-    void el.offsetWidth; // relance anim
+    void el.offsetWidth;
     el.classList.add("ko-pop");
     setTimeout(()=>el.classList.remove("ko-pop"), 420);
   } else if(!ko){
@@ -104,20 +98,20 @@ const I18N = {
     splash_instagram: "INSTAGRAM",
     splash_terrain: "TERRAIN",
 
-terrain_title: "GÉNÉRATEUR DE TERRAIN",
-terrain_subtitle: "Grille 7×7",
-terrain_back: "← Retour",
-terrain_generate: "Générer une map",
-terrain_presets: "Maps préconstruites",
-terrain_legend_title: "Fonctions des terrains",
-terrain_type_vierge: "Vierge",
-terrain_desc_vierge: "Mouvements et tirs normaux lorsqu’une unité se trouve dessus.",
-terrain_type_accidente: "Accidenté",
-terrain_desc_accidente: "Les tirs à distance sont interdits. Le corps-à-corps est possible.",
-terrain_type_ville: "Ville",
-terrain_desc_ville: "Les villes doivent être contournées, bloquent la ligne de mire des tirs à distance.",
-terrain_type_route: "Route",
-terrain_desc_route: "Quand une unité se trouve sur un terrain route, elle a un déplacement gratuit au tour suivant en plus de son action. La forme de la route n’influe pas la direction des déplacements.",
+    terrain_title: "GÉNÉRATEUR DE TERRAIN",
+    terrain_subtitle: "Grille 7×7",
+    terrain_back: "← Retour",
+    terrain_generate: "Générer une map",
+    terrain_presets: "Terrains préconstruits",
+    terrain_legend_title: "Fonctions des terrains",
+    terrain_type_vierge: "Vierge",
+    terrain_desc_vierge: "Mouvements et tirs normaux lorsqu’une unité se trouve dessus.",
+    terrain_type_accidente: "Accidenté",
+    terrain_desc_accidente: "Les tirs à distance sont interdits. Le corps-à-corps est possible.",
+    terrain_type_ville: "Ville",
+    terrain_desc_ville: "Les villes doivent être contournées, bloquent la ligne de mire des tirs à distance.",
+    terrain_type_route: "Route",
+    terrain_desc_route: "Quand une unité se trouve sur un terrain route, elle a un déplacement gratuit au tour suivant en plus de son action. La forme de la route n’influe pas la direction des déplacements.",
 
     index_subtitle: "Choisis ton mode et ton camp.",
 
@@ -167,21 +161,20 @@ terrain_desc_route: "Quand une unité se trouve sur un terrain route, elle a un 
     splash_instagram: "INSTAGRAM",
     splash_terrain: "TERRAIN",
 
-terrain_title: "TERRAIN GENERATOR",
-terrain_subtitle: "7×7 grid",
-terrain_back: "← Back",
-terrain_generate: "Generate a map",
-terrain_presets: "Preset maps",
-
-terrain_legend_title: "Terrain effects",
-terrain_type_vierge: "Clear",
-terrain_desc_vierge: "Normal movement and ranged attacks for units standing on it.",
-terrain_type_accidente: "Rough",
-terrain_desc_accidente: "Ranged attacks are forbidden. Melee is allowed.",
-terrain_type_ville: "City",
-terrain_desc_ville: "Cities must be bypassed and block line of sight for ranged attacks.",
-terrain_type_route: "Road",
-terrain_desc_route: "A unit on a road gets a free move next turn in addition to its action. Road shape does not affect movement direction.",
+    terrain_title: "TERRAIN GENERATOR",
+    terrain_subtitle: "7×7 grid",
+    terrain_back: "← Back",
+    terrain_generate: "Generate a map",
+    terrain_presets: "Preset maps",
+    terrain_legend_title: "Terrain effects",
+    terrain_type_vierge: "Clear",
+    terrain_desc_vierge: "Normal movement and ranged attacks for units standing on it.",
+    terrain_type_accidente: "Rough",
+    terrain_desc_accidente: "Ranged attacks are forbidden. Melee is allowed.",
+    terrain_type_ville: "City",
+    terrain_desc_ville: "Cities must be bypassed and block line of sight for ranged attacks.",
+    terrain_type_route: "Road",
+    terrain_desc_route: "A unit on a road gets a free move next turn in addition to its action. Road shape does not affect movement direction.",
 
     index_subtitle: "Choose your mode and your camp.",
 
@@ -343,8 +336,8 @@ function renderHP(container, hpCur, hpMax){
   }
   container.appendChild(hearts);
 }
+
 function getBlueShieldByTech(){
-  // { [technicianId]: targetCharId }
   try{
     const raw = localStorage.getItem(STORAGE_PREFIX + "blue-shield-by-tech");
     return raw ? JSON.parse(raw) : {};
@@ -353,10 +346,7 @@ function getBlueShieldByTech(){
 function setBlueShieldByTech(map){
   localStorage.setItem(STORAGE_PREFIX + "blue-shield-by-tech", JSON.stringify(map));
 }
-
-// Pour le rendu (glow, tabs, etc) on aime aussi une vue "par cible"
 function getBlueShieldAssignments(){
-  // { [targetCharId]: technicianId }
   const byTech = getBlueShieldByTech();
   const byTarget = {};
   Object.keys(byTech).forEach(techId=>{
@@ -380,7 +370,6 @@ function removeBlueShieldForTarget(targetCharId){
 function isTechnicianChar(c){
   const fr = (c.class?.fr || "").toLowerCase().trim();
   const en = (c.class?.en || "").toLowerCase().trim();
-  // IMPORTANT: use word-boundary matching so "Pyrotechnicien/Pyrotechnician" does NOT match.
   return (/\btechnicien\b/.test(fr)) || (/\btechnician\b/.test(en));
 }
 
@@ -415,7 +404,6 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
       key.className = 'key-button';
       key.type = 'button';
 
-      // ✅ FIX GLOW : les boucliers doivent avoir la classe .shield-button
       if(isShield) key.classList.add('shield-button');
 
       const keyState = currentState[i] !== undefined ? currentState[i] : true;
@@ -423,7 +411,6 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
       key.dataset.toggleId = toggle.id;
       key.dataset.active = keyState ? 'true' : 'false';
 
-      // ✅ utile si tu ajoutes un glow via .shield-button.is-on
       if(isShield) key.classList.toggle('is-on', !!keyState);
 
       key.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_${keyState ? 'on' : 'off'}.svg')`;
@@ -436,7 +423,6 @@ function renderToggleRow(root, toggle, isOn, lang, onChange, sharedShields = nul
 
         this.style.backgroundImage = `url('./assets/icons/${isShield ? 'shield' : 'key'}_${nowOn ? 'on' : 'off'}.svg')`;
 
-        // ✅ FIX GLOW : sync classe .is-on
         if(isShield) this.classList.toggle('is-on', nowOn);
 
         const keysState = [];
@@ -533,7 +519,6 @@ async function initIndex(){
     localStorage.removeItem(STORAGE_PREFIX + "draft");
     localStorage.removeItem(STORAGE_PREFIX + "shields");
     localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
-      localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
     localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
     location.reload();
   }
@@ -544,7 +529,6 @@ async function initIndex(){
       localStorage.removeItem(STORAGE_PREFIX + "shields");
       localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
       localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
-    localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
       location.reload();
     });
   }
@@ -765,12 +749,9 @@ async function initCharacter(){
     return;
   }
 
-
-
-// Camp sur le body (pour styliser le header du perso)
-document.body.classList.remove("camp-mechkawaii","camp-prodrome");
-const pageCamp = (c.camp || "mechkawaii").toLowerCase();
-document.body.classList.add(pageCamp === "prodrome" ? "camp-prodrome" : "camp-mechkawaii");
+  document.body.classList.remove("camp-mechkawaii","camp-prodrome");
+  const pageCamp = (c.camp || "mechkawaii").toLowerCase();
+  document.body.classList.add(pageCamp === "prodrome" ? "camp-prodrome" : "camp-mechkawaii");
 
   const saved = getState(c.id);
 
@@ -791,23 +772,22 @@ document.body.classList.add(pageCamp === "prodrome" ? "camp-prodrome" : "camp-me
     if (state.toggles[k] === undefined) state.toggles[k] = defaultToggles[k];
   });
   setState(c.id, state);
-   
-   // --- Coup Unique : toggle "ultimate_used" dans la section Coup Unique ---
-const ultToggleContainer = qs("#ultToggleContainer");
-if (ultToggleContainer) {
-  ultToggleContainer.innerHTML = "";
 
-  const ultToggle = (c.toggles || []).find(tg => tg.id === "ultimate_used");
+  const ultToggleContainer = qs("#ultToggleContainer");
+  if (ultToggleContainer) {
+    ultToggleContainer.innerHTML = "";
 
-  if (ultToggle) {
-    const isOn = !!state.toggles[ultToggle.id];
+    const ultToggle = (c.toggles || []).find(tg => tg.id === "ultimate_used");
 
-    renderToggleRow(ultToggleContainer, ultToggle, isOn, lang, (v) => {
-      state.toggles[ultToggle.id] = v;
-      setState(c.id, state);
-    });
+    if (ultToggle) {
+      const isOn = !!state.toggles[ultToggle.id];
+
+      renderToggleRow(ultToggleContainer, ultToggle, isOn, lang, (v) => {
+        state.toggles[ultToggle.id] = v;
+        setState(c.id, state);
+      });
+    }
   }
-}
 
   const charName = qs("#charName");
   const charClass = qs("#charClass");
@@ -829,7 +809,6 @@ if (ultToggleContainer) {
       img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
       img.onerror = function(){
         charPortrait.innerHTML = `<div style="font-size:36px;font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(c.name, lang).charAt(0)}</div>`;
-        // ✅ remet l’overlay KO au-dessus si besoin
         setKoStateForEl(charPortrait, state.hp <= 0, false);
       };
       charPortrait.appendChild(img);
@@ -847,13 +826,8 @@ if (ultToggleContainer) {
 
     const isKo = state.hp <= 0;
 
-    // ✅ overlay + KO sur le portrait (au-dessus)
     setKoStateForEl(charPortrait, isKo, false);
-
-    // ✅ contour rouge sur toute la fiche (CSS via body.is-ko)
     document.body.classList.toggle("is-ko", isKo);
-
-    // ✅ tabs bas
     updateTabKO(c.id, isKo);
   }
 
@@ -865,7 +839,6 @@ if (ultToggleContainer) {
 
     const isKoNow = state.hp <= 0;
     if(!wasKo && isKoNow){
-      // KO = pop
       setKoStateForEl(qs("#charPortrait"), true, true);
     }
 
@@ -876,8 +849,6 @@ if (ultToggleContainer) {
   qs("#hpPlus")?.addEventListener("click", ()=>{
     state.hp = clamp(state.hp + 1, 0, c.hp?.max ?? 0);
     setState(c.id, state);
-
-    // ✅ si on repasse à 1 PV, retour normal direct
     refreshHP();
     updateTabHP(c.id, state.hp);
   });
@@ -893,132 +864,119 @@ if (ultToggleContainer) {
 
   if(classActionTitle) classActionTitle.textContent = t(c.texts?.class_action_title, lang);
   if(classActionBody) classActionBody.textContent = t(c.texts?.class_action_body, lang);
-   // --- TECHNICIEN : bouton bouclier bleu illimité dans "Action de classe"
-// --- TECHNICIEN : bouton bouclier bleu illimité dans "Action de classe"
-if (isTechnicianChar(c)) {
-  const classCardBody = qs("#classActionBody")?.closest(".card")?.querySelector(".card-b");
-  if (classCardBody) {
-    // évite doublons si reload
-    let techWrap = qs("#techShieldWrap");
-    if (!techWrap) {
-      techWrap = document.createElement("div");
-      techWrap.id = "techShieldWrap";
-      techWrap.style.cssText = "margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;";
-      classCardBody.appendChild(techWrap);
-    } else {
-      techWrap.innerHTML = "";
+
+  if (isTechnicianChar(c)) {
+    const classCardBody = qs("#classActionBody")?.closest(".card")?.querySelector(".card-b");
+    if (classCardBody) {
+      let techWrap = qs("#techShieldWrap");
+      if (!techWrap) {
+        techWrap = document.createElement("div");
+        techWrap.id = "techShieldWrap";
+        techWrap.style.cssText = "margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;";
+        classCardBody.appendChild(techWrap);
+      } else {
+        techWrap.innerHTML = "";
+      }
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.style.cssText = "display:inline-flex; align-items:center; gap:10px;";
+      btn.innerHTML = `<img src="./assets/icons/shield_blue_on.svg" alt="Bouclier" style="width:26px;height:26px;display:block;" />`;
+
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        showBlueShieldAssignmentModal(c.id, lang, chars);
+      });
+
+      techWrap.appendChild(btn);
     }
-
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.style.cssText = "display:inline-flex; align-items:center; gap:10px;";
-    btn.innerHTML = `
-      <img src="./assets/icons/shield_blue_on.svg" alt="Bouclier" style="width:26px;height:26px;display:block;" />      
-    `;
-
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      showBlueShieldAssignmentModal(c.id, lang, chars);
-    });
-
-    techWrap.appendChild(btn);
   }
-}
 
   if(ultTitle) ultTitle.textContent = t(c.texts?.ultimate_title, lang);
   if(ultBody) ultBody.textContent = t(c.texts?.ultimate_body, lang);
-  
-  // Shields
-const shieldsDisplay = qs('#shieldsDisplay');
-if (shieldsDisplay) {
-  shieldsDisplay.innerHTML = '';
 
-  const shieldToggle = (c.toggles || []).find(tg => tg.id === 'shield');
-  if (shieldToggle) {
-    const freshShields = getSharedShields();
-    const freshAssignments = getShieldAssignments();
-    const blueAssignments = getBlueShieldAssignments();
+  const shieldsDisplay = qs('#shieldsDisplay');
+  if (shieldsDisplay) {
+    shieldsDisplay.innerHTML = '';
 
-    // ✅ Glow bouclier sur la carte HP: si ce perso a un bouclier (orange OU bleu)
-    const hpCard = qs("#hpCard");
-    if (hpCard) {
-      const hasAssignedShield =
-        (freshAssignments[c.id] !== undefined) || (blueAssignments[c.id] !== undefined);
-      hpCard.classList.toggle("has-shield", hasAssignedShield);
-    }
+    const shieldToggle = (c.toggles || []).find(tg => tg.id === 'shield');
+    if (shieldToggle) {
+      const freshShields = getSharedShields();
+      const freshAssignments = getShieldAssignments();
+      const blueAssignments = getBlueShieldAssignments();
 
-    renderToggleRow(
-      shieldsDisplay,
-      shieldToggle,
-      freshShields,
-      lang,
-      (v) => setSharedShields(v),
-      freshShields
-    );
-
-    const keyButtons = shieldsDisplay.querySelectorAll('.key-button');
-    keyButtons.forEach((btn, i) => {
-      btn.classList.add('shield-button');
-
-      if (!freshShields[i]) {
-        btn.style.display = 'none';
-        return;
+      const hpCard = qs("#hpCard");
+      if (hpCard) {
+        const hasAssignedShield =
+          (freshAssignments[c.id] !== undefined) || (blueAssignments[c.id] !== undefined);
+        hpCard.classList.toggle("has-shield", hasAssignedShield);
       }
 
-      btn.dataset.active = 'true';
-      btn.classList.add('is-on');
-      btn.style.backgroundImage = `url('./assets/icons/shield_on.svg')`;
+      renderToggleRow(
+        shieldsDisplay,
+        shieldToggle,
+        freshShields,
+        lang,
+        (v) => setSharedShields(v),
+        freshShields
+      );
 
-      btn.onclick = (e) => {
-        e.preventDefault();
-        showShieldAssignmentModal(i, c.id, lang, chars);
-      };
-    });
+      const keyButtons = shieldsDisplay.querySelectorAll('.key-button');
+      keyButtons.forEach((btn, i) => {
+        btn.classList.add('shield-button');
 
-    if (freshAssignments[c.id] !== undefined) {
-      const removeShield = document.createElement('button');
-      removeShield.className = 'shield-remove-btn';
-      removeShield.textContent = tr("shield_remove");
+        if (!freshShields[i]) {
+          btn.style.display = 'none';
+          return;
+        }
 
-      removeShield.addEventListener('click', (e) => {
-  e.preventDefault();
-  const currentAssignments = getShieldAssignments();
-  const assignedIndex = currentAssignments[c.id];
+        btn.dataset.active = 'true';
+        btn.classList.add('is-on');
+        btn.style.backgroundImage = `url('./assets/icons/shield_on.svg')`;
 
-  // 🟠 Bouclier ORANGE = usage unique :
-  // on retire l'affectation, mais on NE remet PAS le bouclier dans la réserve partagée.
-  if (assignedIndex !== undefined) {
-    delete currentAssignments[c.id];
-    // Important: on laisse l'état du bouclier (false) dans sharedShields pour qu'il reste "consommé".
-  }
-
-  setShieldAssignments(currentAssignments);
-  location.reload();
-});
-
-
-      shieldsDisplay.appendChild(removeShield);
-    }
-
-    // Bouclier bleu (Technicien) : retrait (illimité)
-    if (blueAssignments && blueAssignments[c.id]) {
-      const removeBlue = document.createElement('button');
-      removeBlue.className = 'shield-remove-btn';
-      removeBlue.textContent = (lang === 'fr') ? 'Retirer le bouclier (Technicien)' : 'Remove Shield (Technician)';
-
-      removeBlue.addEventListener('click', (e) => {
-        e.preventDefault();
-        removeBlueShieldForTarget(c.id);
-        location.reload();
+        btn.onclick = (e) => {
+          e.preventDefault();
+          showShieldAssignmentModal(i, c.id, lang, chars);
+        };
       });
 
-      shieldsDisplay.appendChild(removeBlue);
+      if (freshAssignments[c.id] !== undefined) {
+        const removeShield = document.createElement('button');
+        removeShield.className = 'shield-remove-btn';
+        removeShield.textContent = tr("shield_remove");
+
+        removeShield.addEventListener('click', (e) => {
+          e.preventDefault();
+          const currentAssignments = getShieldAssignments();
+          const assignedIndex = currentAssignments[c.id];
+
+          if (assignedIndex !== undefined) {
+            delete currentAssignments[c.id];
+          }
+
+          setShieldAssignments(currentAssignments);
+          location.reload();
+        });
+
+        shieldsDisplay.appendChild(removeShield);
+      }
+
+      if (blueAssignments && blueAssignments[c.id]) {
+        const removeBlue = document.createElement('button');
+        removeBlue.className = 'shield-remove-btn';
+        removeBlue.textContent = (lang === 'fr') ? 'Retirer le bouclier (Technicien)' : 'Remove Shield (Technician)';
+
+        removeBlue.addEventListener('click', (e) => {
+          e.preventDefault();
+          removeBlueShieldForTarget(c.id);
+          location.reload();
+        });
+
+        shieldsDisplay.appendChild(removeBlue);
+      }
     }
   }
-}
 
-
-  // Repair keys
   const repairKeysDisplay = qs('#repairKeysDisplay');
   if (repairKeysDisplay) {
     repairKeysDisplay.innerHTML = '';
@@ -1078,8 +1036,6 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
   title.style.marginTop = '0';
   content.appendChild(title);
 
-  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
-  const setup = setupRaw ? JSON.parse(setupRaw) : null;
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
   const draft = draftRaw ? JSON.parse(draftRaw) : null;
 
@@ -1087,16 +1043,11 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
   const currentCamp = (currentChar?.camp || "mechkawaii");
 
   const teamChars = allChars.filter(c => {
-    // doit être dans les persos sélectionnés (draft)
     if (!draft?.activeIds?.includes(c.id)) return false;
-
-    // ✅ même camp que le perso actuel (IMPORTANT, même en mode single)
     return (c.camp || "mechkawaii") === currentCamp;
   });
 
-  // Prevent orange shield if target already has a blue technician shield
   const blueByTarget = getBlueShieldAssignments();
-
 
   teamChars.forEach(char => {
     const btn = document.createElement('button');
@@ -1110,8 +1061,8 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
     }
     btn.style.cssText = `width:100%;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:6px;cursor:pointer;background:white;color:black;transition:all .2s ease;`;
 
-    btn.addEventListener('mouseover', ()=>{ btn.style.borderColor='#3b82f6'; btn.style.background='#eff6ff'; });
-    btn.addEventListener('mouseout', ()=>{ btn.style.borderColor='#ddd'; btn.style.background='white'; });
+    btn.addEventListener('mouseover', ()=>{ if(!btn.disabled){ btn.style.borderColor='#3b82f6'; btn.style.background='#eff6ff'; }});
+    btn.addEventListener('mouseout', ()=>{ if(!btn.disabled){ btn.style.borderColor='#ddd'; btn.style.background='white'; }});
 
     btn.addEventListener('click', ()=>{
       if(hasBlue) return;
@@ -1156,15 +1107,12 @@ function showBlueShieldAssignmentModal(currentTechId, lang, allChars){
   title.style.marginTop = '0';
   content.appendChild(title);
 
-  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
-  const setup = setupRaw ? JSON.parse(setupRaw) : null;
   const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
   const draft = draftRaw ? JSON.parse(draftRaw) : null;
 
   const techChar = allChars.find(ch => ch.id === currentTechId);
   const techCamp = (techChar?.camp || "mechkawaii");
 
-  // 1 seul bouclier bleu actif par Technicien
   const byTech = getBlueShieldByTech();
   const currentTargetId = byTech[currentTechId] || null;
 
@@ -1196,20 +1144,19 @@ function showBlueShieldAssignmentModal(currentTechId, lang, allChars){
     content.appendChild(removeBtn);
   }
 
-  // Persos draftés + même camp
   const teamChars = allChars.filter(ch => {
     if (!draft?.activeIds?.includes(ch.id)) return false;
     return (ch.camp || "mechkawaii") === techCamp;
   });
 
   const orangeAssignments = getShieldAssignments();
-  const byTarget = getBlueShieldAssignments(); // {targetId: techId}
+  const byTarget = getBlueShieldAssignments();
 
   teamChars.forEach(char => {
     const btn = document.createElement('button');
     const hasOrange = (orangeAssignments && orangeAssignments[char.id] !== undefined);
 
-    const alreadyTech = byTarget[char.id]; // undefined ou techId
+    const alreadyTech = byTarget[char.id];
     const isCurrent = currentTargetId === char.id;
     const isTakenByOther = !!alreadyTech && alreadyTech !== currentTechId;
 
@@ -1217,7 +1164,6 @@ function showBlueShieldAssignmentModal(currentTechId, lang, allChars){
     btn.style.cssText = `width:100%;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:6px;cursor:pointer;background:white;color:black;transition:all .2s ease;`;
 
     if(currentTargetId && !isCurrent){
-      // tech déjà utilisé => pas de nouvel assign
       btn.disabled = true;
       btn.style.opacity = "0.55";
       btn.style.cursor = "not-allowed";
@@ -1251,7 +1197,6 @@ function showBlueShieldAssignmentModal(currentTechId, lang, allChars){
       if(hasOrange) return;
       if(btn.disabled) return;
 
-      // sécurité : 1 seul bouclier bleu par tech
       const latest = getBlueShieldByTech();
       if(latest[currentTechId] && latest[currentTechId] !== char.id) return;
 
@@ -1309,7 +1254,6 @@ document.addEventListener("DOMContentLoaded", async ()=>{
       localStorage.removeItem(STORAGE_PREFIX + "shields");
       localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
       localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
-    localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
 
       const chars = await loadCharacters();
       window.__cachedChars = chars;
@@ -1380,7 +1324,6 @@ function initUnitTabs(currentCharId, allChars, lang){
   tabsContainer.innerHTML = '';
   tabCharacters.forEach(char => tabsContainer.appendChild(createCharacterTab(char, lang)));
 
-  // ✅ après insertion : on peut marquer l’onglet “actif” si tu veux
   const activeTab = tabsContainer.querySelector(`.unit-tab[data-char-id="${currentCharId}"]`);
   if(activeTab) activeTab.classList.add("active");
 }
@@ -1389,10 +1332,9 @@ function createCharacterTab(char, lang){
   const tab = document.createElement('div');
   tab.className = 'unit-tab';
 
-  // Camp (pour styliser chaque onglet individuellement, même en mode "single")
   const tabCamp = (char.camp || "mechkawaii").toLowerCase();
   tab.classList.add(tabCamp === "prodrome" ? "camp-prodrome" : "camp-mechkawaii");
-  tab.dataset.charId = char.id; // => data-char-id
+  tab.dataset.charId = char.id;
 
   const saved = getState(char.id);
   const hp = saved?.hp ?? (char.hp?.max ?? 0);
@@ -1403,6 +1345,7 @@ function createCharacterTab(char, lang){
   const assignments = getShieldAssignments();
   const blueAssignments = getBlueShieldAssignments();
   const hasShield = (assignments[char.id] !== undefined) || (blueAssignments[char.id] !== undefined);
+
   const visualEl = document.createElement('div');
   visualEl.className = 'unit-tab-visual';
   visualEl.classList.add(tabCamp === "prodrome" ? "camp-prodrome" : "camp-mechkawaii");
@@ -1416,7 +1359,6 @@ function createCharacterTab(char, lang){
     img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;filter:none;';
     img.onerror = function(){
       visualEl.innerHTML = `<div style="width:70%;height:70%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px,8vw,36px);font-weight:900;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.3)">${t(char.name, lang).charAt(0)}</div>`;
-      // ✅ remet KO overlay au-dessus
       setKoStateForEl(visualEl, isKo, false);
     };
     visualEl.appendChild(img);
@@ -1429,7 +1371,6 @@ function createCharacterTab(char, lang){
   hpBadge.innerHTML = `<span>❤️</span><span>${hp}/${maxHp}</span>`;
   visualEl.appendChild(hpBadge);
 
-  // ✅ KO overlay APRES avoir tout ajouté => overlay en dernier => AU-DESSUS
   setKoStateForEl(visualEl, isKo, false);
 
   const infoEl = document.createElement('div');
@@ -1443,10 +1384,7 @@ function createCharacterTab(char, lang){
   tab.appendChild(infoEl);
 
   if (hasShield) tab.classList.add('has-shield');
-
-  // ✅ KO sur l’onglet entier (contour rouge / glow rouge via CSS .unit-tab.is-ko)
   tab.classList.toggle("is-ko", isKo);
-if (hasShield) tab.classList.add('has-shield');
 
   tab.addEventListener('click', () => {
     location.href = `character.html?id=${encodeURIComponent(char.id)}`;
@@ -1484,203 +1422,82 @@ function updateTabHP(charId, newHp){
     setTimeout(() => { tab.style.animation = 'heartShake 0.3s ease'; }, 10);
   }
 
-  // ✅ KO sync (tabs + overlay)
   updateTabKO(charId, newHp <= 0);
 }
-// ===============================
-// Navigation vers Générateur
-// ===============================
-
-const terrainBtn = document.getElementById("terrainBtn");
-const terrainPage = document.getElementById("terrainPage");
-const terrainBackBtn = document.getElementById("terrainBackBtn");
-const splash = document.getElementById("splash");
-
-terrainBtn?.addEventListener("click", () => {
-  // ✅ Important : rend visibles topbar/cards malgré body.has-splash
-  document.documentElement.classList.add("splash-dismissed");
-
-  splash.style.display = "none";
-  terrainPage.classList.remove("hidden");
-});
-
-terrainBackBtn?.addEventListener("click", () => {
-  terrainPage.classList.add("hidden");
-  splash.style.display = "block";
-
-  // ✅ On revient au comportement normal du splash
-  document.documentElement.classList.remove("splash-dismissed");
-});
-// ===============================
-// Création grille 7x7
-// ===============================
-
-function createEmptyGrid(){
-  const grid = document.getElementById("terrainGrid");
-  if(!grid) return;
-
-  grid.innerHTML = "";
-
-  const letters = ["A","B","C","D","E","F","G"];
-
-  // Coin vide en haut à gauche
-  grid.appendChild(document.createElement("div"));
-
-  // Lettres en haut
-  letters.forEach(letter => {
-    const div = document.createElement("div");
-    div.className = "coord";
-    div.textContent = letter;
-    grid.appendChild(div);
-  });
-
-  for(let row=1; row<=7; row++){
-
-    // Numéro à gauche
-    const rowLabel = document.createElement("div");
-    rowLabel.className = "coord";
-    rowLabel.textContent = row;
-    grid.appendChild(rowLabel);
-
-    for(let col=0; col<7; col++){
-      const tile = document.createElement("div");
-      tile.className = "tile";
-      tile.dataset.x = letters[col];
-      tile.dataset.y = row;
-      grid.appendChild(tile);
-    }
-  }
-}
-
-// Initialisation au chargement de la page terrain
-terrainBtn?.addEventListener("click", () => {
-  createEmptyGrid();
-
-  // Si tu veux voir directement une map (avec flip), on génère une base
-  // (Localisation A1 + Événement D4). Les règles avancées arrivent ensuite.
-  try { generateBaseMap(); } catch(e) {}
-});
-// ===============================
-// Terrain Model
-// ===============================
-
-const TERRAIN_TYPES = {
-  VIERGE: "vierge",
-  VILLE: "ville",
-  ACCIDENTE: "accidente",
-  ROUTE_DROITE: "route_droite",
-  ROUTE_ANGLE: "route_angle",
-  ROUTE_CROISEMENT: "route_croisement",
-  EVENEMENT: "evenement",
-  LOCALISATION: "localisation"
-};
-
-let terrainModel = [];
-function generateBaseMap(){
-
-  // Crée matrice 7x7 remplie de vierge
-  terrainModel = Array.from({length:7}, () =>
-    Array.from({length:7}, () => TERRAIN_TYPES.VIERGE)
-  );
-
-  // Localisation en A1 (0,0)
-  terrainModel[0][0] = TERRAIN_TYPES.LOCALISATION;
-
-  // Événement en D4 (3,3)
-  terrainModel[3][3] = TERRAIN_TYPES.EVENEMENT;
-
-  renderTerrain();
-}
-function renderTerrain(){
-  const grid = document.getElementById("terrainGrid");
-  if(!grid) return;
-
-  const letters = ["A","B","C","D","E","F","G"];
-  const tiles = grid.querySelectorAll(".tile"); // 👈 uniquement les cases du générateur
-
-  tiles.forEach((tile) => {
-    const x = letters.indexOf(tile.dataset.x);
-    const y = parseInt(tile.dataset.y, 10) - 1;
-
-    const type = terrainModel?.[y]?.[x] || "vierge";
-
-    tile.classList.remove("flipped");
-    tile.innerHTML = "";
-
-    const inner = document.createElement("div");
-    inner.className = "tile-inner";
-
-    const front = document.createElement("div");
-    front.className = "tile-face tile-front";
-
-    const back = document.createElement("div");
-    back.className = "tile-face tile-back";
-
-    const img = document.createElement("img");
-    img.src = `./assets/terrain/${type}.png`;
-    img.alt = type;
-
-    back.appendChild(img);
-    inner.appendChild(front);
-    inner.appendChild(back);
-    tile.appendChild(inner);
-
-    const delay = (x + y) * 45;
-    tile.style.setProperty("--delay", `${delay}ms`);
-
-    // force reflow (important)
-    void inner.offsetWidth;
-
-    requestAnimationFrame(() => tile.classList.add("flipped"));
-  });
-}
-
-
-// ===============================
-// Bind UI buttons (robuste)
-// ===============================
-(function bindTerrainUI(){
-  const tryBind = (ids, fn) => {
-    for(const id of ids){
-      const el = document.getElementById(id);
-      if(el){
-        el.addEventListener("click", fn);
-        return true;
-      }
-    }
-    return false;
-  };
-
-  // Bouton "Générer une map"
-  tryBind(["generateMapBtn","tgGenerate","terrainGenerate","btnGenerateMap"], () => {
-    createEmptyGrid();
-    generateBaseMap();
-  });
-
- })();
 
 /* =========================================================
-   TERRAIN GENERATOR (Mechkawaii Companion) — v8 CLEAN
-   - 7×7 grid + coordinates
-   - Fixed: localisation A1, evenement D4 (no rotation)
-   - Landing rows: row 1 & row 7 are always "vierge" (A1 is localisation)
-   - Exact counts (total 49):
-     - ville x8  : variants 1-4 used twice each (ville_1..ville_4)
-     - accidente x6 : variants 1-3 used twice each (accidente_1..accidente_3)
-     - vierge x27 : variants 1-4 spread as evenly as possible (vierge_1..vierge_4)
-     - routes x6 : droite x2, angle x2, croisement x2
-     - evenement x1, localisation x1
-   - Rotation:
-     - event + localisation: 0°
-     - roads: rotation solved to connect to adjacent road tiles
-     - others: random 0/90/180/270
-   - Validation (anti-wall around event):
-     Must have a traversable path (cities block) from TOP (row 1) to BOTTOM (row 7)
-     on BOTH sides of the event:
-       LEFT columns A–C (0..2) AND RIGHT columns E–G (4..6)
-   - Flip animation: batch trigger (reliable on iOS + PC)
+   TERRAIN GENERATOR + PRESET PAGE (clean navigation)
+   - No alerts / no popups
+   - Dedicated preset page (menu -> terrain -> presets)
    ========================================================= */
-(function TG_module(){
+(function TerrainAndPresets(){
+  const $ = (id)=>document.getElementById(id);
+
+  const splash = $("splash");
+  const terrainBtn = $("terrainBtn");
+  const terrainPage = $("terrainPage");
+  const terrainBackBtn = $("terrainBackBtn");
+
+  const presetPage = $("presetPage");
+  const presetBackBtn = $("presetBackBtn");
+  const presetMapBtn = $("presetMapBtn"); // button INSIDE terrain page
+
+  const generateMapBtn = $("generateMapBtn");
+  const gridEl = $("terrainGrid");
+
+  // --- robust show/hide helpers
+  function show(el){ if(el) el.classList.remove("hidden"); }
+  function hide(el){ if(el) el.classList.add("hidden"); }
+
+  function showSplash(){
+    if(splash) splash.style.display = "block";
+    hide(terrainPage);
+    hide(presetPage);
+    document.documentElement.classList.remove("splash-dismissed");
+  }
+
+  function showTerrain(){
+    // hide splash overlay but keep it in DOM (playable)
+    if(splash) splash.style.display = "none";
+    show(terrainPage);
+    hide(presetPage);
+    document.documentElement.classList.add("splash-dismissed");
+    TG_createEmptyGrid();
+    TG_generateFullMap();
+  }
+
+  function showPresets(){
+    hide(terrainPage);
+    show(presetPage);
+    document.documentElement.classList.add("splash-dismissed");
+    renderPresets();
+  }
+
+  function backToTerrain(){
+    hide(presetPage);
+    show(terrainPage);
+    document.documentElement.classList.add("splash-dismissed");
+  }
+
+  // Ensure hidden by default
+  hide(terrainPage);
+  hide(presetPage);
+
+  // --- bind nav
+  if(terrainBtn) terrainBtn.addEventListener("click", (e)=>{ e.preventDefault(); showTerrain(); });
+  if(terrainBackBtn) terrainBackBtn.addEventListener("click", (e)=>{ e.preventDefault(); showSplash(); });
+  if(presetMapBtn) presetMapBtn.addEventListener("click", (e)=>{ e.preventDefault(); showPresets(); });
+  if(presetBackBtn) presetBackBtn.addEventListener("click", (e)=>{ e.preventDefault(); backToTerrain(); });
+
+  if(generateMapBtn) generateMapBtn.addEventListener("click", (e)=>{
+    e.preventDefault();
+    TG_createEmptyGrid();
+    TG_generateFullMap();
+  });
+
+  /* ------------------------------
+     TERRAIN GENERATOR CORE
+  ------------------------------ */
   const TG = {
     SIZE: 7,
     letters: ["A","B","C","D","E","F","G"],
@@ -1698,101 +1515,78 @@ function renderTerrain(){
     model: [] // 7x7 of {type, variant, rot}
   };
 
-  const $ = (id) => document.getElementById(id);
-
-  // ---------- helpers ----------
   function randInt(n){ return Math.floor(Math.random() * n); }
   function randRot(){ return randInt(4) * 90; }
-
   function shuffle(arr){
     for(let i = arr.length - 1; i > 0; i--){
       const j = Math.floor(Math.random() * (i + 1));
-      const tmp = arr[i];
-      arr[i] = arr[j];
-      arr[j] = tmp;
+      [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr;
   }
-
   function makeCell(type, variant, rot){
     return { type, variant: variant || 0, rot: (typeof rot === "number" ? rot : randRot()) };
   }
-
   function key(x,y){ return x + "," + y; }
   function inBounds(x,y){ return x>=0 && y>=0 && x<TG.SIZE && y<TG.SIZE; }
-
   function isRoadForbidden(x,y){
-    // roads must not appear on landing rows or on event tile
     return (y === 0 || y === TG.SIZE - 1) || (x === 3 && y === 3);
   }
 
-  // ---------- grid UI ----------
   function TG_createEmptyGrid(){
-    const grid = $("terrainGrid");
-    if(!grid) return;
+    if(!gridEl) return;
+    gridEl.innerHTML = "";
 
-    grid.innerHTML = "";
-
-    grid.appendChild(document.createElement("div")); // corner
-
+    gridEl.appendChild(document.createElement("div"));
     for(const letter of TG.letters){
       const d = document.createElement("div");
       d.className = "coord";
       d.textContent = letter;
-      grid.appendChild(d);
+      gridEl.appendChild(d);
     }
 
     for(let row=1; row<=TG.SIZE; row++){
       const rowLabel = document.createElement("div");
       rowLabel.className = "coord";
       rowLabel.textContent = String(row);
-      grid.appendChild(rowLabel);
+      gridEl.appendChild(rowLabel);
 
       for(let col=0; col<TG.SIZE; col++){
         const tile = document.createElement("div");
         tile.className = "tile";
         tile.dataset.x = TG.letters[col];
         tile.dataset.y = String(row);
-        grid.appendChild(tile);
+        gridEl.appendChild(tile);
       }
     }
   }
 
-  // ---------- variant pools (exact) ----------
   function buildViergePool(total){
     const n = TG.VARIANTS.vierge;
     const pool = [];
-    for(let i=0; i<total; i++){
-      pool.push(1 + (i % n));
-    }
+    for(let i=0; i<total; i++) pool.push(1 + (i % n));
     return shuffle(pool);
   }
-
   function poolsExact(){
     return {
-      ville: shuffle([1,1,2,2,3,3,4,4]),        // 8
-      accidente: shuffle([1,1,2,2,3,3]),         // 6
-      vierge: buildViergePool(27)                // 27
+      ville: shuffle([1,1,2,2,3,3,4,4]),
+      accidente: shuffle([1,1,2,2,3,3]),
+      vierge: buildViergePool(27)
     };
   }
 
-  // ---------- road generation (1–3 groups, 6 tiles total) ----------
   function getRoadCandidates(){
     const pos = [];
     for(let y=0; y<TG.SIZE; y++){
       for(let x=0; x<TG.SIZE; x++){
         if(isRoadForbidden(x,y)) continue;
-        // also avoid fixed localisation tile (A1), but it's on landing row anyway
         pos.push({x,y});
       }
     }
     return pos;
   }
-
   function neighbors4(x,y){
-    const n = [
-      {x:x+1,y:y},{x:x-1,y:y},{x:x,y:y+1},{x:x,y:y-1}
-    ];
+    const n = [{x:x+1,y:y},{x:x-1,y:y},{x:x,y:y+1},{x:x,y:y-1}];
     return n.filter(p => inBounds(p.x,p.y) && !isRoadForbidden(p.x,p.y));
   }
 
@@ -1802,7 +1596,6 @@ function renderTerrain(){
 
     const groupsCount = 1 + randInt(3);
 
-    // split 6 into group sizes (each >=1)
     let remaining = 6;
     const sizes = [];
     for(let g=0; g<groupsCount; g++){
@@ -1846,7 +1639,6 @@ function renderTerrain(){
       groups.push(group);
     }
 
-    // attach leftovers near existing roads
     let total = groups.reduce((s,g)=>s+g.length,0);
     let safety = 4000;
     while(total < 6 && safety-- > 0){
@@ -1865,7 +1657,6 @@ function renderTerrain(){
     return groups.flat().slice(0,6);
   }
 
-  // Determine required connections for each road cell (based on adjacency to other road cells)
   function roadAdjacency(roadSet){
     const need = new Map();
     const dirs = [
@@ -1875,8 +1666,7 @@ function renderTerrain(){
       {dx:-1,dy:0,k:"W"}
     ];
     for(const k0 of roadSet){
-      const parts = k0.split(",").map(Number);
-      const x = parts[0], y = parts[1];
+      const [x,y] = k0.split(",").map(Number);
       const obj = {N:false,E:false,S:false,W:false};
       for(const d of dirs){
         const k1 = key(x + d.dx, y + d.dy);
@@ -1886,7 +1676,6 @@ function renderTerrain(){
     }
     return need;
   }
-
   function requiredDirs(obj){
     const out = [];
     if(obj.N) out.push("N");
@@ -1895,18 +1684,14 @@ function renderTerrain(){
     if(obj.W) out.push("W");
     return out;
   }
-
   function countDirs(obj){
     return (obj.N?1:0) + (obj.E?1:0) + (obj.S?1:0) + (obj.W?1:0);
   }
 
-  // Solve road tile type + rotation so it connects to neighbors.
-  // We keep exact counts: 2 straight, 2 corner, 2 junction (cross).
   function solveRoadTiles(roadCells){
     const roadSet = new Set(roadCells.map(p => key(p.x,p.y)));
     const need = roadAdjacency(roadSet);
 
-    // Pick 2 junctions: prefer higher degree
     const ranked = Array.from(roadSet).sort((a,b) => countDirs(need.get(b)) - countDirs(need.get(a)));
     const junctionKeys = new Set(ranked.slice(0,2));
 
@@ -1914,10 +1699,6 @@ function renderTerrain(){
     let cornerLeft = 2;
     let junctionLeft = 2;
 
-    // Patterns at rot=0:
-    // straight: N-S
-    // corner : N-E
-    // junction: N-E-S-W
     const order = ["N","E","S","W"];
     function rotDir(d, rot){
       const idx = order.indexOf(d);
@@ -1961,7 +1742,6 @@ function renderTerrain(){
 
       const fit = bestFit(req, allow) || bestFit(req, ["junction","corner","straight"]) || {t:"junction", rot:0, extra:0};
 
-      // consume counts (best effort)
       if(fit.t === "junction" && junctionLeft > 0) junctionLeft--;
       else if(fit.t === "corner" && cornerLeft > 0) cornerLeft--;
       else if(fit.t === "straight" && straightLeft > 0) straightLeft--;
@@ -1974,20 +1754,16 @@ function renderTerrain(){
     return solved;
   }
 
-  // ---------- model build (one candidate) ----------
   function TG_buildCandidateMap(){
     const pools = poolsExact();
 
-    // init model with vierge (we'll overwrite exactly)
     TG.model = Array.from({length: TG.SIZE}, () =>
       Array.from({length: TG.SIZE}, () => makeCell(TG.TYPES.VIERGE, 1, randRot()))
     );
 
-    // fixed tiles (no rotation)
-    TG.model[0][0] = makeCell(TG.TYPES.LOCALISATION, 0, 0); // A1
-    TG.model[3][3] = makeCell(TG.TYPES.EVENEMENT, 0, 0);    // D4
+    TG.model[0][0] = makeCell(TG.TYPES.LOCALISATION, 0, 0);
+    TG.model[3][3] = makeCell(TG.TYPES.EVENEMENT, 0, 0);
 
-    // roads
     const roadCells = generateRoadCells();
     const roadSolved = solveRoadTiles(roadCells);
     const roadSet = new Set(roadCells.map(p => key(p.x,p.y)));
@@ -1998,7 +1774,6 @@ function renderTerrain(){
       TG.model[p.y][p.x] = makeCell(s.type, 0, s.rot);
     }
 
-    // landing rows forced to vierge (A1 excluded)
     function placeViergeAt(x,y){
       const v = pools.vierge.pop() || 1;
       TG.model[y][x] = makeCell(TG.TYPES.VIERGE, v, randRot());
@@ -2009,7 +1784,6 @@ function renderTerrain(){
     }
     TG.model[0][0] = makeCell(TG.TYPES.LOCALISATION, 0, 0);
 
-    // remaining positions (excluding fixed, roads, landing rows)
     const positions = [];
     for(let y=0; y<TG.SIZE; y++){
       for(let x=0; x<TG.SIZE; x++){
@@ -2022,21 +1796,18 @@ function renderTerrain(){
     }
     shuffle(positions);
 
-    // villes
     for(let i=0; i<8 && positions.length; i++){
       const p = positions.pop();
       const v = pools.ville.pop() || 1;
       TG.model[p.y][p.x] = makeCell(TG.TYPES.VILLE, v, randRot());
     }
 
-    // accidentes
     for(let i=0; i<6 && positions.length; i++){
       const p = positions.pop();
       const v = pools.accidente.pop() || 1;
       TG.model[p.y][p.x] = makeCell(TG.TYPES.ACCIDENTE, v, randRot());
     }
 
-    // rest vierge
     while(positions.length){
       const p = positions.pop();
       const v = pools.vierge.pop() || 1;
@@ -2044,12 +1815,10 @@ function renderTerrain(){
     }
   }
 
-  // ---------- validation (anti-wall cities around event) ----------
   function isBlockedCell(x,y){
     const c = TG.model[y][x];
     return c && c.type === TG.TYPES.VILLE;
   }
-
   function hasVerticalPathInColumns(colMin, colMax){
     const q = [];
     const seen = new Set();
@@ -2083,40 +1852,20 @@ function renderTerrain(){
     }
     return false;
   }
-
   function isMapValid(){
-    const leftOk = hasVerticalPathInColumns(0, 2);  // A–C
-    const rightOk = hasVerticalPathInColumns(4, 6); // E–G
+    const leftOk = hasVerticalPathInColumns(0, 2);
+    const rightOk = hasVerticalPathInColumns(4, 6);
     return leftOk && rightOk;
   }
 
-  function TG_generateFullMap(){
-    const MAX_TRIES = 60;
-    for(let i=0; i<MAX_TRIES; i++){
-      TG_buildCandidateMap();
-      if(isMapValid()){
-        TG_render();
-        return;
-      }
-    }
-    console.warn("[Terrain] Could not satisfy anti-wall constraint after " + MAX_TRIES + " tries.");
-    TG_render(); // render last candidate anyway
-  }
-
-  // ---------- images ----------
   function srcFor(type, variant){
-    if(variant && variant > 0){
-      return "./assets/terrain/" + type + "_" + variant + ".png";
-    }
+    if(variant && variant > 0) return "./assets/terrain/" + type + "_" + variant + ".png";
     return "./assets/terrain/" + type + ".png";
   }
 
-  // ---------- render (flip batch) ----------
   function TG_render(){
-    const grid = $("terrainGrid");
-    if(!grid) return;
-
-    const tiles = grid.querySelectorAll(".tile");
+    if(!gridEl) return;
+    const tiles = gridEl.querySelectorAll(".tile");
 
     tiles.forEach(tile => {
       const x = TG.letters.indexOf(tile.dataset.x);
@@ -2158,146 +1907,75 @@ function renderTerrain(){
 
       const delay = (x + y) * 45;
       tile.style.setProperty("--delay", delay + "ms");
-
-      // trigger transitions reliably
       void inner.offsetWidth;
     });
 
-    // batch flip (reliable)
     setTimeout(() => {
       tiles.forEach(t => t.classList.add("flipped"));
     }, 20);
   }
 
-  // ---------- navigation / bindings ----------
-  function TG_open(){
-    const splash = $("splash");
-    const terrainPage = $("terrainPage");
-    if(!terrainPage) return;
-
-    document.documentElement.classList.add("splash-dismissed");
-
-    if(splash) splash.style.display = "none";
-    terrainPage.classList.remove("hidden");
-
-    TG_createEmptyGrid();
-    TG_generateFullMap();
-  }
-
-  function TG_close(){
-    const splash = $("splash");
-    const terrainPage = $("terrainPage");
-    if(!terrainPage) return;
-
-    terrainPage.classList.add("hidden");
-    if(splash) splash.style.display = "block";
-
-    document.documentElement.classList.remove("splash-dismissed");
-  }
-
-  function TG_bind(){
-    const terrainBtn = $("terrainBtn");
-    const backBtn = $("terrainBackBtn");
-    const genBtn = $("generateMapBtn");
-    const presetBtn = $("presetMapBtn");
-
-    if(terrainBtn) terrainBtn.addEventListener("click", TG_open);
-    if(backBtn) backBtn.addEventListener("click", TG_close);
-
-    if(genBtn) genBtn.addEventListener("click", () => {
-      TG_createEmptyGrid();
-      TG_generateFullMap();
-    });
-
+  function TG_generateFullMap(){
+    const MAX_TRIES = 60;
+    for(let i=0; i<MAX_TRIES; i++){
+      TG_buildCandidateMap();
+      if(isMapValid()){
+        TG_render();
+        return;
       }
-
-  TG_bind();
-})();
-/* =============================
-   PRESET PAGE LOGIC
-============================= */
-
-const presetPage = document.getElementById("presetPage");
-const presetBackBtn = document.getElementById("presetBackBtn");
-const presetGrid = document.getElementById("presetGrid");
-const presetDetail = document.getElementById("presetDetail");
-const presetTitle = document.getElementById("presetTitle");
-const presetLore = document.getElementById("presetLore");
-const presetImage = document.getElementById("presetImage");
-const presetCloseDetail = document.getElementById("presetCloseDetail");
-
-const presets = [
-  {
-    title: "Giga Centrale Électrique",
-    lore: "Source principale d'énergie des grandes villes Mechkawaii.",
-    image: "./assets/presets/01_Giga_centrale.png"
-  },
-  {
-    title: "Grande Route Logistique",
-    lore: "Acheminement stratégique des ressources vitales.",
-    image: "./assets/presets/02_Grande_route.png"
+    }
+    console.warn("[Terrain] Anti-wall constraint not satisfied after " + MAX_TRIES + " tries.");
+    TG_render();
   }
-];
 
-document.getElementById("presetMapBtn")?.addEventListener("click", () => {
-  presetPage.classList.remove("hidden");
-  document.body.classList.add("has-splash");
-  renderPresets();
-});
+  /* ------------------------------
+     PRESETS PAGE
+  ------------------------------ */
+  const presetGrid = $("presetGrid");
+  const presetDetail = $("presetDetail");
+  const presetTitle = $("presetTitle");
+  const presetLore = $("presetLore");
+  const presetImage = $("presetImage");
+  const presetCloseDetail = $("presetCloseDetail");
 
-presetBackBtn?.addEventListener("click", () => {
-  presetPage.classList.add("hidden");
-  presetDetail.classList.add("hidden");
-  document.body.classList.remove("has-splash");
-});
+  const presets = [
+    { title: "Giga Centrale Électrique", lore: "Source principale d'énergie des grandes villes Mechkawaii.", image: "./assets/presets/01_Giga_centrale.png" },
+    { title: "Grande Route Logistique", lore: "Acheminement stratégique des ressources vitales.", image: "./assets/presets/02_Grande_route.png" }
+  ];
 
-presetCloseDetail?.addEventListener("click", () => {
-  presetDetail.classList.add("hidden");
-});
+  function closePresetDetail(){
+    if(presetDetail) presetDetail.classList.add("hidden");
+  }
 
-function renderPresets(){
-  presetGrid.innerHTML = "";
-  presets.forEach(p => {
-    const card = document.createElement("div");
-    card.className = "preset-card";
-    card.innerHTML = `
-      <img src="${p.image}">
-      <h3>${p.title}</h3>
-      <p>${p.lore}</p>
-    `;
-    card.addEventListener("click", () => {
-      presetTitle.textContent = p.title;
-      presetLore.textContent = p.lore;
-      presetImage.src = p.image;
-      presetDetail.classList.remove("hidden");
+  function renderPresets(){
+    if(!presetGrid) return;
+    presetGrid.innerHTML = "";
+    closePresetDetail();
+
+    presets.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "preset-card";
+      card.innerHTML = `
+        <div class="preset-thumb">
+          <img src="${p.image}" alt="${p.title}">
+        </div>
+        <h3>${p.title}</h3>
+        <p>${p.lore}</p>
+      `;
+      card.addEventListener("click", () => {
+        if(presetTitle) presetTitle.textContent = p.title;
+        if(presetLore) presetLore.textContent = p.lore;
+        if(presetImage) presetImage.src = p.image;
+        if(presetDetail) presetDetail.classList.remove("hidden");
+      });
+      presetGrid.appendChild(card);
     });
-    presetGrid.appendChild(card);
-  });
-}
-
-/* =============================
-   PRESETS: navigation (no alerts)
-============================= */
-document.addEventListener("DOMContentLoaded", () => {
-  const terrainPage = document.getElementById("terrainPage");
-  const presetPage  = document.getElementById("presetPage");
-
-  const presetMapBtn  = document.getElementById("presetMapBtn");   // bouton dans Terrain
-  const presetBackBtn = document.getElementById("presetBackBtn");  // bouton retour dans Presets
-
-  // sécurité : au chargement, la page presets doit être cachée
-  if (presetPage) presetPage.classList.add("hidden");
-
-  function openPresets(){
-    if (terrainPage) terrainPage.classList.add("hidden");
-    if (presetPage)  presetPage.classList.remove("hidden");
   }
 
-  function backToTerrain(){
-    if (presetPage)  presetPage.classList.add("hidden");
-    if (terrainPage) terrainPage.classList.remove("hidden");
-  }
+  if(presetCloseDetail) presetCloseDetail.addEventListener("click", (e)=>{ e.preventDefault(); closePresetDetail(); });
 
-  if (presetMapBtn)  presetMapBtn.addEventListener("click", openPresets);
-  if (presetBackBtn) presetBackBtn.addEventListener("click", backToTerrain);
-});
+  // expose to navigation functions
+  window.__mkw_renderPresets = renderPresets;
+  // but also keep local usage
+  // (renderPresets called inside showPresets())
+})();
