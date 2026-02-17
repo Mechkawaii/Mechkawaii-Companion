@@ -2013,6 +2013,95 @@ function renderTerrain(){
       const v = pools.vierge.pop() || 1;
       TG.model[p.y][p.x] = makeCell(TG.TYPES.VIERGE, v, randRot());
     }
+
+    // ✅ Ensure road visuals are continuous with neighbors
+    TG_reorientRoads();
+
+  }
+
+
+  // ---------- road auto-orientation (visual continuity) ----------
+  function isRoadType(t){
+    return t === TG.TYPES.ROUTE_DROITE || t === TG.TYPES.ROUTE_ANGLE || t === TG.TYPES.ROUTE_CROISEMENT;
+  }
+
+  function roadRequiredDirs(x,y){
+    const req = [];
+    const here = TG.model[y][x];
+    if(!here || !isRoadType(here.type)) return req;
+
+    const n = [
+      {d:"N", x:x,   y:y-1},
+      {d:"E", x:x+1, y:y},
+      {d:"S", x:x,   y:y+1},
+      {d:"W", x:x-1, y:y},
+    ];
+    for(const p of n){
+      if(!inBounds(p.x,p.y)) continue;
+      const nb = TG.model[p.y][p.x];
+      if(nb && isRoadType(nb.type)) req.push(p.d);
+    }
+    return req;
+  }
+
+  const _roadOrder = ["N","E","S","W"];
+  function rotDir(d, rot){
+    const idx = _roadOrder.indexOf(d);
+    const steps = (rot/90) % 4;
+    return _roadOrder[(idx + steps) % 4];
+  }
+  function connsStraight(rot){ return new Set([rotDir("N",rot), rotDir("S",rot)]); } // rot=0 is N-S
+  function connsCorner(rot){ return new Set([rotDir("N",rot), rotDir("E",rot)]); }  // rot=0 is N-E
+  function connsJunction(){ return new Set(["N","E","S","W"]); }
+
+  function bestRotationForType(type, req){
+    // Junction: rotation doesn't matter
+    if(type === TG.TYPES.ROUTE_CROISEMENT) return 0;
+
+    const getConns = (rot) => {
+      if(type === TG.TYPES.ROUTE_DROITE) return connsStraight(rot);
+      if(type === TG.TYPES.ROUTE_ANGLE) return connsCorner(rot);
+      return connsJunction();
+    };
+
+    let best = null;
+    for(const rot of [0,90,180,270]){
+      const conns = getConns(rot);
+      let ok = true;
+      for(const d of req){ if(!conns.has(d)) { ok = false; break; } }
+      if(!ok) continue;
+
+      // prefer rotations with less "extra" open ends
+      const extra = Array.from(conns).filter(d => req.indexOf(d) === -1).length;
+      if(!best || extra < best.extra) best = {rot, extra};
+    }
+    return best ? best.rot : 0;
+  }
+
+  function TG_reorientRoads(){
+    // Two-pass so neighbors can influence each other without order artifacts
+    const nextRot = Array.from({length: TG.SIZE}, () => Array(TG.SIZE).fill(null));
+
+    for(let y=0; y<TG.SIZE; y++){
+      for(let x=0; x<TG.SIZE; x++){
+        const cell = TG.model[y][x];
+        if(!cell || !isRoadType(cell.type)) continue;
+
+        const req = roadRequiredDirs(x,y);
+        nextRot[y][x] = bestRotationForType(cell.type, req);
+      }
+    }
+
+    for(let y=0; y<TG.SIZE; y++){
+      for(let x=0; x<TG.SIZE; x++){
+        if(nextRot[y][x] == null) continue;
+        TG.model[y][x].rot = nextRot[y][x];
+      }
+    }
+
+    // Safety: fixed tiles never rotate
+    if(TG.model?.[0]?.[0]) TG.model[0][0].rot = 0;
+    if(TG.model?.[3]?.[3]) TG.model[3][3].rot = 0;
   }
 
   // ---------- validation (anti-wall cities around event) ----------
