@@ -1634,21 +1634,24 @@ function getTileImgSrc(type){
 }
 
 function renderTerrain(){
+
   const grid = document.getElementById("terrainGrid");
   if(!grid) return;
 
   const letters = ["A","B","C","D","E","F","G"];
-  const tiles = grid.querySelectorAll(".tile"); // 👈 uniquement les cases du générateur
+  const tiles = grid.querySelectorAll(".tile");
 
   tiles.forEach((tile) => {
+
     const x = letters.indexOf(tile.dataset.x);
     const y = parseInt(tile.dataset.y, 10) - 1;
+    const type = terrainModel[y][x];
 
-    const type = terrainModel?.[y]?.[x] || "vierge";
-
+    // Reset
     tile.classList.remove("flipped");
     tile.innerHTML = "";
 
+    // Structure
     const inner = document.createElement("div");
     inner.className = "tile-inner";
 
@@ -1659,23 +1662,7 @@ function renderTerrain(){
     back.className = "tile-face tile-back";
 
     const img = document.createElement("img");
-    const candidates = getTileImgSrc(type);
-    let ci = 0;
-    img.src = candidates[ci];
-    img.onerror = () => {
-      ci++;
-      if(ci < candidates.length){
-        img.src = candidates[ci];
-        return;
-      }
-      // If still failing, show a text fallback on the back face
-      back.textContent = type;
-      back.style.fontWeight = "900";
-      back.style.letterSpacing = "1px";
-      back.style.color = "rgba(255,255,255,0.85)";
-      back.style.textShadow = "0 2px 10px rgba(0,0,0,0.55)";
-    };
-
+    img.src = `./assets/terrain/${type}.png`;
     img.alt = type;
 
     back.appendChild(img);
@@ -1685,14 +1672,13 @@ function renderTerrain(){
 
     const delay = (x + y) * 45;
     tile.style.setProperty("--delay", `${delay}ms`);
-
-    // force reflow (important)
-    void inner.offsetWidth;
-
-    requestAnimationFrame(() => tile.classList.add("flipped"));
   });
-}
 
+  // ⚠️ Important : déclenche le flip APRÈS que tout soit injecté
+  setTimeout(() => {
+    tiles.forEach(tile => tile.classList.add("flipped"));
+  }, 20);
+}
 
 // ===============================
 // Bind UI buttons (robuste)
