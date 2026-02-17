@@ -1727,3 +1727,8 @@ body.page-character .brand-with-portrait{
     -webkit-transition-duration: 480ms !important;
   }
 }
+/* --- Mobile: reduce tile roundness --- */
+#terrainGrid .tile,
+#terrainGrid .tile-face{
+  border-radius: clamp(6px, 1.2vw, 12px);
+}
