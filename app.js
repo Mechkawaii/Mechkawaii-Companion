@@ -1607,6 +1607,32 @@ function generateBaseMap(){
 
   renderTerrain();
 }
+
+// ===============================
+// Terrain assets helper (fallbacks)
+// ===============================
+function getTileImgSrc(type){
+  // Candidates in order. We try terrain folder first, then root assets.
+  const baseCandidates = [
+    `${type}.png`,
+  ];
+
+  // Common accented legacy filenames (if you didn't rename files)
+  if(type === "evenement") baseCandidates.push("événement.png", "evenement.png");
+  if(type === "accidente") baseCandidates.push("accidenté.png", "accidente.png");
+  if(type === "route_droite") baseCandidates.push("Droite.png", "route_droite.png");
+  if(type === "route_angle") baseCandidates.push("angle.png", "route_angle.png");
+  if(type === "route_croisement") baseCandidates.push("croisement.png", "route_croisement.png");
+
+  const candidates = [];
+  baseCandidates.forEach(fn => {
+    candidates.push(`./assets/terrain/${fn}`);
+    candidates.push(`./assets/${fn}`);
+  });
+
+  return candidates;
+}
+
 function renderTerrain(){
   const grid = document.getElementById("terrainGrid");
   if(!grid) return;
@@ -1633,7 +1659,23 @@ function renderTerrain(){
     back.className = "tile-face tile-back";
 
     const img = document.createElement("img");
-    img.src = `./assets/terrain/${type}.png`;
+    const candidates = getTileImgSrc(type);
+    let ci = 0;
+    img.src = candidates[ci];
+    img.onerror = () => {
+      ci++;
+      if(ci < candidates.length){
+        img.src = candidates[ci];
+        return;
+      }
+      // If still failing, show a text fallback on the back face
+      back.textContent = type;
+      back.style.fontWeight = "900";
+      back.style.letterSpacing = "1px";
+      back.style.color = "rgba(255,255,255,0.85)";
+      back.style.textShadow = "0 2px 10px rgba(0,0,0,0.55)";
+    };
+
     img.alt = type;
 
     back.appendChild(img);
