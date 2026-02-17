@@ -103,6 +103,25 @@ const I18N = {
     splash_site: "SITE",
     splash_instagram: "INSTAGRAM",
 
+
+    splash_terrain: "TERRAIN",
+
+    terrain_title: "GÉNÉRATEUR DE TERRAIN",
+    terrain_back: "← Retour",
+    terrain_generate: "Générer un terrain",
+    terrain_presets: "Terrains préconstruits",
+    terrain_presets_title: "Maps préconstruites",
+    terrain_presets_hint: "Fais défiler → puis clique sur une carte pour afficher la map.",
+
+    terrain_legend_title: "Fonctions des terrains",
+    terrain_type_vierge: "Vierge",
+    terrain_desc_vierge: "Mouvements et tirs normaux lorsqu’une unité se trouve dessus.",
+    terrain_type_accidente: "Accidenté",
+    terrain_desc_accidente: "Les tirs à distance sont interdits. Le corps-à-corps est possible.",
+    terrain_type_ville: "Ville",
+    terrain_desc_ville: "Les villes doivent être contournées, bloquent la ligne de mire des tirs à distance.",
+    terrain_type_route: "Route",
+    terrain_desc_route: "Quand une unité se trouve sur un terrain route, elle a un déplacement gratuit au tour suivant en plus de son action. La forme de la route n’influe pas la direction des déplacements.",
     index_subtitle: "Choisis ton mode et ton camp.",
 
     setup_title: "Configuration de la partie",
@@ -150,6 +169,25 @@ const I18N = {
     splash_site: "WEBSITE",
     splash_instagram: "INSTAGRAM",
 
+
+    splash_terrain: "TERRAIN",
+
+    terrain_title: "TERRAIN GENERATOR",
+    terrain_back: "← Back",
+    terrain_generate: "Generate terrain",
+    terrain_presets: "Preset terrains",
+    terrain_presets_title: "Preset maps",
+    terrain_presets_hint: "Swipe → then tap a card to show the map.",
+
+    terrain_legend_title: "Terrain effects",
+    terrain_type_vierge: "Clear",
+    terrain_desc_vierge: "Normal movement and ranged attacks for units standing on it.",
+    terrain_type_accidente: "Rough",
+    terrain_desc_accidente: "Ranged attacks are forbidden. Melee is allowed.",
+    terrain_type_ville: "City",
+    terrain_desc_ville: "Cities must be bypassed and block line of sight for ranged attacks.",
+    terrain_type_route: "Road",
+    terrain_desc_route: "A unit on a road gets a free move next turn in addition to its action. Road shape does not affect movement direction.",
     index_subtitle: "Choose your mode and your camp.",
 
     setup_title: "Game setup",
@@ -242,6 +280,7 @@ function initSplashLang(){
       setLang(v);
       wrap.querySelectorAll("[data-lang]").forEach(b=>b.classList.toggle("active", b.getAttribute("data-lang") === v));
       applyI18n();
+      refreshPresetUI();
     });
   });
 }
@@ -1525,8 +1564,7 @@ terrainBtn?.addEventListener("click", () => {
 
   // Si tu veux voir directement une map (avec flip), on génère une base
   // (Localisation A1 + Événement D4). Les règles avancées arrivent ensuite.
-  try { clearPresetView();
-    generateBaseMap(); } catch(e) {}
+  try { generateBaseMap(); } catch(e) {}
 });
 // ===============================
 // Terrain Model
@@ -1607,6 +1645,208 @@ function renderTerrain(){
 // ===============================
 // Bind UI buttons (robuste)
 // ===============================
+
+/* =========================================================
+   PRESET MAPS (carousel + view)
+   - Opens overlay from "Terrains préconstruits"
+   - Shows title + lore + preview image
+   - Language-aware (FR/EN)
+========================================================= */
+
+let CURRENT_PRESET_ID = null;
+
+const PRESET_MAPS = [
+  {
+    id: "01",
+    title_fr: "Giga Centrale Électrique ⚡",
+    title_en: "Giga Power Plant ⚡",
+    lore_fr: "L’une des plus vastes centrales d’énergie de l’univers Mechkawaii. Ces installations colossales alimentent les métropoles et font tourner l’infrastructure des mégacités. Les Prodromes cherchent à les saboter pour plonger les villes dans l’obscurité.",
+    lore_en: "One of the largest power plants in the Mechkawaii universe. These colossal facilities power entire megacities. The Prodromes seek to sabotage them and plunge cities into darkness.",
+    img: "./assets/terrain/presets/01.png"
+  },
+  {
+    id: "02",
+    title_fr: "Grande Route Logistique 🚚",
+    title_en: "Grand Logistics Route 🚚",
+    lore_fr: "Principal axe d’approvisionnement transportant matériaux et modules d’armement. Les Prodromes frappent ici pour bloquer la production.",
+    lore_en: "Main supply route transporting materials and weapon modules. The Prodromes strike here to disrupt production.",
+    img: "./assets/terrain/presets/02.png"
+  },
+  {
+    id: "03",
+    title_fr: "La Zone Cendrée 🌑",
+    title_en: "Ashen Zone 🌑",
+    lore_fr: "Vestiges d’un quartier réduit en cendres. La visibilité y est brouillée, idéale pour les embuscades Prodromes.",
+    lore_en: "Ruins of a district reduced to ashes. Poor visibility makes it perfect for Prodrome ambushes.",
+    img: "./assets/terrain/presets/03.png"
+  },
+  {
+    id: "04",
+    title_fr: "L’Usine Silencieuse 🏭",
+    title_en: "Silent Factory 🏭",
+    lore_fr: "Immense usine abandonnée contenant encore des ressources rares et de l’énergie dormante.",
+    lore_en: "A massive abandoned factory still hiding rare resources and dormant energy.",
+    img: "./assets/terrain/presets/04.png"
+  },
+  {
+    id: "05",
+    title_fr: "Le Cratère Noir ⚫",
+    title_en: "Black Crater ⚫",
+    lore_fr: "Un gouffre béant laissé par une explosion titanesque. Symbole de destruction entretenu par les Prodromes.",
+    lore_en: "A massive crater left by a colossal explosion. A symbol of destruction maintained by the Prodromes.",
+    img: "./assets/terrain/presets/05.png"
+  },
+  {
+    id: "06",
+    title_fr: "La Gare Fracturée 🚉",
+    title_en: "Shattered Station 🚉",
+    lore_fr: "Réseaux de transport détruits. Zone stratégique pour isoler les cités.",
+    lore_en: "Transport networks destroyed. A strategic point to isolate cities.",
+    img: "./assets/terrain/presets/06.png"
+  },
+  {
+    id: "07",
+    title_fr: "La Place du Souvenir 🕯",
+    title_en: "Memorial Plaza 🕯",
+    lore_fr: "Ancienne esplanade cérémonielle ravagée par les impacts. Les Prodromes cherchent à effacer la mémoire collective.",
+    lore_en: "A former ceremonial plaza now shattered by impacts. The Prodromes aim to erase collective memory.",
+    img: "./assets/terrain/presets/07.png"
+  },
+  {
+    id: "08",
+    title_fr: "La Fosse d’Assemblage 🏭",
+    title_en: "Assembly Pit 🏭",
+    lore_fr: "Usine souterraine figée, remplie de carcasses de mechas inachevés.",
+    lore_en: "A frozen underground factory filled with unfinished mech carcasses.",
+    img: "./assets/terrain/presets/08.png"
+  },
+  {
+    id: "09",
+    title_fr: "Quartiers Résidentiels 🏢",
+    title_en: "Residential District 🏢",
+    lore_fr: "Gratte-ciel éventrés dominant la zone. Poste d’observation idéal.",
+    lore_en: "Shattered skyscrapers dominating the area. A perfect observation post.",
+    img: "./assets/terrain/presets/09.png"
+  },
+  {
+    id: "10",
+    title_fr: "Les Grandes Archives 📚",
+    title_en: "Grand Archives 📚",
+    lore_fr: "Bâtisses du savoir ouvertes par une frappe orbitale. Les Mechkawaii cherchent à protéger les données restantes.",
+    lore_en: "Knowledge buildings torn open by orbital strike. The Mechkawaii seek to protect remaining data.",
+    img: "./assets/terrain/presets/10.png"
+  }
+];
+function presetText(map, fieldBase, lang){
+  const key = fieldBase + '_' + (lang === 'en' ? 'en' : 'fr');
+  return map[key] || '';
+}
+
+
+function getPresetById(id){
+  return PRESET_MAPS.find(m => m.id === id) || null;
+}
+
+function openPresetCarousel(){
+  const overlay = document.getElementById("presetOverlay");
+  const carousel = document.getElementById("presetCarousel");
+  if(!overlay || !carousel) return;
+
+  const lang = getLang();
+
+  carousel.innerHTML = PRESET_MAPS.map(m => {
+    const title = presetText(m, 'title', lang);
+    const lore  = presetText(m, 'lore', lang);
+return `
+      <div class="preset-card" data-preset="${m.id}">
+        <h4>${title}</h4>
+        <p>${lore}</p>
+        <img class="preset-thumb" src="${m.img}" alt="${title}">
+      </div>
+    `;
+  }).join("");
+
+  overlay.classList.remove("hidden");
+
+  carousel.querySelectorAll(".preset-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const id = card.getAttribute("data-preset");
+      const map = getPresetById(id);
+      if(map) showPresetMap(map);
+      overlay.classList.add("hidden");
+    });
+  });
+}
+
+function showPresetMap(map){
+  const terrainGrid = document.getElementById("terrainGrid");
+  const presetInfo = document.getElementById("presetInfo");
+  const presetTitle = document.getElementById("presetTitle");
+  const presetLore = document.getElementById("presetLore");
+  const presetMapImg = document.getElementById("presetMapImg");
+
+  if(!presetInfo || !presetTitle || !presetLore || !presetMapImg) return;
+
+  const lang = getLang();
+  CURRENT_PRESET_ID = map.id;
+
+  if(terrainGrid) terrainGrid.classList.add("hidden");
+
+  presetMapImg.src = map.img;
+  presetMapImg.alt = presetText(map, 'title', lang);
+  presetMapImg.classList.remove("hidden");
+
+  presetTitle.textContent = presetText(map, 'title', lang);
+  presetLore.textContent  = presetText(map, 'lore', lang);
+  presetInfo.classList.remove("hidden");
+}
+
+function closePresetMapView(){
+  const terrainGrid = document.getElementById("terrainGrid");
+  const presetInfo = document.getElementById("presetInfo");
+  const presetMapImg = document.getElementById("presetMapImg");
+
+  CURRENT_PRESET_ID = null;
+
+  if(terrainGrid) terrainGrid.classList.remove("hidden");
+  if(presetMapImg) presetMapImg.classList.add("hidden");
+  if(presetInfo) presetInfo.classList.add("hidden");
+}
+
+function refreshPresetUI(){
+  const overlay = document.getElementById("presetOverlay");
+  if(overlay && !overlay.classList.contains("hidden")){
+    openPresetCarousel(); // rebuild content in the new language
+  }
+
+  const presetInfo = document.getElementById("presetInfo");
+  if(presetInfo && !presetInfo.classList.contains("hidden") && CURRENT_PRESET_ID){
+    const map = getPresetById(CURRENT_PRESET_ID);
+    if(map) showPresetMap(map);
+  }
+}
+
+// Close buttons (delegated)
+document.addEventListener("click", (e) => {
+  const tEl = e.target;
+
+  // Close overlay
+  if(tEl && tEl.id === "presetCloseBtn"){
+    document.getElementById("presetOverlay")?.classList.add("hidden");
+  }
+
+  // Click outside modal closes overlay
+  if(tEl && tEl.id === "presetOverlay"){
+    document.getElementById("presetOverlay")?.classList.add("hidden");
+  }
+
+  // Close preset view
+  if(tEl && tEl.id === "closePresetView"){
+    closePresetMapView();
+  }
+});
+
+
 (function bindTerrainUI(){
   const tryBind = (ids, fn) => {
     for(const id of ids){
@@ -1621,123 +1861,17 @@ function renderTerrain(){
 
   // Bouton "Générer une map"
   tryBind(["generateMapBtn","tgGenerate","terrainGenerate","btnGenerateMap"], () => {
+    closePresetMapView();
+
     createEmptyGrid();
-    clearPresetView();
     generateBaseMap();
   });
 
   // Bouton "Maps préconstruites"
-  // Affiche un carrousel (titre + lore + miniature). Au clic, affiche l'image preset.
-  const PRESET_MAPS = [
-    { id:"01", title:{fr:"Giga Centrale Électrique ⚡", en:"Giga Power Plant ⚡"}, lore:{fr:"L’une des plus vastes centrales d’énergie de l’univers Mechkawaii. Ces installations colossales alimentent les métropoles et font tourner l’infrastructure des mégacités. Les Prodromes cherchent à les saboter pour plonger les villes dans l’obscurité.", en:"One of the largest power plants in the Mechkawaii universe. These colossal facilities power entire megacities. The Prodromes seek to sabotage them and plunge cities into darkness."}, img:"./assets/terrain/presets/01.png" },
-    { id:"02", title:{fr:"Grande Route Logistique 🚚", en:"Grand Logistics Route 🚚"}, lore:{fr:"Principal axe d’approvisionnement transportant matériaux et modules d’armement. Les Prodromes frappent ici pour bloquer la production.", en:"Main supply route transporting materials and weapon modules. The Prodromes strike here to disrupt production."}, img:"./assets/terrain/presets/02.png" },
-    { id:"03", title:{fr:"La Zone Cendrée 🌑", en:"Ashen Zone 🌑"}, lore:{fr:"Vestiges d’un quartier réduit en cendres. La visibilité y est brouillée, idéale pour les embuscades Prodromes.", en:"Ruins of a district reduced to ashes. Poor visibility makes it perfect for Prodrome ambushes."}, img:"./assets/terrain/presets/03.png" },
-    { id:"04", title:{fr:"L’Usine Silencieuse 🏭", en:"Silent Factory 🏭"}, lore:{fr:"Immense usine abandonnée contenant encore des ressources rares et de l’énergie dormante.", en:"A massive abandoned factory still hiding rare resources and dormant energy."}, img:"./assets/terrain/presets/04.png" },
-    { id:"05", title:{fr:"Le Cratère Noir ⚫", en:"Black Crater ⚫"}, lore:{fr:"Un gouffre béant laissé par une explosion titanesque. Symbole de destruction entretenu par les Prodromes.", en:"A massive crater left by a colossal explosion. A symbol of destruction maintained by the Prodromes."}, img:"./assets/terrain/presets/05.png" },
-    { id:"06", title:{fr:"La Gare Fracturée 🚉", en:"Shattered Station 🚉"}, lore:{fr:"Réseaux de transport détruits. Zone stratégique pour isoler les cités.", en:"Transport networks destroyed. A strategic point to isolate cities."}, img:"./assets/terrain/presets/06.png" },
-    { id:"07", title:{fr:"La Place du Souvenir 🕯", en:"Memorial Plaza 🕯"}, lore:{fr:"Ancienne esplanade cérémonielle ravagée par les impacts. Les Prodromes cherchent à effacer la mémoire collective.", en:"A former ceremonial plaza now shattered by impacts. The Prodromes aim to erase collective memory."}, img:"./assets/terrain/presets/07.png" },
-    { id:"08", title:{fr:"La Fosse d’Assemblage 🏭", en:"Assembly Pit 🏭"}, lore:{fr:"Usine souterraine figée, remplie de carcasses de mechas inachevés.", en:"A frozen underground factory filled with unfinished mech carcasses."}, img:"./assets/terrain/presets/08.png" },
-    { id:"09", title:{fr:"Quartiers Résidentiels 🏢", en:"Residential District 🏢"}, lore:{fr:"Gratte-ciel éventrés dominant la zone. Poste d’observation idéal.", en:"Shattered skyscrapers dominating the area. A perfect observation post."}, img:"./assets/terrain/presets/09.png" },
-    { id:"10", title:{fr:"Les Grandes Archives 📚", en:"Grand Archives 📚"}, lore:{fr:"Bâtisses du savoir ouvertes par une frappe orbitale. Les Mechkawaii cherchent à protéger les données restantes.", en:"Knowledge buildings torn open by orbital strike. The Mechkawaii seek to protect remaining data."}, img:"./assets/terrain/presets/10.png" }
-  ];
-
-  function getPresetById(id){ return PRESET_MAPS.find(m => m.id === id) || null; }
-
-  function setPresetView(map){
-    const lang = getLang();
-    const gridEl = document.getElementById("terrainGrid");
-    const infoEl = document.getElementById("presetInfo");
-    const titleEl = document.getElementById("presetTitle");
-    const loreEl = document.getElementById("presetLore");
-    const imgEl = document.getElementById("presetMapImg");
-
-    if(titleEl) titleEl.textContent = t(map.title, lang);
-    if(loreEl) loreEl.textContent = t(map.lore, lang);
-
-    if(imgEl){
-      imgEl.src = map.img;
-      imgEl.classList.remove("hidden");
-    }
-    if(infoEl) infoEl.classList.remove("hidden");
-    if(gridEl) gridEl.classList.add("hidden");
-  }
-
-  function clearPresetView(){
-    const gridEl = document.getElementById("terrainGrid");
-    const infoEl = document.getElementById("presetInfo");
-    const imgEl = document.getElementById("presetMapImg");
-
-    if(imgEl){
-      imgEl.classList.add("hidden");
-      imgEl.removeAttribute("src");
-    }
-    if(infoEl) infoEl.classList.add("hidden");
-    if(gridEl) gridEl.classList.remove("hidden");
-  }
-
-  function openPresetOverlay(){
-    const overlay = document.getElementById("presetOverlay");
-    const carousel = document.getElementById("presetCarousel");
-    if(!overlay || !carousel) return;
-
-    const lang = getLang();
-    // Build cards with DOM to avoid any string escaping issues
-    carousel.innerHTML = "";
-    PRESET_MAPS.forEach(map => {
-      const card = document.createElement("div");
-      card.className = "preset-card";
-      card.dataset.preset = map.id;
-
-      const h4 = document.createElement("h4");
-      h4.textContent = t(map.title, lang);
-
-      const p = document.createElement("p");
-      p.textContent = t(map.lore, lang);
-
-      const img = document.createElement("img");
-      img.className = "preset-thumb";
-      img.src = map.img;
-      img.alt = h4.textContent;
-
-      card.appendChild(h4);
-      card.appendChild(p);
-      card.appendChild(img);
-
-      card.addEventListener("click", () => {
-        const chosen = getPresetById(map.id);
-        if(chosen) setPresetView(chosen);
-        overlay.classList.add("hidden");
-      });
-
-      carousel.appendChild(card);
-    });
-
-    overlay.classList.remove("hidden");
-  }
-
-  // Close actions
-  tryBind(["presetCloseBtn"], () => {
-    const overlay = document.getElementById("presetOverlay");
-    if(overlay) overlay.classList.add("hidden");
-  });
-
-  // Click outside modal closes
-  (function(){
-    const overlay = document.getElementById("presetOverlay");
-    if(!overlay) return;
-    overlay.addEventListener("click", (e) => {
-      if(e.target === overlay) overlay.classList.add("hidden");
-    });
-  });
-
-  // Close preset view (back to grid)
-  tryBind(["closePresetView"], () => clearPresetView());
-
-  // Open overlay
   tryBind(["presetMapBtn","tgPresets","terrainPresets","btnPresetMap"], () => {
-    openPresetOverlay();
+    openPresetCarousel();
   });
-  });
+})();
 
 /* =========================================================
    TERRAIN GENERATOR (Mechkawaii Companion) — v8 CLEAN
@@ -2005,7 +2139,7 @@ function renderTerrain(){
       return order[(idx + steps) % 4];
     }
     function patternStraight(rot){ return new Set([rotDir("N",rot), rotDir("S",rot)]); }
-    function patternCorner(rot){ return new Set([rotDir("N",rot), rotDir("E",rot)]); }
+    function patternCorner(rot){ return new Set([rotDir("W",rot), rotDir("S",rot)]); }
     function patternJunction(){ return new Set(["N","E","S","W"]); }
 
     function bestFit(req, allow){
