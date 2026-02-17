@@ -1657,11 +1657,7 @@ function renderTerrain(){
     generateBaseMap();
   });
 
-  // Bouton "Maps préconstruites" (sera implémenté à l'étape suivante)
-  tryBind(["presetMapBtn","tgPresets","terrainPresets","btnPresetMap"], () => {
-    alert("Maps préconstruites : bientôt 👀");
-  });
-})();
+ })();
 
 /* =========================================================
    TERRAIN GENERATOR (Mechkawaii Companion) — v8 CLEAN
@@ -2213,10 +2209,7 @@ function renderTerrain(){
       TG_generateFullMap();
     });
 
-    if(presetBtn) presetBtn.addEventListener("click", () => {
-      alert("Maps préconstruites : prochaine étape 😄");
-    });
-  }
+      }
 
   TG_bind();
 })();
