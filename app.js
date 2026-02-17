@@ -1738,7 +1738,6 @@ function renderTerrain(){
     openPresetOverlay();
   });
   });
-});
 
 /* =========================================================
    TERRAIN GENERATOR (Mechkawaii Companion) — v8 CLEAN
