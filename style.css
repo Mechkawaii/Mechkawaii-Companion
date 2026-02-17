@@ -1572,3 +1572,14 @@ body.page-character .brand-with-portrait{
   flex: 1 1 auto !important;
   align-self: stretch !important;
 }
+.hidden {
+  display: none;
+}
+
+.terrain-page {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  overflow-y: auto;
+  z-index: 10000;
+}
