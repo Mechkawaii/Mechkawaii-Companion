@@ -2274,32 +2274,30 @@ function renderPresets(){
     presetGrid.appendChild(card);
   });
 }
+
 /* =============================
-   NAVIGATION TERRAIN / PRESETS
+   PRESETS: navigation (no alerts)
 ============================= */
-
 document.addEventListener("DOMContentLoaded", () => {
-
   const terrainPage = document.getElementById("terrainPage");
   const presetPage  = document.getElementById("presetPage");
 
-  const presetMapBtn = document.getElementById("presetMapBtn");
-  const presetBackBtn = document.getElementById("presetBackBtn");
+  const presetMapBtn  = document.getElementById("presetMapBtn");   // bouton dans Terrain
+  const presetBackBtn = document.getElementById("presetBackBtn");  // bouton retour dans Presets
 
-  // Aller vers Presets
-  if (presetMapBtn) {
-    presetMapBtn.addEventListener("click", () => {
-      if (terrainPage) terrainPage.classList.add("hidden");
-      if (presetPage)  presetPage.classList.remove("hidden");
-    });
+  // sécurité : au chargement, la page presets doit être cachée
+  if (presetPage) presetPage.classList.add("hidden");
+
+  function openPresets(){
+    if (terrainPage) terrainPage.classList.add("hidden");
+    if (presetPage)  presetPage.classList.remove("hidden");
   }
 
-  // Retour vers Terrain
-  if (presetBackBtn) {
-    presetBackBtn.addEventListener("click", () => {
-      if (presetPage)  presetPage.classList.add("hidden");
-      if (terrainPage) terrainPage.classList.remove("hidden");
-    });
+  function backToTerrain(){
+    if (presetPage)  presetPage.classList.add("hidden");
+    if (terrainPage) terrainPage.classList.remove("hidden");
   }
 
+  if (presetMapBtn)  presetMapBtn.addEventListener("click", openPresets);
+  if (presetBackBtn) presetBackBtn.addEventListener("click", backToTerrain);
 });
