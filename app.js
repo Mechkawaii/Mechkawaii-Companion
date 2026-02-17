@@ -102,6 +102,22 @@ const I18N = {
     splash_play: "JOUER",
     splash_site: "SITE",
     splash_instagram: "INSTAGRAM",
+    splash_terrain: "TERRAIN",
+
+terrain_title: "GÉNÉRATEUR DE TERRAIN",
+terrain_subtitle: "Grille 7×7",
+terrain_back: "← Retour",
+terrain_generate: "Générer une map",
+terrain_presets: "Maps préconstruites",
+terrain_legend_title: "Fonctions des terrains",
+terrain_type_vierge: "Vierge",
+terrain_desc_vierge: "Mouvements et tirs normaux lorsqu’une unité se trouve dessus.",
+terrain_type_accidente: "Accidenté",
+terrain_desc_accidente: "Les tirs à distance sont interdits. Le corps-à-corps est possible.",
+terrain_type_ville: "Ville",
+terrain_desc_ville: "Les villes doivent être contournées, bloquent la ligne de mire des tirs à distance.",
+terrain_type_route: "Route",
+terrain_desc_route: "Quand une unité se trouve sur un terrain route, elle a un déplacement gratuit au tour suivant en plus de son action. La forme de la route n’influe pas la direction des déplacements.",
 
     index_subtitle: "Choisis ton mode et ton camp.",
 
@@ -149,6 +165,23 @@ const I18N = {
     splash_play: "PLAY",
     splash_site: "WEBSITE",
     splash_instagram: "INSTAGRAM",
+    splash_terrain: "TERRAIN",
+
+terrain_title: "TERRAIN GENERATOR",
+terrain_subtitle: "7×7 grid",
+terrain_back: "← Back",
+terrain_generate: "Generate a map",
+terrain_presets: "Preset maps",
+
+terrain_legend_title: "Terrain effects",
+terrain_type_vierge: "Clear",
+terrain_desc_vierge: "Normal movement and ranged attacks for units standing on it.",
+terrain_type_accidente: "Rough",
+terrain_desc_accidente: "Ranged attacks are forbidden. Melee is allowed.",
+terrain_type_ville: "City",
+terrain_desc_ville: "Cities must be bypassed and block line of sight for ranged attacks.",
+terrain_type_route: "Road",
+terrain_desc_route: "A unit on a road gets a free move next turn in addition to its action. Road shape does not affect movement direction.",
 
     index_subtitle: "Choose your mode and your camp.",
 
