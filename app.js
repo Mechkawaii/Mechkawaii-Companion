@@ -2281,3 +2281,32 @@ function renderPresets(){
     presetGrid.appendChild(card);
   });
 }
+/* =============================
+   NAVIGATION TERRAIN / PRESETS
+============================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const terrainPage = document.getElementById("terrainPage");
+  const presetPage  = document.getElementById("presetPage");
+
+  const presetMapBtn = document.getElementById("presetMapBtn");
+  const presetBackBtn = document.getElementById("presetBackBtn");
+
+  // Aller vers Presets
+  if (presetMapBtn) {
+    presetMapBtn.addEventListener("click", () => {
+      if (terrainPage) terrainPage.classList.add("hidden");
+      if (presetPage)  presetPage.classList.remove("hidden");
+    });
+  }
+
+  // Retour vers Terrain
+  if (presetBackBtn) {
+    presetBackBtn.addEventListener("click", () => {
+      if (presetPage)  presetPage.classList.add("hidden");
+      if (terrainPage) terrainPage.classList.remove("hidden");
+    });
+  }
+
+});
