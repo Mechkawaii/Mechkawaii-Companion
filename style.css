@@ -1673,21 +1673,30 @@ body.page-character .brand-with-portrait{
 }
 /* ============================= */
 /*     Terrain flip animation    */
+/* (robuste mobile / Safari iOS) */
 /* ============================= */
 
 .tile{
   position: relative;
   perspective: 900px;
-  background: transparent; /* l'intérieur gère le visuel */
-  border: none;            /* option: on garde le border sur les faces */
+  -webkit-perspective: 900px;
+  background: transparent;
+  border: none;
 }
 
 .tile-inner{
   width: 100%;
   height: 100%;
   position: relative;
+
   transform-style: preserve-3d;
-  transition: transform 420ms cubic-bezier(0.2, 1.2, 0.2, 1);
+  -webkit-transform-style: preserve-3d;
+
+  transform: translateZ(0); /* aide Safari */
+  -webkit-transform: translateZ(0);
+
+  transition: transform 480ms cubic-bezier(0.2, 1.2, 0.2, 1);
+  -webkit-transition: -webkit-transform 480ms cubic-bezier(0.2, 1.2, 0.2, 1);
   transition-delay: var(--delay, 0ms);
 }
 
@@ -1697,13 +1706,15 @@ body.page-character .brand-with-portrait{
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--border);
+
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
   display: grid;
   place-items: center;
 }
 
 .tile-front{
-  /* Dos de carte (simple, style “panel”) */
   background:
     radial-gradient(220px 140px at 20% 10%, rgba(255, 210, 0, 0.10), transparent 60%),
     radial-gradient(220px 140px at 80% 20%, rgba(61, 220, 151, 0.08), transparent 60%),
@@ -1720,7 +1731,8 @@ body.page-character .brand-with-portrait{
 }
 
 .tile-back{
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(0);
+  -webkit-transform: rotateY(180deg) translateZ(0);
   background: rgba(255,255,255,0.05);
 }
 
@@ -1733,12 +1745,13 @@ body.page-character .brand-with-portrait{
 
 /* état retourné */
 .tile.flipped .tile-inner{
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(0);
+  -webkit-transform: rotateY(180deg) translateZ(0);
 }
 
-/* accessibilité */
 @media (prefers-reduced-motion: reduce){
   .tile-inner{
     transition: none !important;
+    -webkit-transition: none !important;
   }
 }
