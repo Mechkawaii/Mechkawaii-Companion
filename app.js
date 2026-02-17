@@ -1557,30 +1557,41 @@ function generateBaseMap(){
 function renderTerrain(){
   const letters = ["A","B","C","D","E","F","G"];
 
-  document.querySelectorAll(".tile").forEach((tile, i) => {
+  document.querySelectorAll(".tile").forEach((tile) => {
     const x = letters.indexOf(tile.dataset.x);
     const y = parseInt(tile.dataset.y) - 1;
 
     const type = terrainModel[y][x];
 
-    // reset + contenu
-    tile.classList.remove("tile-appear");
+    // reset
+    tile.classList.remove("flipped");
     tile.innerHTML = "";
+
+    // structure flip
+    const inner = document.createElement("div");
+    inner.className = "tile-inner";
+
+    const front = document.createElement("div");
+    front.className = "tile-face tile-front";
+
+    const back = document.createElement("div");
+    back.className = "tile-face tile-back";
 
     const img = document.createElement("img");
     img.src = `./assets/terrain/${type}.png`;
-    tile.appendChild(img);
+    img.alt = type;
 
-    // cascade: délai basé sur la position (diagonale)
-    const delay = (x + y) * 35; // ajuste 25–60ms selon ton goût
+    back.appendChild(img);
+    inner.appendChild(front);
+    inner.appendChild(back);
+    tile.appendChild(inner);
+
+    // cascade (diagonale)
+    const delay = (x + y) * 45; // ajuste 25–70ms selon ton goût
     tile.style.setProperty("--delay", `${delay}ms`);
 
-    // déclenche l'apparition (au prochain frame)
-    requestAnimationFrame(() => tile.classList.add("tile-appear"));
+    // déclenche flip au prochain frame
+    requestAnimationFrame(() => tile.classList.add("flipped"));
   });
 }
-
-document.getElementById("generateMapBtn")?.addEventListener("click", () => {
-  generateBaseMap();
-});
 
