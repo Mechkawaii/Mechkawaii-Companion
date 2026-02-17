@@ -1658,93 +1658,83 @@ let CURRENT_PRESET_ID = null;
 const PRESET_MAPS = [
   {
     id: "01",
-    title: { fr: "Giga Centrale Électrique⚡️", en: "Giga Power Plant ⚡️" },
-    lore: {
-      fr: "L’une des plus vastes centrales d’énergie de l’univers Mechkawaii. Ces installations colossales alimentent les métropoles grouillantes de vie et font tourner l’infrastructure des mégacités. Mais leur importance en fait aussi des cibles stratégiques. Les Prodromes, toujours en quête de chaos, cherchent régulièrement à saboter ou capturer ces centrales pour plonger les villes dans l’obscurité… et affaiblir la résistance des habitants.",
-      en: "One of the largest power plants in the Mechkawaii universe. These colossal installations feed bustling megacities and keep the whole infrastructure running. But that importance makes them prime targets. The Prodromes—always hungry for chaos—regularly attempt to sabotage or seize the plant to plunge cities into darkness… and weaken the resistance."
-    },
-    img: "./assets/terrain/presets/01_Giga centrale électrique.png"
+    title_fr: "Giga Centrale Électrique ⚡",
+    title_en: "Giga Power Plant ⚡",
+    lore_fr: "L’une des plus vastes centrales d’énergie de l’univers Mechkawaii. Ces installations colossales alimentent les métropoles et font tourner l’infrastructure des mégacités. Les Prodromes cherchent à les saboter pour plonger les villes dans l’obscurité.",
+    lore_en: "One of the largest power plants in the Mechkawaii universe. These colossal facilities power entire megacities. The Prodromes seek to sabotage them and plunge cities into darkness.",
+    img: "./assets/terrain/presets/01.png"
   },
   {
     id: "02",
-    title: { fr: "Grande Route Logistique 🚚", en: "Grand Logistics Highway 🚚" },
-    lore: {
-      fr: "Principaux axes d’approvisionnement. Ces immenses routes industrielles transportent en continu des cargaisons précieuses : matériaux de construction, pièces mécaniques et modules d’armement destinés aux gigantesques Génématrices – ces machines titanesques capables d’imprimer bâtiments, infrastructures et même parties d’unités de combat. Mais une route si cruciale attire forcément les convoitises. Les Prodromes savent que frapper ici, c’est bloquer toute une chaîne de production. Embuscades, pillages et sabotages transforment fréquemment ce corridor en champ de bataille.",
-      en: "Major supply arteries. These massive industrial highways constantly move valuable cargo: building materials, mechanical parts, and weapon modules bound for the giant Genematrices—titanic machines able to print buildings, infrastructure, and even combat unit components. A route this critical inevitably draws attacks. The Prodromes know that striking here can jam an entire production chain—turning the corridor into a battlefield of ambushes, raids, and sabotage."
-    },
-    img: "./assets/terrain/presets/02_Grande Route Logistique.png"
+    title_fr: "Grande Route Logistique 🚚",
+    title_en: "Grand Logistics Route 🚚",
+    lore_fr: "Principal axe d’approvisionnement transportant matériaux et modules d’armement. Les Prodromes frappent ici pour bloquer la production.",
+    lore_en: "Main supply route transporting materials and weapon modules. The Prodromes strike here to disrupt production.",
+    img: "./assets/terrain/presets/02.png"
   },
   {
     id: "03",
-    title: { fr: "La Zone Cendrée 🌑", en: "The Ashen Zone 🌑" },
-    lore: {
-      fr: "Les vestiges d’un quartier entier réduit en poussière. Les façades calcinées tiennent à peine debout, et un voile gris recouvre chaque ruelle. Le silence est seulement brisé par l’écho métallique des pas et le craquement des débris qui s’effondrent. Les Prodromes aiment s’y aventurer car les cendres opaques brouillent la visibilité et masquent leurs mouvements.",
-      en: "The remains of a whole district turned to dust. Charred facades barely stand, and a grey veil coats every alley. Silence is broken only by metallic footsteps and collapsing debris. The Prodromes favor this area because the opaque ash ruins visibility and hides their movements."
-    },
-    img: "./assets/terrain/presets/03_La Zone Cendrée.png"
+    title_fr: "La Zone Cendrée 🌑",
+    title_en: "Ashen Zone 🌑",
+    lore_fr: "Vestiges d’un quartier réduit en cendres. La visibilité y est brouillée, idéale pour les embuscades Prodromes.",
+    lore_en: "Ruins of a district reduced to ashes. Poor visibility makes it perfect for Prodrome ambushes.",
+    img: "./assets/terrain/presets/03.png"
   },
   {
     id: "04",
-    title: { fr: "L’Usine Silencieuse 🏭", en: "The Silent Factory 🏭" },
-    lore: {
-      fr: "Immense bâtiment industriel déserté, ses halls obscurs sont remplis de poutres tordues et de machines éventrées. L’air est chargé de poussière et de suie, vestiges d’une activité qui ne reprendra jamais. Les Mechkawaii la protège car ses ruines recèlent encore des ressources rares, pièces mécaniques et énergie dormante.",
-      en: "A vast abandoned industrial complex. Its dark halls are packed with twisted beams and gutted machines, the air heavy with dust and soot—remains of activity that will never return. The Mechkawaii defend it because its ruins still hide rare resources, mechanical parts, and dormant energy."
-    },
-    img: "./assets/terrain/presets/04_L’Usine Silencieuse.png"
+    title_fr: "L’Usine Silencieuse 🏭",
+    title_en: "Silent Factory 🏭",
+    lore_fr: "Immense usine abandonnée contenant encore des ressources rares et de l’énergie dormante.",
+    lore_en: "A massive abandoned factory still hiding rare resources and dormant energy.",
+    img: "./assets/terrain/presets/04.png"
   },
   {
     id: "05",
-    title: { fr: "Le Cratère Noir ⚫", en: "The Black Crater ⚫" },
-    lore: {
-      fr: "Une explosion titanesque a éventré cette zone, ne laissant qu’un gouffre béant bordé de décombres noircis. Tout autour, les bâtiments sont tordus comme des silhouettes en souffrance, rappelant la violence de l’attaque. Les Prodromes y voient un symbole de destruction à entretenir, un rappel constant de leur puissance et de leur menace.",
-      en: "A titanic blast tore this area open, leaving a yawning pit ringed with blackened rubble. Nearby buildings twist like wounded silhouettes, a reminder of the strike’s violence. The Prodromes see it as a symbol of destruction to maintain—a constant reminder of their power and threat."
-    },
-    img: "./assets/terrain/presets/05_Le Cratère noir.png"
+    title_fr: "Le Cratère Noir ⚫",
+    title_en: "Black Crater ⚫",
+    lore_fr: "Un gouffre béant laissé par une explosion titanesque. Symbole de destruction entretenu par les Prodromes.",
+    lore_en: "A massive crater left by a colossal explosion. A symbol of destruction maintained by the Prodromes.",
+    img: "./assets/terrain/presets/05.png"
   },
   {
     id: "06",
-    title: { fr: "La Gare Fracturée 🚉", en: "The Shattered Station 🚉" },
-    lore: {
-      fr: "Les rails sont tordus, les wagons éventrés gisent de travers et l'édifice monumentale s’est effondrée. L’endroit résonne encore du vacarme des trains disparus. Les Prodromes attaquent cette zone pour couper les réseaux de transport et isoler les cités entre elles.",
-      en: "Rails are twisted, gutted cars lie scattered, and the monumental station has collapsed. The place still seems to echo with the roar of vanished trains. The Prodromes strike here to sever transport networks and isolate cities from one another."
-    },
-    img: "./assets/terrain/presets/06_La Gare Fracturée.png"
+    title_fr: "La Gare Fracturée 🚉",
+    title_en: "Shattered Station 🚉",
+    lore_fr: "Réseaux de transport détruits. Zone stratégique pour isoler les cités.",
+    lore_en: "Transport networks destroyed. A strategic point to isolate cities.",
+    img: "./assets/terrain/presets/06.png"
   },
   {
     id: "07",
-    title: { fr: "La Place du Souvenir 🕯️", en: "Memorial Square 🕯️" },
-    lore: {
-      fr: "Une grande esplanade autrefois dédiée aux cérémonies, aujourd’hui ravagée par des impacts d’obus. Les statues sont décapitées et les pavés éclatés par les flammes. Les Prodromes aiment y frapper pour effacer les symboles de la mémoire collective et marquer leur domination psychologique.",
-      en: "A broad plaza once reserved for ceremonies, now ravaged by shell impacts. Statues are beheaded and paving stones shattered by fire. The Prodromes love to strike here to erase symbols of collective memory and stamp their psychological dominance."
-    },
-    img: "./assets/terrain/presets/07_La Place du Souvenir.png"
+    title_fr: "La Place du Souvenir 🕯",
+    title_en: "Memorial Plaza 🕯",
+    lore_fr: "Ancienne esplanade cérémonielle ravagée par les impacts. Les Prodromes cherchent à effacer la mémoire collective.",
+    lore_en: "A former ceremonial plaza now shattered by impacts. The Prodromes aim to erase collective memory.",
+    img: "./assets/terrain/presets/07.png"
   },
   {
     id: "08",
-    title: { fr: "La Fosse d’Assemblage 🏭", en: "The Assembly Pit 🏭" },
-    lore: {
-      fr: "Vestige d’une usine souterraine, ses chaînes de montage sont figées et ses fosses grouillent de carcasses de mechas inachevés. Les Prodromes cherchent à s’en emparer pour réactiver les machines et détourner leur production.",
-      en: "A relic of an underground factory. Its assembly lines are frozen, and its pits teem with the carcasses of unfinished mechas. The Prodromes want to seize it to restart the machines and divert the production."
-    },
-    img: "./assets/terrain/presets/08_La Fosse d’Assemblage.png"
+    title_fr: "La Fosse d’Assemblage 🏭",
+    title_en: "Assembly Pit 🏭",
+    lore_fr: "Usine souterraine figée, remplie de carcasses de mechas inachevés.",
+    lore_en: "A frozen underground factory filled with unfinished mech carcasses.",
+    img: "./assets/terrain/presets/08.png"
   },
   {
     id: "09",
-    title: { fr: "Quartiers résidentiels 🏢", en: "Residential Districts 🏢" },
-    lore: {
-      fr: "Des gratte-ciel éventrés, dont la moitié des étages a disparu, laissant des squelettes métalliques. Ses ruines dominent encore toute la zone. Les Prodromes en font un bastion, utilisant sa hauteur comme poste d’observation pour contrôler la ville.",
-      en: "Gutted skyscrapers with half their floors missing, leaving metallic skeletons behind. The ruins still dominate the area. The Prodromes turn it into a bastion, using the height as an observation post to control the city."
-    },
-    img: "./assets/terrain/presets/09_Quartiers résidentiels.png"
+    title_fr: "Quartiers Résidentiels 🏢",
+    title_en: "Residential District 🏢",
+    lore_fr: "Gratte-ciel éventrés dominant la zone. Poste d’observation idéal.",
+    lore_en: "Shattered skyscrapers dominating the area. A perfect observation post.",
+    img: "./assets/terrain/presets/09.png"
   },
   {
     id: "10",
-    title: { fr: "Les Grandes Archives", en: "The Great Archives" },
-    lore: {
-      fr: "Colossales bâtisses autrefois dédiées au savoir, aujourd’hui ouvertes en deux par une frappe orbitale. Des piles de tablettes de données s’entassent dans les couloirs noircis. Les Mechkawaii cherchent à la protéger car elle renferme encore des archives et des plans techniques cruciaux pour la reconstruction.",
-      en: "Colossal buildings once devoted to knowledge, now split open by an orbital strike. Stacks of data tablets pile up in blackened corridors. The Mechkawaii try to protect it because it still contains archives and technical blueprints crucial for rebuilding."
-    },
-    img: "./assets/terrain/presets/10_Les Grandes Archives.png"
+    title_fr: "Les Grandes Archives 📚",
+    title_en: "Grand Archives 📚",
+    lore_fr: "Bâtisses du savoir ouvertes par une frappe orbitale. Les Mechkawaii cherchent à protéger les données restantes.",
+    lore_en: "Knowledge buildings torn open by orbital strike. The Mechkawaii seek to protect remaining data.",
+    img: "./assets/terrain/presets/10.png"
   }
 ];
 
