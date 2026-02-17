@@ -1464,6 +1464,9 @@ const terrainBackBtn = document.getElementById("terrainBackBtn");
 const splash = document.getElementById("splash");
 
 terrainBtn?.addEventListener("click", () => {
+  // ✅ Important : rend visibles topbar/cards malgré body.has-splash
+  document.documentElement.classList.add("splash-dismissed");
+
   splash.style.display = "none";
   terrainPage.classList.remove("hidden");
 });
@@ -1471,4 +1474,8 @@ terrainBtn?.addEventListener("click", () => {
 terrainBackBtn?.addEventListener("click", () => {
   terrainPage.classList.add("hidden");
   splash.style.display = "block";
+
+  // ✅ On revient au comportement normal du splash
+  document.documentElement.classList.remove("splash-dismissed");
 });
+
