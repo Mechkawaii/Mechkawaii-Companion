@@ -1733,8 +1733,139 @@ body.page-character .brand-with-portrait{
   border-radius: clamp(6px, 1.2vw, 12px);
 }
 
+/* =========================================================
+   TERRAIN LEGEND (with visuals)
+   ========================================================= */
 
+#terrainPage .terrain-legend{
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(19, 19, 26, 0.55);
+}
 
+#terrainPage .terrain-legend h3{
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  letter-spacing: 0.3px;
+}
+
+#terrainPage .legend-grid{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+@media (min-width: 720px){
+  #terrainPage .legend-grid{
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+#terrainPage .legend-item{
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(11, 11, 14, 0.45);
+}
+
+#terrainPage .terrain-sample{
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  flex: 0 0 auto;
+  position: relative;
+  overflow: hidden;
+  background: rgba(255,255,255,0.04);
+}
+
+#terrainPage .legend-title{
+  font-weight: 900;
+  letter-spacing: 0.2px;
+}
+
+#terrainPage .legend-desc{
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  margin-top: 2px;
+}
+
+/* Sample visuals (pure CSS, no assets required) */
+
+/* Vierge: subtle clean ground */
+#terrainPage .sample-blank{
+  background:
+    radial-gradient(90px 60px at 20% 20%, rgba(255,210,0,0.12), transparent 60%),
+    radial-gradient(90px 60px at 80% 80%, rgba(61,220,151,0.10), transparent 60%),
+    rgba(255,255,255,0.04);
+}
+
+/* Accidenté: diagonal rough pattern */
+#terrainPage .sample-rough{
+  background:
+    repeating-linear-gradient(135deg,
+      rgba(255,255,255,0.06) 0 6px,
+      rgba(0,0,0,0.0) 6px 12px
+    ),
+    rgba(255,255,255,0.03);
+}
+
+/* Ville: blocky tiles */
+#terrainPage .sample-city::before{
+  content:"";
+  position:absolute;
+  inset: 8px;
+  border-radius: 10px;
+  background:
+    linear-gradient(rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06) inset;
+}
+#terrainPage .sample-city::after{
+  content:"";
+  position:absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px) 0 0/14px 14px,
+    linear-gradient(0deg, rgba(255,255,255,0.08) 1px, transparent 1px) 0 0/14px 14px;
+  opacity: 0.55;
+}
+
+/* Route: a thick line with center marking */
+#terrainPage .sample-road::before{
+  content:"";
+  position:absolute;
+  left: 10px;
+  right: 10px;
+  top: 50%;
+  height: 14px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.10);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.10) inset;
+}
+#terrainPage .sample-road::after{
+  content:"";
+  position:absolute;
+  left: 16px;
+  right: 16px;
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(255,210,0,0.65) 0 6px,
+      transparent 6px 12px
+    );
+  opacity: 0.9;
+}
 /* =============================
    Terrain Legend (images)
 ============================= */
@@ -1769,244 +1900,4 @@ body.page-character .brand-with-portrait{
   margin: 4px 0 0 0;
   font-size: 14px;
   color: var(--muted);
-}
-
-/* =============================
-   Preset maps: carousel + view
-============================= */
-
-.preset-overlay{
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.72);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 18px;
-  z-index: 9999;
-}
-
-.preset-modal{
-  width: min(980px, 100%);
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
-}
-
-.preset-modal-head{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 14px;
-  background: rgba(255,255,255,0.03);
-  border-bottom: 1px solid var(--border);
-}
-
-.preset-modal-title{
-  font-weight: 800;
-  letter-spacing: .5px;
-}
-
-.preset-carousel{
-  display: flex;
-  gap: 14px;
-  overflow-x: auto;
-  padding: 14px;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-}
-
-.preset-card{
-  scroll-snap-align: start;
-  flex: 0 0 min(340px, 85vw);
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px;
-  cursor: pointer;
-  transition: transform .15s ease;
-}
-
-.preset-card:active{ transform: scale(0.98); }
-
-.preset-card h4{
-  margin: 0 0 8px 0;
-  font-size: 16px;
-}
-
-.preset-card p{
-  margin: 0;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.35;
-}
-
-.preset-thumb{
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  object-fit: cover;
-  margin-top: 10px;
-}
-
-.preset-hint{
-  padding: 0 14px 14px 14px;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.preset-info{
-  margin-top: 14px;
-  padding: 12px 12px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: rgba(255,255,255,0.04);
-}
-
-.preset-info-head{
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.preset-title{
-  font-weight: 900;
-  letter-spacing: .3px;
-}
-
-.preset-lore{
-  margin-top: 6px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.35;
-}
-
-.preset-map-img{
-  width: 100%;
-  max-width: 720px;
-  display: block;
-  margin: 0 auto;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  box-shadow: 0 18px 50px rgba(0,0,0,0.25);
-}
-
-
-/* Hard fix: ensure preset overlay always covers screen (iOS/Safari safe) */
-.preset-overlay{
-  position: fixed !important;
-  top: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  z-index: 20000 !important;
-}
-/* =============================
-   PRESET MAPS — HARD FIX (fullscreen + carousel)
-   Colle ce bloc tout en bas de style.css
-============================= */
-
-/* Overlay plein écran (même si d'autres styles existent déjà) */
-.preset-overlay{
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 99999 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 18px !important;
-  background: rgba(0,0,0,0.72) !important;
-}
-
-/* Modal */
-.preset-modal{
-  width: min(980px, 100%) !important;
-  max-height: min(78vh, 680px) !important;
-  overflow: hidden !important;
-  border-radius: 18px !important;
-  border: 1px solid var(--border, rgba(255,255,255,.12)) !important;
-  background: var(--panel, #15151c) !important;
-  box-shadow: 0 24px 70px rgba(0,0,0,0.55) !important;
-  display: flex !important;
-  flex-direction: column !important;
-}
-
-.preset-modal-head{
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 12px !important;
-  padding: 14px 14px !important;
-  border-bottom: 1px solid var(--border, rgba(255,255,255,.12)) !important;
-  background: rgba(255,255,255,0.03) !important;
-}
-
-.preset-modal-title{
-  font-weight: 900 !important;
-  letter-spacing: .4px !important;
-}
-
-/* Carousel */
-.preset-carousel{
-  display: flex !important;
-  gap: 14px !important;
-  overflow-x: auto !important;
-  overflow-y: hidden !important;
-  padding: 14px !important;
-  scroll-snap-type: x mandatory !important;
-  -webkit-overflow-scrolling: touch !important;
-}
-
-.preset-card{
-  scroll-snap-align: start !important;
-  flex: 0 0 min(360px, 84vw) !important;
-  background: rgba(255,255,255,0.04) !important;
-  border: 1px solid var(--border, rgba(255,255,255,.12)) !important;
-  border-radius: 16px !important;
-  padding: 12px !important;
-  cursor: pointer !important;
-  user-select: none !important;
-  transition: transform .12s ease !important;
-}
-
-.preset-card:active{
-  transform: scale(0.98) !important;
-}
-
-.preset-card h4{
-  margin: 0 0 8px 0 !important;
-  font-size: 16px !important;
-}
-
-.preset-card p{
-  margin: 0 0 10px 0 !important;
-  color: var(--muted, rgba(255,255,255,.75)) !important;
-  font-size: 13px !important;
-  line-height: 1.35 !important;
-}
-
-.preset-thumb{
-  width: 100% !important;
-  aspect-ratio: 1 / 1 !important;
-  object-fit: cover !important;
-  border-radius: 12px !important;
-  border: 1px solid var(--border, rgba(255,255,255,.12)) !important;
-}
-
-.preset-hint{
-  padding: 0 14px 14px 14px !important;
-  color: var(--muted, rgba(255,255,255,.75)) !important;
-  font-size: 12px !important;
-}
-
-/* Quand l'overlay est hidden, on le cache vraiment */
-.preset-overlay.hidden{
-  display: none !important;
 }
