@@ -1641,3 +1641,10 @@ body.page-character .brand-with-portrait{
   object-fit: cover;
   display: block;
 }
+/* Terrain Generator: keep flip animation even with reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  #terrainGrid .tile-inner{
+    transition-duration: 480ms !important;
+    -webkit-transition-duration: 480ms !important;
+  }
+}
