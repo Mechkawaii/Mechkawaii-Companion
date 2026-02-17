@@ -1523,4 +1523,57 @@ function createEmptyGrid(){
 terrainBtn?.addEventListener("click", () => {
   createEmptyGrid();
 });
+// ===============================
+// Terrain Model
+// ===============================
+
+const TERRAIN_TYPES = {
+  VIERGE: "vierge",
+  VILLE: "ville",
+  ACCIDENTE: "accidente",
+  ROUTE_DROITE: "route_droite",
+  ROUTE_ANGLE: "route_angle",
+  ROUTE_CROISEMENT: "route_croisement",
+  EVENEMENT: "evenement",
+  LOCALISATION: "localisation"
+};
+
+let terrainModel = [];
+function generateBaseMap(){
+
+  // Crée matrice 7x7 remplie de vierge
+  terrainModel = Array.from({length:7}, () =>
+    Array.from({length:7}, () => TERRAIN_TYPES.VIERGE)
+  );
+
+  // Localisation en A1 (0,0)
+  terrainModel[0][0] = TERRAIN_TYPES.LOCALISATION;
+
+  // Événement en D4 (3,3)
+  terrainModel[3][3] = TERRAIN_TYPES.EVENEMENT;
+
+  renderTerrain();
+}
+function renderTerrain(){
+
+  const letters = ["A","B","C","D","E","F","G"];
+
+  document.querySelectorAll(".tile").forEach(tile => {
+
+    const x = letters.indexOf(tile.dataset.x);
+    const y = parseInt(tile.dataset.y) - 1;
+
+    const type = terrainModel[y][x];
+
+    tile.innerHTML = "";
+
+    const img = document.createElement("img");
+    img.src = `./assets/terrain/${type}.png`;
+    tile.appendChild(img);
+
+  });
+}
+document.getElementById("generateMapBtn")?.addEventListener("click", () => {
+  generateBaseMap();
+});
 
