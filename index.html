@@ -135,7 +135,7 @@
             
             <button id="terrainBtn" class="mkw-btn">
                <img src="./assets/ui/btn_play.svg" alt="" aria-hidden="true">
-               <span class="mkw-label">TERRAIN</span>
+               <span class="mkw-label" data-i18n="splash_terrain">TERRAIN</span>
             </button>
 
             <a class="mkw-link" href="https://mechkawaii.com" target="_blank" rel="noopener">
@@ -172,19 +172,18 @@
   <div class="container">
     <div class="topbar">
       <div class="brand">
-        <div class="title">GÉNÉRATEUR DE TERRAIN</div>
-        <div class="subtitle">Grille 7×7</div>
+        <div class="title" data-i18n="terrain_title">GÉNÉRATEUR DE TERRAIN</div>
       </div>
       <div class="controls">
-        <button id="terrainBackBtn">← Retour</button>
+        <button id="terrainBackBtn" data-i18n="terrain_back">← Retour</button>
       </div>
     </div>
 
     <div id="terrainApp" class="terrain-wrapper">
 
   <div class="terrain-controls">
-    <button id="generateMapBtn" class="btn-accent">Générer une map</button>
-    <button id="presetMapBtn">Maps préconstruites</button>
+    <button id="generateMapBtn" class="btn-accent" data-i18n="terrain_generate">Générer un terrain</button>
+<button id="presetMapBtn" data-i18n="terrain_presets">Terrain préconstruits</button>
   </div>
 
   <div class="terrain-grid-wrapper">
@@ -192,37 +191,36 @@
   </div>
 
   <div class="terrain-legend">
-  <h3>Fonctions des terrains</h3>
-
+  <h3 data-i18n="terrain_legend_title">Fonctions des terrains</h3>
   <div class="legend-item">
     <img src="./assets/terrain/vierge.png" alt="Terrain vierge">
     <div>
-      <b>Vierge</b>
-      <p>Mouvements et tirs normaux lorsqu’une unité se trouve dessus.</p>
+      <b data-i18n="terrain_type_vierge">Vierge</b>
+      <p data-i18n="terrain_desc_vierge">Mouvements et tirs normaux lorsqu’une unité se trouve dessus.</p>
     </div>
   </div>
 
   <div class="legend-item">
     <img src="./assets/terrain/accidente.png" alt="Terrain accidenté">
     <div>
-      <b>Accidenté</b>
-      <p>Les tirs à distance sont interdits. Le corps-à-corps est possible.</p>
+      <b data-i18n="terrain_type_accidente">Accidenté</b>
+      <p data-i18n="terrain_desc_accidente">Les tirs à distance sont interdits. Le corps-à-corps est possible.</p>
     </div>
   </div>
 
   <div class="legend-item">
     <img src="./assets/terrain/ville.png" alt="Ville">
     <div>
-      <b>Ville</b>
-      <p>Les villes doivent être contournées, bloquent la ligne de mire des tirs à distance.</p>
+      <b data-i18n="terrain_type_ville">Ville</b>
+      <p data-i18n="terrain_desc_ville">Les villes doivent être contournées, bloquent la ligne de mire des tirs à distance.</p>
     </div>
   </div>
 
   <div class="legend-item">
     <img src="./assets/terrain/route_croisement.png" alt="Route">
     <div>
-      <b>Route</b>
-      <p>Quand une unité se trouve sur un terrain route, elle a un déplacement gratuit au tour suivant en plus de son action. La forme de la route n’influe pas la direction des déplacements.</p>
+      <b data-i18n="terrain_type_route">Route</b>
+      <p data-i18n="terrain_desc_route">Quand une unité se trouve sur un terrain route, elle a un déplacement gratuit au tour suivant en plus de son action. La forme de la route n’influe pas la direction des déplacements.</p>
     </div>
   </div>
 </div>
