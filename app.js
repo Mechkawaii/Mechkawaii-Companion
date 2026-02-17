@@ -1752,13 +1752,13 @@ function openPresetCarousel(){
   carousel.innerHTML = PRESET_MAPS.map(m => {
     const title = t(m.title, lang);
     const lore = t(m.lore, lang);
-    return \`
-      <div class="preset-card" data-preset="\${m.id}">
-        <h4>\${title}</h4>
-        <p>\${lore}</p>
-        <img class="preset-thumb" src="\${m.img}" alt="\${title}">
+    return `
+      <div class="preset-card" data-preset="${m.id}">
+        <h4>${title}</h4>
+        <p>${lore}</p>
+        <img class="preset-thumb" src="${m.img}" alt="${title}">
       </div>
-    \`;
+    `;
   }).join("");
 
   overlay.classList.remove("hidden");
