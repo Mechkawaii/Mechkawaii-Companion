@@ -154,15 +154,7 @@
           <div class="brand">
             <div class="title" id="presetsPageTitle">TERRAINS PRÉCONSTRUITS</div>
           </div>
-          <div class="controls">
-            <nav id="mkw-breadcrumb-presets" style="display:flex;align-items:center;gap:8px;">
-              <button class="bc-step bc-done" id="presetsGoHome">Accueil</button>
-              <span class="bc-sep">></span>
-              <button class="bc-step bc-done" id="presetsGoTerrain">Terrain</button>
-              <span class="bc-sep">></span>
-              <button class="bc-step bc-current" disabled>Maps préconstruites</button>
-            </nav>
-          </div>
+          <div class="controls"></div>
         </div>
 
         <div class="presets-carousel-section">
@@ -302,6 +294,50 @@
     if (titleEl) titleEl.textContent = tr("TERRAINS PRÉCONSTRUITS", "PRESET TERRAINS");
     const keyHint = document.getElementById("presetsKeyHint");
     if (keyHint) keyHint.textContent = tr("← → pour naviguer · clic pour retourner", "← → to navigate · click to flip");
+
+    // Injecter le fil d'ariane sous la topbar
+    if (!page.querySelector("#mkw-breadcrumb-presets")) {
+      const bc = document.createElement("nav");
+      bc.id = "mkw-breadcrumb-presets";
+      bc.style.cssText = "display:flex;align-items:center;gap:8px;margin-top:14px;";
+
+      const homeBtn = document.createElement("button");
+      homeBtn.className = "bc-step bc-done";
+      homeBtn.id = "presetsGoHome";
+      homeBtn.textContent = "Accueil";
+
+      const sep1 = document.createElement("span");
+      sep1.className = "bc-sep";
+      sep1.textContent = ">";
+
+      const terrainBtn = document.createElement("button");
+      terrainBtn.className = "bc-step bc-done";
+      terrainBtn.id = "presetsGoTerrain";
+      terrainBtn.textContent = "Terrain";
+
+      const sep2 = document.createElement("span");
+      sep2.className = "bc-sep";
+      sep2.textContent = ">";
+
+      const currentLabel = document.createElement("button");
+      currentLabel.className = "bc-step bc-current";
+      currentLabel.textContent = "Maps préconstruites";
+      currentLabel.disabled = true;
+
+      bc.appendChild(homeBtn);
+      bc.appendChild(sep1);
+      bc.appendChild(terrainBtn);
+      bc.appendChild(sep2);
+      bc.appendChild(currentLabel);
+
+      const container = page.querySelector(".container");
+      const topbar = container?.querySelector(".topbar");
+      if (topbar?.nextSibling) {
+        container.insertBefore(bc, topbar.nextSibling);
+      } else if (container) {
+        container.appendChild(bc);
+      }
+    }
 
     currentIndex = 0;
     page.classList.remove("hidden");
