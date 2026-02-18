@@ -113,6 +113,10 @@
   transition: width 0.3s ease;
 }
 .char-card-hpbar-fill.low { background: var(--danger); }
+.char-card.camp-mechkawaii .char-card-hpbar-fill { background: #FF9F50; }
+.char-card.camp-prodrome   .char-card-hpbar-fill { background: #86F777; }
+.char-card.camp-mechkawaii .char-card-hpbar-fill.low { background: var(--danger); }
+.char-card.camp-prodrome   .char-card-hpbar-fill.low { background: var(--danger); }
 
 /* Mobile : colonne si très petit écran */
 @media (max-width: 480px) {
