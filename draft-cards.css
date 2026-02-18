@@ -1,0 +1,148 @@
+/* =========================================================
+   MECHKAWAII — Sélection par cartes (draft-cards.css)
+   ========================================================= */
+
+/* === Grille des 5 cartes sur une ligne =================== */
+#draftList.draft-upgraded {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  padding: 4px 0 8px;
+  overflow-x: auto;
+}
+
+/* === Carte ================================================ */
+.draft-card {
+  flex: 1;
+  min-width: 120px;
+  max-width: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  border-radius: 16px;
+  border: 2px solid var(--border);
+  background: rgba(19, 19, 26, 0.85);
+  padding: 12px 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+  user-select: none;
+}
+
+.draft-card:hover {
+  border-color: rgba(255, 159, 80, 0.5);
+  transform: translateY(-3px);
+}
+
+.draft-card.selected {
+  border-color: #FF9F50;
+  background: rgba(255, 159, 80, 0.08);
+  box-shadow: 0 0 20px rgba(255, 159, 80, 0.2);
+}
+
+/* === Image plein corps ==================================== */
+.draft-card-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.draft-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  display: block;
+  transition: transform 0.2s;
+}
+
+.draft-card:hover .draft-card-img {
+  transform: scale(1.04);
+}
+
+.draft-card-initial {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 36px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.15);
+}
+
+/* === Checkmark =========================================== */
+.draft-card-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #FF9F50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 2;
+}
+
+.draft-card-check svg {
+  width: 14px;
+  height: 14px;
+  color: #000;
+}
+
+.draft-card.selected .draft-card-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* === Infos =============================================== */
+.draft-card-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.draft-card-class-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.draft-card-name {
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.draft-card.selected .draft-card-name {
+  color: #FF9F50;
+}
+
+.draft-card-class-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* === Bouton confirmer ==================================== */
+.draft-btn-wrap {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+}
+
+.draft-confirm-btn {
+  transition: opacity 0.2s;
+}
