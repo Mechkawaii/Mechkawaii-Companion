@@ -32,6 +32,7 @@
      Étapes
   ------------------------------------------------------- */
   const STEPS = [
+    { label_fr: "Accueil",       label_en: "Home",    step: 0 },
     { label_fr: "Configuration", label_en: "Setup",   step: 1 },
     { label_fr: "Unités",        label_en: "Units",   step: 2 },
     { label_fr: "Gestion",       label_en: "Game",    step: 3 },
@@ -81,7 +82,11 @@
       btn.className = "bc-step";
       btn.textContent = label;
 
-      if (s.step < currentStep) {
+      if (s.step === 0) {
+        // Accueil toujours cliquable sauf si on est au step 0
+        btn.classList.add("bc-done");
+        btn.addEventListener("click", () => goToStep(0));
+      } else if (s.step < currentStep) {
         btn.classList.add("bc-done");
         btn.addEventListener("click", () => goToStep(s.step));
       } else if (s.step === currentStep) {
@@ -97,13 +102,20 @@
   }
 
   function goToStep(step) {
-    if (step === 1) {
+    if (step === 0) {
+      // Retour écran titre : tout effacer + reload
       localStorage.removeItem(PREFIX + "setup");
       localStorage.removeItem(PREFIX + "draft");
+      localStorage.removeItem(PREFIX + "splashDismissed");
+      location.reload();
+    } else if (step === 1) {
+      localStorage.removeItem(PREFIX + "setup");
+      localStorage.removeItem(PREFIX + "draft");
+      location.reload();
     } else if (step === 2) {
       localStorage.removeItem(PREFIX + "draft");
+      location.reload();
     }
-    location.reload();
   }
 
   function hideOldNavButtons() {
