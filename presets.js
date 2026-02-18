@@ -204,7 +204,6 @@
 
         <!-- Recto : texte -->
         <div class="preset-face preset-front" data-num="${p.id.padStart(2, "0")}" style="background-image: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.35) 100%), url('./assets/presets/bg/${p.id}.png')">
-          <div class="preset-emoji" aria-hidden="true">${p.emoji}</div>
           <div class="preset-lore-wrapper">
             <h2 class="preset-title">${title} <span class="title-emoji" aria-hidden="true">${p.emoji}</span></h2>
             ${paragraphs}
