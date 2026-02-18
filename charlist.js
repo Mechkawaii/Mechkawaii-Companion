@@ -1,14 +1,5 @@
 /* =========================================================
    MECHKAWAII — Liste de personnages enrichie (charlist.js)
-   Remplace l'écran vide (image 4) par des cartes visuelles.
-
-   Attend :
-   - c.images.portrait  → visuel plein corps du perso
-   - c.images.icon      → logo / icône de la classe (optionnel)
-
-   À inclure dans index.html après app.js :
-   <link rel="stylesheet" href="./charlist.css" />
-   <script src="./charlist.js" defer></script>
    ========================================================= */
 
 (function () {
@@ -31,26 +22,22 @@
     } catch (e) { return null; }
   }
 
-  /* -------------------------------------------------------
-     Observer : dès que #charList reçoit des .char,
-     on les remplace par nos cartes améliorées
-  ------------------------------------------------------- */
   function upgradeCharList() {
     const list = document.getElementById("charList");
     if (!list || list.children.length === 0) return;
-
-    // Déjà upgradé ?
     if (list.classList.contains("charlist-upgraded")) return;
 
-    // Les .char créés par app.js ont un attribut href
+    // Attendre que __cachedChars soit disponible
+    if (!window.__cachedChars || window.__cachedChars.length === 0) return;
+
     const links = [...list.querySelectorAll("a.char")];
     if (links.length === 0) return;
 
     list.classList.add("charlist-upgraded");
-    list.innerHTML = ""; // on vide et reconstruit
+    list.innerHTML = "";
 
     const lang = getLang();
-    const chars = window.__cachedChars || [];
+    const chars = window.__cachedChars;
 
     links.forEach(link => {
       const href = link.getAttribute("href") || "";
@@ -59,14 +46,10 @@
       const charId = decodeURIComponent(idMatch[1]);
       const c = chars.find(x => x.id === charId);
       if (!c) return;
-
       list.appendChild(buildCard(c, lang, href));
     });
   }
 
-  /* -------------------------------------------------------
-     Construire une carte personnage
-  ------------------------------------------------------- */
   function buildCard(c, lang, href) {
     const saved = getState(c.id);
     const hp    = saved?.hp ?? (c.hp?.max ?? 0);
@@ -79,15 +62,14 @@
     card.href = href;
     if (isKo) card.classList.add("is-ko");
 
-    /* ── Visuel plein corps (character_xxx.png) ── */
+    /* Visuel plein corps */
     const visual = document.createElement("div");
     visual.className = "char-card-visual";
 
-    const portrait = c.images?.full
-      || `./assets/characters/full_${c.id}.png`;
-    if (portrait) {
+    const fullSrc = c.images?.full;
+    if (fullSrc) {
       const img = document.createElement("img");
-      img.src = portrait;
+      img.src = fullSrc;
       img.alt = t(c.name, lang);
       img.className = "char-card-img";
       img.onerror = () => {
@@ -98,26 +80,21 @@
       visual.innerHTML = `<div class="char-card-initial">${t(c.name, lang).charAt(0)}</div>`;
     }
 
-    /* ── HP bar ── */
+    /* HP bar */
     const hpPct = maxHp > 0 ? (hp / maxHp) * 100 : 0;
     const hpBar = document.createElement("div");
     hpBar.className = "char-card-hpbar";
     hpBar.innerHTML = `<div class="char-card-hpbar-fill${hpPct <= 33 ? " low" : ""}" style="width:${hpPct}%"></div>`;
     visual.appendChild(hpBar);
 
-    /* ── Infos bas de carte ── */
+    /* Infos */
     const info = document.createElement("div");
     info.className = "char-card-info";
 
-    /* Logo de classe → assets/characters/classe_{nomclasse}.png */
-    const rawClass = (typeof c.class === "object" ? c.class.fr : c.class) || "";
-    const classSlug = rawClass.toLowerCase()
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // retire accents
-      .replace(/\s+/g, "_")
-      .replace(/[^a-z0-9_]/g, "");
-    const icon = `./assets/characters/classe_${classSlug}.png`;
-    const iconHtml = icon
-      ? `<img src="${icon}" alt="" class="char-card-class-icon" />`
+    /* Logo de classe via c.images.portrait */
+    const iconSrc = c.images?.portrait;
+    const iconHtml = iconSrc
+      ? `<img src="${iconSrc}" alt="" class="char-card-class-icon" onerror="this.style.display='none'" />`
       : "";
 
     info.innerHTML = `
@@ -130,23 +107,30 @@
 
     card.appendChild(visual);
     card.appendChild(info);
-
     return card;
   }
 
-  /* -------------------------------------------------------
-     Observer les modifications de #charList
-  ------------------------------------------------------- */
   function watch() {
     const list = document.getElementById("charList");
     if (!list) return;
 
-    const observer = new MutationObserver(() => upgradeCharList());
+    // Observer les mutations (app.js injecte les .char de manière async)
+    const observer = new MutationObserver(() => {
+      if (window.__cachedChars && window.__cachedChars.length > 0) {
+        upgradeCharList();
+      }
+    });
     observer.observe(list, { childList: true });
 
-    // Essai immédiat au cas où app.js a déjà rendu
-    upgradeCharList();
-    setTimeout(upgradeCharList, 400);
+    // Polling de sécurité (app.js est async, peut finir après nous)
+    let attempts = 0;
+    const poll = setInterval(() => {
+      attempts++;
+      if (window.__cachedChars && window.__cachedChars.length > 0) {
+        upgradeCharList();
+      }
+      if (attempts >= 20) clearInterval(poll);
+    }, 100);
   }
 
   if (document.readyState === "loading") {
