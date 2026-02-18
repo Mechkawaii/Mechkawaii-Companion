@@ -161,7 +161,8 @@
     newConfirm.addEventListener("click", () => {
       if (selected.size !== maxPick) return;
       localStorage.setItem(PREFIX + "draft", JSON.stringify({ activeIds: [...selected] }));
-      location.reload();
+      const firstId = [...selected][0];
+      location.href = `character.html?id=${encodeURIComponent(firstId)}`;
     });
 
     btnWrap.appendChild(newConfirm);
