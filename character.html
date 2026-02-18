@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mechkawaii — Fiche personnage</title>
   <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="./breadcrumb.css" />
 
   <style>
     /* ===========================
@@ -230,7 +231,7 @@
       <div style="display:flex; gap:10px;">
         <button id="resetBtn" class="btn-danger" data-i18n="reset_char">Réinitialiser</button>
       </div>
-      <button id="backBtn" data-i18n="back_list">← Retour à la liste</button>
+      <button id="backBtn" data-i18n="back_list" style="display:none;">← Retour à la liste</button>
     </div>
 
     <div id="error" class="footer-note" style="color:var(--danger); margin-top:16px;"></div>
@@ -243,5 +244,6 @@
 
   <script src="./app.js"></script>
   <script src="./tabs-all.js" defer></script>
+  <script src="./breadcrumb-character.js" defer></script>
 </body>
 </html>
