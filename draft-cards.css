@@ -29,15 +29,22 @@
   user-select: none;
 }
 
-.draft-card:hover {
-  border-color: rgba(255, 159, 80, 0.5);
-  transform: translateY(-3px);
-}
+.draft-card:hover { transform: translateY(-3px); }
 
-.draft-card.selected {
+/* Mechkawaii = orange */
+.draft-card.camp-mechkawaii:hover { border-color: rgba(255, 159, 80, 0.5); }
+.draft-card.camp-mechkawaii.selected {
   border-color: #FF9F50;
   background: rgba(255, 159, 80, 0.08);
   box-shadow: 0 0 20px rgba(255, 159, 80, 0.2);
+}
+
+/* Prodrome = vert */
+.draft-card.camp-prodrome:hover { border-color: rgba(134, 247, 119, 0.5); }
+.draft-card.camp-prodrome.selected {
+  border-color: #86F777;
+  background: rgba(134, 247, 119, 0.08);
+  box-shadow: 0 0 20px rgba(134, 247, 119, 0.2);
 }
 
 /* === Image plein corps ==================================== */
@@ -81,7 +88,7 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: #FF9F50;
+  background: #FF9F50; /* défaut mechkawaii */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,6 +97,8 @@
   transition: opacity 0.2s, transform 0.2s;
   z-index: 2;
 }
+
+.draft-card.camp-prodrome .draft-card-check { background: #86F777; }
 
 .draft-card-check svg {
   width: 14px;
@@ -125,9 +134,8 @@
   line-height: 1.2;
 }
 
-.draft-card.selected .draft-card-name {
-  color: #FF9F50;
-}
+.draft-card.camp-mechkawaii.selected .draft-card-name { color: #FF9F50; }
+.draft-card.camp-prodrome.selected .draft-card-name { color: #86F777; }
 
 .draft-card-class-label {
   font-size: 11px;
