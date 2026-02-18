@@ -1,0 +1,64 @@
+/* =========================================================
+   MECHKAWAII — Fil d'ariane
+   ========================================================= */
+
+#mkw-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 0 4px;
+}
+
+/* === Séparateur > ======================================= */
+.bc-sep {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 15px;
+  font-weight: 400;
+  user-select: none;
+}
+
+/* === Étapes ============================================= */
+.bc-step {
+  background: none;
+  border: none;
+  padding: 2px 0;
+  min-height: unset;
+  min-width: unset;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s;
+  box-shadow: none;
+}
+
+.bc-step:hover {
+  box-shadow: none;
+  border: none;
+}
+
+/* Étape passée : soulignée, cliquable */
+.bc-step.bc-done {
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.bc-step.bc-done:hover {
+  color: var(--text);
+}
+
+/* Étape courante : texte normal, non souligné */
+.bc-step.bc-current {
+  color: var(--text);
+  font-weight: 600;
+  cursor: default;
+  text-decoration: none;
+}
+
+/* Étape future : grisée */
+.bc-step.bc-future {
+  color: rgba(255, 255, 255, 0.25);
+  cursor: default;
+  text-decoration: none;
+}
