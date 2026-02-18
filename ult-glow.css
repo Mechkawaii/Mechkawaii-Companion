@@ -6,8 +6,16 @@
 #ultCard {
   border-color: rgba(255, 159, 80, 0.6);
   box-shadow: 0 0 24px rgba(255, 159, 80, 0.2);
-  background: rgba(255, 159, 80, 0.6);
+  background: rgba(255, 159, 80, 0.06);
   transition: border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, background 0.3s ease;
+}
+
+/* Couleur du texte */
+#ultCard .text,
+#ultCard .section-title,
+#ultCard label,
+#ultCard .switch-label {
+  color: #FFFFFF;
 }
 
 /* Coup unique utilisé : grisé */
