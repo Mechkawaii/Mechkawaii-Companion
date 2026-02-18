@@ -2,8 +2,16 @@
    MECHKAWAII — Coup Unique glow (ult-glow.css)
    ========================================================= */
 
-.card.ult-active {
-  border-color: rgba(255, 159, 80, 0.6) !important;
-  box-shadow: 0 0 24px rgba(255, 159, 80, 0.2) !important;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+/* Par défaut : illuminé orange */
+#ultCard {
+  border-color: rgba(255, 159, 80, 0.6);
+  box-shadow: 0 0 24px rgba(255, 159, 80, 0.2);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+}
+
+/* Coup unique utilisé : grisé */
+#ultCard.ult-used {
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+  opacity: 0.45;
 }
