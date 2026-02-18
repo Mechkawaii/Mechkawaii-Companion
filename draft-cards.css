@@ -2,7 +2,6 @@
    MECHKAWAII — Sélection par cartes (draft-cards.css)
    ========================================================= */
 
-/* === Grille des 5 cartes sur une ligne =================== */
 #draftList.draft-upgraded {
   display: flex;
   flex-direction: row;
@@ -11,7 +10,7 @@
   overflow-x: auto;
 }
 
-/* === Carte ================================================ */
+/* === Carte base ========================================== */
 .draft-card {
   flex: 1;
   min-width: 120px;
@@ -21,30 +20,34 @@
   align-items: center;
   gap: 10px;
   border-radius: 16px;
-  border: 2px solid var(--border);
+  border: 2px solid rgba(255,255,255,0.1);
   background: rgba(19, 19, 26, 0.85);
   padding: 12px 10px;
   cursor: pointer;
-  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s, background 0.2s;
   user-select: none;
 }
 
-.draft-card:hover { transform: translateY(-3px); }
-
-/* Mechkawaii = orange */
-.draft-card.camp-mechkawaii:hover { border-color: rgba(255, 159, 80, 0.5); }
-.draft-card.camp-mechkawaii.selected {
-  border-color: #FF9F50;
-  background: rgba(255, 159, 80, 0.08);
-  box-shadow: 0 0 20px rgba(255, 159, 80, 0.2);
+/* === Hover par camp ====================================== */
+.draft-card.camp-mechkawaii:hover {
+  border-color: rgba(255, 159, 80, 0.5);
+  transform: translateY(-3px);
+}
+.draft-card.camp-prodrome:hover {
+  border-color: rgba(134, 247, 119, 0.5);
+  transform: translateY(-3px);
 }
 
-/* Prodrome = vert */
-.draft-card.camp-prodrome:hover { border-color: rgba(134, 247, 119, 0.5); }
+/* === Sélectionné par camp ================================ */
+.draft-card.camp-mechkawaii.selected {
+  border-color: #FF9F50;
+  background: rgba(255, 159, 80, 0.1);
+  box-shadow: 0 0 20px rgba(255, 159, 80, 0.25);
+}
 .draft-card.camp-prodrome.selected {
   border-color: #86F777;
-  background: rgba(134, 247, 119, 0.08);
-  box-shadow: 0 0 20px rgba(134, 247, 119, 0.2);
+  background: rgba(134, 247, 119, 0.1);
+  box-shadow: 0 0 20px rgba(134, 247, 119, 0.25);
 }
 
 /* === Image plein corps ==================================== */
@@ -66,29 +69,23 @@
   transition: transform 0.2s;
 }
 
-.draft-card:hover .draft-card-img {
-  transform: scale(1.04);
-}
+.draft-card:hover .draft-card-img { transform: scale(1.04); }
 
 .draft-card-initial {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   font-size: 36px;
   font-weight: 900;
-  color: rgba(255, 255, 255, 0.15);
+  color: rgba(255,255,255,0.15);
 }
 
 /* === Checkmark =========================================== */
 .draft-card-check {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 26px;
-  height: 26px;
+  top: 8px; right: 8px;
+  width: 26px; height: 26px;
   border-radius: 50%;
-  background: #FF9F50; /* défaut mechkawaii */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,14 +94,10 @@
   transition: opacity 0.2s, transform 0.2s;
   z-index: 2;
 }
+.draft-card.camp-mechkawaii .draft-card-check { background: #FF9F50; }
+.draft-card.camp-prodrome   .draft-card-check { background: #86F777; }
 
-.draft-card.camp-prodrome .draft-card-check { background: #86F777; }
-
-.draft-card-check svg {
-  width: 14px;
-  height: 14px;
-  color: #000;
-}
+.draft-card-check svg { width: 14px; height: 14px; color: #000; }
 
 .draft-card.selected .draft-card-check {
   opacity: 1;
@@ -121,8 +114,7 @@
 }
 
 .draft-card-class-icon {
-  width: 32px;
-  height: 32px;
+  width: 32px; height: 32px;
   object-fit: contain;
 }
 
@@ -132,10 +124,11 @@
   text-align: center;
   color: var(--text);
   line-height: 1.2;
+  transition: color 0.2s;
 }
 
 .draft-card.camp-mechkawaii.selected .draft-card-name { color: #FF9F50; }
-.draft-card.camp-prodrome.selected .draft-card-name { color: #86F777; }
+.draft-card.camp-prodrome.selected   .draft-card-name { color: #86F777; }
 
 .draft-card-class-label {
   font-size: 11px;
@@ -151,6 +144,4 @@
   gap: 10px;
 }
 
-.draft-confirm-btn {
-  transition: opacity 0.2s;
-}
+.draft-confirm-btn { transition: opacity 0.2s; }

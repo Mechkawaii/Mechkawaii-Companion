@@ -61,8 +61,9 @@
       const c = chars.find(x => x.id === charId);
       if (!c) return;
 
+      const camp = (c.camp || "mechkawaii").toLowerCase();
       const card = document.createElement("div");
-      card.className = "draft-card";
+      card.className = "draft-card camp-" + (camp === "prodrome" ? "prodrome" : "mechkawaii");
       card.dataset.charId = charId;
 
       const imgWrap = document.createElement("div");
