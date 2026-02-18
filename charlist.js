@@ -1,7 +1,3 @@
-/* =========================================================
-   MECHKAWAII — Liste de personnages enrichie (charlist.js)
-   ========================================================= */
-
 (function () {
   "use strict";
 
@@ -26,8 +22,6 @@
     const list = document.getElementById("charList");
     if (!list || list.children.length === 0) return;
     if (list.classList.contains("charlist-upgraded")) return;
-
-    // Attendre que __cachedChars soit disponible
     if (!window.__cachedChars || window.__cachedChars.length === 0) return;
 
     const links = [...list.querySelectorAll("a.char")];
@@ -56,15 +50,16 @@
     const maxHp = c.hp?.max ?? 0;
     const isKo  = hp <= 0;
     const camp  = (c.camp || "mechkawaii").toLowerCase();
+    const hpPct = maxHp > 0 ? (hp / maxHp) * 100 : 0;
 
     const card = document.createElement("a");
     card.className = `char-card camp-${camp === "prodrome" ? "prodrome" : "mechkawaii"}`;
     card.href = href;
     if (isKo) card.classList.add("is-ko");
 
-    /* Visuel plein corps */
-    const visual = document.createElement("div");
-    visual.className = "char-card-visual";
+    /* Image plein corps */
+    const imgWrap = document.createElement("div");
+    imgWrap.className = "char-card-img-wrap";
 
     const fullSrc = c.images?.full;
     if (fullSrc) {
@@ -73,40 +68,45 @@
       img.alt = t(c.name, lang);
       img.className = "char-card-img";
       img.onerror = () => {
-        visual.innerHTML = `<div class="char-card-initial">${t(c.name, lang).charAt(0)}</div>`;
+        imgWrap.innerHTML = `<div class="char-card-initial">${t(c.name, lang).charAt(0)}</div>`;
       };
-      visual.appendChild(img);
+      imgWrap.appendChild(img);
     } else {
-      visual.innerHTML = `<div class="char-card-initial">${t(c.name, lang).charAt(0)}</div>`;
+      imgWrap.innerHTML = `<div class="char-card-initial">${t(c.name, lang).charAt(0)}</div>`;
     }
 
-    /* HP bar */
-    const hpPct = maxHp > 0 ? (hp / maxHp) * 100 : 0;
-    const hpBar = document.createElement("div");
-    hpBar.className = "char-card-hpbar";
-    hpBar.innerHTML = `<div class="char-card-hpbar-fill${hpPct <= 33 ? " low" : ""}" style="width:${hpPct}%"></div>`;
-    visual.appendChild(hpBar);
-
-    /* Infos */
+    /* Infos : logo + nom + classe */
     const info = document.createElement("div");
     info.className = "char-card-info";
 
-    /* Logo de classe via c.images.portrait */
     const iconSrc = c.images?.portrait;
-    const iconHtml = iconSrc
-      ? `<img src="${iconSrc}" alt="" class="char-card-class-icon" onerror="this.style.display='none'" />`
-      : "";
+    if (iconSrc) {
+      const icon = document.createElement("img");
+      icon.src = iconSrc;
+      icon.alt = "";
+      icon.className = "char-card-class-icon";
+      icon.onerror = () => icon.style.display = "none";
+      info.appendChild(icon);
+    }
 
-    info.innerHTML = `
-      <div class="char-card-name">${t(c.name, lang)}</div>
-      <div class="char-card-class">
-        ${iconHtml}
-        <span>${t(c.class, lang)}</span>
-      </div>
-    `;
+    const name = document.createElement("div");
+    name.className = "char-card-name";
+    name.textContent = t(c.name, lang);
+    info.appendChild(name);
 
-    card.appendChild(visual);
+    const classLabel = document.createElement("div");
+    classLabel.className = "char-card-class-label";
+    classLabel.textContent = t(c.class, lang);
+    info.appendChild(classLabel);
+
+    /* HP bar */
+    const hpBar = document.createElement("div");
+    hpBar.className = "char-card-hpbar";
+    hpBar.innerHTML = `<div class="char-card-hpbar-fill${hpPct <= 33 ? " low" : ""}" style="width:${hpPct}%"></div>`;
+
+    card.appendChild(imgWrap);
     card.appendChild(info);
+    card.appendChild(hpBar);
     return card;
   }
 
@@ -114,7 +114,6 @@
     const list = document.getElementById("charList");
     if (!list) return;
 
-    // Observer les mutations (app.js injecte les .char de manière async)
     const observer = new MutationObserver(() => {
       if (window.__cachedChars && window.__cachedChars.length > 0) {
         upgradeCharList();
@@ -122,13 +121,10 @@
     });
     observer.observe(list, { childList: true });
 
-    // Polling de sécurité (app.js est async, peut finir après nous)
     let attempts = 0;
     const poll = setInterval(() => {
       attempts++;
-      if (window.__cachedChars && window.__cachedChars.length > 0) {
-        upgradeCharList();
-      }
+      if (window.__cachedChars && window.__cachedChars.length > 0) upgradeCharList();
       if (attempts >= 20) clearInterval(poll);
     }, 100);
   }
