@@ -34,10 +34,10 @@
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
 }
 
-.char-card.camp-mechkawaii { border-color: #FF9F5040; }
-.char-card.camp-mechkawaii:hover { border-color: #FF9F5088; }
-.char-card.camp-prodrome { border-color: #86F77740; }
-.char-card.camp-prodrome:hover { border-color: #86F77788; }
+.char-card.camp-mechkawaii { border-color: rgba(255, 159, 80, 0.25); }
+.char-card.camp-mechkawaii:hover { border-color: rgba(255, 159, 80, 0.7); box-shadow: 0 16px 40px rgba(255, 159, 80, 0.12); }
+.char-card.camp-prodrome { border-color: rgba(134, 247, 119, 0.25); }
+.char-card.camp-prodrome:hover { border-color: rgba(134, 247, 119, 0.7); box-shadow: 0 16px 40px rgba(134, 247, 119, 0.12); }
 .char-card.is-ko { opacity: 0.5; filter: grayscale(0.6); }
 
 /* === Image plein corps ==================================== */
