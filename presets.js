@@ -155,7 +155,13 @@
             <div class="title" id="presetsPageTitle">TERRAINS PRÉCONSTRUITS</div>
           </div>
           <div class="controls">
-            <button id="presetsBackBtn">← Retour</button>
+            <nav id="mkw-breadcrumb-presets" style="display:flex;align-items:center;gap:8px;">
+              <button class="bc-step bc-done" id="presetsGoHome">Accueil</button>
+              <span class="bc-sep">></span>
+              <button class="bc-step bc-done" id="presetsGoTerrain">Terrain</button>
+              <span class="bc-sep">></span>
+              <button class="bc-step bc-current" disabled>Maps préconstruites</button>
+            </nav>
           </div>
         </div>
 
@@ -314,11 +320,25 @@
      Bind events
   ------------------------------------------------------- */
   function bind() {
-    // Prev / Next buttons
+    // Prev / Next buttons + breadcrumb
     document.addEventListener("click", (e) => {
       if (e.target.id === "presetsPrevBtn") goTo(currentIndex - 1);
       if (e.target.id === "presetsNextBtn") goTo(currentIndex + 1);
-      if (e.target.id === "presetsBackBtn") closePresets();
+
+      // Breadcrumb : retour terrain
+      if (e.target.id === "presetsGoTerrain") {
+        closePresets();
+      }
+
+      // Breadcrumb : retour accueil
+      if (e.target.id === "presetsGoHome") {
+        closePresets();
+        const terrainPage = document.getElementById("terrainPage");
+        if (terrainPage) terrainPage.classList.add("hidden");
+        const splash = document.getElementById("splash");
+        if (splash) splash.style.display = "block";
+        document.documentElement.classList.remove("splash-dismissed");
+      }
     });
 
     // Keyboard navigation (only when page is visible)
