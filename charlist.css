@@ -34,10 +34,10 @@
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
 }
 
-.char-card.camp-mechkawaii { border-color: rgba(61, 220, 151, 0.25); }
-.char-card.camp-mechkawaii:hover { border-color: rgba(61, 220, 151, 0.55); }
-.char-card.camp-prodrome { border-color: rgba(255, 77, 77, 0.25); }
-.char-card.camp-prodrome:hover { border-color: rgba(255, 77, 77, 0.55); }
+.char-card.camp-mechkawaii { border-color: #FF9F5040; }
+.char-card.camp-mechkawaii:hover { border-color: #FF9F5088; }
+.char-card.camp-prodrome { border-color: #86F77740; }
+.char-card.camp-prodrome:hover { border-color: #86F77788; }
 .char-card.is-ko { opacity: 0.5; filter: grayscale(0.6); }
 
 /* === Image plein corps ==================================== */
@@ -88,8 +88,8 @@
   color: var(--text);
 }
 
-.char-card.camp-mechkawaii .char-card-name { color: rgba(200, 255, 230, 0.95); }
-.char-card.camp-prodrome .char-card-name   { color: rgba(255, 200, 200, 0.95); }
+.char-card.camp-mechkawaii .char-card-name { color: #FF9F50; }
+.char-card.camp-prodrome .char-card-name   { color: #86F777; }
 
 .char-card-class-label {
   font-size: 12px;
