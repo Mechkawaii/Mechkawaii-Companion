@@ -20,7 +20,6 @@
       "attack_expert": "./assets/patterns/banado_attack_expert.png",
       "full": "./assets/characters/full_banado.png",
       "portrait": "./assets/characters/classe_technicien.png"
-      
     },
     "texts": {
       "class_action_title": {
@@ -82,7 +81,8 @@
           "en": "Ultimate Ability used"
         }
       }
-    ]
+    ],
+    "collection": "urbain"
   },
   {
     "id": "meimei",
@@ -112,12 +112,12 @@
         "en": "Class Action: Scout"
       },
       "class_action_body": {
-        "fr": "Contrairement aux autres classes, cette unité rapide comme l’éclair peut se déplacer deux fois durant son tour.",
+        "fr": "Contrairement aux autres classes, cette unité rapide comme l'éclair peut se déplacer deux fois durant son tour.",
         "en": "Unlike other classes, this unit may perform the Move action twice during its activation."
       },
       "ultimate_title": {
         "fr": "Coup Unique : Disruption Visuelle",
-        "en": "Ultimate Ability : Visual Disruption"
+        "en": "Ultimate Ability: Visual Disruption"
       },
       "ultimate_body": {
         "fr": "Rend invisible tous les Mechkawaii pendant 1 tour. Les unités invisibles ne peuvent pas être prises pour cible.",
@@ -166,7 +166,8 @@
           "en": "Ultimate Ability used"
         }
       }
-    ]
+    ],
+    "collection": "urbain"
   },
   {
     "id": "johanna",
@@ -193,15 +194,15 @@
     "texts": {
       "class_action_title": {
         "fr": "Action de classe : Grenadier",
-        "en": "Class Action : Grenadier"
+        "en": "Class Action: Grenadier"
       },
       "class_action_body": {
-        "fr": "Tirs lobés, sa ligne de mire n’est jamais bloquée par un terrain infranchissable ou une unité.",
+        "fr": "Tirs lobés, sa ligne de mire n'est jamais bloquée par un terrain infranchissable ou une unité.",
         "en": "Arcing Shots: This unit ignores Line of Sight restrictions caused by impassable terrain or units."
       },
       "ultimate_title": {
         "fr": "Coup Unique : Correction de Trajectoire",
-        "en": "Ultimate Ability : Trajectory Correction"
+        "en": "Ultimate Ability: Trajectory Correction"
       },
       "ultimate_body": {
         "fr": "Une unité alliée au choix ne peut plus manquer ses tirs pour toute la partie. Les critiques restent applicables. Ce coup unique ne peut pas être réamorcé.",
@@ -250,7 +251,8 @@
           "en": "Ultimate Ability used"
         }
       }
-    ]
+    ],
+    "collection": "urbain"
   },
   {
     "id": "yamabato",
@@ -285,7 +287,7 @@
       },
       "ultimate_title": {
         "fr": "Coup Unique : Tempête de Tir",
-        "en": "Ultimate Ability : Firing Storm"
+        "en": "Ultimate Ability: Firing Storm"
       },
       "ultimate_body": {
         "fr": "Tous les Mechkawaii alliés peuvent tirer une fois gratuitement ce tour.",
@@ -334,7 +336,8 @@
           "en": "Ultimate Ability used"
         }
       }
-    ]
+    ],
+    "collection": "urbain"
   },
   {
     "id": "fuyu",
@@ -369,10 +372,10 @@
       },
       "ultimate_title": {
         "fr": "Coup Unique : Réveil enflammé",
-        "en": "Ultimate Ability : Blazing Awakening"
+        "en": "Ultimate Ability: Blazing Awakening"
       },
       "ultimate_body": {
-        "fr": "De leurs cendres, il rallume l’étincelle. Tous les Mechkawaii HS reviennent avec 2 PV et peuvent jouer immédiatement. Ce coup unique ne peut pas être réamorcé.",
+        "fr": "De leurs cendres, il rallume l'étincelle. Tous les Mechkawaii HS reviennent avec 2 PV et peuvent jouer immédiatement. Ce coup unique ne peut pas être réamorcé.",
         "en": "From their ashes, the spark reignites. All Disabled Mechkawaii units return to play with 2 HP and may activate immediately. This Ultimate Ability cannot be reactivated."
       },
       "movement_desc": {
@@ -418,7 +421,433 @@
           "en": "Ultimate Ability used"
         }
       }
-    ]
+    ],
+    "collection": "urbain"
+  },
+  {
+    "id": "duke",
+    "name": {
+      "fr": "Duke",
+      "en": "Duke"
+    },
+    "class": {
+      "fr": "Démineur",
+      "en": "Deminer"
+    },
+    "camp": "mechkawaii",
+    "hp": {
+      "max": 3
+    },
+    "images": {
+      "movement": "./assets/patterns/duke_movement_normal.png",
+      "attack": "./assets/patterns/duke_attack_normal.png",
+      "movement_expert": "./assets/patterns/duke_movement_expert.png",
+      "attack_expert": "./assets/patterns/duke_attack_expert.png",
+      "full": "./assets/characters/full_duke.png",
+      "portrait": "./assets/characters/classe_demineur.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Démineur",
+        "en": "Class Action: Deminer"
+      },
+      "class_action_body": {
+        "fr": "Cette unité inflige 1 PV à tous les adversaires présents sur un terrain miné sur un jet de dé de tir réussi. Cette unité ne fait pas de corps-à-corps et ignore les mines adverses.",
+        "en": "On a successful ranged die roll, this unit deals 1 HP to all enemies on any mined terrain. This unit cannot perform melee attacks and ignores enemy mines."
+      },
+      "ultimate_title": {
+        "fr": "Coup Unique : Lancer de Mine",
+        "en": "Ultimate Ability: Mine Throw"
+      },
+      "ultimate_body": {
+        "fr": "Lance une mine sur 3 terrains ciblés par un jet de dés de terrain. Si un adversaire est concerné, faites un jet de dé de tir pour résoudre les dégâts.",
+        "en": "Place a mine on 3 target spaces determined by a terrain die roll. If an enemy unit occupies one of those spaces, roll a ranged die to resolve damage."
+      },
+      "movement_desc": {
+        "fr": "Déplacement standard.",
+        "en": "Standard movement."
+      },
+      "attack_desc": {
+        "fr": "Pose des mines à distance.",
+        "en": "Places mines from range."
+      }
+    },
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Boucliers",
+          "en": "Shields"
+        },
+        "hint": {
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 2
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate Ability used"
+        }
+      }
+    ],
+    "collection": "foret"
+  },
+  {
+    "id": "faline",
+    "name": {
+      "fr": "Faline",
+      "en": "Faline"
+    },
+    "class": {
+      "fr": "Cartographe",
+      "en": "Cartographer"
+    },
+    "camp": "mechkawaii",
+    "hp": {
+      "max": 3
+    },
+    "images": {
+      "movement": "./assets/patterns/faline_movement_normal.png",
+      "attack": "./assets/patterns/faline_attack_normal.png",
+      "movement_expert": "./assets/patterns/faline_movement_expert.png",
+      "attack_expert": "./assets/patterns/faline_attack_expert.png",
+      "full": "./assets/characters/full_faline.png",
+      "portrait": "./assets/characters/classe_cartographe.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Cartographe",
+        "en": "Class Action: Cartographer"
+      },
+      "class_action_body": {
+        "fr": "Cette unité a une haute maîtrise du terrain. Lorsqu'elle subit une attaque, le joueur lance un dé de tir : sur un résultat réussi, l'unité se cache et évite le tir. Ne subit aucun malus de terrain.",
+        "en": "This unit has mastery of the terrain. When targeted by an attack, roll a ranged die: on a success, the unit hides and avoids the attack. This unit suffers no terrain penalties."
+      },
+      "ultimate_title": {
+        "fr": "Coup Unique : Mise à Jour de Coordonnées",
+        "en": "Ultimate Ability: Coordinate Update"
+      },
+      "ultimate_body": {
+        "fr": "Échange deux terrains du champ de bataille sans unités. Le terrain événement ne peut pas être échangé.",
+        "en": "Swap two unoccupied terrain tiles on the battlefield. The event terrain cannot be swapped."
+      },
+      "movement_desc": {
+        "fr": "Déplacement standard.",
+        "en": "Standard movement."
+      },
+      "attack_desc": {
+        "fr": "Attaque à distance précise.",
+        "en": "Precise ranged attack."
+      }
+    },
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Boucliers",
+          "en": "Shields"
+        },
+        "hint": {
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 2
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate Ability used"
+        }
+      }
+    ],
+    "collection": "foret"
+  },
+  {
+    "id": "khurt",
+    "name": {
+      "fr": "Khurt",
+      "en": "Khurt"
+    },
+    "class": {
+      "fr": "Tireur d'élite",
+      "en": "Sniper"
+    },
+    "camp": "mechkawaii",
+    "hp": {
+      "max": 2
+    },
+    "images": {
+      "movement": "./assets/patterns/khurt_movement_normal.png",
+      "attack": "./assets/patterns/khurt_attack_normal.png",
+      "movement_expert": "./assets/patterns/khurt_movement_expert.png",
+      "attack_expert": "./assets/patterns/khurt_attack_expert.png",
+      "full": "./assets/characters/full_khurt.png",
+      "portrait": "./assets/characters/classe_tireur_elite.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Tireur d'élite",
+        "en": "Class Action: Sniper"
+      },
+      "class_action_body": {
+        "fr": "Tir partout sur le champ de bataille. Sa ligne de mire n'est jamais bloquée. Ses tirs critiques comptent comme un tir simple.",
+        "en": "This unit may fire anywhere on the battlefield. Its line of sight is never blocked. Critical hit results count as standard hits."
+      },
+      "ultimate_title": {
+        "fr": "Coup Unique : Balle Cryogénique",
+        "en": "Ultimate Ability: Cryogenic Round"
+      },
+      "ultimate_body": {
+        "fr": "Inflige 2 PV. Si le tir est raté, l'unité passe son prochain tour.",
+        "en": "Deals 2 HP. If the shot misses, this unit skips its next turn."
+      },
+      "movement_desc": {
+        "fr": "Déplacement standard.",
+        "en": "Standard movement."
+      },
+      "attack_desc": {
+        "fr": "Tir longue portée, ligne de mire dégagée.",
+        "en": "Long-range shot, unobstructed line of sight."
+      }
+    },
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Boucliers",
+          "en": "Shields"
+        },
+        "hint": {
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 2
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate Ability used"
+        }
+      }
+    ],
+    "collection": "foret"
+  },
+  {
+    "id": "rasmus",
+    "name": {
+      "fr": "Rasmus",
+      "en": "Rasmus"
+    },
+    "class": {
+      "fr": "Bombardier",
+      "en": "Bomber"
+    },
+    "camp": "mechkawaii",
+    "hp": {
+      "max": 3
+    },
+    "images": {
+      "movement": "./assets/patterns/rasmus_movement_normal.png",
+      "attack": "./assets/patterns/rasmus_attack_normal.png",
+      "movement_expert": "./assets/patterns/rasmus_movement_expert.png",
+      "attack_expert": "./assets/patterns/rasmus_attack_expert.png",
+      "full": "./assets/characters/full_rasmus.png",
+      "portrait": "./assets/characters/classe_bombardier.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Bombardier",
+        "en": "Class Action: Bomber"
+      },
+      "class_action_body": {
+        "fr": "Déploie un drone aérien qui tire sur une ligne entière du champ de bataille. Le tir affecte aussi les unités alliées.",
+        "en": "Deploy an aerial drone that fires on an entire row of the battlefield. The attack also affects allied units."
+      },
+      "ultimate_title": {
+        "fr": "Coup Unique : Largage de Ravitaillement",
+        "en": "Ultimate Ability: Supply Drop"
+      },
+      "ultimate_body": {
+        "fr": "Distribue à trois alliés différents : +1 PV au premier, 1 bouclier au second, 1 clé de réparation au troisième.",
+        "en": "Distribute to three different allied units: +1 HP to the first, 1 Shield to the second, 1 Repair Key to the third."
+      },
+      "movement_desc": {
+        "fr": "Déplacement standard.",
+        "en": "Standard movement."
+      },
+      "attack_desc": {
+        "fr": "Frappe toute une ligne via drone.",
+        "en": "Strikes an entire row via drone."
+      }
+    },
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Boucliers",
+          "en": "Shields"
+        },
+        "hint": {
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 2
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate Ability used"
+        }
+      }
+    ],
+    "collection": "foret"
+  },
+  {
+    "id": "rhoney",
+    "name": {
+      "fr": "Rhoney",
+      "en": "Rhoney"
+    },
+    "class": {
+      "fr": "Armurier",
+      "en": "Armorer"
+    },
+    "camp": "mechkawaii",
+    "hp": {
+      "max": 4
+    },
+    "images": {
+      "movement": "./assets/patterns/rhoney_movement_normal.png",
+      "attack": "./assets/patterns/rhoney_attack_normal.png",
+      "movement_expert": "./assets/patterns/rhoney_movement_expert.png",
+      "attack_expert": "./assets/patterns/rhoney_attack_expert.png",
+      "full": "./assets/characters/full_rhoney.png",
+      "portrait": "./assets/characters/classe_armurier.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Armurier",
+        "en": "Class Action: Armorer"
+      },
+      "class_action_body": {
+        "fr": "Dirige les tirs vers lui. Cette unité peut prendre les tirs à la place d'un allié, même durant le tour adverse.",
+        "en": "This unit draws fire. It may intercept attacks targeting an ally, even during the opponent's turn."
+      },
+      "ultimate_title": {
+        "fr": "Coup Unique : Armure de Plastofer",
+        "en": "Ultimate Ability: Plastofer Armor"
+      },
+      "ultimate_body": {
+        "fr": "Donne une armure à une unité alliée qui contre les tirs critiques ennemis pour toute la partie. Utilisable une fois par partie.",
+        "en": "Grant one allied unit an armor that negates enemy critical hits for the rest of the game. Usable once per game."
+      },
+      "movement_desc": {
+        "fr": "Déplacement lent mais robuste.",
+        "en": "Slow but robust movement."
+      },
+      "attack_desc": {
+        "fr": "Attaque de protection en bouclier.",
+        "en": "Protective shield attack."
+      }
+    },
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Boucliers",
+          "en": "Shields"
+        },
+        "hint": {
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 2
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate Ability used"
+        }
+      }
+    ],
+    "collection": "foret"
   },
   {
     "id": "goki",
@@ -453,10 +882,10 @@
       },
       "ultimate_title": {
         "fr": "Coup Unique : Poings Corrosifs",
-        "en": "Ultimate Ability : Corrosive Fists"
+        "en": "Ultimate Ability: Corrosive Fists"
       },
       "ultimate_body": {
-        "fr": "Sur une unité un allié : jusqu’à la fin de la partie, ses attaques de mêlée infligent 2 PV même sur les résultats de dé simple. Ce coup unique ne peut pas être réamorcé.",
+        "fr": "Sur une unité alliée : jusqu'à la fin de la partie, ses attaques de mêlée infligent 2 PV même sur les résultats de dé simple. Ce coup unique ne peut pas être réamorcé.",
         "en": "Choose one allied unit. Until the end of the game, its Melee Attacks deal 2 HP, even on standard hit results. This Ultimate Ability cannot be reactivated."
       },
       "movement_desc": {
@@ -502,7 +931,8 @@
           "en": "Ultimate Ability used"
         }
       }
-    ]
+    ],
+    "collection": "urbain"
   },
   {
     "id": "goryo",
@@ -532,16 +962,16 @@
         "en": "Class Action: Grenadier"
       },
       "class_action_body": {
-        "fr": "Tirs lobés, sa ligne de mire n’est jamais bloquée par un terrain infranchissable ou une unité.",
+        "fr": "Tirs lobés, sa ligne de mire n'est jamais bloquée par un terrain infranchissable ou une unité.",
         "en": "Arcing Shots: This unit ignores Line of Sight restrictions caused by impassable terrain or units."
       },
       "ultimate_title": {
         "fr": "Coup Unique : Rayon Orbital",
-        "en": "Ultimate Ability : Orbital Beam"
+        "en": "Ultimate Ability: Orbital Beam"
       },
       "ultimate_body": {
         "fr": "Après un jet de dé de tir réussi, cette unité met HS une unité ennemie. Les boucliers sont ignorés. Ce coup unique ne peut pas être réamorcé.",
-        "en": "After a successful Ranged Attack roll, this unit immediately Disabled the targeted enemy unit. Shields are ignored. This Ultimate Ability cannot be reactivated."
+        "en": "After a successful Ranged Attack roll, this unit immediately Disables the targeted enemy unit. Shields are ignored. This Ultimate Ability cannot be reactivated."
       },
       "movement_desc": {
         "fr": "Se déplace en carré.",
@@ -586,7 +1016,8 @@
           "en": "Ultimate Ability used"
         }
       }
-    ]
+    ],
+    "collection": "urbain"
   },
   {
     "id": "gyuki",
@@ -621,7 +1052,7 @@
       },
       "ultimate_title": {
         "fr": "Coup Unique : Détonation Ionique",
-        "en": "Ultimate Ability : Ionic Detonation"
+        "en": "Ultimate Ability: Ionic Detonation"
       },
       "ultimate_body": {
         "fr": "Déclenche une onde explosive. Soufflés par la détonation, les ennemis sont déplacés sur une case adjacente à leur position.",
@@ -670,7 +1101,8 @@
           "en": "Ultimate Ability used"
         }
       }
-    ]
+    ],
+    "collection": "urbain"
   },
   {
     "id": "gaoro",
@@ -700,15 +1132,15 @@
         "en": "Class Action: Scout"
       },
       "class_action_body": {
-        "fr": "Contrairement aux autres classes, cette unité rapide comme l’éclair peut se déplacer deux fois durant son tour.",
+        "fr": "Contrairement aux autres classes, cette unité rapide comme l'éclair peut se déplacer deux fois durant son tour.",
         "en": "Unlike other classes, this unit may perform the Move action twice during its activation."
       },
       "ultimate_title": {
         "fr": "Coup Unique : Ruée Tactique",
-        "en": "Ultimate Ability : Tactical Rush"
+        "en": "Ultimate Ability: Tactical Rush"
       },
       "ultimate_body": {
-        "fr": "L’Éclaireur ouvre la voie. Chaque unité alliée peut se déplacer gratuitement ce tour.",
+        "fr": "L'Éclaireur ouvre la voie. Chaque unité alliée peut se déplacer gratuitement ce tour.",
         "en": "The Scout leads the way. Each allied unit may perform one Move action for free this turn."
       },
       "movement_desc": {
@@ -754,7 +1186,8 @@
           "en": "Ultimate Ability used"
         }
       }
-    ]
+    ],
+    "collection": "urbain"
   },
   {
     "id": "genbu",
@@ -789,7 +1222,7 @@
       },
       "ultimate_title": {
         "fr": "Coup Unique : Regard Laser",
-        "en": "Ultimate Ability : Laser Gaze"
+        "en": "Ultimate Ability: Laser Gaze"
       },
       "ultimate_body": {
         "fr": "Les résultats de dé critiques font perdre un seul PV. Applicable sur une unité adverse durant toute la partie. Ce coup unique ne peut pas être réamorcé.",
@@ -838,6 +1271,772 @@
           "en": "Ultimate Ability used"
         }
       }
-    ]
+    ],
+    "collection": "urbain"
+  },
+  {
+    "id": "samebito",
+    "name": {
+      "fr": "Samebito",
+      "en": "Samebito"
+    },
+    "class": {
+      "fr": "Tireur d'élite",
+      "en": "Sniper"
+    },
+    "camp": "prodrome",
+    "hp": {
+      "max": 2
+    },
+    "images": {
+      "movement": "./assets/patterns/samebito_movement_normal.png",
+      "attack": "./assets/patterns/samebito_attack_normal.png",
+      "movement_expert": "./assets/patterns/samebito_movement_expert.png",
+      "attack_expert": "./assets/patterns/samebito_attack_expert.png",
+      "full": "./assets/characters/full_samebito.png",
+      "portrait": "./assets/characters/classe_tireur_elite.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Tireur d'élite",
+        "en": "Class Action: Sniper"
+      },
+      "class_action_body": {
+        "fr": "Tir partout sur le champ de bataille. Sa ligne de mire n'est jamais bloquée. Ses tirs critiques comptent comme un tir simple.",
+        "en": "This unit may fire anywhere on the battlefield. Its line of sight is never blocked. Critical hit results count as standard hits."
+      },
+      "ultimate_title": {
+        "fr": "Coup Unique : Balle à Fragmentation",
+        "en": "Ultimate Ability: Fragmentation Round"
+      },
+      "ultimate_body": {
+        "fr": "Inflige 1, 2 ou 3 PV selon le résultat du dé (1 = nul, 2 = normal, 3 = critique).",
+        "en": "Deals 1, 2, or 3 HP depending on the die result (1 = miss, 2 = normal, 3 = critical)."
+      },
+      "movement_desc": {
+        "fr": "Déplacement standard.",
+        "en": "Standard movement."
+      },
+      "attack_desc": {
+        "fr": "Tir longue portée, ligne de mire dégagée.",
+        "en": "Long-range shot, unobstructed line of sight."
+      }
+    },
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Boucliers",
+          "en": "Shields"
+        },
+        "hint": {
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 2
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate Ability used"
+        }
+      }
+    ],
+    "collection": "foret"
+  },
+  {
+    "id": "sankai",
+    "name": {
+      "fr": "Sankai",
+      "en": "Sankai"
+    },
+    "class": {
+      "fr": "Armurier",
+      "en": "Armorer"
+    },
+    "camp": "prodrome",
+    "hp": {
+      "max": 4
+    },
+    "images": {
+      "movement": "./assets/patterns/sankai_movement_normal.png",
+      "attack": "./assets/patterns/sankai_attack_normal.png",
+      "movement_expert": "./assets/patterns/sankai_movement_expert.png",
+      "attack_expert": "./assets/patterns/sankai_attack_expert.png",
+      "full": "./assets/characters/full_sankai.png",
+      "portrait": "./assets/characters/classe_armurier.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Armurier",
+        "en": "Class Action: Armorer"
+      },
+      "class_action_body": {
+        "fr": "Dirige les tirs vers lui. Cette unité peut prendre les tirs à la place d'un allié, même durant le tour de l'adversaire.",
+        "en": "This unit draws fire. It may intercept attacks targeting an ally, even during the opponent's turn."
+      },
+      "ultimate_title": {
+        "fr": "Coup Unique : Armure à Ricochet",
+        "en": "Ultimate Ability: Ricochet Armor"
+      },
+      "ultimate_body": {
+        "fr": "La prochaine fois que cette unité est touchée, elle renvoie le tir sur un terrain aléatoire. Si une unité (alliée ou ennemie) est présente, elle subit les dégâts.",
+        "en": "The next time this unit is hit, it deflects the attack to a random space. If a unit (allied or enemy) is present on that space, it takes the damage."
+      },
+      "movement_desc": {
+        "fr": "Déplacement lent mais robuste.",
+        "en": "Slow but robust movement."
+      },
+      "attack_desc": {
+        "fr": "Attaque de riposte défensive.",
+        "en": "Defensive counter-attack."
+      }
+    },
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Boucliers",
+          "en": "Shields"
+        },
+        "hint": {
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 2
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate Ability used"
+        }
+      }
+    ],
+    "collection": "foret"
+  },
+  {
+    "id": "senpoku",
+    "name": {
+      "fr": "Senpoku",
+      "en": "Senpoku"
+    },
+    "class": {
+      "fr": "Bombardier",
+      "en": "Bomber"
+    },
+    "camp": "prodrome",
+    "hp": {
+      "max": 3
+    },
+    "images": {
+      "movement": "./assets/patterns/senpoku_movement_normal.png",
+      "attack": "./assets/patterns/senpoku_attack_normal.png",
+      "movement_expert": "./assets/patterns/senpoku_movement_expert.png",
+      "attack_expert": "./assets/patterns/senpoku_attack_expert.png",
+      "full": "./assets/characters/full_senpoku.png",
+      "portrait": "./assets/characters/classe_bombardier.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Bombardier",
+        "en": "Class Action: Bomber"
+      },
+      "class_action_body": {
+        "fr": "Déploie un drone aérien qui tire sur une ligne entière du champ de bataille. Le tir affecte aussi les unités alliées.",
+        "en": "Deploy an aerial drone that fires on an entire row of the battlefield. The attack also affects allied units."
+      },
+      "ultimate_title": {
+        "fr": "Coup Unique : Bombardement Chirurgical",
+        "en": "Ultimate Ability: Surgical Bombing"
+      },
+      "ultimate_body": {
+        "fr": "Retire une clé de réparation à chaque unité adverse.",
+        "en": "Remove one Repair Key from each enemy unit."
+      },
+      "movement_desc": {
+        "fr": "Déplacement standard.",
+        "en": "Standard movement."
+      },
+      "attack_desc": {
+        "fr": "Frappe toute une ligne via drone.",
+        "en": "Strikes an entire row via drone."
+      }
+    },
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Boucliers",
+          "en": "Shields"
+        },
+        "hint": {
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 2
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate Ability used"
+        }
+      }
+    ],
+    "collection": "foret"
+  },
+  {
+    "id": "shojo",
+    "name": {
+      "fr": "Shojo",
+      "en": "Shojo"
+    },
+    "class": {
+      "fr": "Démineur",
+      "en": "Deminer"
+    },
+    "camp": "prodrome",
+    "hp": {
+      "max": 3
+    },
+    "images": {
+      "movement": "./assets/patterns/shojo_movement_normal.png",
+      "attack": "./assets/patterns/shojo_attack_normal.png",
+      "movement_expert": "./assets/patterns/shojo_movement_expert.png",
+      "attack_expert": "./assets/patterns/shojo_attack_expert.png",
+      "full": "./assets/characters/full_shojo.png",
+      "portrait": "./assets/characters/classe_demineur.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Démineur",
+        "en": "Class Action: Deminer"
+      },
+      "class_action_body": {
+        "fr": "Cette unité inflige 1 PV à tous les adversaires présents sur un terrain miné sur un jet de dé de tir réussi. Cette unité ne fait pas de corps-à-corps et ignore les mines adverses.",
+        "en": "On a successful ranged die roll, this unit deals 1 HP to all enemies on any mined terrain. This unit cannot perform melee attacks and ignores enemy mines."
+      },
+      "ultimate_title": {
+        "fr": "Coup Unique : Super Mine Nucléaire",
+        "en": "Ultimate Ability: Nuclear Super Mine"
+      },
+      "ultimate_body": {
+        "fr": "L'unité se détruit. Elle inflige 2 PV à tous les ennemis sur les terrains adjacents (pas aux alliés). Utilisable une fois par partie.",
+        "en": "This unit is destroyed. It deals 2 HP to all enemies on adjacent spaces (allies are unaffected). Usable once per game."
+      },
+      "movement_desc": {
+        "fr": "Déplacement standard.",
+        "en": "Standard movement."
+      },
+      "attack_desc": {
+        "fr": "Pose des mines à distance.",
+        "en": "Places mines from range."
+      }
+    },
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Boucliers",
+          "en": "Shields"
+        },
+        "hint": {
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 2
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate Ability used"
+        }
+      }
+    ],
+    "collection": "foret"
+  },
+  {
+    "id": "sojobo",
+    "name": {
+      "fr": "Sojobo",
+      "en": "Sojobo"
+    },
+    "class": {
+      "fr": "Cartographe",
+      "en": "Cartographer"
+    },
+    "camp": "prodrome",
+    "hp": {
+      "max": 3
+    },
+    "images": {
+      "movement": "./assets/patterns/sojobo_movement_normal.png",
+      "attack": "./assets/patterns/sojobo_attack_normal.png",
+      "movement_expert": "./assets/patterns/sojobo_movement_expert.png",
+      "attack_expert": "./assets/patterns/sojobo_attack_expert.png",
+      "full": "./assets/characters/full_sojobo.png",
+      "portrait": "./assets/characters/classe_cartographe.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Cartographe",
+        "en": "Class Action: Cartographer"
+      },
+      "class_action_body": {
+        "fr": "Cette unité a une haute maîtrise du terrain. Lorsqu'elle subit une attaque, le joueur lance un dé de tir : sur un résultat réussi, l'unité se cache et évite le tir. Ne subit aucun malus de terrain.",
+        "en": "This unit has mastery of the terrain. When targeted by an attack, roll a ranged die: on a success, the unit hides and avoids the attack. This unit suffers no terrain penalties."
+      },
+      "ultimate_title": {
+        "fr": "Coup Unique : Sabotage de Terrain",
+        "en": "Ultimate Ability: Terrain Sabotage"
+      },
+      "ultimate_body": {
+        "fr": "Détruit deux terrains du champ de bataille sans unités. Le terrain événement ne peut pas être détruit. Utilisable une fois par partie.",
+        "en": "Destroy two unoccupied terrain tiles on the battlefield. The event terrain cannot be destroyed. Usable once per game."
+      },
+      "movement_desc": {
+        "fr": "Déplacement standard.",
+        "en": "Standard movement."
+      },
+      "attack_desc": {
+        "fr": "Attaque à distance précise.",
+        "en": "Precise ranged attack."
+      }
+    },
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Boucliers",
+          "en": "Shields"
+        },
+        "hint": {
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 2
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate Ability used"
+        }
+      }
+    ],
+    "collection": "foret"
+  },
+  {
+    "id": "bl4ck_n3on",
+    "name": {
+      "fr": "Bl4ck_N3on",
+      "en": "Bl4ck_N3on"
+    },
+    "class": {
+      "fr": "Hacker",
+      "en": "Hacker"
+    },
+    "camp": "mechkawaii",
+    "hp": {
+      "max": 3
+    },
+    "images": {
+      "movement": "./assets/patterns/bl4ck_n3on_movement_normal.png",
+      "attack": "./assets/patterns/bl4ck_n3on_attack_normal.png",
+      "movement_expert": "./assets/patterns/bl4ck_n3on_movement_expert.png",
+      "attack_expert": "./assets/patterns/bl4ck_n3on_attack_expert.png",
+      "full": "./assets/characters/full_bl4ck_n3on.png",
+      "portrait": "./assets/characters/classe_hacker.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Hacker",
+        "en": "Class Action: Hacker"
+      },
+      "class_action_body": {
+        "fr": "Lorsqu'il est visé, le Hacker pirate l'arme de son adversaire : l'attaquant relance son tir (1 fois par tour).",
+        "en": "When targeted, the Hacker hacks the attacker's weapon: the attacker must reroll their shot (once per turn)."
+      },
+      "ultimate_title": {
+        "fr": "Coup Unique : CTRL+C CTRL+V",
+        "en": "Ultimate Ability: CTRL+C CTRL+V"
+      },
+      "ultimate_body": {
+        "fr": "Crée une copie du programme du coup unique d'une unité alliée. Une fois que le Hacker a copié le coup unique, il peut le jouer immédiatement.",
+        "en": "Copy the Ultimate Ability program of an allied unit. Once copied, the Hacker may use it immediately."
+      },
+      "movement_desc": {
+        "fr": "Déplacement standard.",
+        "en": "Standard movement."
+      },
+      "attack_desc": {
+        "fr": "Attaque par intrusion numérique.",
+        "en": "Digital intrusion attack."
+      }
+    },
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Boucliers",
+          "en": "Shields"
+        },
+        "hint": {
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 2
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate Ability used"
+        }
+      }
+    ],
+    "collection": "hacker"
+  },
+  {
+    "id": "gr33n_sc4m",
+    "name": {
+      "fr": "Gr33n_Sc4m",
+      "en": "Gr33n_Sc4m"
+    },
+    "class": {
+      "fr": "Hacker",
+      "en": "Hacker"
+    },
+    "camp": "prodrome",
+    "hp": {
+      "max": 3
+    },
+    "images": {
+      "movement": "./assets/patterns/gr33n_sc4m_movement_normal.png",
+      "attack": "./assets/patterns/gr33n_sc4m_attack_normal.png",
+      "movement_expert": "./assets/patterns/gr33n_sc4m_movement_expert.png",
+      "attack_expert": "./assets/patterns/gr33n_sc4m_attack_expert.png",
+      "full": "./assets/characters/full_gr33n_sc4m.png",
+      "portrait": "./assets/characters/classe_hacker.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Hacker",
+        "en": "Class Action: Hacker"
+      },
+      "class_action_body": {
+        "fr": "Lorsqu'il est visé, le Hacker pirate l'arme de son adversaire : l'attaquant relance son tir (1 fois par tour).",
+        "en": "When targeted, the Hacker hacks the attacker's weapon: the attacker must reroll their shot (once per turn)."
+      },
+      "ultimate_title": {
+        "fr": "Coup Unique : SCAMMING",
+        "en": "Ultimate Ability: SCAMMING"
+      },
+      "ultimate_body": {
+        "fr": "Crée une copie du programme du coup unique d'une unité ennemie. Une fois que le Hacker a copié le coup unique, il peut le jouer immédiatement.",
+        "en": "Copy the Ultimate Ability program of an enemy unit. Once copied, the Hacker may use it immediately."
+      },
+      "movement_desc": {
+        "fr": "Déplacement standard.",
+        "en": "Standard movement."
+      },
+      "attack_desc": {
+        "fr": "Attaque par intrusion numérique.",
+        "en": "Digital intrusion attack."
+      }
+    },
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Boucliers",
+          "en": "Shields"
+        },
+        "hint": {
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 2
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate Ability used"
+        }
+      }
+    ],
+    "collection": "hacker"
+  },
+  {
+    "id": "sheepard",
+    "name": {
+      "fr": "Sheepard",
+      "en": "Sheepard"
+    },
+    "class": {
+      "fr": "Général",
+      "en": "General"
+    },
+    "camp": "mechkawaii",
+    "hp": {
+      "max": 3
+    },
+    "images": {
+      "movement": "./assets/patterns/sheepard_movement_normal.png",
+      "attack": "./assets/patterns/sheepard_attack_normal.png",
+      "movement_expert": "./assets/patterns/sheepard_movement_expert.png",
+      "attack_expert": "./assets/patterns/sheepard_attack_expert.png",
+      "full": "./assets/characters/full_sheepard.png",
+      "portrait": "./assets/characters/classe_general.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Général",
+        "en": "Class Action: General"
+      },
+      "class_action_body": {
+        "fr": "Ordonne par radio à un allié d'effectuer une action de 2 cellules d'énergie ou moins, en plus de ses actions.",
+        "en": "Order an allied unit via radio to perform an action costing 2 energy cells or less, in addition to its own actions."
+      },
+      "ultimate_title": {
+        "fr": "Coup Unique : Réaffectation Générale",
+        "en": "Ultimate Ability: General Reallocation"
+      },
+      "ultimate_body": {
+        "fr": "Échange total des boucliers et clés de réparation entre les deux camps. Chaque joueur répartit les ressources reçues entre ses unités. Ce coup unique ne peut pas être réamorcé.",
+        "en": "Fully swap all Shields and Repair Keys between the two camps. Each player distributes the received resources among their units. This Ultimate Ability cannot be reactivated."
+      },
+      "movement_desc": {
+        "fr": "Déplacement standard.",
+        "en": "Standard movement."
+      },
+      "attack_desc": {
+        "fr": "Coordonne les tirs alliés.",
+        "en": "Coordinates allied fire."
+      }
+    },
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Boucliers",
+          "en": "Shields"
+        },
+        "hint": {
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 2
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate Ability used"
+        }
+      }
+    ],
+    "collection": "general"
+  },
+  {
+    "id": "akuma",
+    "name": {
+      "fr": "Akuma",
+      "en": "Akuma"
+    },
+    "class": {
+      "fr": "Général",
+      "en": "General"
+    },
+    "camp": "prodrome",
+    "hp": {
+      "max": 3
+    },
+    "images": {
+      "movement": "./assets/patterns/akuma_movement_normal.png",
+      "attack": "./assets/patterns/akuma_attack_normal.png",
+      "movement_expert": "./assets/patterns/akuma_movement_expert.png",
+      "attack_expert": "./assets/patterns/akuma_attack_expert.png",
+      "full": "./assets/characters/full_akuma.png",
+      "portrait": "./assets/characters/classe_general.png"
+    },
+    "texts": {
+      "class_action_title": {
+        "fr": "Action de classe : Général",
+        "en": "Class Action: General"
+      },
+      "class_action_body": {
+        "fr": "Ordonne par radio à un allié d'effectuer une action de 2 cellules d'énergie ou moins, en plus de ses actions.",
+        "en": "Order an allied unit via radio to perform an action costing 2 energy cells or less, in addition to its own actions."
+      },
+      "ultimate_title": {
+        "fr": "Coup Unique : Œil du Commandement",
+        "en": "Ultimate Ability: Eye of Command"
+      },
+      "ultimate_body": {
+        "fr": "Le Général cible une unité ennemie et neutralise son coup unique. La cible peut réamorcer son coup unique plus tard dans la partie.",
+        "en": "The General targets an enemy unit and neutralizes its Ultimate Ability. The target may reactivate its Ultimate Ability later in the game."
+      },
+      "movement_desc": {
+        "fr": "Déplacement standard.",
+        "en": "Standard movement."
+      },
+      "attack_desc": {
+        "fr": "Coordonne les tirs alliés.",
+        "en": "Coordinates allied fire."
+      }
+    },
+    "toggles": [
+      {
+        "id": "shield",
+        "label": {
+          "fr": "Boucliers",
+          "en": "Shields"
+        },
+        "hint": {
+          "fr": "Réserve partagée (0/3)",
+          "en": "Shared reserve (0/3)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 3
+      },
+      {
+        "id": "repair_keys",
+        "label": {
+          "fr": "Clés de réparation",
+          "en": "Repair Keys"
+        },
+        "hint": {
+          "fr": "Clés utilisées (0, 1 ou 2)",
+          "en": "Keys used (0, 1 or 2)"
+        },
+        "type": "visual_keys",
+        "maxKeys": 2
+      },
+      {
+        "id": "ultimate_used",
+        "label": {
+          "fr": "Coup Unique utilisé",
+          "en": "Ultimate Ability used"
+        }
+      }
+    ],
+    "collection": "general"
   }
 ]
