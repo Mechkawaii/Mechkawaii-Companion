@@ -1,0 +1,47 @@
+/* =========================================================
+   MECHKAWAII — En-têtes de collections dans le draft
+   À ajouter dans draft-cards.css (ou inclure via <link>)
+   ========================================================= */
+
+.draft-collection-heading {
+  margin: 20px 0 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+  border-left: 3px solid var(--accent, #FF9F50);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 0 8px 8px 0;
+}
+
+.draft-collection-heading:first-child {
+  margin-top: 4px;
+}
+
+/* Biome Urbain — orange Mechkawaii */
+.draft-collection-heading:has(+ .toggle [data-collection="urbain"]),
+.draft-collection-heading.col-urbain {
+  border-left-color: #FF9F50;
+}
+
+/* Biome Forêt — vert forêt */
+.draft-collection-heading.col-foret {
+  border-left-color: #5ecf6a;
+}
+
+/* Additionnels — violet */
+.draft-collection-heading.col-additional {
+  border-left-color: #a78bfa;
+}
+
+.draft-collection-sub {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  text-transform: none;
+  margin-top: 2px;
+}

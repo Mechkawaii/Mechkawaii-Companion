@@ -653,52 +653,131 @@ async function initIndex(){
     if(draftList) draftList.innerHTML = "";
     const selected = new Set();
 
-    available.forEach(c=>{
-      const row = document.createElement("div");
-      row.className = "toggle";
+    // Règles des catégories additionnelles : max 1 par camp
+    const ADDITIONAL_COLLECTIONS = ["hacker", "general"];
 
-      const left = document.createElement("div");
-      left.className = "lbl";
-      left.innerHTML = `<div class="t">${t(c.name, lang)}</div><div class="d">${t(c.class, lang)} — HP ${c.hp?.max ?? "?"}</div>`;
+    // Labels des collections (FR/EN)
+    const COLLECTION_LABELS = {
+      urbain: { fr: "🏙️ Biome Urbain", en: "🏙️ Urban Biome" },
+      foret:  { fr: "🌲 Biome Forêt",  en: "🌲 Forest Biome" },
+      hacker: { fr: "💻 Personnages Additionnels — Hacker", en: "💻 Additional Characters — Hacker" },
+      general:{ fr: "🎖️ Personnages Additionnels — Général", en: "🎖️ Additional Characters — General" },
+    };
+    const COLLECTION_ORDER = ["urbain", "foret", "hacker", "general"];
 
-      const sw = document.createElement("div");
-      sw.className = "switch";
-      sw.setAttribute("role","switch");
-      sw.setAttribute("tabindex","0");
-      sw.setAttribute("aria-checked","false");
-
-      function refresh(){
-        const on = selected.has(c.id);
-        sw.className = "switch" + (on ? " on" : "");
-        sw.setAttribute("aria-checked", on ? "true" : "false");
-      }
-
-      function flip(){
-        if(selected.has(c.id)){
-          selected.delete(c.id);
-        }else{
-          if(selected.size >= maxPick){
-            if(draftError) draftError.textContent = (lang === "fr")
-              ? `Tu as déjà ${maxPick} unités sélectionnées.`
-              : `You already selected ${maxPick} units.`;
-            return;
-          }
-          selected.add(c.id);
-        }
-        if(draftError) draftError.textContent = "";
-        refresh();
-      }
-
-      sw.addEventListener("click", flip);
-      sw.addEventListener("keydown",(e)=>{
-        if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flip(); }
-      });
-
-      row.appendChild(left);
-      row.appendChild(sw);
-      if(draftList) draftList.appendChild(row);
-      refresh();
+    // Grouper par collection
+    const byCollection = {};
+    COLLECTION_ORDER.forEach(col => { byCollection[col] = []; });
+    available.forEach(c => {
+      const col = c.collection || "urbain";
+      if(!byCollection[col]) byCollection[col] = [];
+      byCollection[col].push(c);
     });
+
+    // Map charId -> switch element pour refreshAll
+    const switchMap = {};
+
+    function countAdditionalByCollection(col){
+      return [...selected].filter(id => {
+        const ch = available.find(x => x.id === id);
+        return ch && ch.collection === col;
+      }).length;
+    }
+
+    function refreshAll(){
+      Object.keys(switchMap).forEach(id => {
+        const ch = available.find(x => x.id === id);
+        const sw = switchMap[id];
+        const isOn = selected.has(id);
+        sw.className = "switch" + (isOn ? " on" : "");
+        sw.setAttribute("aria-checked", isOn ? "true" : "false");
+
+        // Désactiver si : max atteint ET pas sélectionné, OU règle additionnel violée
+        let blocked = false;
+        if(!isOn){
+          if(selected.size >= maxPick) blocked = true;
+          if(ch && ADDITIONAL_COLLECTIONS.includes(ch.collection)){
+            if(countAdditionalByCollection(ch.collection) >= 1) blocked = true;
+          }
+        }
+        sw.style.opacity = (!isOn && blocked) ? "0.35" : "";
+        sw.style.pointerEvents = (!isOn && blocked) ? "none" : "";
+      });
+    }
+
+    // Construire l'UI groupée
+    COLLECTION_ORDER.forEach(col => {
+      const group = byCollection[col];
+      if(!group || group.length === 0) return;
+
+      // En-tête de collection
+      const heading = document.createElement("div");
+      heading.className = "draft-collection-heading";
+      heading.textContent = (lang === "fr")
+        ? COLLECTION_LABELS[col].fr
+        : COLLECTION_LABELS[col].en;
+
+      // Sous-titre pour les additionnels
+      if(ADDITIONAL_COLLECTIONS.includes(col)){
+        const sub = document.createElement("div");
+        sub.className = "draft-collection-sub";
+        sub.textContent = (lang === "fr")
+          ? "Maximum 1 par équipe"
+          : "Maximum 1 per team";
+        heading.appendChild(sub);
+      }
+
+      if(draftList) draftList.appendChild(heading);
+
+      group.forEach(c => {
+        const row = document.createElement("div");
+        row.className = "toggle";
+
+        const left = document.createElement("div");
+        left.className = "lbl";
+        left.innerHTML = `<div class="t">${t(c.name, lang)}</div><div class="d">${t(c.class, lang)} — HP ${c.hp?.max ?? "?"}</div>`;
+
+        const sw = document.createElement("div");
+        sw.className = "switch";
+        sw.setAttribute("role","switch");
+        sw.setAttribute("tabindex","0");
+        sw.setAttribute("aria-checked","false");
+        switchMap[c.id] = sw;
+
+        sw.addEventListener("click", ()=>{
+          if(selected.has(c.id)){
+            selected.delete(c.id);
+            if(draftError) draftError.textContent = "";
+          } else {
+            if(selected.size >= maxPick){
+              if(draftError) draftError.textContent = (lang === "fr")
+                ? `Tu as déjà ${maxPick} unités sélectionnées.`
+                : `You already selected ${maxPick} units.`;
+              return;
+            }
+            if(ADDITIONAL_COLLECTIONS.includes(c.collection) && countAdditionalByCollection(c.collection) >= 1){
+              if(draftError) draftError.textContent = (lang === "fr")
+                ? `Maximum 1 personnage "${COLLECTION_LABELS[c.collection].fr.split("—")[1]?.trim() || c.collection}" par équipe.`
+                : `Maximum 1 "${COLLECTION_LABELS[c.collection].en.split("—")[1]?.trim() || c.collection}" character per team.`;
+              return;
+            }
+            selected.add(c.id);
+            if(draftError) draftError.textContent = "";
+          }
+          refreshAll();
+        });
+
+        sw.addEventListener("keydown",(e)=>{
+          if(e.key === "Enter" || e.key === " "){ e.preventDefault(); sw.click(); }
+        });
+
+        row.appendChild(left);
+        row.appendChild(sw);
+        if(draftList) draftList.appendChild(row);
+      });
+    });
+
+    refreshAll();
 
     qs("#confirmDraft")?.addEventListener("click", ()=>{
       if(selected.size !== maxPick){
