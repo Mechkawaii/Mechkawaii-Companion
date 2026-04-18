@@ -651,38 +651,13 @@ async function initIndex(){
     list.innerHTML = "";
     if(draftList) draftList.innerHTML = "";
 
-    // Inject collection CSS once
-    if(!document.getElementById("mkw-col-css")){
-      const s = document.createElement("style");
-      s.id = "mkw-col-css";
-      s.textContent = [
-        ".draft-section-title{margin:18px 0 4px;padding:6px 12px;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;border-left:3px solid #FF9F50;border-radius:0 6px 6px 0;background:rgba(255,255,255,.04);}",
-        ".draft-section-title[data-col=foret]{border-left-color:#5ecf6a;}",
-        ".draft-section-title[data-col=hacker]{border-left-color:#a78bfa;}",
-        ".draft-section-title[data-col=general]{border-left-color:#f472b6;}",
-        ".draft-section-title .section-sub{display:block;font-size:10px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.65;margin-top:1px;}",
-        ".col-pill{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:20px;margin-left:6px;vertical-align:middle;}",
-        ".col-pill.p-urbain{background:rgba(255,159,80,.2);color:#FF9F50;}",
-        ".col-pill.p-foret{background:rgba(94,207,106,.2);color:#5ecf6a;}",
-        ".col-pill.p-hacker{background:rgba(167,139,250,.2);color:#a78bfa;}",
-        ".col-pill.p-general{background:rgba(244,114,182,.2);color:#f472b6;}"
-      ].join("");
-      document.head.appendChild(s);
-    }
-
     const selected = new Set();
     const ADDITIONAL = ["hacker","general"];
     const COL_LABELS = {
-      urbain:  {fr:"🏙️ Biome Urbain",       en:"🏙️ Urban Biome"},
-      foret:   {fr:"🌲 Biome Forêt",         en:"🌲 Forest Biome"},
-      hacker:  {fr:"💻 Additionnels — Hacker", en:"💻 Additional — Hacker"},
-      general: {fr:"🎖️ Additionnels — Général",en:"🎖️ Additional — General"},
-    };
-    const PILL_LABELS = {
-      urbain:  {fr:"Urbain",  en:"Urban"},
-      foret:   {fr:"Forêt",   en:"Forest"},
-      hacker:  {fr:"Hacker",  en:"Hacker"},
-      general: {fr:"Général", en:"General"},
+      urbain:  {fr:"🏙️ Biome Urbain",            en:"🏙️ Urban Biome"},
+      foret:   {fr:"🌲 Biome Forêt",              en:"🌲 Forest Biome"},
+      hacker:  {fr:"💻 Additionnels — Hacker",    en:"💻 Additional — Hacker"},
+      general: {fr:"🎖️ Additionnels — Général",  en:"🎖️ Additional — General"},
     };
     const COL_ORDER = ["urbain","foret","hacker","general"];
 
@@ -694,7 +669,6 @@ async function initIndex(){
       (groups[k] = groups[k] || []).push(c);
     });
 
-    // switchMap for refreshAll
     const switchMap = {};
 
     function countCol(col){
@@ -721,48 +695,41 @@ async function initIndex(){
       });
     }
 
-    // Build grouped UI
+    // Pour chaque collection : insérer l'en-tête AVANT #draftList via un wrapper,
+    // puis les .toggle avec data-collection dans #draftList
     COL_ORDER.forEach(colKey => {
       const group = groups[colKey];
       if(!group || group.length === 0) return;
 
-      // Section heading
+      // En-tête inséré dans draftList mais marqué comme heading (draft-cards.js l'ignorera)
       const heading = document.createElement("div");
-      heading.className = "draft-section-title";
-      heading.setAttribute("data-col", colKey);
-      const titleText = document.createTextNode((lang === "fr") ? COL_LABELS[colKey].fr : COL_LABELS[colKey].en);
-      heading.appendChild(titleText);
+      heading.className = "draft-col-heading";
+      heading.setAttribute("data-heading", "1");
+      heading.textContent = (lang === "fr") ? COL_LABELS[colKey].fr : COL_LABELS[colKey].en;
       if(ADDITIONAL.includes(colKey)){
         const sub = document.createElement("span");
-        sub.className = "section-sub";
-        sub.textContent = (lang === "fr") ? "Maximum 1 par équipe" : "Max 1 per team";
+        sub.className = "draft-col-sub";
+        sub.textContent = (lang === "fr") ? " — max 1 par équipe" : " — max 1 per team";
         heading.appendChild(sub);
       }
       if(draftList) draftList.appendChild(heading);
 
-      // Character rows
       group.forEach(c => {
         const charCol = c.collection || "urbain";
-        const pillLabel = (PILL_LABELS[charCol] || {})[lang] || charCol;
-
         const row = document.createElement("div");
         row.className = "toggle";
+        // Stocker collection ET camp sur le toggle pour que draft-cards.js puisse lire
+        row.setAttribute("data-collection", charCol);
+        row.setAttribute("data-char-id", c.id);
 
         const left = document.createElement("div");
         left.className = "lbl";
-
         const nameDiv = document.createElement("div");
         nameDiv.className = "t";
         nameDiv.textContent = t(c.name, lang);
-        const pill = document.createElement("span");
-        pill.className = "col-pill p-" + charCol;
-        pill.textContent = pillLabel;
-        nameDiv.appendChild(pill);
-
         const descDiv = document.createElement("div");
         descDiv.className = "d";
         descDiv.textContent = t(c.class, lang) + " — HP " + (c.hp?.max ?? "?");
-
         left.appendChild(nameDiv);
         left.appendChild(descDiv);
 
@@ -785,9 +752,10 @@ async function initIndex(){
               return;
             }
             if(ADDITIONAL.includes(charCol) && countCol(charCol) >= 1){
+              const colName = charCol === "hacker" ? "Hacker" : "Général";
               if(draftError) draftError.textContent = (lang === "fr")
-                ? "Maximum 1 personnage de la catégorie [" + pillLabel + "] par équipe."
-                : "Maximum 1 [" + pillLabel + "] character per team.";
+                ? "Maximum 1 personnage " + colName + " par équipe."
+                : "Maximum 1 " + colName + " character per team.";
               return;
             }
             selected.add(c.id);
