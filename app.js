@@ -506,6 +506,57 @@ async function initIndex(){
   bindTopbar();
   applyI18n();
 
+  // Inject collection styles dynamically (no external CSS needed)
+  if(!document.getElementById("mkw-collection-styles")){
+    const _s = document.createElement("style");
+    _s.id = "mkw-collection-styles";
+    _s.textContent = `
+      .draft-collection-heading {
+        margin: 20px 0 4px;
+        padding: 7px 14px 7px 12px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text);
+        border-left: 3px solid #FF9F50;
+        background: rgba(255,255,255,0.04);
+        border-radius: 0 8px 8px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .draft-collection-heading:first-child { margin-top: 4px; }
+      .draft-collection-heading[data-col="foret"]   { border-left-color: #5ecf6a; }
+      .draft-collection-heading[data-col="hacker"]  { border-left-color: #a78bfa; }
+      .draft-collection-heading[data-col="general"] { border-left-color: #f472b6; }
+      .draft-collection-sub {
+        font-size: 10px;
+        font-weight: 500;
+        color: var(--muted);
+        text-transform: none;
+        letter-spacing: 0;
+        margin-left: auto;
+        opacity: 0.8;
+      }
+      .draft-col-badge {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        padding: 2px 7px;
+        border-radius: 20px;
+        margin-left: 6px;
+        vertical-align: middle;
+      }
+      .draft-col-badge.col-urbain  { background: rgba(255,159,80,0.18);  color: #FF9F50; }
+      .draft-col-badge.col-foret   { background: rgba(94,207,106,0.18);  color: #5ecf6a; }
+      .draft-col-badge.col-hacker  { background: rgba(167,139,250,0.18); color: #a78bfa; }
+      .draft-col-badge.col-general { background: rgba(244,114,182,0.18); color: #f472b6; }
+    `;
+    document.head.appendChild(_s);
+  }
+
   const list = qs("#charList");
   if(!list) return;
 
@@ -733,9 +784,17 @@ async function initIndex(){
         const row = document.createElement("div");
         row.className = "toggle";
 
+        const col = c.collection || "urbain";
+        const BADGE_LABELS = {
+          urbain:  { fr: "Urbain",  en: "Urban" },
+          foret:   { fr: "Forêt",   en: "Forest" },
+          hacker:  { fr: "Hacker",  en: "Hacker" },
+          general: { fr: "Général", en: "General" },
+        };
+        const badgeLabel = (BADGE_LABELS[col] || {})[lang] || col;
         const left = document.createElement("div");
         left.className = "lbl";
-        left.innerHTML = `<div class="t">${t(c.name, lang)}</div><div class="d">${t(c.class, lang)} — HP ${c.hp?.max ?? "?"}</div>`;
+        left.innerHTML = `<div class="t">${t(c.name, lang)}<span class="draft-col-badge col-${col}">${badgeLabel}</span></div><div class="d">${t(c.class, lang)} — HP ${c.hp?.max ?? "?"}</div>`;
 
         const sw = document.createElement("div");
         sw.className = "switch";
