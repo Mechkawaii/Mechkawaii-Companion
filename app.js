@@ -506,57 +506,6 @@ async function initIndex(){
   bindTopbar();
   applyI18n();
 
-  // Inject collection styles dynamically (no external CSS needed)
-  if(!document.getElementById("mkw-collection-styles")){
-    const _s = document.createElement("style");
-    _s.id = "mkw-collection-styles";
-    _s.textContent = `
-      .draft-collection-heading {
-        margin: 20px 0 4px;
-        padding: 7px 14px 7px 12px;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: var(--text);
-        border-left: 3px solid #FF9F50;
-        background: rgba(255,255,255,0.04);
-        border-radius: 0 8px 8px 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .draft-collection-heading:first-child { margin-top: 4px; }
-      .draft-collection-heading[data-col="foret"]   { border-left-color: #5ecf6a; }
-      .draft-collection-heading[data-col="hacker"]  { border-left-color: #a78bfa; }
-      .draft-collection-heading[data-col="general"] { border-left-color: #f472b6; }
-      .draft-collection-sub {
-        font-size: 10px;
-        font-weight: 500;
-        color: var(--muted);
-        text-transform: none;
-        letter-spacing: 0;
-        margin-left: auto;
-        opacity: 0.8;
-      }
-      .draft-col-badge {
-        display: inline-block;
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 0.03em;
-        padding: 2px 7px;
-        border-radius: 20px;
-        margin-left: 6px;
-        vertical-align: middle;
-      }
-      .draft-col-badge.col-urbain  { background: rgba(255,159,80,0.18);  color: #FF9F50; }
-      .draft-col-badge.col-foret   { background: rgba(94,207,106,0.18);  color: #5ecf6a; }
-      .draft-col-badge.col-hacker  { background: rgba(167,139,250,0.18); color: #a78bfa; }
-      .draft-col-badge.col-general { background: rgba(244,114,182,0.18); color: #f472b6; }
-    `;
-    document.head.appendChild(_s);
-  }
-
   const list = qs("#charList");
   if(!list) return;
 
@@ -700,35 +649,55 @@ async function initIndex(){
     if(draftCard) draftCard.style.display = "block";
     if(setupCard) setupCard.style.display = "none";
     list.innerHTML = "";
-
     if(draftList) draftList.innerHTML = "";
+
+    // Inject collection CSS once
+    if(!document.getElementById("mkw-col-css")){
+      const s = document.createElement("style");
+      s.id = "mkw-col-css";
+      s.textContent = [
+        ".draft-section-title{margin:18px 0 4px;padding:6px 12px;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;border-left:3px solid #FF9F50;border-radius:0 6px 6px 0;background:rgba(255,255,255,.04);}",
+        ".draft-section-title[data-col=foret]{border-left-color:#5ecf6a;}",
+        ".draft-section-title[data-col=hacker]{border-left-color:#a78bfa;}",
+        ".draft-section-title[data-col=general]{border-left-color:#f472b6;}",
+        ".draft-section-title .section-sub{display:block;font-size:10px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.65;margin-top:1px;}",
+        ".col-pill{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:20px;margin-left:6px;vertical-align:middle;}",
+        ".col-pill.p-urbain{background:rgba(255,159,80,.2);color:#FF9F50;}",
+        ".col-pill.p-foret{background:rgba(94,207,106,.2);color:#5ecf6a;}",
+        ".col-pill.p-hacker{background:rgba(167,139,250,.2);color:#a78bfa;}",
+        ".col-pill.p-general{background:rgba(244,114,182,.2);color:#f472b6;}"
+      ].join("");
+      document.head.appendChild(s);
+    }
+
     const selected = new Set();
-
-    // Règles des catégories additionnelles : max 1 par camp
-    const ADDITIONAL_COLLECTIONS = ["hacker", "general"];
-
-    // Labels des collections (FR/EN)
-    const COLLECTION_LABELS = {
-      urbain: { fr: "🏙️ Biome Urbain", en: "🏙️ Urban Biome" },
-      foret:  { fr: "🌲 Biome Forêt",  en: "🌲 Forest Biome" },
-      hacker: { fr: "💻 Personnages Additionnels — Hacker", en: "💻 Additional Characters — Hacker" },
-      general:{ fr: "🎖️ Personnages Additionnels — Général", en: "🎖️ Additional Characters — General" },
+    const ADDITIONAL = ["hacker","general"];
+    const COL_LABELS = {
+      urbain:  {fr:"🏙️ Biome Urbain",       en:"🏙️ Urban Biome"},
+      foret:   {fr:"🌲 Biome Forêt",         en:"🌲 Forest Biome"},
+      hacker:  {fr:"💻 Additionnels — Hacker", en:"💻 Additional — Hacker"},
+      general: {fr:"🎖️ Additionnels — Général",en:"🎖️ Additional — General"},
     };
-    const COLLECTION_ORDER = ["urbain", "foret", "hacker", "general"];
+    const PILL_LABELS = {
+      urbain:  {fr:"Urbain",  en:"Urban"},
+      foret:   {fr:"Forêt",   en:"Forest"},
+      hacker:  {fr:"Hacker",  en:"Hacker"},
+      general: {fr:"Général", en:"General"},
+    };
+    const COL_ORDER = ["urbain","foret","hacker","general"];
 
-    // Grouper par collection
-    const byCollection = {};
-    COLLECTION_ORDER.forEach(col => { byCollection[col] = []; });
+    // Group by collection
+    const groups = {};
+    COL_ORDER.forEach(k => groups[k] = []);
     available.forEach(c => {
-      const col = c.collection || "urbain";
-      if(!byCollection[col]) byCollection[col] = [];
-      byCollection[col].push(c);
+      const k = c.collection || "urbain";
+      (groups[k] = groups[k] || []).push(c);
     });
 
-    // Map charId -> switch element pour refreshAll
+    // switchMap for refreshAll
     const switchMap = {};
 
-    function countAdditionalByCollection(col){
+    function countCol(col){
       return [...selected].filter(id => {
         const ch = available.find(x => x.id === id);
         return ch && ch.collection === col;
@@ -742,59 +711,60 @@ async function initIndex(){
         const isOn = selected.has(id);
         sw.className = "switch" + (isOn ? " on" : "");
         sw.setAttribute("aria-checked", isOn ? "true" : "false");
-
-        // Désactiver si : max atteint ET pas sélectionné, OU règle additionnel violée
         let blocked = false;
         if(!isOn){
           if(selected.size >= maxPick) blocked = true;
-          if(ch && ADDITIONAL_COLLECTIONS.includes(ch.collection)){
-            if(countAdditionalByCollection(ch.collection) >= 1) blocked = true;
-          }
+          if(ch && ADDITIONAL.includes(ch.collection) && countCol(ch.collection) >= 1) blocked = true;
         }
-        sw.style.opacity = (!isOn && blocked) ? "0.35" : "";
+        sw.style.opacity = (!isOn && blocked) ? "0.3" : "";
         sw.style.pointerEvents = (!isOn && blocked) ? "none" : "";
       });
     }
 
-    // Construire l'UI groupée
-    COLLECTION_ORDER.forEach(col => {
-      const group = byCollection[col];
+    // Build grouped UI
+    COL_ORDER.forEach(colKey => {
+      const group = groups[colKey];
       if(!group || group.length === 0) return;
 
-      // En-tête de collection
+      // Section heading
       const heading = document.createElement("div");
-      heading.className = "draft-collection-heading";
-      heading.textContent = (lang === "fr")
-        ? COLLECTION_LABELS[col].fr
-        : COLLECTION_LABELS[col].en;
-
-      // Sous-titre pour les additionnels
-      if(ADDITIONAL_COLLECTIONS.includes(col)){
-        const sub = document.createElement("div");
-        sub.className = "draft-collection-sub";
-        sub.textContent = (lang === "fr")
-          ? "Maximum 1 par équipe"
-          : "Maximum 1 per team";
+      heading.className = "draft-section-title";
+      heading.setAttribute("data-col", colKey);
+      const titleText = document.createTextNode((lang === "fr") ? COL_LABELS[colKey].fr : COL_LABELS[colKey].en);
+      heading.appendChild(titleText);
+      if(ADDITIONAL.includes(colKey)){
+        const sub = document.createElement("span");
+        sub.className = "section-sub";
+        sub.textContent = (lang === "fr") ? "Maximum 1 par équipe" : "Max 1 per team";
         heading.appendChild(sub);
       }
-
       if(draftList) draftList.appendChild(heading);
 
+      // Character rows
       group.forEach(c => {
+        const charCol = c.collection || "urbain";
+        const pillLabel = (PILL_LABELS[charCol] || {})[lang] || charCol;
+
         const row = document.createElement("div");
         row.className = "toggle";
 
-        const charCol = c.collection || "urbain";
-        const BADGE_LABELS = {
-          urbain:  { fr: "Urbain",  en: "Urban" },
-          foret:   { fr: "Forêt",   en: "Forest" },
-          hacker:  { fr: "Hacker",  en: "Hacker" },
-          general: { fr: "Général", en: "General" },
-        };
-        const badgeLabel = (BADGE_LABELS[charCol] || {})[lang] || charCol;
         const left = document.createElement("div");
         left.className = "lbl";
-        left.innerHTML = `<div class="t">${t(c.name, lang)}<span class="draft-col-badge col-${charCol}">${badgeLabel}</span></div><div class="d">${t(c.class, lang)} — HP ${c.hp?.max ?? "?"}</div>`;
+
+        const nameDiv = document.createElement("div");
+        nameDiv.className = "t";
+        nameDiv.textContent = t(c.name, lang);
+        const pill = document.createElement("span");
+        pill.className = "col-pill p-" + charCol;
+        pill.textContent = pillLabel;
+        nameDiv.appendChild(pill);
+
+        const descDiv = document.createElement("div");
+        descDiv.className = "d";
+        descDiv.textContent = t(c.class, lang) + " — HP " + (c.hp?.max ?? "?");
+
+        left.appendChild(nameDiv);
+        left.appendChild(descDiv);
 
         const sw = document.createElement("div");
         sw.className = "switch";
@@ -803,21 +773,21 @@ async function initIndex(){
         sw.setAttribute("aria-checked","false");
         switchMap[c.id] = sw;
 
-        sw.addEventListener("click", ()=>{
+        sw.addEventListener("click", () => {
           if(selected.has(c.id)){
             selected.delete(c.id);
             if(draftError) draftError.textContent = "";
           } else {
             if(selected.size >= maxPick){
               if(draftError) draftError.textContent = (lang === "fr")
-                ? `Tu as déjà ${maxPick} unités sélectionnées.`
-                : `You already selected ${maxPick} units.`;
+                ? "Tu as déjà " + maxPick + " unités sélectionnées."
+                : "You already selected " + maxPick + " units.";
               return;
             }
-            if(ADDITIONAL_COLLECTIONS.includes(c.collection) && countAdditionalByCollection(c.collection) >= 1){
+            if(ADDITIONAL.includes(charCol) && countCol(charCol) >= 1){
               if(draftError) draftError.textContent = (lang === "fr")
-                ? `Maximum 1 personnage "${COLLECTION_LABELS[c.collection].fr.split("—")[1]?.trim() || c.collection}" par équipe.`
-                : `Maximum 1 "${COLLECTION_LABELS[c.collection].en.split("—")[1]?.trim() || c.collection}" character per team.`;
+                ? "Maximum 1 personnage de la catégorie [" + pillLabel + "] par équipe."
+                : "Maximum 1 [" + pillLabel + "] character per team.";
               return;
             }
             selected.add(c.id);
@@ -826,7 +796,7 @@ async function initIndex(){
           refreshAll();
         });
 
-        sw.addEventListener("keydown",(e)=>{
+        sw.addEventListener("keydown", e => {
           if(e.key === "Enter" || e.key === " "){ e.preventDefault(); sw.click(); }
         });
 
@@ -838,18 +808,18 @@ async function initIndex(){
 
     refreshAll();
 
-    qs("#confirmDraft")?.addEventListener("click", ()=>{
+    qs("#confirmDraft")?.addEventListener("click", () => {
       if(selected.size !== maxPick){
         if(draftError) draftError.textContent = (lang === "fr")
-          ? `Sélectionne exactement ${maxPick} unités.`
-          : `Select exactly ${maxPick} units.`;
+          ? "Sélectionne exactement " + maxPick + " unités."
+          : "Select exactly " + maxPick + " units.";
         return;
       }
       saveDraft({activeIds:[...selected]});
       location.reload();
     });
 
-    qs("#skipDraft")?.addEventListener("click", ()=>{
+    qs("#skipDraft")?.addEventListener("click", () => {
       saveDraft({activeIds: null});
       location.reload();
     });
