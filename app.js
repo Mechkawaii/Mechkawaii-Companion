@@ -784,17 +784,17 @@ async function initIndex(){
         const row = document.createElement("div");
         row.className = "toggle";
 
-        const col = c.collection || "urbain";
+        const charCol = c.collection || "urbain";
         const BADGE_LABELS = {
           urbain:  { fr: "Urbain",  en: "Urban" },
           foret:   { fr: "Forêt",   en: "Forest" },
           hacker:  { fr: "Hacker",  en: "Hacker" },
           general: { fr: "Général", en: "General" },
         };
-        const badgeLabel = (BADGE_LABELS[col] || {})[lang] || col;
+        const badgeLabel = (BADGE_LABELS[charCol] || {})[lang] || charCol;
         const left = document.createElement("div");
         left.className = "lbl";
-        left.innerHTML = `<div class="t">${t(c.name, lang)}<span class="draft-col-badge col-${col}">${badgeLabel}</span></div><div class="d">${t(c.class, lang)} — HP ${c.hp?.max ?? "?"}</div>`;
+        left.innerHTML = `<div class="t">${t(c.name, lang)}<span class="draft-col-badge col-${charCol}">${badgeLabel}</span></div><div class="d">${t(c.class, lang)} — HP ${c.hp?.max ?? "?"}</div>`;
 
         const sw = document.createElement("div");
         sw.className = "switch";
