@@ -452,16 +452,16 @@
         "en": "Class Action: Deminer"
       },
       "class_action_body": {
-        "fr": "Cette unité inflige 1 PV à tous les adversaires présents sur un terrain miné sur un jet de dé de tir réussi. Cette unité ne fait pas de corps-à-corps et ignore les mines adverses.",
-        "en": "On a successful ranged die roll, this unit deals 1 HP to all enemies on any mined terrain. This unit cannot perform melee attacks and ignores enemy mines."
+        "fr": "Une unité adverse subit 1 PV (jet de tir réussi) en entrant sur les cases mines 💥. Les mines se déplacent avec le Démineur et ne se déclenchent pas si elles apparaissent sous une unité. Ignore les mines adverses. Pas de corps-à-corps.",
+        "en": "Enemy units take 1 HP when entering a mine space 💥 on a successful Ranged Attack roll. Mines move with the Deminer and do not trigger when placed beneath a unit. This unit ignores enemy mines and cannot perform Melee Attacks."
       },
       "ultimate_title": {
         "fr": "Coup Unique : Lancer de Mine",
         "en": "Ultimate Ability: Mine Throw"
       },
       "ultimate_body": {
-        "fr": "Lance une mine sur 3 terrains ciblés par un jet de dés de terrain. Si un adversaire est concerné, faites un jet de dé de tir pour résoudre les dégâts.",
-        "en": "Place a mine on 3 target spaces determined by a terrain die roll. If an enemy unit occupies one of those spaces, roll a ranged die to resolve damage."
+        "fr": "Lance une mine sur 3 terrains ciblés par un jet de dés de terrain. Si un adversaire est concerné, faites un jet de dé de tir pour résoudre les dégâts. Sinon la mine disparait.",
+        "en": "Deploy a mine onto three spaces determined by the Terrain Dice. If an enemy unit occupies one of those spaces, roll the Shooting Die to resolve damage. Otherwise, the mine is discarded."
       },
       "movement_desc": {
         "fr": "Déplacement standard.",
@@ -537,16 +537,16 @@
         "en": "Class Action: Cartographer"
       },
       "class_action_body": {
-        "fr": "Cette unité a une haute maîtrise du terrain. Lorsqu'elle subit une attaque, le joueur lance un dé de tir : sur un résultat réussi, l'unité se cache et évite le tir. Ne subit aucun malus de terrain.",
-        "en": "This unit has mastery of the terrain. When targeted by an attack, roll a ranged die: on a success, the unit hides and avoids the attack. This unit suffers no terrain penalties."
+        "fr": "Lorsqu’il est attaqué, le Cartographe lance un dé de tir. En cas de réussite, il se cache sur le terrain et évite l’attaque. Il ne subit aucun malus de terrain.",
+        "en": "When this unit is targeted by an attack, the Cartographer rolls the Shooting Die. On a success, it avoids the attack. This unit is not affected by terrain penalties."
       },
       "ultimate_title": {
         "fr": "Coup Unique : Mise à Jour de Coordonnées",
         "en": "Ultimate Ability: Coordinate Update"
       },
       "ultimate_body": {
-        "fr": "Échange deux terrains du champ de bataille sans unités. Le terrain événement ne peut pas être échangé.",
-        "en": "Swap two unoccupied terrain tiles on the battlefield. The event terrain cannot be swapped."
+        "fr": "Échange deux terrains du champ de bataille. Ils ne doivent pas contenir d’unités. Le terrain Événement ne peut pas être échangé.",
+        "en": "Choose two terrain tiles on the battlefield that do not contain any units and swap their positions. The Event tile cannot be chosen."
       },
       "movement_desc": {
         "fr": "Déplacement standard.",
@@ -622,16 +622,16 @@
         "en": "Class Action: Sniper"
       },
       "class_action_body": {
-        "fr": "Tir partout sur le champ de bataille. Sa ligne de mire n'est jamais bloquée. Ses tirs critiques comptent comme un tir simple.",
-        "en": "This unit may fire anywhere on the battlefield. Its line of sight is never blocked. Critical hit results count as standard hits."
+        "fr": "Tir où il veut sur le champ de bataille. Ses tirs critiques comptent comme un tir simple.",
+        "en": "This unit may target any space on the battlefield with its Ranged Attacks. Critical Hit results are resolved as standard hits (1 HP)."
       },
       "ultimate_title": {
         "fr": "Coup Unique : Balle Cryogénique",
-        "en": "Ultimate Ability: Cryogenic Round"
+        "en": "Ultimate Ability: Cryogenic Bullet"
       },
       "ultimate_body": {
-        "fr": "Inflige 2 PV. Si le tir est raté, l'unité passe son prochain tour.",
-        "en": "Deals 2 HP. If the shot misses, this unit skips its next turn."
+        "fr": "Tir une balle qui inflige 2PV. Si le tir est raté, l’unité visée doit passer son prochain tour.",
+        "en": "Perform a Ranged Attack that deals 2 HP on a hit. If the attack misses, the targeted unit must skip its next turn."
       },
       "movement_desc": {
         "fr": "Déplacement standard.",
@@ -707,16 +707,16 @@
         "en": "Class Action: Bomber"
       },
       "class_action_body": {
-        "fr": "Déploie un drone aérien qui tire sur une ligne entière du champ de bataille. Le tir affecte aussi les unités alliées.",
-        "en": "Deploy an aerial drone that fires on an entire row of the battlefield. The attack also affects allied units."
+        "fr": "Cette unité déploie un drone aérien qui tire sur une ligne entière de terrains du champ de bataille. Le tir affecte les alliées et ennemies.",
+        "en": "This unit deploys an aerial drone and performs a Ranged Attack across an entire line of spaces on the battlefield. All units on that line are affected, including allies."
       },
       "ultimate_title": {
         "fr": "Coup Unique : Largage de Ravitaillement",
         "en": "Ultimate Ability: Supply Drop"
       },
       "ultimate_body": {
-        "fr": "Distribue à trois alliés différents : +1 PV au premier, 1 bouclier au second, 1 clé de réparation au troisième.",
-        "en": "Distribute to three different allied units: +1 HP to the first, 1 Shield to the second, 1 Repair Key to the third."
+        "fr": "Le drone largue des équipements sur trois alliés distincts : +1 PV pour un allié, un bouclier pour un second, une clé de réparation pour un troisième",
+        "en": "The drone deploys equipment to three different allied units: choose one allied unit to gain +1 HP, a second to gain a Shield, and a third to gain one Repair Key."
       },
       "movement_desc": {
         "fr": "Déplacement standard.",
@@ -792,16 +792,16 @@
         "en": "Class Action: Armorer"
       },
       "class_action_body": {
-        "fr": "Dirige les tirs vers lui. Cette unité peut prendre les tirs à la place d'un allié, même durant le tour adverse.",
-        "en": "This unit draws fire. It may intercept attacks targeting an ally, even during the opponent's turn."
+        "fr": "Cette unité peut rediriger vers elle les tirs ennemis visant une unité alliée. Cette capacité est jouable durant le tour de l’adversaire. Ne peut pas recevoir de bouclier.",
+        "en": "This unit may redirect enemy attacks targeting an allied unit to itself. This ability can be used during the opponent’s turn. This unit cannot gain Shields."
       },
       "ultimate_title": {
         "fr": "Coup Unique : Armure de Plastofer",
         "en": "Ultimate Ability: Plastofer Armor"
       },
       "ultimate_body": {
-        "fr": "Donne une armure à une unité alliée qui contre les tirs critiques ennemis pour toute la partie. Utilisable une fois par partie.",
-        "en": "Grant one allied unit an armor that negates enemy critical hits for the rest of the game. Usable once per game."
+        "fr": "Donne une armure à une unité alliée. Elle annule les tirs critiques ennemis durant toute la partie. Ce coup unique ne peut pas être réamorcé.",
+        "en": "Choose one allied unit. For the rest of the game, Critical Hit results against that unit are ignored. This Ultimate Ability may only be used once per game."
       },
       "movement_desc": {
         "fr": "Déplacement lent mais robuste.",
@@ -1302,16 +1302,16 @@
         "en": "Class Action: Sniper"
       },
       "class_action_body": {
-        "fr": "Tir partout sur le champ de bataille. Sa ligne de mire n'est jamais bloquée. Ses tirs critiques comptent comme un tir simple.",
-        "en": "This unit may fire anywhere on the battlefield. Its line of sight is never blocked. Critical hit results count as standard hits."
+        "fr": "Tir où il veut sur le champ de bataille. Ses tirs critiques comptent comme un tir simple.",
+        "en": "This unit may target any space on the battlefield with its Ranged Attacks. Critical Hit results are resolved as standard hits (1 HP)."
       },
       "ultimate_title": {
         "fr": "Coup Unique : Balle à Fragmentation",
-        "en": "Ultimate Ability: Fragmentation Round"
+        "en": "Ultimate Ability: Fragmentation Bullet"
       },
       "ultimate_body": {
-        "fr": "Inflige 1, 2 ou 3 PV selon le résultat du dé (1 = nul, 2 = normal, 3 = critique).",
-        "en": "Deals 1, 2, or 3 HP depending on the die result (1 = miss, 2 = normal, 3 = critical)."
+        "fr": "Tir une balle qui inflige 1, 2, ou 3PV suivant le résultat d’un jet de dé (1 pour la face nulle, 2 pour la face tir normal, 3 pour la face tir critique).",
+        "en": "Perform a shot that deals damage based on the die result: 1 HP on a blank result, 2 HP on a standard hit, and 3 HP on a Critical Hit."
       },
       "movement_desc": {
         "fr": "Déplacement standard.",
@@ -1387,16 +1387,16 @@
         "en": "Class Action: Armorer"
       },
       "class_action_body": {
-        "fr": "Dirige les tirs vers lui. Cette unité peut prendre les tirs à la place d'un allié, même durant le tour de l'adversaire.",
-        "en": "This unit draws fire. It may intercept attacks targeting an ally, even during the opponent's turn."
+        "fr": "Cette unité peut rediriger vers elle les tirs ennemis visant une unité alliée. Cette capacité est jouable durant le tour de l’adversaire. Ne peut pas recevoir de bouclier.",
+        "en": "When an allied unit is targeted by an enemy attack, this unit may redirect that attack to itself. This ability can be used during the opponent’s turn. This unit cannot gain Shields."
       },
       "ultimate_title": {
         "fr": "Coup Unique : Armure à Ricochet",
         "en": "Ultimate Ability: Ricochet Armor"
       },
       "ultimate_body": {
-        "fr": "La prochaine fois que cette unité est touchée, elle renvoie le tir sur un terrain aléatoire. Si une unité (alliée ou ennemie) est présente, elle subit les dégâts.",
-        "en": "The next time this unit is hit, it deflects the attack to a random space. If a unit (allied or enemy) is present on that space, it takes the damage."
+        "fr": "La prochaine fois que cette unité est attaquée, elle renvoie un tir vers un terrain déterminé par un jet de dé de terrain. Toute unité présente sur ce terrain, alliée ou ennemie, subit 2PV.",
+        "en": "The next time this unit is targeted by an attack, it performs a counterattack targeting a space determined by the Terrain Dice. Any unit on that space, allied or enemy, suffers 2 HP."
       },
       "movement_desc": {
         "fr": "Déplacement lent mais robuste.",
@@ -1472,16 +1472,16 @@
         "en": "Class Action: Bomber"
       },
       "class_action_body": {
-        "fr": "Déploie un drone aérien qui tire sur une ligne entière du champ de bataille. Le tir affecte aussi les unités alliées.",
-        "en": "Deploy an aerial drone that fires on an entire row of the battlefield. The attack also affects allied units."
+        "fr": "Cette unité déploie un drone aérien qui tire sur une ligne entière de terrains du champ de bataille. Le tir affecte les alliées et ennemies.",
+        "en": "This unit deploys an aerial drone and performs a Ranged Attack across an entire line of spaces on the battlefield. All units on that line are affected, including allies."
       },
       "ultimate_title": {
         "fr": "Coup Unique : Bombardement Chirurgical",
         "en": "Ultimate Ability: Surgical Bombing"
       },
       "ultimate_body": {
-        "fr": "Retire une clé de réparation à chaque unité adverse.",
-        "en": "Remove one Repair Key from each enemy unit."
+        "fr": "Le drone cible les clés de réparation ennemies. Chaque unité adverse perd 1 clé de réparation. Si elle n’en a pas, elle perd 1 PV.",
+        "en": "The drone targets enemy Repair Keys. Each enemy unit loses 1 Repair Key. If a unit has no Repair Keys, it instead loses 1 HP."
       },
       "movement_desc": {
         "fr": "Déplacement standard.",
@@ -1565,8 +1565,8 @@
         "en": "Ultimate Ability: Nuclear Super Mine"
       },
       "ultimate_body": {
-        "fr": "L'unité se détruit. Elle inflige 2 PV à tous les ennemis sur les terrains adjacents (pas aux alliés). Utilisable une fois par partie.",
-        "en": "This unit is destroyed. It deals 2 HP to all enemies on adjacent spaces (allies are unaffected). Usable once per game."
+        "fr": "Cette unité explose, devient HS et inflige 2 PV à tous les ennemis sur des terrains adjacents (les alliés ne sont pas affectés). Ce coup unique ne peut pas être réamorcé.",
+        "en": "This unit self-destructs, becoming Disabled and dealing 2 HP to all adjacent enemy units (allies are unaffected). This Ultimate Ability cannot be used again."
       },
       "movement_desc": {
         "fr": "Déplacement standard.",
@@ -1642,16 +1642,16 @@
         "en": "Class Action: Cartographer"
       },
       "class_action_body": {
-        "fr": "Cette unité a une haute maîtrise du terrain. Lorsqu'elle subit une attaque, le joueur lance un dé de tir : sur un résultat réussi, l'unité se cache et évite le tir. Ne subit aucun malus de terrain.",
-        "en": "This unit has mastery of the terrain. When targeted by an attack, roll a ranged die: on a success, the unit hides and avoids the attack. This unit suffers no terrain penalties."
+        "fr": "Lorsqu’il est attaqué, le Cartographe lance un dé de tir. En cas de réussite, il se cache sur le terrain et évite l’attaque. Il ne subit aucun malus de terrain.",
+        "en": "When this unit is targeted by an attack, the Cartographer rolls the Shooting Die. On a success, it avoids the attack. This unit is not affected by terrain penalties."
       },
       "ultimate_title": {
         "fr": "Coup Unique : Sabotage de Terrain",
         "en": "Ultimate Ability: Terrain Sabotage"
       },
       "ultimate_body": {
-        "fr": "Détruit deux terrains du champ de bataille sans unités. Le terrain événement ne peut pas être détruit. Utilisable une fois par partie.",
-        "en": "Destroy two unoccupied terrain tiles on the battlefield. The event terrain cannot be destroyed. Usable once per game."
+        "fr": "Détruit deux terrains du champ de bataille ne contenant aucune unité. Le terrain Événement ne peut pas être détruit. Ce coup unique ne peut pas être réamorcé.",
+        "en": "Choose two terrain tiles on the battlefield that do not contain any units and destroy them. The Event tile cannot be chosen. This Ultimate Ability may only be used once per game."
       },
       "movement_desc": {
         "fr": "Déplacement standard.",
