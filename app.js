@@ -358,12 +358,8 @@ function setBlueShieldByTech(map){
 function getCuBadges(){
   try{ const r=localStorage.getItem(STORAGE_PREFIX+"cu-badges"); return r?JSON.parse(r):{}; }catch(e){return{};}
 }
-function setCuBadges(map){
-  localStorage.setItem(STORAGE_PREFIX+"cu-badges",JSON.stringify(map));
-}
-function clearAllCuBadges(){
-  localStorage.removeItem(STORAGE_PREFIX+"cu-badges");
-}
+function setCuBadges(map){ localStorage.setItem(STORAGE_PREFIX+"cu-badges",JSON.stringify(map)); }
+function clearAllCuBadges(){ localStorage.removeItem(STORAGE_PREFIX+"cu-badges"); }
 
 
 // Pour le rendu (glow, tabs, etc) on aime aussi une vue "par cible"
@@ -660,134 +656,67 @@ async function initIndex(){
   if(!draft){
     if(draftCard) draftCard.style.display = "block";
     if(setupCard) setupCard.style.display = "none";
-    list.innerHTML = "";
-    if(draftList) draftList.innerHTML = "";
-
+    list.innerHTML = ""; if(draftList) draftList.innerHTML = "";
     const selected = new Set();
     const ADDITIONAL = ["hacker","general"];
     const COL_LABELS = {
-      urbain:  {fr:"🏙️ Biome Urbain",           en:"🏙️ Urban Biome"},
-      foret:   {fr:"🌲 Biome Forêt",             en:"🌲 Forest Biome"},
-      hacker:  {fr:"💻 Additionnels — Hacker",   en:"💻 Additional — Hacker"},
-      general: {fr:"🎖️ Additionnels — Général",  en:"🎖️ Additional — General"},
+      urbain:{fr:"🏙️ Biome Urbain",en:"🏙️ Urban Biome"},
+      foret:{fr:"🌲 Biome Forêt",en:"🌲 Forest Biome"},
+      hacker:{fr:"💻 Additionnels — Hacker",en:"💻 Additional — Hacker"},
+      general:{fr:"🎖️ Additionnels — Général",en:"🎖️ Additional — General"},
     };
     const COL_ORDER = ["urbain","foret","hacker","general"];
-
-    const groups = {};
-    COL_ORDER.forEach(k => groups[k] = []);
-    available.forEach(c => {
-      const k = c.collection || "urbain";
-      (groups[k] = groups[k] || []).push(c);
-    });
-
+    const groups = {}; COL_ORDER.forEach(k => groups[k] = []);
+    available.forEach(c => { const k=c.collection||"urbain"; (groups[k]=groups[k]||[]).push(c); });
     const switchMap = {};
-
-    function countCol(col){
-      return [...selected].filter(id => {
-        const ch = available.find(x => x.id === id);
-        return ch && (ch.collection || "urbain") === col;
-      }).length;
-    }
-
+    function countCol(col){ return [...selected].filter(id=>{ const ch=available.find(x=>x.id===id); return ch&&(ch.collection||"urbain")===col; }).length; }
     function refreshAll(){
       Object.keys(switchMap).forEach(id => {
-        const ch = available.find(x => x.id === id);
-        const sw = switchMap[id];
-        const isOn = selected.has(id);
-        sw.className = "switch" + (isOn ? " on" : "");
-        sw.setAttribute("aria-checked", isOn ? "true" : "false");
-        let blocked = false;
-        if(!isOn){
-          if(selected.size >= maxPick) blocked = true;
-          if(ch && ADDITIONAL.includes(ch.collection) && countCol(ch.collection) >= 1) blocked = true;
-        }
-        sw.style.opacity = (!isOn && blocked) ? "0.35" : "";
-        sw.style.pointerEvents = (!isOn && blocked) ? "none" : "";
+        const ch=available.find(x=>x.id===id), sw=switchMap[id], isOn=selected.has(id);
+        sw.className="switch"+(isOn?" on":""); sw.setAttribute("aria-checked",isOn?"true":"false");
+        let blocked=false;
+        if(!isOn){ if(selected.size>=maxPick) blocked=true; if(ch&&ADDITIONAL.includes(ch.collection)&&countCol(ch.collection)>=1) blocked=true; }
+        sw.style.opacity=(!isOn&&blocked)?"0.35":""; sw.style.pointerEvents=(!isOn&&blocked)?"none":"";
       });
     }
-
+    const colColors={urbain:"#FF9F50",foret:"#5ecf6a",hacker:"#a78bfa",general:"#f472b6"};
     COL_ORDER.forEach(colKey => {
-      const group = groups[colKey];
-      if(!group || group.length === 0) return;
-
-      const heading = document.createElement("div");
+      const group=groups[colKey]; if(!group||!group.length) return;
+      const heading=document.createElement("div");
       heading.setAttribute("data-heading","1");
-      heading.style.cssText = "margin:16px 0 6px;padding:5px 12px;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;border-left:3px solid #FF9F50;border-radius:0 6px 6px 0;background:rgba(255,255,255,.04);color:var(--text);display:flex;align-items:center;gap:6px;";
-      const colColors = {urbain:"#FF9F50",foret:"#5ecf6a",hacker:"#a78bfa",general:"#f472b6"};
-      heading.style.borderLeftColor = colColors[colKey] || "#FF9F50";
-      heading.textContent = (lang === "fr") ? COL_LABELS[colKey].fr : COL_LABELS[colKey].en;
-      if(ADDITIONAL.includes(colKey)){
-        const sub = document.createElement("span");
-        sub.style.cssText = "font-size:10px;font-weight:500;text-transform:none;opacity:.6;margin-left:6px;";
-        sub.textContent = lang === "fr" ? "— max 1 par équipe" : "— max 1 per team";
-        heading.appendChild(sub);
-      }
+      heading.style.cssText="margin:16px 0 6px;padding:5px 12px;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;border-left:3px solid "+(colColors[colKey]||"#FF9F50")+";border-radius:0 6px 6px 0;background:rgba(255,255,255,.04);color:var(--text);display:flex;align-items:center;gap:6px;";
+      heading.textContent=(lang==="fr")?COL_LABELS[colKey].fr:COL_LABELS[colKey].en;
+      if(ADDITIONAL.includes(colKey)){ const sub=document.createElement("span"); sub.style.cssText="font-size:10px;font-weight:500;text-transform:none;opacity:.6;margin-left:6px;"; sub.textContent=lang==="fr"?"— max 1 par équipe":"— max 1 per team"; heading.appendChild(sub); }
       if(draftList) draftList.appendChild(heading);
-
       group.forEach(c => {
-        const charCol = c.collection || "urbain";
-        const row = document.createElement("div");
-        row.className = "toggle";
-        row.setAttribute("data-char-id", c.id);
-        row.setAttribute("data-collection", charCol);
-
-        const left = document.createElement("div");
-        left.className = "lbl";
-        const nameDiv = document.createElement("div"); nameDiv.className = "t"; nameDiv.textContent = t(c.name, lang);
-        const descDiv = document.createElement("div"); descDiv.className = "d"; descDiv.textContent = t(c.class, lang) + " — HP " + (c.hp?.max ?? "?");
-        left.appendChild(nameDiv); left.appendChild(descDiv);
-
-        const sw = document.createElement("div");
-        sw.className = "switch";
-        sw.setAttribute("role","switch");
-        sw.setAttribute("tabindex","0");
-        sw.setAttribute("aria-checked","false");
-        switchMap[c.id] = sw;
-
-        sw.addEventListener("click", () => {
-          if(selected.has(c.id)){
-            selected.delete(c.id);
-            if(draftError) draftError.textContent = "";
-          } else {
-            if(selected.size >= maxPick){
-              if(draftError) draftError.textContent = lang === "fr" ? "Tu as déjà " + maxPick + " unités sélectionnées." : "You already selected " + maxPick + " units.";
-              return;
-            }
-            if(ADDITIONAL.includes(charCol) && countCol(charCol) >= 1){
-              if(draftError) draftError.textContent = lang === "fr" ? "Maximum 1 personnage de cette catégorie par équipe." : "Maximum 1 character of this category per team.";
-              return;
-            }
-            selected.add(c.id);
-            if(draftError) draftError.textContent = "";
+        const charCol=c.collection||"urbain";
+        const row=document.createElement("div"); row.className="toggle";
+        row.setAttribute("data-char-id",c.id); row.setAttribute("data-collection",charCol);
+        const left=document.createElement("div"); left.className="lbl";
+        const nd=document.createElement("div"); nd.className="t"; nd.textContent=t(c.name,lang);
+        const dd=document.createElement("div"); dd.className="d"; dd.textContent=t(c.class,lang)+" — HP "+(c.hp?.max??"?");
+        left.appendChild(nd); left.appendChild(dd);
+        const sw=document.createElement("div"); sw.className="switch"; sw.setAttribute("role","switch"); sw.setAttribute("tabindex","0"); sw.setAttribute("aria-checked","false");
+        switchMap[c.id]=sw;
+        sw.addEventListener("click",()=>{
+          if(selected.has(c.id)){ selected.delete(c.id); if(draftError) draftError.textContent=""; }
+          else {
+            if(selected.size>=maxPick){ if(draftError) draftError.textContent=lang==="fr"?"Tu as déjà "+maxPick+" unités sélectionnées.":"You already selected "+maxPick+" units."; return; }
+            if(ADDITIONAL.includes(charCol)&&countCol(charCol)>=1){ if(draftError) draftError.textContent=lang==="fr"?"Maximum 1 personnage de cette catégorie par équipe.":"Maximum 1 character of this category per team."; return; }
+            selected.add(c.id); if(draftError) draftError.textContent="";
           }
           refreshAll();
         });
-
-        sw.addEventListener("keydown", e => {
-          if(e.key === "Enter" || e.key === " "){ e.preventDefault(); sw.click(); }
-        });
-
-        row.appendChild(left); row.appendChild(sw);
-        if(draftList) draftList.appendChild(row);
+        sw.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); sw.click(); } });
+        row.appendChild(left); row.appendChild(sw); if(draftList) draftList.appendChild(row);
       });
     });
-
     refreshAll();
-
-    qs("#confirmDraft")?.addEventListener("click", () => {
-      if(selected.size !== maxPick){
-        if(draftError) draftError.textContent = lang === "fr" ? "Sélectionne exactement " + maxPick + " unités." : "Select exactly " + maxPick + " units.";
-        return;
-      }
-      saveDraft({activeIds:[...selected]});
-      location.reload();
+    qs("#confirmDraft")?.addEventListener("click",()=>{
+      if(selected.size!==maxPick){ if(draftError) draftError.textContent=lang==="fr"?"Sélectionne exactement "+maxPick+" unités.":"Select exactly "+maxPick+" units."; return; }
+      saveDraft({activeIds:[...selected]}); location.reload();
     });
-
-    qs("#skipDraft")?.addEventListener("click", () => {
-      saveDraft({activeIds: null});
-      location.reload();
-    });
-
+    qs("#skipDraft")?.addEventListener("click",()=>{ saveDraft({activeIds:null}); location.reload(); });
     return;
   }
 
@@ -877,167 +806,68 @@ if (ultToggleContainer) {
     renderToggleRow(ultToggleContainer, ultToggle, isOn, lang, (v) => {
       state.toggles[ultToggle.id] = v;
       setState(c.id, state);
-      applyUltLockOverlay(v);
+      if(typeof _applyLock === "function") _applyLock(v);
     });
   }
 }
 
-// Inject lock overlay CSS once
-if(!document.getElementById("mkw-lock-css")){
-  const _lcs = document.createElement("style");
-  _lcs.id = "mkw-lock-css";
-  _lcs.textContent = `
-    .ult-card-wrap {
-      position: relative;
-      overflow: hidden;
-      border-radius: inherit;
-    }
-    .ult-lock-overlay {
-      display: none;
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      z-index: 10;
-      pointer-events: none;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .ult-lock-overlay.active {
-      display: flex;
-      pointer-events: all;
-    }
-    /* Rayures diagonales rouges */
-    .ult-lock-stripes {
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background: repeating-linear-gradient(
-        -45deg,
-        rgba(231, 76, 60, 0.18) 0px,
-        rgba(231, 76, 60, 0.18) 18px,
-        rgba(255,255,255,0.04) 18px,
-        rgba(255,255,255,0.04) 36px
-      );
-    }
-    /* Blur sur le contenu dessous */
-    .ult-card-wrap.locked > *:not(.ult-lock-overlay) {
-      filter: blur(2px);
-      pointer-events: none;
-      user-select: none;
-    }
-    .ult-lock-icon {
-      font-size: 40px;
-      line-height: 1;
-      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));
-      position: relative;
-      z-index: 1;
-    }
-    .ult-lock-label {
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: rgba(231, 76, 60, 0.95);
-      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-      position: relative;
-      z-index: 1;
-    }
-  `;
-  document.head.appendChild(_lcs);
-}
+// (lock overlay handled by new CU system below)
 
-// Wrap the ult card and add the overlay
-const _ultCard = qs("#ultTitle")?.closest(".card");
-let _lockOverlay = null;
-if(_ultCard){
-  // Wrap inner content
-  if(!_ultCard.querySelector(".ult-card-wrap")){
-    const wrap = document.createElement("div");
-    wrap.className = "ult-card-wrap";
-    while(_ultCard.firstChild) wrap.appendChild(_ultCard.firstChild);
-    _ultCard.appendChild(wrap);
-  }
-  const wrap = _ultCard.querySelector(".ult-card-wrap");
+// Apply on load — lock overlay applied after content is injected below
+  const charName = qs("#charName");
+  const charClass = qs("#charClass");
+  const hpMaxLabel = qs("#hpMaxLabel");
 
-  // Create overlay
-  _lockOverlay = document.createElement("div");
-  _lockOverlay.className = "ult-lock-overlay";
-
-  const stripes = document.createElement("div");
-  stripes.className = "ult-lock-stripes";
-  _lockOverlay.appendChild(stripes);
-
-  const icon = document.createElement("div");
-  icon.className = "ult-lock-icon";
-  icon.textContent = "🔒";
-  _lockOverlay.appendChild(icon);
-
-  const label = document.createElement("div");
-  label.className = "ult-lock-label";
-  label.textContent = lang === "fr" ? "Coup Unique utilisé" : "Ultimate used";
-  _lockOverlay.appendChild(label);
-
-  wrap.appendChild(_lockOverlay);
-}
-
-function applyUltLockOverlay(isUsed){
-  if(!_lockOverlay) return;
-  const wrap = _ultCard?.querySelector(".ult-card-wrap");
-  const locked = isUsed && !c.cu_rearmable;
-  _lockOverlay.classList.toggle("active", locked);
-  if(wrap) wrap.classList.toggle("locked", locked);
-}
-
-// Apply on load
-applyUltLockOverlay(!!state.toggles["ultimate_used"]);
+  if(charName) charName.textContent = t(c.name, lang);
+  if(charClass) charClass.textContent = t(c.class, lang);
 
   /* =====================================================
-     CU BADGE SYSTEM
+     CU BADGE SYSTEM + LOCK OVERLAY
      ===================================================== */
 
   if(!document.getElementById("mkw-cu-css")){
     const _cs=document.createElement("style");
     _cs.id="mkw-cu-css";
     _cs.textContent=`
-      /* Badge zone in header */
-      .cu-header-slot {
+      /* ── Header badge slot (right of name, mirrors portrait) ── */
+      .brand-with-portrait {
         display: flex;
         align-items: center;
-        justify-content: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        flex: 1;
+      }
+      .char-name-block { flex: 1; min-width: 0; }
+      .cu-header-slot {
+        width: 100px; height: 100px;
         flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        position: relative;
+      }
+      @media(max-width:480px){
+        .cu-header-slot { width: 80px; height: 80px; }
       }
       .cu-badge {
-        position: relative;
-        width: 52px;
-        height: 52px;
-        border-radius: 50%;
+        width: 100%; height: 100%;
+        border-radius: 12px;
         cursor: pointer;
         overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex; align-items: center; justify-content: center;
         transition: transform 0.15s;
-        flex-shrink: 0;
+        position: relative;
       }
-      .cu-badge:hover { transform: scale(1.1); }
+      .cu-badge:hover { transform: scale(1.05); }
       .cu-badge img { width: 100%; height: 100%; object-fit: contain; display: block; }
       .cu-badge-remove {
-        position: absolute;
-        top: -3px; right: -3px;
-        width: 16px; height: 16px;
-        border-radius: 50%;
-        background: #e74c3c;
-        color: white;
-        font-size: 10px;
-        font-weight: 900;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 2;
+        position: absolute; top: 4px; right: 4px;
+        width: 20px; height: 20px; border-radius: 50%;
+        background: #e74c3c; color: white;
+        font-size: 12px; font-weight: 900;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; z-index: 2;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.4);
       }
+      /* ── Modals ── */
       .cu-modal-overlay {
         position: fixed; inset: 0;
         background: rgba(0,0,0,0.65);
@@ -1047,37 +877,24 @@ applyUltLockOverlay(!!state.toggles["ultimate_used"]);
       .cu-modal {
         background: #1a1a2e;
         border: 1px solid rgba(255,255,255,0.15);
-        border-radius: 16px;
-        padding: 20px;
-        max-width: 400px;
-        width: 90%;
-        max-height: 80vh;
-        overflow-y: auto;
+        border-radius: 16px; padding: 20px;
+        max-width: 400px; width: 90%; max-height: 80vh; overflow-y: auto;
       }
       .cu-modal h3 { margin: 0 0 14px; font-size: 15px; color: var(--text); }
       .cu-target-btn {
         display: flex; align-items: center; gap: 10px;
         width: 100%; padding: 10px 12px;
-        border-radius: 10px;
-        border: 1px solid rgba(255,255,255,0.1);
-        background: rgba(255,255,255,0.04);
-        color: var(--text); cursor: pointer;
-        margin-bottom: 8px; text-align: left; font-size: 13px;
+        border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.04); color: var(--text);
+        cursor: pointer; margin-bottom: 8px; text-align: left; font-size: 13px;
       }
-      .cu-target-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); }
-      .cu-target-btn img { width: 40px; height: 40px; object-fit: contain; border-radius: 6px; }
-      .cu-target-grid {
-        display: flex; flex-wrap: wrap; gap: 12px;
-        justify-content: center; padding: 4px 0;
-      }
-      .cu-grid-item {
-        display: flex; flex-direction: column; align-items: center; gap: 6px;
-        cursor: pointer; width: 72px;
-      }
+      .cu-target-btn:hover { background: rgba(255,255,255,0.1); }
+      .cu-target-btn img { width: 36px; height: 36px; object-fit: contain; border-radius: 6px; }
+      .cu-target-grid { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; padding: 4px 0; }
+      .cu-grid-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; width: 76px; }
       .cu-grid-item img {
-        width: 60px; height: 60px; object-fit: contain;
-        border-radius: 12px;
-        border: 2px solid rgba(255,255,255,0.1);
+        width: 64px; height: 64px; object-fit: contain;
+        border-radius: 12px; border: 2px solid rgba(255,255,255,0.1);
         transition: transform 0.15s, border-color 0.15s;
       }
       .cu-grid-item:hover img { transform: scale(1.08); border-color: rgba(255,255,255,0.5); }
@@ -1089,29 +906,42 @@ applyUltLockOverlay(!!state.toggles["ultimate_used"]);
         z-index: 2100;
       }
       .cu-detail-modal {
-        background: #1a1a2e;
-        border: 1px solid rgba(255,255,255,0.15);
-        border-radius: 16px; padding: 20px;
-        max-width: 360px; width: 90%;
+        background: #1a1a2e; border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 16px; padding: 20px; max-width: 360px; width: 90%;
       }
       .cu-detail-modal h3 { margin: 0 0 6px; font-size: 14px; color: #FFD700; }
       .cu-detail-modal .cu-src { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
       .cu-detail-modal p { margin: 0 0 16px; font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.5; }
       .cu-close-btn { width: 100%; padding: 8px; border-radius: 8px; background: rgba(255,255,255,0.08); color: var(--text); cursor: pointer; font-size: 13px; border: 1px solid rgba(255,255,255,0.15); }
-      .cu-assign-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); cursor: pointer; color: var(--text); margin-top: 8px; }
-      .cu-assign-btn:hover { background: rgba(255,255,255,0.1); }
+      .cu-cancel-btn { width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,0.06);color:var(--text);cursor:pointer;font-size:13px;border:1px solid rgba(255,255,255,0.1);margin-top:12px; }
+      .cu-assign-btn { display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);cursor:pointer;color:var(--text);margin-top:8px; }
+      .cu-assign-btn:hover { background:rgba(255,255,255,0.1); }
+      /* ── Lock overlay ── */
+      .ult-card-inner { position: relative; overflow: hidden; border-radius: 8px; }
+      .ult-lock-overlay {
+        display: none; position: absolute; inset: 0;
+        border-radius: 8px; z-index: 10;
+        align-items: center; justify-content: center; flex-direction: column; gap: 8px;
+      }
+      .ult-lock-overlay.active { display: flex; }
+      .ult-lock-stripes {
+        position: absolute; inset: 0; border-radius: 8px;
+        background: repeating-linear-gradient(-45deg,rgba(231,76,60,0.22) 0px,rgba(231,76,60,0.22) 18px,rgba(255,255,255,0.04) 18px,rgba(255,255,255,0.04) 36px);
+      }
+      .ult-lock-overlay.active ~ * { filter: blur(2px); pointer-events: none; user-select: none; }
+      .ult-card-inner.locked > *:not(.ult-lock-overlay) { filter: blur(2px); pointer-events: none; user-select: none; }
+      .ult-lock-icon { font-size: 42px; line-height: 1; position: relative; z-index: 1; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.7)); }
+      .ult-lock-label { font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: rgba(231,76,60,0.95); text-shadow: 0 1px 4px rgba(0,0,0,0.8); position: relative; z-index: 1; }
     `;
     document.head.appendChild(_cs);
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────
-
   function _cuActiveChars(campFilter){
     const dr=localStorage.getItem(STORAGE_PREFIX+"draft");
     const draft=dr?JSON.parse(dr):null;
     return chars.filter(ch=>{
-      const chCamp=ch.camp||"mechkawaii";
-      const myCamp=c.camp||"mechkawaii";
+      const chCamp=ch.camp||"mechkawaii", myCamp=c.camp||"mechkawaii";
       if(campFilter==="ally") return chCamp===myCamp && ch.id!==c.id;
       if(campFilter==="enemy") return chCamp!==myCamp;
       return false;
@@ -1122,189 +952,192 @@ applyUltLockOverlay(!!state.toggles["ultimate_used"]);
     const ov=document.createElement("div"); ov.className="cu-detail-overlay";
     const m=document.createElement("div"); m.className="cu-detail-modal";
     const h=document.createElement("h3"); h.textContent=badge.sourceUltTitle||(lang==="fr"?"Coup Unique":"Ultimate");
-    const src=document.createElement("div"); src.className="cu-src";
-    src.textContent=(lang==="fr"?"De : ":"From: ")+badge.sourceName;
+    const src=document.createElement("div"); src.className="cu-src"; src.textContent=(lang==="fr"?"De : ":"From: ")+badge.sourceName;
     const p=document.createElement("p"); p.textContent=badge.sourceUltBody||"";
-    const btn=document.createElement("button"); btn.className="cu-close-btn";
-    btn.textContent=lang==="fr"?"Fermer":"Close"; btn.onclick=()=>ov.remove();
+    const btn=document.createElement("button"); btn.className="cu-close-btn"; btn.textContent=lang==="fr"?"Fermer":"Close"; btn.onclick=()=>ov.remove();
     m.append(h,src,p,btn); ov.appendChild(m);
     ov.addEventListener("click",e=>{if(e.target===ov)ov.remove();});
     document.body.appendChild(ov);
   }
 
-  // The header slot element (set after building it)
-  let _cuHeaderSlot = null;
+  // ── Badge slot setup ──────────────────────────────────────────────────────
+  // Wrap name+class in a block, add portrait-sized CU slot on the right
+  const _brandWrap = document.querySelector(".brand-with-portrait");
+  const _cuSlot = document.createElement("div");
+  _cuSlot.className = "cu-header-slot";
+  if(_brandWrap && !_brandWrap.querySelector(".cu-header-slot")){
+    // Wrap existing middle content (name+class div) in .char-name-block
+    const _midDiv = _brandWrap.children[1];
+    if(_midDiv) _midDiv.classList.add("char-name-block");
+    _brandWrap.appendChild(_cuSlot);
+  }
 
   function _renderCuBadge(){
-    if(!_cuHeaderSlot) return;
+    _cuSlot.innerHTML="";
     const badges=getCuBadges();
     const raw=badges[c.id];
     const list=Array.isArray(raw)?raw:(raw?[raw]:[]);
-    _cuHeaderSlot.innerHTML="";
 
     if(!list.length){
-      // Show CU_vide.png — clickable to open receive modal
+      // CU_vide — cliquable → modal recevoir
       const el=document.createElement("div"); el.className="cu-badge";
-      el.title=lang==="fr"?"Recevoir un effet":"Receive an effect";
+      el.title=lang==="fr"?"Recevoir un effet adverse":"Receive an effect";
       const img=document.createElement("img"); img.src="./assets/cu/CU_vide.png";
-      img.onerror=()=>img.style.display="none";
+      img.onerror=()=>{ img.style.display="none"; };
       el.appendChild(img);
       el.addEventListener("click",()=>_showCuReceiveModal());
-      _cuHeaderSlot.appendChild(el);
+      _cuSlot.appendChild(el);
     } else {
       list.forEach((badge,idx)=>{
-        const el=document.createElement("div"); el.className="cu-badge";
-        el.title=badge.sourceUltTitle||"";
-        const img=document.createElement("img");
-        img.src="./assets/cu/CU_"+badge.sourceId+".png";
-        img.onerror=()=>{ img.style.display="none"; };
+        const el=document.createElement("div"); el.className="cu-badge"; el.title=badge.sourceUltTitle||"";
+        const img=document.createElement("img"); img.src="./assets/cu/CU_"+badge.sourceId+".png";
+        img.onerror=()=>{ img.src="./assets/cu/CU_vide.png"; };
         el.appendChild(img);
         el.addEventListener("click",()=>_showCuDetail(badge));
         const rm=document.createElement("div"); rm.className="cu-badge-remove"; rm.textContent="×";
         rm.addEventListener("click",e=>{ e.stopPropagation();
-          const map=getCuBadges(); const cur=map[c.id];
-          if(Array.isArray(cur)){ cur.splice(idx,1); if(!cur.length) delete map[c.id]; else map[c.id]=cur; }
-          else delete map[c.id];
+          const map=getCuBadges(), cur=map[c.id];
+          if(Array.isArray(cur)){ cur.splice(idx,1); if(!cur.length) delete map[c.id]; else map[c.id]=cur; } else delete map[c.id];
           setCuBadges(map); _renderCuBadge();
         });
-        el.appendChild(rm);
-        _cuHeaderSlot.appendChild(el);
+        el.appendChild(rm); _cuSlot.appendChild(el);
       });
     }
   }
+  _renderCuBadge();
 
   // ── Modals ────────────────────────────────────────────────────────────────
+  function _cuModal(title, body){
+    const ov=document.createElement("div"); ov.className="cu-modal-overlay";
+    const m=document.createElement("div"); m.className="cu-modal";
+    const h=document.createElement("h3"); h.textContent=title; m.appendChild(h);
+    body(m, ov);
+    const cancel=document.createElement("button"); cancel.className="cu-cancel-btn";
+    cancel.textContent=lang==="fr"?"Annuler":"Cancel"; cancel.onclick=()=>ov.remove();
+    m.appendChild(cancel); ov.appendChild(m);
+    ov.addEventListener("click",e=>{if(e.target===ov)ov.remove();});
+    document.body.appendChild(ov);
+  }
 
+  function _flash(text, color){
+    const f=document.createElement("div"); f.textContent=text;
+    f.style.cssText="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:"+color+";color:#000;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:3000;pointer-events:none;";
+    document.body.appendChild(f); setTimeout(()=>f.remove(),2200);
+  }
+
+  // List modal (for assigning targets — shows portrait + name)
   function _showCuTargetModal(campFilter){
     const eligible=_cuActiveChars(campFilter);
     if(!eligible.length){ alert(lang==="fr"?"Aucune unité éligible.":"No eligible unit."); return; }
-    const ov=document.createElement("div"); ov.className="cu-modal-overlay";
-    const m=document.createElement("div"); m.className="cu-modal";
-    const h=document.createElement("h3"); h.textContent=lang==="fr"?"Choisir la cible":"Choose target";
-    m.appendChild(h);
-    eligible.forEach(target=>{
-      const btn=document.createElement("button"); btn.className="cu-target-btn";
-      const ico=target.images?.portrait;
-      if(ico){ const i=document.createElement("img"); i.src=ico; i.onerror=()=>i.style.display="none"; btn.appendChild(i); }
-      const sp=document.createElement("span"); sp.textContent=t(target.name,lang)+" — "+t(target.class,lang); btn.appendChild(sp);
-      btn.addEventListener("click",()=>{
-        const badge={sourceId:c.id,sourceName:t(c.name,lang),sourceUltTitle:t(c.texts?.ultimate_title,lang),sourceUltBody:t(c.texts?.ultimate_body,lang)};
-        const map=getCuBadges();
-        if(!map[target.id]) map[target.id]=[];
-        if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
-        if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
-        setCuBadges(map);
-        if(!c.cu_rearmable){ state.toggles["ultimate_used"]=true; setState(c.id,state); applyUltLockOverlay(true); }
-        ov.remove();
-        const flash=document.createElement("div");
-        flash.textContent=(lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang);
-        flash.style.cssText="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#2ecc71;color:#000;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:3000;pointer-events:none;";
-        document.body.appendChild(flash); setTimeout(()=>flash.remove(),2000);
+    _cuModal(lang==="fr"?"Choisir la cible":"Choose target", (m,ov)=>{
+      eligible.forEach(target=>{
+        const btn=document.createElement("button"); btn.className="cu-target-btn";
+        const ico=target.images?.portrait; if(ico){ const i=document.createElement("img"); i.src=ico; i.onerror=()=>i.style.display="none"; btn.appendChild(i); }
+        const sp=document.createElement("span"); sp.textContent=t(target.name,lang)+" — "+t(target.class,lang); btn.appendChild(sp);
+        btn.addEventListener("click",()=>{
+          const badge={sourceId:c.id,sourceName:t(c.name,lang),sourceUltTitle:t(c.texts?.ultimate_title,lang),sourceUltBody:t(c.texts?.ultimate_body,lang)};
+          const map=getCuBadges();
+          if(!map[target.id]) map[target.id]=[];
+          if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
+          if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
+          setCuBadges(map);
+          if(!c.cu_rearmable){ state.toggles["ultimate_used"]=true; setState(c.id,state); _applyLock(true); }
+          ov.remove();
+          _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang), "#2ecc71");
+        });
+        m.appendChild(btn);
       });
-      m.appendChild(btn);
     });
-    const cancel=document.createElement("button");
-    cancel.style.cssText="width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,0.06);color:var(--text);cursor:pointer;font-size:13px;border:1px solid rgba(255,255,255,0.1);margin-top:4px;";
-    cancel.textContent=lang==="fr"?"Annuler":"Cancel"; cancel.onclick=()=>ov.remove();
-    m.appendChild(cancel); ov.appendChild(m);
-    ov.addEventListener("click",e=>{if(e.target===ov)ov.remove();});
-    document.body.appendChild(ov);
   }
 
-  function _showCuCopyModal(campFilter){
-    const eligible=_cuActiveChars(campFilter);
-    if(!eligible.length){ alert(lang==="fr"?"Aucune unité éligible.":"No eligible unit."); return; }
-    const ov=document.createElement("div"); ov.className="cu-modal-overlay";
-    const m=document.createElement("div"); m.className="cu-modal";
-    const h=document.createElement("h3"); h.textContent=lang==="fr"?"Copier le coup unique de...":"Copy ultimate from...";
-    m.appendChild(h);
-    const grid=document.createElement("div"); grid.className="cu-target-grid"; m.appendChild(grid);
-    eligible.forEach(source=>{
-      const item=document.createElement("div"); item.className="cu-grid-item";
-      const img=document.createElement("img");
-      img.src="./assets/cu/CU_"+source.id+".png";
-      img.onerror=()=>{ img.src=source.images?.portrait||""; };
-      const sp=document.createElement("span"); sp.textContent=t(source.name,lang);
-      item.appendChild(img); item.appendChild(sp);
-      item.addEventListener("click",()=>{
-        const badge={sourceId:source.id,sourceName:t(source.name,lang),sourceUltTitle:t(source.texts?.ultimate_title,lang),sourceUltBody:t(source.texts?.ultimate_body,lang)};
-        const map=getCuBadges(); map[c.id]=[badge]; setCuBadges(map);
-        ov.remove(); _renderCuBadge();
-        const flash=document.createElement("div");
-        flash.textContent=(lang==="fr"?"Coup unique copié : ":"Ultimate copied: ")+badge.sourceUltTitle;
-        flash.style.cssText="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#a78bfa;color:#000;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:3000;pointer-events:none;";
-        document.body.appendChild(flash); setTimeout(()=>flash.remove(),2500);
+  // Grid modal (CU images — for hackers copying, and receive)
+  function _showCuGridModal(title, sources, onPick){
+    _cuModal(title, (m,ov)=>{
+      const grid=document.createElement("div"); grid.className="cu-target-grid"; m.appendChild(grid);
+      sources.forEach(source=>{
+        const item=document.createElement("div"); item.className="cu-grid-item";
+        const img=document.createElement("img");
+        img.src="./assets/cu/CU_"+source.id+".png";
+        img.onerror=()=>{ img.src=source.images?.portrait||"./assets/cu/CU_vide.png"; };
+        const sp=document.createElement("span"); sp.textContent=t(source.name,lang);
+        item.appendChild(img); item.appendChild(sp);
+        item.addEventListener("click",()=>{ onPick(source); ov.remove(); });
+        grid.appendChild(item);
       });
-      grid.appendChild(item);
     });
-    const cancel=document.createElement("button");
-    cancel.style.cssText="width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,0.06);color:var(--text);cursor:pointer;font-size:13px;border:1px solid rgba(255,255,255,0.1);margin-top:12px;";
-    cancel.textContent=lang==="fr"?"Annuler":"Cancel"; cancel.onclick=()=>ov.remove();
-    m.appendChild(cancel); ov.appendChild(m);
-    ov.addEventListener("click",e=>{if(e.target===ov)ov.remove();});
-    document.body.appendChild(ov);
   }
 
-  // Modal "recevoir un effet adverse" — affiche TOUS les CU du camp adverse en grille
+  // Receive: ALL active enemies
   function _showCuReceiveModal(){
     const dr=localStorage.getItem(STORAGE_PREFIX+"draft"); const draft=dr?JSON.parse(dr):null;
     const enemyCamp=(c.camp||"mechkawaii")==="mechkawaii"?"prodrome":"mechkawaii";
     const sources=chars.filter(ch=>{
       if((ch.camp||"mechkawaii")!==enemyCamp) return false;
-      if(draft?.activeIds && !draft.activeIds.includes(ch.id)) return false;
-      return true; // ALL enemy chars, not just those with cu_targets
+      return !draft?.activeIds || draft.activeIds.includes(ch.id);
     });
     if(!sources.length){ alert(lang==="fr"?"Aucun adversaire actif.":"No active opponent."); return; }
-    const ov=document.createElement("div"); ov.className="cu-modal-overlay";
-    const m=document.createElement("div"); m.className="cu-modal";
-    const h=document.createElement("h3"); h.textContent=lang==="fr"?"Quel coup unique adverse ?":"Which enemy ultimate?";
-    m.appendChild(h);
-    const grid=document.createElement("div"); grid.className="cu-target-grid"; m.appendChild(grid);
-    sources.forEach(source=>{
-      const item=document.createElement("div"); item.className="cu-grid-item";
-      const img=document.createElement("img");
-      img.src="./assets/cu/CU_"+source.id+".png";
-      img.onerror=()=>{ img.src=source.images?.portrait||""; };
-      const sp=document.createElement("span"); sp.textContent=t(source.name,lang);
-      item.appendChild(img); item.appendChild(sp);
-      item.addEventListener("click",()=>{
-        const badge={sourceId:source.id,sourceName:t(source.name,lang),sourceUltTitle:t(source.texts?.ultimate_title,lang),sourceUltBody:t(source.texts?.ultimate_body,lang)};
-        const map=getCuBadges();
-        if(!map[c.id]) map[c.id]=[];
-        if(!Array.isArray(map[c.id])) map[c.id]=[map[c.id]];
-        if(!map[c.id].find(b=>b.sourceId===source.id)) map[c.id].push(badge);
-        setCuBadges(map); ov.remove(); _renderCuBadge();
-        const flash=document.createElement("div"); flash.textContent=lang==="fr"?"Effet appliqué":"Effect applied";
-        flash.style.cssText="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#e74c3c;color:#fff;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:3000;pointer-events:none;";
-        document.body.appendChild(flash); setTimeout(()=>flash.remove(),2000);
-      });
-      grid.appendChild(item);
+    _showCuGridModal(lang==="fr"?"Coup unique adverse reçu":"Received enemy ultimate", sources, source=>{
+      const badge={sourceId:source.id,sourceName:t(source.name,lang),sourceUltTitle:t(source.texts?.ultimate_title,lang),sourceUltBody:t(source.texts?.ultimate_body,lang)};
+      const map=getCuBadges();
+      if(!map[c.id]) map[c.id]=[];
+      if(!Array.isArray(map[c.id])) map[c.id]=[map[c.id]];
+      if(!map[c.id].find(b=>b.sourceId===source.id)) map[c.id].push(badge);
+      setCuBadges(map); _renderCuBadge();
+      _flash(lang==="fr"?"Effet appliqué":"Effect applied", "#e74c3c");
     });
-    const cancel=document.createElement("button");
-    cancel.style.cssText="width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,0.06);color:var(--text);cursor:pointer;font-size:13px;border:1px solid rgba(255,255,255,0.1);margin-top:12px;";
-    cancel.textContent=lang==="fr"?"Annuler":"Cancel"; cancel.onclick=()=>ov.remove();
-    m.appendChild(cancel); ov.appendChild(m);
-    ov.addEventListener("click",e=>{if(e.target===ov)ov.remove();});
-    document.body.appendChild(ov);
   }
 
-  // ── Place badge slot in the char header (right side of name) ─────────────
-  // We inject after charName is set — patched below via charName section
-  const _cuSlot=document.createElement("div");
-  _cuSlot.className="cu-header-slot";
-  _cuHeaderSlot=_cuSlot;
+  // Copy: hacker picks a unit and inherits their CU badge
+  function _showCuCopyModal(campFilter){
+    const eligible=_cuActiveChars(campFilter);
+    if(!eligible.length){ alert(lang==="fr"?"Aucune unité éligible.":"No eligible unit."); return; }
+    _showCuGridModal(lang==="fr"?"Copier le coup unique de...":"Copy ultimate from...", eligible, source=>{
+      const badge={sourceId:source.id,sourceName:t(source.name,lang),sourceUltTitle:t(source.texts?.ultimate_title,lang),sourceUltBody:t(source.texts?.ultimate_body,lang)};
+      const map=getCuBadges(); map[c.id]=[badge]; setCuBadges(map);
+      _renderCuBadge();
+      _flash((lang==="fr"?"Coup unique copié : ":"Ultimate copied: ")+badge.sourceUltTitle, "#a78bfa");
+    });
+  }
+
+  // ── Lock overlay ──────────────────────────────────────────────────────────
+  // Applied AFTER ult content is injected (ultTitle/ultBody set later)
+  let _lockOverlayEl = null;
+  function _buildLockOverlay(){
+    const ultCard = qs("#ultTitle")?.closest(".card");
+    if(!ultCard || ultCard.querySelector(".ult-lock-overlay")) return;
+    const cardB = ultCard.querySelector(".card-b");
+    if(!cardB) return;
+    // Wrap card-b content in .ult-card-inner
+    const inner = document.createElement("div");
+    inner.className = "ult-card-inner";
+    while(cardB.firstChild) inner.appendChild(cardB.firstChild);
+    cardB.appendChild(inner);
+    // Overlay
+    const ov = document.createElement("div"); ov.className="ult-lock-overlay";
+    const stripes=document.createElement("div"); stripes.className="ult-lock-stripes"; ov.appendChild(stripes);
+    const icon=document.createElement("div"); icon.className="ult-lock-icon"; icon.textContent="🔒"; ov.appendChild(icon);
+    const lbl=document.createElement("div"); lbl.className="ult-lock-label"; lbl.textContent=lang==="fr"?"Coup Unique utilisé":"Ultimate used"; ov.appendChild(lbl);
+    inner.appendChild(ov);
+    _lockOverlayEl = ov;
+  }
+  function _applyLock(isUsed){
+    if(!_lockOverlayEl) _buildLockOverlay();
+    if(!_lockOverlayEl) return;
+    const inner = _lockOverlayEl.parentElement;
+    const locked = isUsed && !c.cu_rearmable;
+    _lockOverlayEl.classList.toggle("active", locked);
+    if(inner) inner.classList.toggle("locked", locked);
+  }
 
   // ── Ult card: assign / copy buttons ──────────────────────────────────────
-  const _ultCardCu=qs("#ultTitle")?.closest(".card");
+  const _ultCardCu = qs("#ultTitle")?.closest(".card");
   if(_ultCardCu){
-    const cuTargets=c.cu_targets;
+    const cuTargets = c.cu_targets;
     if(cuTargets==="ally"||cuTargets==="enemy"){
       const btn=document.createElement("button"); btn.className="cu-assign-btn";
       btn.innerHTML="⭐ "+(lang==="fr"?"Assigner ce coup unique à une cible":"Assign this ultimate to a target");
       btn.addEventListener("click",()=>{
-        if(!c.cu_rearmable&&state.toggles["ultimate_used"]){
-          alert(lang==="fr"?"Ce coup unique a déjà été utilisé.":"This ultimate has already been used."); return;
-        }
+        if(!c.cu_rearmable&&state.toggles["ultimate_used"]){ alert(lang==="fr"?"Ce coup unique a déjà été utilisé.":"This ultimate has already been used."); return; }
         _showCuTargetModal(cuTargets);
       });
       _ultCardCu.appendChild(btn);
@@ -1317,24 +1150,6 @@ applyUltLockOverlay(!!state.toggles["ultimate_used"]);
       _ultCardCu.appendChild(btn);
     }
   }
-
-  const charName = qs("#charName");
-  const charClass = qs("#charClass");
-  const hpMaxLabel = qs("#hpMaxLabel");
-
-  if(charName) charName.textContent = t(c.name, lang);
-  // Inject CU badge slot to the right of the char name
-  if(charName && _cuHeaderSlot){
-    const nameParent = charName.parentElement;
-    if(nameParent && !nameParent.querySelector(".cu-header-slot")){
-      nameParent.style.display = "flex";
-      nameParent.style.alignItems = "center";
-      nameParent.style.gap = "10px";
-      nameParent.appendChild(_cuHeaderSlot);
-    }
-    _renderCuBadge();
-  }
-  if(charClass) charClass.textContent = t(c.class, lang);
   if(hpMaxLabel) hpMaxLabel.textContent = `/${c.hp?.max ?? 0}`;
 
   const charPortrait = qs("#charPortrait");
@@ -1447,6 +1262,9 @@ if (isTechnicianChar(c)) {
 
   if(ultTitle) ultTitle.textContent = t(c.texts?.ultimate_title, lang);
   if(ultBody) ultBody.textContent = t(c.texts?.ultimate_body, lang);
+  // Apply lock overlay now that ult card content is set
+  _buildLockOverlay();
+  _applyLock(!!state.toggles["ultimate_used"]);
   
   // Shields
 const shieldsDisplay = qs('#shieldsDisplay');
