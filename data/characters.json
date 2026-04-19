@@ -82,7 +82,9 @@
         }
       }
     ],
-    "collection": "urbain"
+    "collection": "urbain",
+    "cu_targets": null,
+    "cu_rearmable": true
   },
   {
     "id": "meimei",
@@ -167,7 +169,9 @@
         }
       }
     ],
-    "collection": "urbain"
+    "collection": "urbain",
+    "cu_targets": null,
+    "cu_rearmable": true
   },
   {
     "id": "johanna",
@@ -252,7 +256,9 @@
         }
       }
     ],
-    "collection": "urbain"
+    "collection": "urbain",
+    "cu_targets": "ally",
+    "cu_rearmable": false
   },
   {
     "id": "yamabato",
@@ -337,7 +343,9 @@
         }
       }
     ],
-    "collection": "urbain"
+    "collection": "urbain",
+    "cu_targets": null,
+    "cu_rearmable": true
   },
   {
     "id": "fuyu",
@@ -422,7 +430,9 @@
         }
       }
     ],
-    "collection": "urbain"
+    "collection": "urbain",
+    "cu_targets": null,
+    "cu_rearmable": false
   },
   {
     "id": "duke",
@@ -507,7 +517,9 @@
         }
       }
     ],
-    "collection": "foret"
+    "collection": "foret",
+    "cu_targets": null,
+    "cu_rearmable": true
   },
   {
     "id": "faline",
@@ -592,7 +604,9 @@
         }
       }
     ],
-    "collection": "foret"
+    "collection": "foret",
+    "cu_targets": null,
+    "cu_rearmable": true
   },
   {
     "id": "khurt",
@@ -677,7 +691,9 @@
         }
       }
     ],
-    "collection": "foret"
+    "collection": "foret",
+    "cu_targets": null,
+    "cu_rearmable": true
   },
   {
     "id": "rasmus",
@@ -762,7 +778,9 @@
         }
       }
     ],
-    "collection": "foret"
+    "collection": "foret",
+    "cu_targets": null,
+    "cu_rearmable": true
   },
   {
     "id": "rhoney",
@@ -847,7 +865,9 @@
         }
       }
     ],
-    "collection": "foret"
+    "collection": "foret",
+    "cu_targets": "ally",
+    "cu_rearmable": false
   },
   {
     "id": "goki",
@@ -932,7 +952,9 @@
         }
       }
     ],
-    "collection": "urbain"
+    "collection": "urbain",
+    "cu_targets": "ally",
+    "cu_rearmable": false
   },
   {
     "id": "goryo",
@@ -1017,7 +1039,9 @@
         }
       }
     ],
-    "collection": "urbain"
+    "collection": "urbain",
+    "cu_targets": null,
+    "cu_rearmable": false
   },
   {
     "id": "gyuki",
@@ -1102,7 +1126,9 @@
         }
       }
     ],
-    "collection": "urbain"
+    "collection": "urbain",
+    "cu_targets": null,
+    "cu_rearmable": true
   },
   {
     "id": "gaoro",
@@ -1187,7 +1213,9 @@
         }
       }
     ],
-    "collection": "urbain"
+    "collection": "urbain",
+    "cu_targets": null,
+    "cu_rearmable": true
   },
   {
     "id": "genbu",
@@ -1272,7 +1300,9 @@
         }
       }
     ],
-    "collection": "urbain"
+    "collection": "urbain",
+    "cu_targets": "enemy",
+    "cu_rearmable": false
   },
   {
     "id": "samebito",
@@ -1357,7 +1387,9 @@
         }
       }
     ],
-    "collection": "foret"
+    "collection": "foret",
+    "cu_targets": null,
+    "cu_rearmable": true
   },
   {
     "id": "sankai",
@@ -1442,7 +1474,9 @@
         }
       }
     ],
-    "collection": "foret"
+    "collection": "foret",
+    "cu_targets": null,
+    "cu_rearmable": true
   },
   {
     "id": "senpoku",
@@ -1527,7 +1561,9 @@
         }
       }
     ],
-    "collection": "foret"
+    "collection": "foret",
+    "cu_targets": null,
+    "cu_rearmable": true
   },
   {
     "id": "shojo",
@@ -1612,7 +1648,9 @@
         }
       }
     ],
-    "collection": "foret"
+    "collection": "foret",
+    "cu_targets": null,
+    "cu_rearmable": false
   },
   {
     "id": "sojobo",
@@ -1697,7 +1735,9 @@
         }
       }
     ],
-    "collection": "foret"
+    "collection": "foret",
+    "cu_targets": null,
+    "cu_rearmable": false
   },
   {
     "id": "bl4ck_n3on",
@@ -1782,7 +1822,9 @@
         }
       }
     ],
-    "collection": "hacker"
+    "collection": "hacker",
+    "cu_targets": "copy_ally",
+    "cu_rearmable": true
   },
   {
     "id": "gr33n_sc4m",
@@ -1867,7 +1909,9 @@
         }
       }
     ],
-    "collection": "hacker"
+    "collection": "hacker",
+    "cu_targets": "copy_enemy",
+    "cu_rearmable": true
   },
   {
     "id": "sheepard",
@@ -1952,7 +1996,9 @@
         }
       }
     ],
-    "collection": "general"
+    "collection": "general",
+    "cu_targets": null,
+    "cu_rearmable": false
   },
   {
     "id": "akuma",
@@ -2037,6 +2083,8 @@
         }
       }
     ],
-    "collection": "general"
+    "collection": "general",
+    "cu_targets": "enemy",
+    "cu_rearmable": true
   }
 ]
