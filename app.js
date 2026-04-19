@@ -649,29 +649,35 @@ async function initIndex(){
     if(draftCard) draftCard.style.display = "block";
     if(setupCard) setupCard.style.display = "none";
     list.innerHTML = "";
+
     if(draftList) draftList.innerHTML = "";
-
     const selected = new Set();
-    const ADDITIONAL = ["hacker","general"];
-    const COL_LABELS = {
-      urbain:  {fr:"🏙️ Biome Urbain",            en:"🏙️ Urban Biome"},
-      foret:   {fr:"🌲 Biome Forêt",              en:"🌲 Forest Biome"},
-      hacker:  {fr:"💻 Additionnels — Hacker",    en:"💻 Additional — Hacker"},
-      general: {fr:"🎖️ Additionnels — Général",  en:"🎖️ Additional — General"},
-    };
-    const COL_ORDER = ["urbain","foret","hacker","general"];
 
-    // Group by collection
-    const groups = {};
-    COL_ORDER.forEach(k => groups[k] = []);
+    // Règles des catégories additionnelles : max 1 par camp
+    const ADDITIONAL_COLLECTIONS = ["hacker", "general"];
+
+    // Labels des collections (FR/EN)
+    const COLLECTION_LABELS = {
+      urbain: { fr: "🏙️ Biome Urbain", en: "🏙️ Urban Biome" },
+      foret:  { fr: "🌲 Biome Forêt",  en: "🌲 Forest Biome" },
+      hacker: { fr: "💻 Personnages Additionnels — Hacker", en: "💻 Additional Characters — Hacker" },
+      general:{ fr: "🎖️ Personnages Additionnels — Général", en: "🎖️ Additional Characters — General" },
+    };
+    const COLLECTION_ORDER = ["urbain", "foret", "hacker", "general"];
+
+    // Grouper par collection
+    const byCollection = {};
+    COLLECTION_ORDER.forEach(col => { byCollection[col] = []; });
     available.forEach(c => {
-      const k = c.collection || "urbain";
-      (groups[k] = groups[k] || []).push(c);
+      const col = c.collection || "urbain";
+      if(!byCollection[col]) byCollection[col] = [];
+      byCollection[col].push(c);
     });
 
+    // Map charId -> switch element pour refreshAll
     const switchMap = {};
 
-    function countCol(col){
+    function countAdditionalByCollection(col){
       return [...selected].filter(id => {
         const ch = available.find(x => x.id === id);
         return ch && ch.collection === col;
@@ -685,53 +691,51 @@ async function initIndex(){
         const isOn = selected.has(id);
         sw.className = "switch" + (isOn ? " on" : "");
         sw.setAttribute("aria-checked", isOn ? "true" : "false");
+
+        // Désactiver si : max atteint ET pas sélectionné, OU règle additionnel violée
         let blocked = false;
         if(!isOn){
           if(selected.size >= maxPick) blocked = true;
-          if(ch && ADDITIONAL.includes(ch.collection) && countCol(ch.collection) >= 1) blocked = true;
+          if(ch && ADDITIONAL_COLLECTIONS.includes(ch.collection)){
+            if(countAdditionalByCollection(ch.collection) >= 1) blocked = true;
+          }
         }
-        sw.style.opacity = (!isOn && blocked) ? "0.3" : "";
+        sw.style.opacity = (!isOn && blocked) ? "0.35" : "";
         sw.style.pointerEvents = (!isOn && blocked) ? "none" : "";
       });
     }
 
-    // Pour chaque collection : insérer l'en-tête AVANT #draftList via un wrapper,
-    // puis les .toggle avec data-collection dans #draftList
-    COL_ORDER.forEach(colKey => {
-      const group = groups[colKey];
+    // Construire l'UI groupée
+    COLLECTION_ORDER.forEach(col => {
+      const group = byCollection[col];
       if(!group || group.length === 0) return;
 
-      // En-tête inséré dans draftList mais marqué comme heading (draft-cards.js l'ignorera)
+      // En-tête de collection
       const heading = document.createElement("div");
-      heading.className = "draft-col-heading";
-      heading.setAttribute("data-heading", "1");
-      heading.textContent = (lang === "fr") ? COL_LABELS[colKey].fr : COL_LABELS[colKey].en;
-      if(ADDITIONAL.includes(colKey)){
-        const sub = document.createElement("span");
-        sub.className = "draft-col-sub";
-        sub.textContent = (lang === "fr") ? " — max 1 par équipe" : " — max 1 per team";
+      heading.className = "draft-collection-heading";
+      heading.textContent = (lang === "fr")
+        ? COLLECTION_LABELS[col].fr
+        : COLLECTION_LABELS[col].en;
+
+      // Sous-titre pour les additionnels
+      if(ADDITIONAL_COLLECTIONS.includes(col)){
+        const sub = document.createElement("div");
+        sub.className = "draft-collection-sub";
+        sub.textContent = (lang === "fr")
+          ? "Maximum 1 par équipe"
+          : "Maximum 1 per team";
         heading.appendChild(sub);
       }
+
       if(draftList) draftList.appendChild(heading);
 
       group.forEach(c => {
-        const charCol = c.collection || "urbain";
         const row = document.createElement("div");
         row.className = "toggle";
-        // Stocker collection ET camp sur le toggle pour que draft-cards.js puisse lire
-        row.setAttribute("data-collection", charCol);
-        row.setAttribute("data-char-id", c.id);
 
         const left = document.createElement("div");
         left.className = "lbl";
-        const nameDiv = document.createElement("div");
-        nameDiv.className = "t";
-        nameDiv.textContent = t(c.name, lang);
-        const descDiv = document.createElement("div");
-        descDiv.className = "d";
-        descDiv.textContent = t(c.class, lang) + " — HP " + (c.hp?.max ?? "?");
-        left.appendChild(nameDiv);
-        left.appendChild(descDiv);
+        left.innerHTML = `<div class="t">${t(c.name, lang)}</div><div class="d">${t(c.class, lang)} — HP ${c.hp?.max ?? "?"}</div>`;
 
         const sw = document.createElement("div");
         sw.className = "switch";
@@ -740,22 +744,21 @@ async function initIndex(){
         sw.setAttribute("aria-checked","false");
         switchMap[c.id] = sw;
 
-        sw.addEventListener("click", () => {
+        sw.addEventListener("click", ()=>{
           if(selected.has(c.id)){
             selected.delete(c.id);
             if(draftError) draftError.textContent = "";
           } else {
             if(selected.size >= maxPick){
               if(draftError) draftError.textContent = (lang === "fr")
-                ? "Tu as déjà " + maxPick + " unités sélectionnées."
-                : "You already selected " + maxPick + " units.";
+                ? `Tu as déjà ${maxPick} unités sélectionnées.`
+                : `You already selected ${maxPick} units.`;
               return;
             }
-            if(ADDITIONAL.includes(charCol) && countCol(charCol) >= 1){
-              const colName = charCol === "hacker" ? "Hacker" : "Général";
+            if(ADDITIONAL_COLLECTIONS.includes(c.collection) && countAdditionalByCollection(c.collection) >= 1){
               if(draftError) draftError.textContent = (lang === "fr")
-                ? "Maximum 1 personnage " + colName + " par équipe."
-                : "Maximum 1 " + colName + " character per team.";
+                ? `Maximum 1 personnage "${COLLECTION_LABELS[c.collection].fr.split("—")[1]?.trim() || c.collection}" par équipe.`
+                : `Maximum 1 "${COLLECTION_LABELS[c.collection].en.split("—")[1]?.trim() || c.collection}" character per team.`;
               return;
             }
             selected.add(c.id);
@@ -764,7 +767,7 @@ async function initIndex(){
           refreshAll();
         });
 
-        sw.addEventListener("keydown", e => {
+        sw.addEventListener("keydown",(e)=>{
           if(e.key === "Enter" || e.key === " "){ e.preventDefault(); sw.click(); }
         });
 
@@ -776,18 +779,18 @@ async function initIndex(){
 
     refreshAll();
 
-    qs("#confirmDraft")?.addEventListener("click", () => {
+    qs("#confirmDraft")?.addEventListener("click", ()=>{
       if(selected.size !== maxPick){
         if(draftError) draftError.textContent = (lang === "fr")
-          ? "Sélectionne exactement " + maxPick + " unités."
-          : "Select exactly " + maxPick + " units.";
+          ? `Sélectionne exactement ${maxPick} unités.`
+          : `Select exactly ${maxPick} units.`;
         return;
       }
       saveDraft({activeIds:[...selected]});
       location.reload();
     });
 
-    qs("#skipDraft")?.addEventListener("click", () => {
+    qs("#skipDraft")?.addEventListener("click", ()=>{
       saveDraft({activeIds: null});
       location.reload();
     });
@@ -868,7 +871,7 @@ document.body.classList.add(pageCamp === "prodrome" ? "camp-prodrome" : "camp-me
   });
   setState(c.id, state);
    
-   // --- Coup Unique : toggle "ultimate_used" dans la section Coup Unique ---
+   // --- Coup Unique : toggle "ultimate_used" + overlay cadenas si non réamorçable ---
 const ultToggleContainer = qs("#ultToggleContainer");
 if (ultToggleContainer) {
   ultToggleContainer.innerHTML = "";
@@ -881,9 +884,121 @@ if (ultToggleContainer) {
     renderToggleRow(ultToggleContainer, ultToggle, isOn, lang, (v) => {
       state.toggles[ultToggle.id] = v;
       setState(c.id, state);
+      applyUltLockOverlay(v);
     });
   }
 }
+
+// Inject lock overlay CSS once
+if(!document.getElementById("mkw-lock-css")){
+  const _lcs = document.createElement("style");
+  _lcs.id = "mkw-lock-css";
+  _lcs.textContent = `
+    .ult-card-wrap {
+      position: relative;
+      overflow: hidden;
+      border-radius: inherit;
+    }
+    .ult-lock-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      z-index: 10;
+      pointer-events: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .ult-lock-overlay.active {
+      display: flex;
+      pointer-events: all;
+    }
+    /* Rayures diagonales rouges */
+    .ult-lock-stripes {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: repeating-linear-gradient(
+        -45deg,
+        rgba(231, 76, 60, 0.18) 0px,
+        rgba(231, 76, 60, 0.18) 18px,
+        rgba(255,255,255,0.04) 18px,
+        rgba(255,255,255,0.04) 36px
+      );
+    }
+    /* Blur sur le contenu dessous */
+    .ult-card-wrap.locked > *:not(.ult-lock-overlay) {
+      filter: blur(2px);
+      pointer-events: none;
+      user-select: none;
+    }
+    .ult-lock-icon {
+      font-size: 40px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));
+      position: relative;
+      z-index: 1;
+    }
+    .ult-lock-label {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: rgba(231, 76, 60, 0.95);
+      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+      position: relative;
+      z-index: 1;
+    }
+  `;
+  document.head.appendChild(_lcs);
+}
+
+// Wrap the ult card and add the overlay
+const _ultCard = qs("#ultTitle")?.closest(".card");
+let _lockOverlay = null;
+if(_ultCard){
+  // Wrap inner content
+  if(!_ultCard.querySelector(".ult-card-wrap")){
+    const wrap = document.createElement("div");
+    wrap.className = "ult-card-wrap";
+    while(_ultCard.firstChild) wrap.appendChild(_ultCard.firstChild);
+    _ultCard.appendChild(wrap);
+  }
+  const wrap = _ultCard.querySelector(".ult-card-wrap");
+
+  // Create overlay
+  _lockOverlay = document.createElement("div");
+  _lockOverlay.className = "ult-lock-overlay";
+
+  const stripes = document.createElement("div");
+  stripes.className = "ult-lock-stripes";
+  _lockOverlay.appendChild(stripes);
+
+  const icon = document.createElement("div");
+  icon.className = "ult-lock-icon";
+  icon.textContent = "🔒";
+  _lockOverlay.appendChild(icon);
+
+  const label = document.createElement("div");
+  label.className = "ult-lock-label";
+  label.textContent = lang === "fr" ? "Coup Unique utilisé" : "Ultimate used";
+  _lockOverlay.appendChild(label);
+
+  wrap.appendChild(_lockOverlay);
+}
+
+function applyUltLockOverlay(isUsed){
+  if(!_lockOverlay) return;
+  const wrap = _ultCard?.querySelector(".ult-card-wrap");
+  const locked = isUsed && !c.cu_rearmable;
+  _lockOverlay.classList.toggle("active", locked);
+  if(wrap) wrap.classList.toggle("locked", locked);
+}
+
+// Apply on load
+applyUltLockOverlay(!!state.toggles["ultimate_used"]);
 
   const charName = qs("#charName");
   const charClass = qs("#charClass");
