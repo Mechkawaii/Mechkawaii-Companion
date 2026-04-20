@@ -361,6 +361,13 @@ function getCuBadges(){
 function setCuBadges(map){ localStorage.setItem(STORAGE_PREFIX+"cu-badges",JSON.stringify(map)); }
 function clearAllCuBadges(){ localStorage.removeItem(STORAGE_PREFIX+"cu-badges"); }
 
+/* Gr33n_Sc4m copied CU state */
+function getCopiedCu(){
+  try{ const r=localStorage.getItem(STORAGE_PREFIX+"copied-cu"); return r?JSON.parse(r):null; }catch(e){return null;}
+}
+function setCopiedCu(data){ localStorage.setItem(STORAGE_PREFIX+"copied-cu",JSON.stringify(data)); }
+function clearCopiedCu(){ localStorage.removeItem(STORAGE_PREFIX+"copied-cu"); }
+
 
 // Pour le rendu (glow, tabs, etc) on aime aussi une vue "par cible"
 function getBlueShieldAssignments(){
@@ -784,7 +791,7 @@ document.body.classList.add(pageCamp === "prodrome" ? "camp-prodrome" : "camp-me
   });
   setState(c.id, state);
    
-   // --- Coup Unique toggle + CU system ---
+   // --- Coup Unique toggle + full CU system ---
 const ultToggleContainer = qs("#ultToggleContainer");
 if (ultToggleContainer) {
   ultToggleContainer.innerHTML = "";
@@ -795,7 +802,6 @@ if (ultToggleContainer) {
       state.toggles[ultToggle.id] = v;
       setState(c.id, state);
       if(typeof _applyLock === "function") _applyLock(v);
-      // When activated: open target/copy modal directly
       if(v && typeof _onUltActivated === "function") _onUltActivated();
     });
   }
@@ -809,7 +815,7 @@ if (ultToggleContainer) {
   if(charClass) charClass.textContent = t(c.class, lang);
 
   /* =====================================================
-     CU BADGE + LOCK SYSTEM
+     CU BADGE + LOCK SYSTEM (with Gr33n_Sc4m copy logic)
      ===================================================== */
   if(!document.getElementById("mkw-cu-css")){
     const _cs=document.createElement("style"); _cs.id="mkw-cu-css";
@@ -840,19 +846,22 @@ if (ultToggleContainer) {
       .cu-detail-modal p{margin:0 0 16px;font-size:13px;color:rgba(255,255,255,0.85);line-height:1.5;}
       .cu-close-btn{width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--text);cursor:pointer;font-size:13px;border:1px solid rgba(255,255,255,0.15);}
       .cu-cancel-btn{width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,0.06);color:var(--text);cursor:pointer;font-size:13px;border:1px solid rgba(255,255,255,0.1);margin-top:12px;}
-      /* Lock */
+      /* Lock overlay — uses CU_vide.png */
       .ult-card-inner{position:relative;overflow:hidden;border-radius:8px;}
-      .ult-lock-overlay{display:none;position:absolute;inset:0;border-radius:8px;z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:8px;}
+      .ult-lock-overlay{display:none;position:absolute;inset:0;border-radius:8px;z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:0;}
       .ult-lock-overlay.active{display:flex;}
       .ult-lock-stripes{position:absolute;inset:0;border-radius:8px;background:repeating-linear-gradient(-45deg,rgba(231,76,60,0.22) 0px,rgba(231,76,60,0.22) 18px,rgba(255,255,255,0.04) 18px,rgba(255,255,255,0.04) 36px);}
       .ult-card-inner.locked>*:not(.ult-lock-overlay){filter:blur(2px);pointer-events:none;user-select:none;}
-      .ult-lock-icon{font-size:42px;line-height:1;position:relative;z-index:1;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.7));}
-      .ult-lock-label{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:rgba(231,76,60,0.95);text-shadow:0 1px 4px rgba(0,0,0,0.8);position:relative;z-index:1;}
+      .ult-lock-img{width:80px;height:80px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 2px 12px rgba(0,0,0,0.7));}
+      .ult-lock-label{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:rgba(231,76,60,0.95);text-shadow:0 1px 4px rgba(0,0,0,0.8);position:relative;z-index:1;margin-top:6px;}
     `;
     document.head.appendChild(_cs);
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────
+  const _isGr33nScam = c.cu_targets === "copy_enemy";
+  const _isBl4ckN3on = c.cu_targets === "copy_ally";
+
   function _cuActiveChars(campFilter){
     const dr=localStorage.getItem(STORAGE_PREFIX+"draft"), draft=dr?JSON.parse(dr):null;
     return chars.filter(ch=>{
@@ -881,7 +890,7 @@ if (ultToggleContainer) {
     document.body.appendChild(f); setTimeout(()=>f.remove(),2200);
   }
 
-  // ── Badge slot in header ──────────────────────────────────────────────────
+  // ── Header badge slot ─────────────────────────────────────────────────────
   const _brandWrap=document.querySelector(".brand-with-portrait");
   const _cuSlot=document.createElement("div"); _cuSlot.className="cu-header-slot";
   if(_brandWrap && !_brandWrap.querySelector(".cu-header-slot")){
@@ -917,12 +926,33 @@ if (ultToggleContainer) {
   }
   _renderCuBadge();
 
+  // ── Gr33n_Sc4m: inject/restore copied CU in the ult card ─────────────────
+  // Returns the "effective" cu_targets for the current state (copied or original)
+  function _getEffectiveCuData(){
+    if(!_isGr33nScam) return { targets: c.cu_targets, rearmable: c.cu_rearmable };
+    const copied = getCopiedCu();
+    if(copied && copied.forChar === c.id){
+      return { targets: copied.targets, rearmable: copied.rearmable,
+               title: copied.title, body: copied.body, sourceId: copied.sourceId };
+    }
+    return { targets: c.cu_targets, rearmable: c.cu_rearmable };
+  }
+
+  function _refreshUltCardText(){
+    const eff = _getEffectiveCuData();
+    const ultTitleEl = qs("#ultTitle"), ultBodyEl = qs("#ultBody");
+    if(eff.title && ultTitleEl) ultTitleEl.textContent = eff.title;
+    else if(ultTitleEl) ultTitleEl.textContent = t(c.texts?.ultimate_title, lang);
+    if(eff.body && ultBodyEl) ultBodyEl.textContent = eff.body;
+    else if(ultBodyEl) ultBodyEl.textContent = t(c.texts?.ultimate_body, lang);
+  }
+
   // ── Modal factory ────────────────────────────────────────────────────────
   function _cuModal(title, buildBody){
     const ov=document.createElement("div"); ov.className="cu-modal-overlay";
     const m=document.createElement("div"); m.className="cu-modal";
     const h=document.createElement("h3"); h.textContent=title; m.appendChild(h);
-    buildBody(m, ov);
+    buildBody(m,ov);
     const cancel=document.createElement("button"); cancel.className="cu-cancel-btn";
     cancel.textContent=lang==="fr"?"Annuler":"Cancel"; cancel.onclick=()=>ov.remove();
     m.appendChild(cancel); ov.appendChild(m);
@@ -930,32 +960,22 @@ if (ultToggleContainer) {
     document.body.appendChild(ov); return ov;
   }
 
-  // List modal (portrait + name row) — for targeting allies/enemies
-  function _showCuTargetModal(campFilter){
-    const eligible=_cuActiveChars(campFilter);
+  // List modal (portrait rows) — for targeting ally/enemy
+  function _showCuTargetModal(campFilter, onAssign){
+    const eligible = _cuActiveChars(campFilter);
     if(!eligible.length){ alert(lang==="fr"?"Aucune unité éligible.":"No eligible unit."); return; }
     _cuModal(lang==="fr"?"Choisir la cible":"Choose target", (m,ov)=>{
       eligible.forEach(target=>{
         const btn=document.createElement("button"); btn.className="cu-target-btn";
         const ico=target.images?.portrait; if(ico){ const i=document.createElement("img"); i.src=ico; i.onerror=()=>i.style.display="none"; btn.appendChild(i); }
         const sp=document.createElement("span"); sp.textContent=t(target.name,lang)+" — "+t(target.class,lang); btn.appendChild(sp);
-        btn.addEventListener("click",()=>{
-          const badge={sourceId:c.id,sourceName:t(c.name,lang),sourceUltTitle:t(c.texts?.ultimate_title,lang),sourceUltBody:t(c.texts?.ultimate_body,lang)};
-          const map=getCuBadges();
-          if(!map[target.id]) map[target.id]=[];
-          if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
-          if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
-          setCuBadges(map);
-          if(!c.cu_rearmable){ state.toggles["ultimate_used"]=true; setState(c.id,state); _applyLock(true); }
-          ov.remove();
-          _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang), "#2ecc71");
-        });
+        btn.addEventListener("click",()=>{ ov.remove(); onAssign(target); });
         m.appendChild(btn);
       });
     });
   }
 
-  // Grid modal (CU badge images) — for copy and receive
+  // Grid modal (CU images)
   function _showCuGridModal(title, sources, onPick){
     _cuModal(title, (m,ov)=>{
       const grid=document.createElement("div"); grid.className="cu-target-grid"; m.appendChild(grid);
@@ -966,13 +986,13 @@ if (ultToggleContainer) {
         img.onerror=()=>{ img.src=source.images?.portrait||"./assets/cu/CU_vide.png"; };
         const sp=document.createElement("span"); sp.textContent=t(source.name,lang);
         item.appendChild(img); item.appendChild(sp);
-        item.addEventListener("click",()=>{ onPick(source); ov.remove(); });
+        item.addEventListener("click",()=>{ ov.remove(); onPick(source); });
         grid.appendChild(item);
       });
     });
   }
 
-  // Receive: ALL active enemies (clickable grid)
+  // Receive: ALL active enemies (triggered by clicking CU_vide)
   function _showCuReceiveModal(){
     const dr=localStorage.getItem(STORAGE_PREFIX+"draft"), draft=dr?JSON.parse(dr):null;
     const enemyCamp=(c.camp||"mechkawaii")==="mechkawaii"?"prodrome":"mechkawaii";
@@ -985,43 +1005,115 @@ if (ultToggleContainer) {
       if(!Array.isArray(map[c.id])) map[c.id]=[map[c.id]];
       if(!map[c.id].find(b=>b.sourceId===source.id)) map[c.id].push(badge);
       setCuBadges(map); _renderCuBadge();
-      _flash(lang==="fr"?"Effet appliqué":"Effect applied", "#e74c3c", "#fff");
+      _flash(lang==="fr"?"Effet appliqué":"Effect applied", "#e74c3c","#fff");
     });
   }
 
-  // Copy: hacker picks source unit — shows ALL chars of target camp (not just draft)
-  function _showCuCopyModal(campFilter){
-    // For copy_enemy (Gr33n_Sc4m): show ALL Mechkawaii regardless of draft
-    // For copy_ally (Bl4ck_N3on): show allies in draft only
+  // ── Gr33n_Sc4m: copy CU from ALL Mechkawaii ──────────────────────────────
+  function _showGr33nCopyModal(){
+    const enemyCamp=(c.camp||"mechkawaii")==="mechkawaii"?"prodrome":"mechkawaii";
+    // ALL chars of opposite camp — no draft filter
+    const sources=chars.filter(ch=>(ch.camp||"mechkawaii")!==enemyCamp);
+    if(!sources.length){ alert(lang==="fr"?"Aucune unité disponible.":"No unit available."); return; }
+    _showCuGridModal(lang==="fr"?"Copier le coup unique de...":"Copy ultimate from...", sources, source=>{
+      // Store copied CU state
+      setCopiedCu({
+        forChar: c.id,
+        sourceId: source.id,
+        sourceName: t(source.name,lang),
+        title: t(source.texts?.ultimate_title,lang),
+        body: t(source.texts?.ultimate_body,lang),
+        targets: source.cu_targets || null,
+        rearmable: source.cu_rearmable !== false,
+      });
+      // Update displayed text
+      _refreshUltCardText();
+      _flash((lang==="fr"?"Coup unique copié : ":"Ultimate copied: ")+t(source.texts?.ultimate_title,lang), "#a78bfa");
+    });
+  }
+
+  // Bl4ck_N3on: copy from active allies
+  function _showBl4ckCopyModal(){
     const dr=localStorage.getItem(STORAGE_PREFIX+"draft"), draft=dr?JSON.parse(dr):null;
     const myCamp=c.camp||"mechkawaii";
-    let sources;
-    if(campFilter==="enemy"){
-      // ALL chars of opposite camp — not filtered by draft
-      const enemyCamp=myCamp==="mechkawaii"?"prodrome":"mechkawaii";
-      sources=chars.filter(ch=>(ch.camp||"mechkawaii")===enemyCamp);
-    } else {
-      // Allies: only active in draft
-      sources=chars.filter(ch=>(ch.camp||"mechkawaii")===myCamp && ch.id!==c.id && (!draft?.activeIds||draft.activeIds.includes(ch.id)));
-    }
+    const sources=chars.filter(ch=>(ch.camp||"mechkawaii")===myCamp && ch.id!==c.id && (!draft?.activeIds||draft.activeIds.includes(ch.id)));
     if(!sources.length){ alert(lang==="fr"?"Aucune unité disponible.":"No unit available."); return; }
     _showCuGridModal(lang==="fr"?"Copier le coup unique de...":"Copy ultimate from...", sources, source=>{
       const badge={sourceId:source.id,sourceName:t(source.name,lang),sourceUltTitle:t(source.texts?.ultimate_title,lang),sourceUltBody:t(source.texts?.ultimate_body,lang)};
       const map=getCuBadges(); map[c.id]=[badge]; setCuBadges(map);
       _renderCuBadge();
-      _flash((lang==="fr"?"Coup unique copié : ":"Ultimate copied: ")+badge.sourceUltTitle, "#a78bfa");
+      _flash((lang==="fr"?"Coup unique copié : ":"Ultimate copied: ")+badge.sourceUltTitle,"#a78bfa");
     });
   }
 
-  // ── onUltActivated: opens modal directly when toggle is turned on ─────────
+  // ── _onUltActivated: called when toggle is turned ON ────────────────────
   function _onUltActivated(){
-    const cuTargets=c.cu_targets;
-    if(cuTargets==="ally"||cuTargets==="enemy") _showCuTargetModal(cuTargets);
-    else if(cuTargets==="copy_ally") _showCuCopyModal("ally");
-    else if(cuTargets==="copy_enemy") _showCuCopyModal("enemy");
+    const eff = _getEffectiveCuData();
+
+    if(_isGr33nScam){
+      const copied = getCopiedCu();
+      if(!copied || copied.forChar !== c.id){
+        // No CU copied yet → open copy picker
+        _showGr33nCopyModal();
+        // Toggle back off since they haven't chosen yet
+        state.toggles["ultimate_used"] = false;
+        setState(c.id, state);
+        _applyLock(false);
+        return;
+      }
+      // CU is copied — now play it
+      if(eff.targets==="ally"||eff.targets==="enemy"){
+        _showCuTargetModal(eff.targets, target=>{
+          // Assign badge to target
+          const badge={sourceId:c.id,sourceName:t(c.name,lang),sourceUltTitle:eff.title,sourceUltBody:eff.body};
+          const map=getCuBadges();
+          if(!map[target.id]) map[target.id]=[];
+          if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
+          if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
+          setCuBadges(map);
+          _afterGr33nCuPlayed();
+          _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang),"#2ecc71");
+        });
+      } else {
+        // No targeting needed, CU played immediately
+        _afterGr33nCuPlayed();
+      }
+      return;
+    }
+
+    if(_isBl4ckN3on){
+      _showBl4ckCopyModal(); return;
+    }
+
+    // Standard: has targets → open target modal
+    if(eff.targets==="ally"||eff.targets==="enemy"){
+      _showCuTargetModal(eff.targets, target=>{
+        const badge={sourceId:c.id,sourceName:t(c.name,lang),sourceUltTitle:t(c.texts?.ultimate_title,lang),sourceUltBody:t(c.texts?.ultimate_body,lang)};
+        const map=getCuBadges();
+        if(!map[target.id]) map[target.id]=[];
+        if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
+        if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
+        setCuBadges(map);
+        if(!c.cu_rearmable){ state.toggles["ultimate_used"]=true; setState(c.id,state); _applyLock(true); }
+        _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang),"#2ecc71");
+      });
+    }
   }
 
-  // ── Lock overlay ──────────────────────────────────────────────────────────
+  // After Gr33n_Sc4m plays the copied CU: clear copy, restore original, mark used
+  function _afterGr33nCuPlayed(){
+    clearCopiedCu();
+    // Restore original CU text
+    const ultTitleEl=qs("#ultTitle"), ultBodyEl=qs("#ultBody");
+    if(ultTitleEl) ultTitleEl.textContent=t(c.texts?.ultimate_title,lang);
+    if(ultBodyEl) ultBodyEl.textContent=t(c.texts?.ultimate_body,lang);
+    // Mark original CU as used (non-rearmable since it was used)
+    state.toggles["ultimate_used"]=true; setState(c.id,state);
+    _applyLock(true);
+    _flash(lang==="fr"?"Coup unique joué. CU initial verrouillé.":"Ultimate played. Original CU locked.","#f472b6");
+  }
+
+  // ── Lock overlay (uses CU_vide.png) ──────────────────────────────────────
   let _lockOverlayEl=null;
   function _buildLockOverlay(){
     const ultCard=qs("#ultTitle")?.closest(".card");
@@ -1032,14 +1124,18 @@ if (ultToggleContainer) {
     cardB.appendChild(inner);
     const ov=document.createElement("div"); ov.className="ult-lock-overlay";
     const stripes=document.createElement("div"); stripes.className="ult-lock-stripes"; ov.appendChild(stripes);
-    const icon=document.createElement("div"); icon.className="ult-lock-icon"; icon.textContent="🔒"; ov.appendChild(icon);
-    const lbl=document.createElement("div"); lbl.className="ult-lock-label"; lbl.textContent=lang==="fr"?"Coup Unique utilisé":"Ultimate used"; ov.appendChild(lbl);
+    const lockImg=document.createElement("img"); lockImg.className="ult-lock-img";
+    lockImg.src="./assets/cu/CU_vide.png"; lockImg.alt=""; ov.appendChild(lockImg);
+    const lbl=document.createElement("div"); lbl.className="ult-lock-label";
+    lbl.textContent=lang==="fr"?"Coup Unique utilisé":"Ultimate used"; ov.appendChild(lbl);
     inner.appendChild(ov); _lockOverlayEl=ov;
   }
   function _applyLock(isUsed){
     if(!_lockOverlayEl) _buildLockOverlay();
     if(!_lockOverlayEl) return;
-    const inner=_lockOverlayEl.parentElement, locked=isUsed&&!c.cu_rearmable;
+    const inner=_lockOverlayEl.parentElement;
+    const eff=_getEffectiveCuData();
+    const locked=isUsed && !eff.rearmable;
     _lockOverlayEl.classList.toggle("active",locked);
     if(inner) inner.classList.toggle("locked",locked);
   }
@@ -1155,6 +1251,9 @@ if (isTechnicianChar(c)) {
 
   if(ultTitle) ultTitle.textContent = t(c.texts?.ultimate_title, lang);
   if(ultBody) ultBody.textContent = t(c.texts?.ultimate_body, lang);
+  // For Gr33n_Sc4m: if a CU is already copied, show its text
+  if(typeof _refreshUltCardText === "function") _refreshUltCardText();
+  // Build lock overlay now that card content exists
   _buildLockOverlay();
   _applyLock(!!state.toggles["ultimate_used"]);
   
@@ -1286,6 +1385,7 @@ if (shieldsDisplay) {
     setShieldAssignments({});
     setBlueShieldByTech({});
     clearAllCuBadges();
+    clearCopiedCu();
     location.reload();
   });
 
