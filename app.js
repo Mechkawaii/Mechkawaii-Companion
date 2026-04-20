@@ -360,8 +360,6 @@ function getCuBadges(){
 }
 function setCuBadges(map){ localStorage.setItem(STORAGE_PREFIX+"cu-badges",JSON.stringify(map)); }
 function clearAllCuBadges(){ localStorage.removeItem(STORAGE_PREFIX+"cu-badges"); }
-
-/* Gr33n_Sc4m copied CU state */
 function getCopiedCu(){
   try{ const r=localStorage.getItem(STORAGE_PREFIX+"copied-cu"); return r?JSON.parse(r):null; }catch(e){return null;}
 }
@@ -675,7 +673,7 @@ async function initIndex(){
         const ch=available.find(x=>x.id===id),sw=switchMap[id],isOn=selected.has(id);
         sw.className="switch"+(isOn?" on":""); sw.setAttribute("aria-checked",isOn?"true":"false");
         let blocked=false;
-        if(!isOn){if(selected.size>=maxPick)blocked=true; if(ch&&ADDITIONAL.includes(ch.collection)&&countCol(ch.collection)>=1)blocked=true;}
+        if(!isOn){if(selected.size>=maxPick)blocked=true;if(ch&&ADDITIONAL.includes(ch.collection)&&countCol(ch.collection)>=1)blocked=true;}
         sw.style.opacity=(!isOn&&blocked)?"0.35":""; sw.style.pointerEvents=(!isOn&&blocked)?"none":"";
       });
     }
@@ -791,7 +789,7 @@ document.body.classList.add(pageCamp === "prodrome" ? "camp-prodrome" : "camp-me
   });
   setState(c.id, state);
    
-   // --- Coup Unique toggle + full CU system ---
+   // --- Coup Unique toggle + CU system ---
 const ultToggleContainer = qs("#ultToggleContainer");
 if (ultToggleContainer) {
   ultToggleContainer.innerHTML = "";
@@ -815,7 +813,7 @@ if (ultToggleContainer) {
   if(charClass) charClass.textContent = t(c.class, lang);
 
   /* =====================================================
-     CU BADGE + LOCK SYSTEM (with Gr33n_Sc4m copy logic)
+     CU BADGE + LOCK SYSTEM
      ===================================================== */
   if(!document.getElementById("mkw-cu-css")){
     const _cs=document.createElement("style"); _cs.id="mkw-cu-css";
@@ -846,7 +844,6 @@ if (ultToggleContainer) {
       .cu-detail-modal p{margin:0 0 16px;font-size:13px;color:rgba(255,255,255,0.85);line-height:1.5;}
       .cu-close-btn{width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--text);cursor:pointer;font-size:13px;border:1px solid rgba(255,255,255,0.15);}
       .cu-cancel-btn{width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,0.06);color:var(--text);cursor:pointer;font-size:13px;border:1px solid rgba(255,255,255,0.1);margin-top:12px;}
-      /* Lock overlay — uses CU_vide.png */
       .ult-card-inner{position:relative;overflow:hidden;border-radius:8px;}
       .ult-lock-overlay{display:none;position:absolute;inset:0;border-radius:8px;z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:0;}
       .ult-lock-overlay.active{display:flex;}
@@ -858,18 +855,23 @@ if (ultToggleContainer) {
     document.head.appendChild(_cs);
   }
 
-  // ── Helpers ──────────────────────────────────────────────────────────────
   const _isGr33nScam = c.cu_targets === "copy_enemy";
   const _isBl4ckN3on = c.cu_targets === "copy_ally";
 
-  function _cuActiveChars(campFilter){
+  // Get active chars — campFilter relative to a given camp (not necessarily c.camp)
+  function _cuCharsOf(camp, excludeSelf){
     const dr=localStorage.getItem(STORAGE_PREFIX+"draft"), draft=dr?JSON.parse(dr):null;
     return chars.filter(ch=>{
-      const chCamp=ch.camp||"mechkawaii", myCamp=c.camp||"mechkawaii";
-      if(campFilter==="ally") return chCamp===myCamp && ch.id!==c.id;
-      if(campFilter==="enemy") return chCamp!==myCamp;
-      return false;
-    }).filter(ch=>!draft?.activeIds||draft.activeIds.includes(ch.id));
+      if((ch.camp||"mechkawaii")!==camp) return false;
+      if(excludeSelf && ch.id===c.id) return false;
+      return !draft?.activeIds||draft.activeIds.includes(ch.id);
+    });
+  }
+  function _cuActiveChars(campFilter){
+    const myCamp=c.camp||"mechkawaii";
+    if(campFilter==="ally") return _cuCharsOf(myCamp, true);
+    const enemyCamp=myCamp==="mechkawaii"?"prodrome":"mechkawaii";
+    return _cuCharsOf(enemyCamp, false);
   }
 
   function _showCuDetail(badge){
@@ -884,13 +886,13 @@ if (ultToggleContainer) {
     document.body.appendChild(ov);
   }
 
-  function _flash(text, color, textColor){
+  function _flash(text,color,textColor){
     const f=document.createElement("div"); f.textContent=text;
     f.style.cssText="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:"+color+";color:"+(textColor||"#000")+";padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:3000;pointer-events:none;";
     document.body.appendChild(f); setTimeout(()=>f.remove(),2200);
   }
 
-  // ── Header badge slot ─────────────────────────────────────────────────────
+  // Header badge slot
   const _brandWrap=document.querySelector(".brand-with-portrait");
   const _cuSlot=document.createElement("div"); _cuSlot.className="cu-header-slot";
   if(_brandWrap && !_brandWrap.querySelector(".cu-header-slot")){
@@ -905,19 +907,19 @@ if (ultToggleContainer) {
       const el=document.createElement("div"); el.className="cu-badge";
       el.title=lang==="fr"?"Recevoir un effet adverse":"Receive an effect";
       const img=document.createElement("img"); img.src="./assets/cu/CU_vide.png";
-      img.onerror=()=>{ img.style.display="none"; };
+      img.onerror=()=>{img.style.display="none";};
       el.appendChild(img); el.addEventListener("click",()=>_showCuReceiveModal());
       _cuSlot.appendChild(el);
     } else {
       list.forEach((badge,idx)=>{
         const el=document.createElement("div"); el.className="cu-badge"; el.title=badge.sourceUltTitle||"";
         const img=document.createElement("img"); img.src="./assets/cu/CU_"+badge.sourceId+".png";
-        img.onerror=()=>{ img.src="./assets/cu/CU_vide.png"; };
+        img.onerror=()=>{img.src="./assets/cu/CU_vide.png";};
         el.appendChild(img); el.addEventListener("click",()=>_showCuDetail(badge));
         const rm=document.createElement("div"); rm.className="cu-badge-remove"; rm.textContent="×";
         rm.addEventListener("click",e=>{ e.stopPropagation();
           const map=getCuBadges(), cur=map[c.id];
-          if(Array.isArray(cur)){ cur.splice(idx,1); if(!cur.length) delete map[c.id]; else map[c.id]=cur; } else delete map[c.id];
+          if(Array.isArray(cur)){cur.splice(idx,1);if(!cur.length)delete map[c.id];else map[c.id]=cur;}else delete map[c.id];
           setCuBadges(map); _renderCuBadge();
         });
         el.appendChild(rm); _cuSlot.appendChild(el);
@@ -926,29 +928,27 @@ if (ultToggleContainer) {
   }
   _renderCuBadge();
 
-  // ── Gr33n_Sc4m: inject/restore copied CU in the ult card ─────────────────
-  // Returns the "effective" cu_targets for the current state (copied or original)
+  // Gr33n_Sc4m: effective CU data (copied or original)
   function _getEffectiveCuData(){
-    if(!_isGr33nScam) return { targets: c.cu_targets, rearmable: c.cu_rearmable };
-    const copied = getCopiedCu();
-    if(copied && copied.forChar === c.id){
-      return { targets: copied.targets, rearmable: copied.rearmable,
-               title: copied.title, body: copied.body, sourceId: copied.sourceId };
-    }
-    return { targets: c.cu_targets, rearmable: c.cu_rearmable };
+    if(!_isGr33nScam) return {targets:c.cu_targets, rearmable:c.cu_rearmable, sourceCamp:null};
+    const copied=getCopiedCu();
+    if(copied && copied.forChar===c.id)
+      return {targets:copied.targets, rearmable:copied.rearmable,
+              title:copied.title, body:copied.body, sourceId:copied.sourceId, sourceCamp:copied.sourceCamp};
+    return {targets:c.cu_targets, rearmable:c.cu_rearmable, sourceCamp:null};
   }
 
   function _refreshUltCardText(){
-    const eff = _getEffectiveCuData();
-    const ultTitleEl = qs("#ultTitle"), ultBodyEl = qs("#ultBody");
-    if(eff.title && ultTitleEl) ultTitleEl.textContent = eff.title;
-    else if(ultTitleEl) ultTitleEl.textContent = t(c.texts?.ultimate_title, lang);
-    if(eff.body && ultBodyEl) ultBodyEl.textContent = eff.body;
-    else if(ultBodyEl) ultBodyEl.textContent = t(c.texts?.ultimate_body, lang);
+    const eff=_getEffectiveCuData();
+    const titleEl=qs("#ultTitle"), bodyEl=qs("#ultBody");
+    if(eff.title&&titleEl) titleEl.textContent=eff.title;
+    else if(titleEl) titleEl.textContent=t(c.texts?.ultimate_title,lang);
+    if(eff.body&&bodyEl) bodyEl.textContent=eff.body;
+    else if(bodyEl) bodyEl.textContent=t(c.texts?.ultimate_body,lang);
   }
 
-  // ── Modal factory ────────────────────────────────────────────────────────
-  function _cuModal(title, buildBody){
+  // Modal factory
+  function _cuModal(title,buildBody){
     const ov=document.createElement("div"); ov.className="cu-modal-overlay";
     const m=document.createElement("div"); m.className="cu-modal";
     const h=document.createElement("h3"); h.textContent=title; m.appendChild(h);
@@ -960,75 +960,79 @@ if (ultToggleContainer) {
     document.body.appendChild(ov); return ov;
   }
 
-  // List modal (portrait rows) — for targeting ally/enemy
-  function _showCuTargetModal(campFilter, onAssign){
-    const eligible = _cuActiveChars(campFilter);
+  // List modal — targets from a specific camp (not necessarily c.camp)
+  function _showCuTargetModalFromCamp(targetCamp, onAssign){
+    const dr=localStorage.getItem(STORAGE_PREFIX+"draft"), draft=dr?JSON.parse(dr):null;
+    const eligible=chars.filter(ch=>{
+      if((ch.camp||"mechkawaii")!==targetCamp) return false;
+      if(ch.id===c.id) return false;
+      return !draft?.activeIds||draft.activeIds.includes(ch.id);
+    });
     if(!eligible.length){ alert(lang==="fr"?"Aucune unité éligible.":"No eligible unit."); return; }
-    _cuModal(lang==="fr"?"Choisir la cible":"Choose target", (m,ov)=>{
+    _cuModal(lang==="fr"?"Choisir la cible":"Choose target",(m,ov)=>{
       eligible.forEach(target=>{
         const btn=document.createElement("button"); btn.className="cu-target-btn";
-        const ico=target.images?.portrait; if(ico){ const i=document.createElement("img"); i.src=ico; i.onerror=()=>i.style.display="none"; btn.appendChild(i); }
+        const ico=target.images?.portrait; if(ico){const i=document.createElement("img");i.src=ico;i.onerror=()=>i.style.display="none";btn.appendChild(i);}
         const sp=document.createElement("span"); sp.textContent=t(target.name,lang)+" — "+t(target.class,lang); btn.appendChild(sp);
-        btn.addEventListener("click",()=>{ ov.remove(); onAssign(target); });
+        btn.addEventListener("click",()=>{ov.remove();onAssign(target);});
         m.appendChild(btn);
       });
     });
   }
 
-  // Grid modal (CU images)
-  function _showCuGridModal(title, sources, onPick){
-    _cuModal(title, (m,ov)=>{
+  // Grid modal
+  function _showCuGridModal(title,sources,onPick){
+    _cuModal(title,(m,ov)=>{
       const grid=document.createElement("div"); grid.className="cu-target-grid"; m.appendChild(grid);
       sources.forEach(source=>{
         const item=document.createElement("div"); item.className="cu-grid-item";
-        const img=document.createElement("img");
-        img.src="./assets/cu/CU_"+source.id+".png";
-        img.onerror=()=>{ img.src=source.images?.portrait||"./assets/cu/CU_vide.png"; };
+        const img=document.createElement("img"); img.src="./assets/cu/CU_"+source.id+".png";
+        img.onerror=()=>{img.src=source.images?.portrait||"./assets/cu/CU_vide.png";};
         const sp=document.createElement("span"); sp.textContent=t(source.name,lang);
         item.appendChild(img); item.appendChild(sp);
-        item.addEventListener("click",()=>{ ov.remove(); onPick(source); });
+        item.addEventListener("click",()=>{ov.remove();onPick(source);});
         grid.appendChild(item);
       });
     });
   }
 
-  // Receive: ALL active enemies (triggered by clicking CU_vide)
+  // Receive: ALL active enemies
   function _showCuReceiveModal(){
     const dr=localStorage.getItem(STORAGE_PREFIX+"draft"), draft=dr?JSON.parse(dr):null;
     const enemyCamp=(c.camp||"mechkawaii")==="mechkawaii"?"prodrome":"mechkawaii";
     const sources=chars.filter(ch=>(ch.camp||"mechkawaii")===enemyCamp&&(!draft?.activeIds||draft.activeIds.includes(ch.id)));
-    if(!sources.length){ alert(lang==="fr"?"Aucun adversaire actif.":"No active opponent."); return; }
-    _showCuGridModal(lang==="fr"?"Coup unique adverse reçu":"Received enemy ultimate", sources, source=>{
+    if(!sources.length){alert(lang==="fr"?"Aucun adversaire actif.":"No active opponent.");return;}
+    _showCuGridModal(lang==="fr"?"Coup unique adverse reçu":"Received enemy ultimate",sources,source=>{
       const badge={sourceId:source.id,sourceName:t(source.name,lang),sourceUltTitle:t(source.texts?.ultimate_title,lang),sourceUltBody:t(source.texts?.ultimate_body,lang)};
       const map=getCuBadges();
       if(!map[c.id]) map[c.id]=[];
       if(!Array.isArray(map[c.id])) map[c.id]=[map[c.id]];
       if(!map[c.id].find(b=>b.sourceId===source.id)) map[c.id].push(badge);
       setCuBadges(map); _renderCuBadge();
-      _flash(lang==="fr"?"Effet appliqué":"Effect applied", "#e74c3c","#fff");
+      _flash(lang==="fr"?"Effet appliqué":"Effect applied","#e74c3c","#fff");
     });
   }
 
-  // ── Gr33n_Sc4m: copy CU from ALL Mechkawaii ──────────────────────────────
+  // Gr33n_Sc4m: copy from ALL Mechkawaii — stores sourceCamp for correct targeting
   function _showGr33nCopyModal(){
-    const enemyCamp=(c.camp||"mechkawaii")==="mechkawaii"?"prodrome":"mechkawaii";
-    // ALL chars of opposite camp — no draft filter
-    const sources=chars.filter(ch=>(ch.camp||"mechkawaii")!==enemyCamp);
-    if(!sources.length){ alert(lang==="fr"?"Aucune unité disponible.":"No unit available."); return; }
-    _showCuGridModal(lang==="fr"?"Copier le coup unique de...":"Copy ultimate from...", sources, source=>{
-      // Store copied CU state
+    const myCamp=c.camp||"mechkawaii";
+    const enemyCamp=myCamp==="mechkawaii"?"prodrome":"mechkawaii";
+    const sources=chars.filter(ch=>(ch.camp||"mechkawaii")!==myCamp);
+    if(!sources.length){alert(lang==="fr"?"Aucune unité disponible.":"No unit available.");return;}
+    _showCuGridModal(lang==="fr"?"Copier le coup unique de...":"Copy ultimate from...",sources,source=>{
       setCopiedCu({
-        forChar: c.id,
-        sourceId: source.id,
-        sourceName: t(source.name,lang),
-        title: t(source.texts?.ultimate_title,lang),
-        body: t(source.texts?.ultimate_body,lang),
-        targets: source.cu_targets || null,
-        rearmable: source.cu_rearmable !== false,
+        forChar:c.id,
+        sourceId:source.id,
+        sourceName:t(source.name,lang),
+        title:t(source.texts?.ultimate_title,lang),
+        body:t(source.texts?.ultimate_body,lang),
+        targets:source.cu_targets||null,
+        rearmable:source.cu_rearmable!==false,
+        // KEY FIX: store the source's camp so targeting works correctly
+        sourceCamp:source.camp||"mechkawaii",
       });
-      // Update displayed text
       _refreshUltCardText();
-      _flash((lang==="fr"?"Coup unique copié : ":"Ultimate copied: ")+t(source.texts?.ultimate_title,lang), "#a78bfa");
+      _flash((lang==="fr"?"Coup unique copié : ":"Ultimate copied: ")+t(source.texts?.ultimate_title,lang),"#a78bfa");
     });
   }
 
@@ -1036,9 +1040,9 @@ if (ultToggleContainer) {
   function _showBl4ckCopyModal(){
     const dr=localStorage.getItem(STORAGE_PREFIX+"draft"), draft=dr?JSON.parse(dr):null;
     const myCamp=c.camp||"mechkawaii";
-    const sources=chars.filter(ch=>(ch.camp||"mechkawaii")===myCamp && ch.id!==c.id && (!draft?.activeIds||draft.activeIds.includes(ch.id)));
-    if(!sources.length){ alert(lang==="fr"?"Aucune unité disponible.":"No unit available."); return; }
-    _showCuGridModal(lang==="fr"?"Copier le coup unique de...":"Copy ultimate from...", sources, source=>{
+    const sources=chars.filter(ch=>(ch.camp||"mechkawaii")===myCamp&&ch.id!==c.id&&(!draft?.activeIds||draft.activeIds.includes(ch.id)));
+    if(!sources.length){alert(lang==="fr"?"Aucune unité disponible.":"No unit available.");return;}
+    _showCuGridModal(lang==="fr"?"Copier le coup unique de...":"Copy ultimate from...",sources,source=>{
       const badge={sourceId:source.id,sourceName:t(source.name,lang),sourceUltTitle:t(source.texts?.ultimate_title,lang),sourceUltBody:t(source.texts?.ultimate_body,lang)};
       const map=getCuBadges(); map[c.id]=[badge]; setCuBadges(map);
       _renderCuBadge();
@@ -1046,25 +1050,30 @@ if (ultToggleContainer) {
     });
   }
 
-  // ── _onUltActivated: called when toggle is turned ON ────────────────────
   function _onUltActivated(){
-    const eff = _getEffectiveCuData();
+    const eff=_getEffectiveCuData();
 
     if(_isGr33nScam){
-      const copied = getCopiedCu();
-      if(!copied || copied.forChar !== c.id){
-        // No CU copied yet → open copy picker
+      const copied=getCopiedCu();
+      if(!copied||copied.forChar!==c.id){
+        // No CU copied yet — open picker, cancel the toggle
         _showGr33nCopyModal();
-        // Toggle back off since they haven't chosen yet
-        state.toggles["ultimate_used"] = false;
-        setState(c.id, state);
-        _applyLock(false);
+        state.toggles["ultimate_used"]=false; setState(c.id,state); _applyLock(false);
         return;
       }
-      // CU is copied — now play it
+      // CU copied — play it
       if(eff.targets==="ally"||eff.targets==="enemy"){
-        _showCuTargetModal(eff.targets, target=>{
-          // Assign badge to target
+        // *** FIX: use sourceCamp to resolve "ally" correctly ***
+        // "ally" means allies of the SOURCE unit (Mechkawaii allies for Johanna's CU)
+        // "enemy" means enemies of the SOURCE unit
+        const sourceCamp=eff.sourceCamp||"mechkawaii";
+        let targetCamp;
+        if(eff.targets==="ally"){
+          targetCamp=sourceCamp; // allies of Johanna = Mechkawaii
+        } else {
+          targetCamp=sourceCamp==="mechkawaii"?"prodrome":"mechkawaii"; // enemies of source
+        }
+        _showCuTargetModalFromCamp(targetCamp,target=>{
           const badge={sourceId:c.id,sourceName:t(c.name,lang),sourceUltTitle:eff.title,sourceUltBody:eff.body};
           const map=getCuBadges();
           if(!map[target.id]) map[target.id]=[];
@@ -1075,45 +1084,41 @@ if (ultToggleContainer) {
           _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang),"#2ecc71");
         });
       } else {
-        // No targeting needed, CU played immediately
         _afterGr33nCuPlayed();
       }
       return;
     }
 
-    if(_isBl4ckN3on){
-      _showBl4ckCopyModal(); return;
-    }
+    if(_isBl4ckN3on){ _showBl4ckCopyModal(); return; }
 
-    // Standard: has targets → open target modal
+    // Standard units with targets
     if(eff.targets==="ally"||eff.targets==="enemy"){
-      _showCuTargetModal(eff.targets, target=>{
+      const myCamp=c.camp||"mechkawaii";
+      const targetCamp=eff.targets==="ally"?myCamp:(myCamp==="mechkawaii"?"prodrome":"mechkawaii");
+      _showCuTargetModalFromCamp(targetCamp,target=>{
         const badge={sourceId:c.id,sourceName:t(c.name,lang),sourceUltTitle:t(c.texts?.ultimate_title,lang),sourceUltBody:t(c.texts?.ultimate_body,lang)};
         const map=getCuBadges();
         if(!map[target.id]) map[target.id]=[];
         if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
         if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
         setCuBadges(map);
-        if(!c.cu_rearmable){ state.toggles["ultimate_used"]=true; setState(c.id,state); _applyLock(true); }
+        if(!c.cu_rearmable){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
         _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang),"#2ecc71");
       });
     }
   }
 
-  // After Gr33n_Sc4m plays the copied CU: clear copy, restore original, mark used
   function _afterGr33nCuPlayed(){
     clearCopiedCu();
-    // Restore original CU text
-    const ultTitleEl=qs("#ultTitle"), ultBodyEl=qs("#ultBody");
-    if(ultTitleEl) ultTitleEl.textContent=t(c.texts?.ultimate_title,lang);
-    if(ultBodyEl) ultBodyEl.textContent=t(c.texts?.ultimate_body,lang);
-    // Mark original CU as used (non-rearmable since it was used)
+    const titleEl=qs("#ultTitle"), bodyEl=qs("#ultBody");
+    if(titleEl) titleEl.textContent=t(c.texts?.ultimate_title,lang);
+    if(bodyEl) bodyEl.textContent=t(c.texts?.ultimate_body,lang);
     state.toggles["ultimate_used"]=true; setState(c.id,state);
     _applyLock(true);
     _flash(lang==="fr"?"Coup unique joué. CU initial verrouillé.":"Ultimate played. Original CU locked.","#f472b6");
   }
 
-  // ── Lock overlay (uses CU_vide.png) ──────────────────────────────────────
+  // Lock overlay (CU_vide.png)
   let _lockOverlayEl=null;
   function _buildLockOverlay(){
     const ultCard=qs("#ultTitle")?.closest(".card");
@@ -1133,9 +1138,8 @@ if (ultToggleContainer) {
   function _applyLock(isUsed){
     if(!_lockOverlayEl) _buildLockOverlay();
     if(!_lockOverlayEl) return;
-    const inner=_lockOverlayEl.parentElement;
-    const eff=_getEffectiveCuData();
-    const locked=isUsed && !eff.rearmable;
+    const inner=_lockOverlayEl.parentElement, eff=_getEffectiveCuData();
+    const locked=isUsed&&!eff.rearmable;
     _lockOverlayEl.classList.toggle("active",locked);
     if(inner) inner.classList.toggle("locked",locked);
   }
@@ -1251,9 +1255,7 @@ if (isTechnicianChar(c)) {
 
   if(ultTitle) ultTitle.textContent = t(c.texts?.ultimate_title, lang);
   if(ultBody) ultBody.textContent = t(c.texts?.ultimate_body, lang);
-  // For Gr33n_Sc4m: if a CU is already copied, show its text
   if(typeof _refreshUltCardText === "function") _refreshUltCardText();
-  // Build lock overlay now that card content exists
   _buildLockOverlay();
   _applyLock(!!state.toggles["ultimate_used"]);
   
