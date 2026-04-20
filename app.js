@@ -1063,16 +1063,10 @@ if (ultToggleContainer) {
       }
       // CU copied — play it
       if(eff.targets==="ally"||eff.targets==="enemy"){
-        // *** FIX: use sourceCamp to resolve "ally" correctly ***
-        // "ally" means allies of the SOURCE unit (Mechkawaii allies for Johanna's CU)
-        // "enemy" means enemies of the SOURCE unit
-        const sourceCamp=eff.sourceCamp||"mechkawaii";
-        let targetCamp;
-        if(eff.targets==="ally"){
-          targetCamp=sourceCamp; // allies of Johanna = Mechkawaii
-        } else {
-          targetCamp=sourceCamp==="mechkawaii"?"prodrome":"mechkawaii"; // enemies of source
-        }
+        // Gr33n_Sc4m targets from HIS OWN perspective:
+        // "ally" = his Prodrome allies, "enemy" = Mechkawaii enemies
+        const myCamp2=c.camp||"mechkawaii";
+        const targetCamp=eff.targets==="ally"?myCamp2:(myCamp2==="mechkawaii"?"prodrome":"mechkawaii");
         _showCuTargetModalFromCamp(targetCamp,target=>{
           const badge={sourceId:c.id,sourceName:t(c.name,lang),sourceUltTitle:eff.title,sourceUltBody:eff.body};
           const map=getCuBadges();
