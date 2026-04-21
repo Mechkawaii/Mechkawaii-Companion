@@ -1000,12 +1000,16 @@ if (ultToggleContainer) {
   // Receive: ALL active enemies
   function _showCuReceiveModal(){
     const dr=localStorage.getItem(STORAGE_PREFIX+"draft"), draft=dr?JSON.parse(dr):null;
+    const _srRaw=localStorage.getItem(STORAGE_PREFIX+"setup");
+    const _sr=_srRaw?JSON.parse(_srRaw):null;
+    const _isSingle=_sr?.mode==="single";
     const enemyCamp=(c.camp||"mechkawaii")==="mechkawaii"?"prodrome":"mechkawaii";
-    // Only show enemy CUs that target someone (cu_targets defined)
+    // Mode single: show ALL enemy CUs with cu_targets (not filtered by draft)
+    // Mode multi: only active enemies in draft
     const sources=chars.filter(ch=>
       (ch.camp||"mechkawaii")===enemyCamp &&
       ch.cu_targets &&
-      (!draft?.activeIds||draft.activeIds.includes(ch.id))
+      (_isSingle || !draft?.activeIds || draft.activeIds.includes(ch.id))
     );
     if(!sources.length){
       alert(lang==="fr"?"Aucun coup unique adverse applicable.":"No applicable enemy ultimate.");
