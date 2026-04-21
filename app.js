@@ -1001,9 +1001,17 @@ if (ultToggleContainer) {
   function _showCuReceiveModal(){
     const dr=localStorage.getItem(STORAGE_PREFIX+"draft"), draft=dr?JSON.parse(dr):null;
     const enemyCamp=(c.camp||"mechkawaii")==="mechkawaii"?"prodrome":"mechkawaii";
-    const sources=chars.filter(ch=>(ch.camp||"mechkawaii")===enemyCamp&&(!draft?.activeIds||draft.activeIds.includes(ch.id)));
-    if(!sources.length){alert(lang==="fr"?"Aucun adversaire actif.":"No active opponent.");return;}
-    _showCuGridModal(lang==="fr"?"Coup unique adverse reçu":"Received enemy ultimate",sources,source=>{
+    // Only show enemy CUs that target someone (cu_targets defined)
+    const sources=chars.filter(ch=>
+      (ch.camp||"mechkawaii")===enemyCamp &&
+      ch.cu_targets &&
+      (!draft?.activeIds||draft.activeIds.includes(ch.id))
+    );
+    if(!sources.length){
+      alert(lang==="fr"?"Aucun coup unique adverse applicable.":"No applicable enemy ultimate.");
+      return;
+    }
+    _showCuGridModal(lang==="fr"?"Choisir un effet adverse":"Choose an enemy effect", sources, source=>{
       const badge={sourceId:source.id,sourceName:t(source.name,lang),sourceUltTitle:t(source.texts?.ultimate_title,lang),sourceUltBody:t(source.texts?.ultimate_body,lang)};
       const map=getCuBadges();
       if(!map[c.id]) map[c.id]=[];
