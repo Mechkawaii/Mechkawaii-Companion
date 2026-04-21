@@ -821,8 +821,8 @@ if (ultToggleContainer) {
       .brand-with-portrait{display:flex;align-items:center;justify-content:space-between;gap:16px;flex:1;}
       .char-name-block{flex:1;min-width:0;}
       .cu-header-slot{flex-shrink:0;display:flex;flex-direction:row;align-items:center;gap:6px;}
-      .cu-badge{width:52px;height:52px;border-radius:10px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:transform 0.15s;position:relative;flex-shrink:0;}
-      @media(max-width:480px){.cu-badge{width:40px;height:40px;}}
+      .cu-badge{width:100px;height:100px;border-radius:12px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:transform 0.15s;position:relative;flex-shrink:0;}
+      @media(max-width:480px){.cu-badge{width:80px;height:80px;}}
       .cu-badge:hover{transform:scale(1.08);}
       .cu-badge img{width:100%;height:100%;object-fit:contain;display:block;}
       .cu-badge-remove{position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:#e74c3c;color:white;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;box-shadow:0 1px 3px rgba(0,0,0,0.5);}
@@ -1109,7 +1109,21 @@ if (ultToggleContainer) {
         return;
       }
 
-      // Mode multi: no modal — just lock and let the target apply via their CU_vide
+      // Mode multi + cible alliée : toujours modal (allié = même device)
+      if(eff.targets==="ally"){
+        _showCuTargetModalFromCamp(targetCamp,target=>{
+          const badge={sourceId:c.id,sourceName:t(c.name,lang),sourceUltTitle:t(c.texts?.ultimate_title,lang),sourceUltBody:t(c.texts?.ultimate_body,lang)};
+          const map=getCuBadges();
+          if(!map[target.id]) map[target.id]=[];
+          if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
+          if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
+          setCuBadges(map);
+          if(!c.cu_rearmable){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
+          _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang),"#2ecc71");
+        });
+        return;
+      }
+      // Mode multi + cible ennemie : pas de modal — la victime applique via son CU_vide
       if(!c.cu_rearmable){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
       _flash(
         lang==="fr"
