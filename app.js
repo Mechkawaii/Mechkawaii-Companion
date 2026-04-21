@@ -820,12 +820,12 @@ if (ultToggleContainer) {
     _cs.textContent=`
       .brand-with-portrait{display:flex;align-items:center;justify-content:space-between;gap:16px;flex:1;}
       .char-name-block{flex:1;min-width:0;}
-      .cu-header-slot{width:100px;height:100px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;}
-      @media(max-width:480px){.cu-header-slot{width:80px;height:80px;}}
-      .cu-badge{width:100%;height:100%;border-radius:12px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:transform 0.15s;position:relative;}
-      .cu-badge:hover{transform:scale(1.05);}
+      .cu-header-slot{flex-shrink:0;display:flex;flex-direction:row;align-items:center;gap:6px;}
+      .cu-badge{width:52px;height:52px;border-radius:10px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:transform 0.15s;position:relative;flex-shrink:0;}
+      @media(max-width:480px){.cu-badge{width:40px;height:40px;}}
+      .cu-badge:hover{transform:scale(1.08);}
       .cu-badge img{width:100%;height:100%;object-fit:contain;display:block;}
-      .cu-badge-remove{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:#e74c3c;color:white;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;box-shadow:0 2px 4px rgba(0,0,0,0.4);}
+      .cu-badge-remove{position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:#e74c3c;color:white;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;box-shadow:0 1px 3px rgba(0,0,0,0.5);}
       .cu-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;z-index:2000;}
       .cu-modal{background:#1a1a2e;border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:20px;max-width:400px;width:90%;max-height:80vh;overflow-y:auto;}
       .cu-modal h3{margin:0 0 14px;font-size:15px;color:var(--text);}
@@ -902,29 +902,30 @@ if (ultToggleContainer) {
 
   function _renderCuBadge(){
     _cuSlot.innerHTML="";
+
+    // CU_vide toujours présent à gauche — cliquable pour recevoir un effet
+    const vide=document.createElement("div"); vide.className="cu-badge";
+    vide.title=lang==="fr"?"Recevoir un effet adverse":"Receive an effect";
+    const videImg=document.createElement("img"); videImg.src="./assets/cu/CU_vide.png";
+    videImg.onerror=()=>{videImg.style.display="none";};
+    vide.appendChild(videImg); vide.addEventListener("click",()=>_showCuReceiveModal());
+    _cuSlot.appendChild(vide);
+
+    // Badges des effets reçus à droite
     const badges=getCuBadges(), raw=badges[c.id], list=Array.isArray(raw)?raw:(raw?[raw]:[]);
-    if(!list.length){
-      const el=document.createElement("div"); el.className="cu-badge";
-      el.title=lang==="fr"?"Recevoir un effet adverse":"Receive an effect";
-      const img=document.createElement("img"); img.src="./assets/cu/CU_vide.png";
-      img.onerror=()=>{img.style.display="none";};
-      el.appendChild(img); el.addEventListener("click",()=>_showCuReceiveModal());
-      _cuSlot.appendChild(el);
-    } else {
-      list.forEach((badge,idx)=>{
-        const el=document.createElement("div"); el.className="cu-badge"; el.title=badge.sourceUltTitle||"";
-        const img=document.createElement("img"); img.src="./assets/cu/CU_"+badge.sourceId+".png";
-        img.onerror=()=>{img.src="./assets/cu/CU_vide.png";};
-        el.appendChild(img); el.addEventListener("click",()=>_showCuDetail(badge));
-        const rm=document.createElement("div"); rm.className="cu-badge-remove"; rm.textContent="×";
-        rm.addEventListener("click",e=>{ e.stopPropagation();
-          const map=getCuBadges(), cur=map[c.id];
-          if(Array.isArray(cur)){cur.splice(idx,1);if(!cur.length)delete map[c.id];else map[c.id]=cur;}else delete map[c.id];
-          setCuBadges(map); _renderCuBadge();
-        });
-        el.appendChild(rm); _cuSlot.appendChild(el);
+    list.forEach((badge,idx)=>{
+      const el=document.createElement("div"); el.className="cu-badge"; el.title=badge.sourceUltTitle||"";
+      const img=document.createElement("img"); img.src="./assets/cu/CU_"+badge.sourceId+".png";
+      img.onerror=()=>{img.src="./assets/cu/CU_vide.png";};
+      el.appendChild(img); el.addEventListener("click",()=>_showCuDetail(badge));
+      const rm=document.createElement("div"); rm.className="cu-badge-remove"; rm.textContent="×";
+      rm.addEventListener("click",e=>{ e.stopPropagation();
+        const map=getCuBadges(), cur=map[c.id];
+        if(Array.isArray(cur)){cur.splice(idx,1);if(!cur.length)delete map[c.id];else map[c.id]=cur;}else delete map[c.id];
+        setCuBadges(map); _renderCuBadge();
       });
-    }
+      el.appendChild(rm); _cuSlot.appendChild(el);
+    });
   }
   _renderCuBadge();
 
@@ -1087,18 +1088,35 @@ if (ultToggleContainer) {
 
     // Standard units with targets
     if(eff.targets==="ally"||eff.targets==="enemy"){
+      const _setupRaw=localStorage.getItem(STORAGE_PREFIX+"setup");
+      const _setup=_setupRaw?JSON.parse(_setupRaw):null;
+      const _isSingle=_setup?.mode==="single";
       const myCamp=c.camp||"mechkawaii";
       const targetCamp=eff.targets==="ally"?myCamp:(myCamp==="mechkawaii"?"prodrome":"mechkawaii");
-      _showCuTargetModalFromCamp(targetCamp,target=>{
-        const badge={sourceId:c.id,sourceName:t(c.name,lang),sourceUltTitle:t(c.texts?.ultimate_title,lang),sourceUltBody:t(c.texts?.ultimate_body,lang)};
-        const map=getCuBadges();
-        if(!map[target.id]) map[target.id]=[];
-        if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
-        if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
-        setCuBadges(map);
-        if(!c.cu_rearmable){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
-        _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang),"#2ecc71");
-      });
+
+      // Mode single: always show target modal (table can see all units)
+      if(_isSingle){
+        _showCuTargetModalFromCamp(targetCamp,target=>{
+          const badge={sourceId:c.id,sourceName:t(c.name,lang),sourceUltTitle:t(c.texts?.ultimate_title,lang),sourceUltBody:t(c.texts?.ultimate_body,lang)};
+          const map=getCuBadges();
+          if(!map[target.id]) map[target.id]=[];
+          if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
+          if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
+          setCuBadges(map);
+          if(!c.cu_rearmable){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
+          _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang),"#2ecc71");
+        });
+        return;
+      }
+
+      // Mode multi: no modal — just lock and let the target apply via their CU_vide
+      if(!c.cu_rearmable){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
+      _flash(
+        lang==="fr"
+          ? "Coup unique activé — la cible doit appliquer l'effet sur sa fiche."
+          : "Ultimate activated — the target must apply the effect on their sheet.",
+        "#a78bfa"
+      );
     }
   }
 
