@@ -102,18 +102,38 @@
   }
 
   function goToStep(step) {
+    const clear = window.mkwClearStorage || function (opts = {}) {
+      if (opts.setup) localStorage.removeItem(PREFIX + "setup");
+      if (opts.draft) localStorage.removeItem(PREFIX + "draft");
+      if (opts.oppDraft) localStorage.removeItem(PREFIX + "opp-draft");
+      if (opts.splash) localStorage.removeItem(PREFIX + "splashDismissed");
+    };
+
     if (step === 0) {
-      // Retour écran titre : tout effacer + reload
-      localStorage.removeItem(PREFIX + "setup");
-      localStorage.removeItem(PREFIX + "draft");
-      localStorage.removeItem(PREFIX + "splashDismissed");
+      // Retour écran titre : reset global cohérent
+      clear({
+        setup: true,
+        draft: true,
+        oppDraft: true,
+        shared: true,
+        cu: true,
+        states: true,
+        splash: true
+      });
       location.reload();
     } else if (step === 1) {
-      localStorage.removeItem(PREFIX + "setup");
-      localStorage.removeItem(PREFIX + "draft");
+      clear({
+        setup: true,
+        draft: true,
+        oppDraft: true,
+        shared: true
+      });
       location.reload();
     } else if (step === 2) {
-      localStorage.removeItem(PREFIX + "draft");
+      clear({
+        draft: true,
+        oppDraft: true
+      });
       location.reload();
     }
   }
