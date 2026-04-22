@@ -23,6 +23,12 @@
     if (document.getElementById("mkw-breadcrumb-char")) return;
 
     const lang = getLang();
+    const clear = window.mkwClearStorage || function (opts = {}) {
+      if (opts.setup) localStorage.removeItem(PREFIX + "setup");
+      if (opts.draft) localStorage.removeItem(PREFIX + "draft");
+      if (opts.oppDraft) localStorage.removeItem(PREFIX + "opp-draft");
+      if (opts.splash) localStorage.removeItem(PREFIX + "splashDismissed");
+    };
 
     const bc = document.createElement("nav");
     bc.id = "mkw-breadcrumb-char";
@@ -33,9 +39,15 @@
     homeBtn.className = "bc-step bc-done";
     homeBtn.textContent = lang === "en" ? "Home" : "Accueil";
     homeBtn.addEventListener("click", () => {
-      localStorage.removeItem(PREFIX + "setup");
-      localStorage.removeItem(PREFIX + "draft");
-      localStorage.removeItem(PREFIX + "splashDismissed");
+      clear({
+        setup: true,
+        draft: true,
+        oppDraft: true,
+        shared: true,
+        cu: true,
+        states: true,
+        splash: true
+      });
       location.href = "./index.html";
     });
 
@@ -49,8 +61,12 @@
     setupBtn.className = "bc-step bc-done";
     setupBtn.textContent = lang === "en" ? "Setup" : "Configuration";
     setupBtn.addEventListener("click", () => {
-      localStorage.removeItem(PREFIX + "setup");
-      localStorage.removeItem(PREFIX + "draft");
+      clear({
+        setup: true,
+        draft: true,
+        oppDraft: true,
+        shared: true
+      });
       location.href = "./index.html";
     });
 
@@ -64,7 +80,10 @@
     unitsBtn.className = "bc-step bc-done";
     unitsBtn.textContent = lang === "en" ? "Units" : "Unités";
     unitsBtn.addEventListener("click", () => {
-      localStorage.removeItem(PREFIX + "draft");
+      clear({
+        draft: true,
+        oppDraft: true
+      });
       location.href = "./index.html";
     });
 
