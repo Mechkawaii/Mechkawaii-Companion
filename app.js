@@ -796,11 +796,15 @@ async function initIndex(){
     list.innerHTML="";
 
     // Build opponent chars (opposite camp only)
-    const myCamp = (setup.camp || chars.find(ch=>myIds.includes(ch.id))?.camp || "mechkawaii");
+    const myCamp =
+      chars.find(ch => myIds.includes(ch.id))?.camp ||
+      setup.camp ||
+      "mechkawaii";
+
     const oppCamp = myCamp === "mechkawaii" ? "prodrome" : "mechkawaii";
+
     const oppAvailable = chars.filter(ch =>
-      (ch.camp || "mechkawaii") === oppCamp &&
-      !myIds.includes(ch.id)
+      (ch.camp || "mechkawaii") === oppCamp
     );
     const oppMaxPick=3;
 
