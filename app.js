@@ -1011,8 +1011,13 @@ if (ultToggleContainer) {
     document.head.appendChild(_cs);
   }
 
-  const _isGr33nScam = c.cu_targets === "copy_enemy";
-  const _isBl4ckN3on = c.cu_targets === "copy_ally";
+
+  // CU helpers — read directly from character data
+  function _cuTargets(ch){ return (ch && ch.cu_targets != null) ? ch.cu_targets : null; }
+  function _cuRearmable(ch){ return (ch && ch.cu_rearmable !== undefined) ? ch.cu_rearmable : true; }
+
+  const _isGr33nScam = _cuTargets(c) === "copy_enemy";
+  const _isBl4ckN3on = _cuTargets(c) === "copy_ally";
 
   // Get active chars — campFilter relative to a given camp (not necessarily c.camp)
   function _cuCharsOf(camp, excludeSelf){
@@ -1107,7 +1112,7 @@ if (ultToggleContainer) {
         return {targets:copied.targets, rearmable:copied.rearmable,
                 title:copied.title, body:copied.body, sourceId:copied.sourceId, sourceCamp:copied.sourceCamp};
     }
-    return {targets:c.cu_targets, rearmable:c.cu_rearmable, sourceCamp:null};
+    return {targets:_cuTargets(c), rearmable:_cuRearmable(c), sourceCamp:null};
   }
 
   function _refreshUltCardText(){
@@ -1207,8 +1212,8 @@ if (ultToggleContainer) {
         sourceName:t(source.name,lang),
         title:t(source.texts?.ultimate_title,lang),
         body:t(source.texts?.ultimate_body,lang),
-        targets:source.cu_targets||null,
-        rearmable:source.cu_rearmable!==false,
+        targets:_cuTargets(source)||null,
+        rearmable:_cuRearmable(source)!==false,
         // KEY FIX: store the source's camp so targeting works correctly
         sourceCamp:source.camp||"mechkawaii",
       });
@@ -1231,8 +1236,8 @@ if (ultToggleContainer) {
         sourceName:t(source.name,lang),
         title:t(source.texts?.ultimate_title,lang),
         body:t(source.texts?.ultimate_body,lang),
-        targets:source.cu_targets||null,
-        rearmable:source.cu_rearmable!==false,
+        targets:_cuTargets(source)||null,
+        rearmable:_cuRearmable(source)!==false,
         sourceCamp:source.camp||"mechkawaii",
       });
       _refreshUltCardText();
@@ -1318,7 +1323,7 @@ if (ultToggleContainer) {
           if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
           if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
           setCuBadges(map);
-          if(!c.cu_rearmable){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
+          if(!_cuRearmable(c)){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
           _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang),"#2ecc71");
         });
         return;
@@ -1333,13 +1338,13 @@ if (ultToggleContainer) {
           if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
           if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
           setCuBadges(map);
-          if(!c.cu_rearmable){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
+          if(!_cuRearmable(c)){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
           _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang),"#2ecc71");
         });
         return;
       }
       // Mode multi + cible ennemie : pas de modal — la victime applique via son CU_vide
-      if(!c.cu_rearmable){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
+      if(!_cuRearmable(c)){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
       _flash(
         lang==="fr"
           ? "Coup unique activé — la cible doit appliquer l'effet sur sa fiche."
