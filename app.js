@@ -713,7 +713,7 @@ async function initIndex(){
   }
   function confirmDraftSelection(ids){
     saveDraft({activeIds:ids});
-    if(setup.mode==="single" && !getOppDraft()){
+    if(setup.mode==="multi" && !getOppDraft()){
       showOppDraftScreen(ids);
     } else {
       location.href="character.html?id="+encodeURIComponent(ids[0]);
@@ -778,7 +778,7 @@ async function initIndex(){
     });
     qs("#skipDraft")?.addEventListener("click",()=>{
       saveDraft({activeIds:null});
-      if(setup.mode==="single" && !getOppDraft()){
+      if(setup.mode==="multi" && !getOppDraft()){
         showOppDraftScreen([]);
       } else {
         const firstId=available[0]?.id;
