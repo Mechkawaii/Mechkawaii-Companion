@@ -1307,15 +1307,38 @@ if (ultToggleContainer) {
   function _showGr33nCopyModal(){
     const myCamp=c.camp||"mechkawaii";
     const enemyCamp=myCamp==="mechkawaii"?"prodrome":"mechkawaii";
-    const dr=localStorage.getItem(STORAGE_PREFIX+"draft"), draft=dr?JSON.parse(dr):null;
-    const oppDraft=getOppDraft();
-    const activeEnemyIds =
-      setup?.mode==="multi"
-        ? (Array.isArray(oppDraft?.activeIds)&&oppDraft.activeIds.length?oppDraft.activeIds:null)
-        : (Array.isArray(draft?.activeIds)&&draft.activeIds.length?draft.activeIds:null);
-    const sources=chars.filter(ch=>
-      (ch.camp||"mechkawaii")===enemyCamp &&
-      (!activeEnemyIds || activeEnemyIds.includes(ch.id))
+const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
+const draft = draftRaw ? JSON.parse(draftRaw) : null;
+
+const oppDraft = getOppDraft();
+
+let activeEnemyIds = null;
+
+// multi = adversaire stocké dans opp-draft
+if (setup?.mode === "multi") {
+  if (Array.isArray(oppDraft?.activeIds) && oppDraft.activeIds.length) {
+    activeEnemyIds = oppDraft.activeIds;
+  }
+}
+// single = tout est dans draft
+else {
+  if (Array.isArray(draft?.activeIds) && draft.activeIds.length) {
+    activeEnemyIds = draft.activeIds;
+  }
+}
+
+const sources = chars.filter(ch => {
+  const camp = ch.camp || "mechkawaii";
+  if (camp !== enemyCamp) return false;
+
+  // si on connaît les ennemis actifs → on filtre dessus
+  if (Array.isArray(activeEnemyIds) && activeEnemyIds.length) {
+    return activeEnemyIds.includes(ch.id);
+  }
+
+  // fallback → tous les ennemis du camp opposé
+  return true;
+});
     );
     if(!sources.length){alert(lang==="fr"?"Aucune unité disponible.":"No unit available.");return;}
     _showCuGridModal(lang==="fr"?"Copier le coup unique de...":"Copy ultimate from...",sources,source=>{
