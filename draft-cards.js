@@ -289,8 +289,9 @@
 
     newConfirm.addEventListener("click", function() {
       if (selected.size !== maxPick) return;
-      localStorage.setItem(PREFIX + "draft", JSON.stringify({ activeIds: [...selected] }));
-      location.reload();
+      var ids = [...selected];
+      localStorage.setItem(PREFIX + "draft", JSON.stringify({ activeIds: ids }));
+      location.href = "character.html?id=" + encodeURIComponent(ids[0]);
     });
 
     btnWrap.appendChild(newConfirm);

@@ -710,9 +710,17 @@ async function initIndex(){
     refreshAll();
     qs("#confirmDraft")?.addEventListener("click",()=>{
       if(selected.size!==maxPick){if(draftError)draftError.textContent=lang==="fr"?"Sélectionne exactement "+maxPick+" unités.":"Select exactly "+maxPick+" units.";return;}
-      saveDraft({activeIds:[...selected]}); location.reload();
+      const ids=[...selected];
+      saveDraft({activeIds:ids});
+      location.href="character.html?id="+encodeURIComponent(ids[0]);
     });
-    qs("#skipDraft")?.addEventListener("click",()=>{saveDraft({activeIds:null});location.reload();});
+    qs("#skipDraft")?.addEventListener("click",()=>{
+      saveDraft({activeIds:null});
+      // Redirect to first available char
+      const firstId = available[0]?.id;
+      if(firstId) location.href="character.html?id="+encodeURIComponent(firstId);
+      else location.reload();
+    });
     return;
   }
 
