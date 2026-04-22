@@ -1304,15 +1304,76 @@ if (ultToggleContainer) {
   }
 
   // Gr33n_Sc4m: copy from ALL Mechkawaii — stores sourceCamp for correct targeting
-  function _showGr33nCopyModal(){
-    const myCamp=c.camp||"mechkawaii";
-    const enemyCamp=myCamp==="mechkawaii"?"prodrome":"mechkawaii";
-const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
-const draft = draftRaw ? JSON.parse(draftRaw) : null;
+ function _showGr33nCopyModal(){
+  const myCamp = c.camp || "mechkawaii";
+  const enemyCamp = myCamp === "mechkawaii" ? "prodrome" : "mechkawaii";
 
-const oppDraft = getOppDraft();
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const setup = setupRaw ? JSON.parse(setupRaw) : null;
 
-let activeEnemyIds = null;
+  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
+  const draft = draftRaw ? JSON.parse(draftRaw) : null;
+
+  const oppDraft = getOppDraft();
+
+  let activeEnemyIds = null;
+
+  // Mode multi : les unités ennemies choisies sont dans opp-draft
+  if (setup?.mode === "multi") {
+    if (Array.isArray(oppDraft?.activeIds) && oppDraft.activeIds.length) {
+      activeEnemyIds = oppDraft.activeIds;
+    }
+  }
+  // Mode single : les 6 unités sont dans draft
+  else {
+    if (Array.isArray(draft?.activeIds) && draft.activeIds.length) {
+      activeEnemyIds = draft.activeIds.filter(id => {
+        const ch = chars.find(x => x.id === id);
+        return (ch?.camp || "mechkawaii") === enemyCamp;
+      });
+    }
+  }
+
+  const sources = chars.filter(ch => {
+    const camp = ch.camp || "mechkawaii";
+    if (camp !== enemyCamp) return false;
+
+    if (Array.isArray(activeEnemyIds) && activeEnemyIds.length) {
+      return activeEnemyIds.includes(ch.id);
+    }
+
+    // fallback : tous les ennemis du camp opposé
+    return true;
+  });
+
+  if (!sources.length) {
+    alert(lang === "fr" ? "Aucune unité ennemie disponible." : "No enemy unit available.");
+    return;
+  }
+
+  _showCuGridModal(
+    lang === "fr" ? "Copier le coup unique de..." : "Copy ultimate from...",
+    sources,
+    source => {
+      setCopiedCu({
+        forChar: c.id,
+        sourceId: source.id,
+        sourceName: t(source.name, lang),
+        title: t(source.texts?.ultimate_title, lang),
+        body: t(source.texts?.ultimate_body, lang),
+        targets: _cuTargets(source) || null,
+        rearmable: _cuRearmable(source) !== false,
+        sourceCamp: source.camp || "mechkawaii",
+      });
+      _refreshUltCardText();
+      _flash(
+        (lang === "fr" ? "Coup unique copié : " : "Ultimate copied: ") +
+        t(source.texts?.ultimate_title, lang),
+        "#a78bfa"
+      );
+    }
+  );
+}
 
 // multi = adversaire stocké dans opp-draft
 if (setup?.mode === "multi") {
