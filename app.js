@@ -855,8 +855,27 @@ if (ultToggleContainer) {
     document.head.appendChild(_cs);
   }
 
-  const _isGr33nScam = c.cu_targets === "copy_enemy";
-  const _isBl4ckN3on = c.cu_targets === "copy_ally";
+
+  // Fallback CU data map (in case characters.json lacks cu_targets/cu_rearmable)
+  const _CU_FALLBACK = {
+    "johanna":    {cu_targets:"ally",       cu_rearmable:false},
+    "rhoney":     {cu_targets:"ally",       cu_rearmable:false},
+    "goki":       {cu_targets:"ally",       cu_rearmable:false},
+    "genbu":      {cu_targets:"enemy",      cu_rearmable:false},
+    "akuma":      {cu_targets:"enemy",      cu_rearmable:true},
+    "gr33n_sc4m": {cu_targets:"copy_enemy", cu_rearmable:true},
+    "bl4ck_n3on": {cu_targets:"copy_ally",  cu_rearmable:true},
+    "fuyu":       {cu_targets:null,         cu_rearmable:false},
+    "goryo":      {cu_targets:null,         cu_rearmable:false},
+    "shojo":      {cu_targets:null,         cu_rearmable:false},
+    "sojobo":     {cu_targets:null,         cu_rearmable:false},
+    "sheepard":   {cu_targets:null,         cu_rearmable:false},
+  };
+  function _cuTargets(ch){ return ch.cu_targets !== undefined ? ch.cu_targets : (_CU_FALLBACK[ch.id]?.cu_targets ?? null); }
+  function _cuRearmable(ch){ return ch.cu_rearmable !== undefined ? ch.cu_rearmable : (_CU_FALLBACK[ch.id]?.cu_rearmable ?? true); }
+
+  const _isGr33nScam = _cuTargets(c) === "copy_enemy";
+  const _isBl4ckN3on = _cuTargets(c) === "copy_ally";
 
   // Get active chars — campFilter relative to a given camp (not necessarily c.camp)
   function _cuCharsOf(camp, excludeSelf){
@@ -951,7 +970,7 @@ if (ultToggleContainer) {
         return {targets:copied.targets, rearmable:copied.rearmable,
                 title:copied.title, body:copied.body, sourceId:copied.sourceId, sourceCamp:copied.sourceCamp};
     }
-    return {targets:c.cu_targets, rearmable:c.cu_rearmable, sourceCamp:null};
+    return {targets:_cuTargets(c), rearmable:_cuRearmable(c), sourceCamp:null};
   }
 
   function _refreshUltCardText(){
@@ -1024,7 +1043,7 @@ if (ultToggleContainer) {
     // Only Prodrome CUs that target enemies (=Mechkawaii) are relevant here
     const sources=chars.filter(ch=>
       (ch.camp||"mechkawaii")===enemyCamp &&
-      ch.cu_targets==="enemy" &&
+      _cuTargets(ch)==="enemy" &&
       (_isSingle || !draft?.activeIds || draft.activeIds.includes(ch.id))
     );
     if(!sources.length){
@@ -1055,8 +1074,8 @@ if (ultToggleContainer) {
         sourceName:t(source.name,lang),
         title:t(source.texts?.ultimate_title,lang),
         body:t(source.texts?.ultimate_body,lang),
-        targets:source.cu_targets||null,
-        rearmable:source.cu_rearmable!==false,
+        targets:_cuTargets(source)||null,
+        rearmable:_cuRearmable(source)!==false,
         // KEY FIX: store the source's camp so targeting works correctly
         sourceCamp:source.camp||"mechkawaii",
       });
@@ -1079,8 +1098,8 @@ if (ultToggleContainer) {
         sourceName:t(source.name,lang),
         title:t(source.texts?.ultimate_title,lang),
         body:t(source.texts?.ultimate_body,lang),
-        targets:source.cu_targets||null,
-        rearmable:source.cu_rearmable!==false,
+        targets:_cuTargets(source)||null,
+        rearmable:_cuRearmable(source)!==false,
         sourceCamp:source.camp||"mechkawaii",
       });
       _refreshUltCardText();
@@ -1166,7 +1185,7 @@ if (ultToggleContainer) {
           if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
           if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
           setCuBadges(map);
-          if(!c.cu_rearmable){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
+          if(!_cuRearmable(c)){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
           _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang),"#2ecc71");
         });
         return;
@@ -1181,13 +1200,13 @@ if (ultToggleContainer) {
           if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
           if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
           setCuBadges(map);
-          if(!c.cu_rearmable){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
+          if(!_cuRearmable(c)){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
           _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang),"#2ecc71");
         });
         return;
       }
       // Mode multi + cible ennemie : pas de modal — la victime applique via son CU_vide
-      if(!c.cu_rearmable){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
+      if(!_cuRearmable(c)){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
       _flash(
         lang==="fr"
           ? "Coup unique activé — la cible doit appliquer l'effet sur sa fiche."
