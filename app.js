@@ -710,17 +710,9 @@ async function initIndex(){
     refreshAll();
     qs("#confirmDraft")?.addEventListener("click",()=>{
       if(selected.size!==maxPick){if(draftError)draftError.textContent=lang==="fr"?"Sélectionne exactement "+maxPick+" unités.":"Select exactly "+maxPick+" units.";return;}
-      const ids=[...selected];
-      saveDraft({activeIds:ids});
-      location.href="character.html?id="+encodeURIComponent(ids[0]);
+      saveDraft({activeIds:[...selected]}); location.reload();
     });
-    qs("#skipDraft")?.addEventListener("click",()=>{
-      saveDraft({activeIds:null});
-      // Redirect to first available char
-      const firstId = available[0]?.id;
-      if(firstId) location.href="character.html?id="+encodeURIComponent(firstId);
-      else location.reload();
-    });
+    qs("#skipDraft")?.addEventListener("click",()=>{saveDraft({activeIds:null});location.reload();});
     return;
   }
 
@@ -910,16 +902,19 @@ if (ultToggleContainer) {
 
   function _renderCuBadge(){
     _cuSlot.innerHTML="";
+    const myIsMech=(c.camp||"mechkawaii")==="mechkawaii";
 
-    // CU_vide toujours présent à gauche — cliquable pour recevoir un effet
-    const vide=document.createElement("div"); vide.className="cu-badge";
-    vide.title=lang==="fr"?"Recevoir un effet adverse":"Receive an effect";
-    const videImg=document.createElement("img"); videImg.src="./assets/cu/CU_vide.png";
-    videImg.onerror=()=>{videImg.style.display="none";};
-    vide.appendChild(videImg); vide.addEventListener("click",()=>_showCuReceiveModal());
-    _cuSlot.appendChild(vide);
+    // CU_vide : uniquement pour les Mechkawaii (pour recevoir un CU Prodrome)
+    if(myIsMech){
+      const vide=document.createElement("div"); vide.className="cu-badge";
+      vide.title=lang==="fr"?"Recevoir un effet adverse":"Receive an effect";
+      const videImg=document.createElement("img"); videImg.src="./assets/cu/CU_vide.png";
+      videImg.onerror=()=>{videImg.style.display="none";};
+      vide.appendChild(videImg); vide.addEventListener("click",()=>_showCuReceiveModal());
+      _cuSlot.appendChild(vide);
+    }
 
-    // Badges des effets reçus à droite
+    // Badges des effets reçus
     const badges=getCuBadges(), raw=badges[c.id], list=Array.isArray(raw)?raw:(raw?[raw]:[]);
     list.forEach((badge,idx)=>{
       const el=document.createElement("div"); el.className="cu-badge"; el.title=badge.sourceUltTitle||"";
@@ -934,16 +929,28 @@ if (ultToggleContainer) {
       });
       el.appendChild(rm); _cuSlot.appendChild(el);
     });
+
+    // Si slot vide pour un Prodrome, afficher CU_vide non cliquable (emplacement réservé)
+    if(!myIsMech && !list.length){
+      const vide=document.createElement("div"); vide.className="cu-badge";
+      vide.style.cursor="default";
+      const videImg=document.createElement("img"); videImg.src="./assets/cu/CU_vide.png";
+      videImg.onerror=()=>{videImg.style.display="none";};
+      vide.appendChild(videImg);
+      _cuSlot.appendChild(vide);
+    }
   }
   _renderCuBadge();
 
   // Gr33n_Sc4m: effective CU data (copied or original)
   function _getEffectiveCuData(){
-    if(!_isGr33nScam) return {targets:c.cu_targets, rearmable:c.cu_rearmable, sourceCamp:null};
-    const copied=getCopiedCu();
-    if(copied && copied.forChar===c.id)
-      return {targets:copied.targets, rearmable:copied.rearmable,
-              title:copied.title, body:copied.body, sourceId:copied.sourceId, sourceCamp:copied.sourceCamp};
+    // Both Gr33n_Sc4m and Bl4ck_N3on can have a copied CU stored
+    if(_isGr33nScam || _isBl4ckN3on){
+      const copied=getCopiedCu();
+      if(copied && copied.forChar===c.id)
+        return {targets:copied.targets, rearmable:copied.rearmable,
+                title:copied.title, body:copied.body, sourceId:copied.sourceId, sourceCamp:copied.sourceCamp};
+    }
     return {targets:c.cu_targets, rearmable:c.cu_rearmable, sourceCamp:null};
   }
 
@@ -1014,9 +1021,10 @@ if (ultToggleContainer) {
     const enemyCamp=(c.camp||"mechkawaii")==="mechkawaii"?"prodrome":"mechkawaii";
     // Mode single: show ALL enemy CUs with cu_targets (not filtered by draft)
     // Mode multi: only active enemies in draft
+    // Only Prodrome CUs that target enemies (=Mechkawaii) are relevant here
     const sources=chars.filter(ch=>
       (ch.camp||"mechkawaii")===enemyCamp &&
-      ch.cu_targets &&
+      ch.cu_targets==="enemy" &&
       (_isSingle || !draft?.activeIds || draft.activeIds.includes(ch.id))
     );
     if(!sources.length){
@@ -1064,10 +1072,19 @@ if (ultToggleContainer) {
     const sources=chars.filter(ch=>(ch.camp||"mechkawaii")===myCamp&&ch.id!==c.id&&(!draft?.activeIds||draft.activeIds.includes(ch.id)));
     if(!sources.length){alert(lang==="fr"?"Aucune unité disponible.":"No unit available.");return;}
     _showCuGridModal(lang==="fr"?"Copier le coup unique de...":"Copy ultimate from...",sources,source=>{
-      const badge={sourceId:source.id,sourceName:t(source.name,lang),sourceUltTitle:t(source.texts?.ultimate_title,lang),sourceUltBody:t(source.texts?.ultimate_body,lang)};
-      const map=getCuBadges(); map[c.id]=[badge]; setCuBadges(map);
-      _renderCuBadge();
-      _flash((lang==="fr"?"Coup unique copié : ":"Ultimate copied: ")+badge.sourceUltTitle,"#a78bfa");
+      // Store as copied CU (same as Gr33n_Sc4m) so text gets replaced on card
+      setCopiedCu({
+        forChar:c.id,
+        sourceId:source.id,
+        sourceName:t(source.name,lang),
+        title:t(source.texts?.ultimate_title,lang),
+        body:t(source.texts?.ultimate_body,lang),
+        targets:source.cu_targets||null,
+        rearmable:source.cu_rearmable!==false,
+        sourceCamp:source.camp||"mechkawaii",
+      });
+      _refreshUltCardText();
+      _flash((lang==="fr"?"Coup unique copié : ":"Ultimate copied: ")+t(source.texts?.ultimate_title,lang),"#a78bfa");
     });
   }
 
@@ -1095,16 +1112,42 @@ if (ultToggleContainer) {
           if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
           if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
           setCuBadges(map);
-          _afterGr33nCuPlayed();
+          _afterHackerCuPlayed();
           _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang),"#2ecc71");
         });
       } else {
-        _afterGr33nCuPlayed();
+        _afterHackerCuPlayed();
       }
       return;
     }
 
-    if(_isBl4ckN3on){ _showBl4ckCopyModal(); return; }
+    if(_isBl4ckN3on){
+      const copiedB=getCopiedCu();
+      if(!copiedB||copiedB.forChar!==c.id){
+        // No CU copied yet — open picker, cancel toggle
+        _showBl4ckCopyModal();
+        state.toggles["ultimate_used"]=false; setState(c.id,state); _applyLock(false);
+        return;
+      }
+      // CU copied — play it (same logic as Gr33n_Sc4m but targeting allies)
+      if(eff.targets==="ally"||eff.targets==="enemy"){
+        const myCamp2=c.camp||"mechkawaii";
+        const targetCamp=eff.targets==="ally"?myCamp2:(myCamp2==="mechkawaii"?"prodrome":"mechkawaii");
+        _showCuTargetModalFromCamp(targetCamp,target=>{
+          const badge={sourceId:c.id,sourceName:t(c.name,lang),sourceUltTitle:eff.title,sourceUltBody:eff.body};
+          const map=getCuBadges();
+          if(!map[target.id]) map[target.id]=[];
+          if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
+          if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
+          setCuBadges(map);
+          _afterHackerCuPlayed();
+          _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang),"#2ecc71");
+        });
+      } else {
+        _afterHackerCuPlayed();
+      }
+      return;
+    }
 
     // Standard units with targets
     if(eff.targets==="ally"||eff.targets==="enemy"){
@@ -1154,7 +1197,7 @@ if (ultToggleContainer) {
     }
   }
 
-  function _afterGr33nCuPlayed(){
+  function _afterHackerCuPlayed(){
     clearCopiedCu();
     const titleEl=qs("#ultTitle"), bodyEl=qs("#ultBody");
     if(titleEl) titleEl.textContent=t(c.texts?.ultimate_title,lang);
