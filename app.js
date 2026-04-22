@@ -1318,14 +1318,11 @@ if (ultToggleContainer) {
 
   let activeEnemyIds = null;
 
-  // Mode multi : les unités ennemies choisies sont dans opp-draft
   if (setup?.mode === "multi") {
     if (Array.isArray(oppDraft?.activeIds) && oppDraft.activeIds.length) {
       activeEnemyIds = oppDraft.activeIds;
     }
-  }
-  // Mode single : les 6 unités sont dans draft
-  else {
+  } else {
     if (Array.isArray(draft?.activeIds) && draft.activeIds.length) {
       activeEnemyIds = draft.activeIds.filter(id => {
         const ch = chars.find(x => x.id === id);
@@ -1342,7 +1339,6 @@ if (ultToggleContainer) {
       return activeEnemyIds.includes(ch.id);
     }
 
-    // fallback : tous les ennemis du camp opposé
     return true;
   });
 
@@ -1365,7 +1361,9 @@ if (ultToggleContainer) {
         rearmable: _cuRearmable(source) !== false,
         sourceCamp: source.camp || "mechkawaii",
       });
+
       _refreshUltCardText();
+
       _flash(
         (lang === "fr" ? "Coup unique copié : " : "Ultimate copied: ") +
         t(source.texts?.ultimate_title, lang),
@@ -1375,51 +1373,7 @@ if (ultToggleContainer) {
   );
 }
 
-// multi = adversaire stocké dans opp-draft
-if (setup?.mode === "multi") {
-  if (Array.isArray(oppDraft?.activeIds) && oppDraft.activeIds.length) {
-    activeEnemyIds = oppDraft.activeIds;
-  }
-}
-// single = tout est dans draft
-else {
-  if (Array.isArray(draft?.activeIds) && draft.activeIds.length) {
-    activeEnemyIds = draft.activeIds;
-  }
-}
-
-const sources = chars.filter(ch => {
-  const camp = ch.camp || "mechkawaii";
-  if (camp !== enemyCamp) return false;
-
-  // si on connaît les ennemis actifs → on filtre dessus
-  if (Array.isArray(activeEnemyIds) && activeEnemyIds.length) {
-    return activeEnemyIds.includes(ch.id);
-  }
-
-  // fallback → tous les ennemis du camp opposé
-  return true;
-});
-    );
-    if(!sources.length){alert(lang==="fr"?"Aucune unité disponible.":"No unit available.");return;}
-    _showCuGridModal(lang==="fr"?"Copier le coup unique de...":"Copy ultimate from...",sources,source=>{
-      setCopiedCu({
-        forChar:c.id,
-        sourceId:source.id,
-        sourceName:t(source.name,lang),
-        title:t(source.texts?.ultimate_title,lang),
-        body:t(source.texts?.ultimate_body,lang),
-        targets:_cuTargets(source)||null,
-        rearmable:_cuRearmable(source)!==false,
-        // KEY FIX: store the source's camp so targeting works correctly
-        sourceCamp:source.camp||"mechkawaii",
-      });
-      _refreshUltCardText();
-      _flash((lang==="fr"?"Coup unique copié : ":"Ultimate copied: ")+t(source.texts?.ultimate_title,lang),"#a78bfa");
-    });
-  }
-
-  // Bl4ck_N3on: copy from active allies
+      // Bl4ck_N3on: copy from active allies
   function _showBl4ckCopyModal(){
     const dr=localStorage.getItem(STORAGE_PREFIX+"draft"), draft=dr?JSON.parse(dr):null;
     const myCamp=c.camp||"mechkawaii";
