@@ -1307,7 +1307,15 @@ if (ultToggleContainer) {
   function _showGr33nCopyModal(){
     const myCamp=c.camp||"mechkawaii";
     const enemyCamp=myCamp==="mechkawaii"?"prodrome":"mechkawaii";
-    const sources=chars.filter(ch=>(ch.camp||"mechkawaii")!==myCamp);
+    const oppDraft=getOppDraft();
+    const sources=chars.filter(ch=>
+      (ch.camp||"mechkawaii")===enemyCamp &&
+      (
+        !Array.isArray(oppDraft?.activeIds) ||
+        oppDraft.activeIds.length===0 ||
+        oppDraft.activeIds.includes(ch.id)
+      )
+    );
     if(!sources.length){alert(lang==="fr"?"Aucune unité disponible.":"No unit available.");return;}
     _showCuGridModal(lang==="fr"?"Copier le coup unique de...":"Copy ultimate from...",sources,source=>{
       setCopiedCu({
