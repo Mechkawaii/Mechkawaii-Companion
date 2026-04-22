@@ -557,7 +557,7 @@ async function initIndex(){
       localStorage.removeItem(STORAGE_PREFIX + "shields");
       localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
       localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
-    localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
+      localStorage.removeItem(STORAGE_PREFIX + "opp-draft");
       location.reload();
     });
   }
@@ -657,6 +657,12 @@ async function initIndex(){
   function saveDraft(obj){
     localStorage.setItem(STORAGE_PREFIX + "draft", JSON.stringify(obj));
   }
+  function saveOppDraft(obj){
+    localStorage.setItem(STORAGE_PREFIX + "opp-draft", JSON.stringify(obj));
+  }
+  function getOppDraft(){
+    try{ const r=localStorage.getItem(STORAGE_PREFIX+"opp-draft"); return r?JSON.parse(r):null; }catch(e){return null;}
+  }
 
   if(!draft){
     if(draftCard) draftCard.style.display="block"; if(setupCard) setupCard.style.display="none";
@@ -710,10 +716,134 @@ async function initIndex(){
     refreshAll();
     qs("#confirmDraft")?.addEventListener("click",()=>{
       if(selected.size!==maxPick){if(draftError)draftError.textContent=lang==="fr"?"Sélectionne exactement "+maxPick+" unités.":"Select exactly "+maxPick+" units.";return;}
-      saveDraft({activeIds:[...selected]}); location.reload();
+      const ids=[...selected];
+      saveDraft({activeIds:ids});
+      // Mode single: ask for opponent units before starting
+      if(setup.mode==="single" && !getOppDraft()){
+        showOppDraftScreen(ids);
+      } else {
+        location.href="character.html?id="+encodeURIComponent(ids[0]);
+      }
     });
-    qs("#skipDraft")?.addEventListener("click",()=>{saveDraft({activeIds:null});location.reload();});
+    qs("#skipDraft")?.addEventListener("click",()=>{
+      saveDraft({activeIds:null});
+      if(setup.mode==="single" && !getOppDraft()){
+        showOppDraftScreen([]);
+      } else {
+        const firstId=available[0]?.id;
+        if(firstId) location.href="character.html?id="+encodeURIComponent(firstId);
+        else location.reload();
+      }
+    });
     return;
+  }
+
+  // ── Opponent draft (single mode) ──────────────────────────────────────────
+  function showOppDraftScreen(myIds){
+    // Hide draft card, show a new full-screen opponent picker
+    if(draftCard) draftCard.style.display="none";
+    list.innerHTML="";
+
+    // Build opponent chars (all chars NOT in myIds)
+    const oppCamp=setup.mode==="single"
+      ? (chars.find(ch=>myIds.includes(ch.id))?.camp==="mechkawaii"?"prodrome":"mechkawaii")
+      : null;
+    const oppAvailable=chars.filter(ch=>!myIds.includes(ch.id));
+    const oppMaxPick=3;
+
+    // Inject screen into draftCard
+    const card=draftCard||list;
+    if(draftCard){ draftCard.style.display="block"; draftCard.querySelector(".card-h .section-title").textContent=lang==="fr"?"Unités du camp adverse":"Opponent units"; }
+
+    // Rebuild draftList
+    if(draftList) draftList.innerHTML="";
+    const oppSelected=new Set();
+    const oppSwitchMap={};
+
+    function oppRefreshAll(){
+      Object.keys(oppSwitchMap).forEach(id=>{
+        const sw=oppSwitchMap[id],isOn=oppSelected.has(id);
+        sw.className="switch"+(isOn?" on":""); sw.setAttribute("aria-checked",isOn?"true":"false");
+        if(!isOn&&oppSelected.size>=oppMaxPick){sw.style.opacity="0.35";sw.style.pointerEvents="none";}
+        else{sw.style.opacity="";sw.style.pointerEvents="";}
+      });
+    }
+
+    // Group by collection
+    const OPP_COL_LABELS={urbain:{fr:"🏙️ Biome Urbain",en:"🏙️ Urban Biome"},foret:{fr:"🌲 Biome Forêt",en:"🌲 Forest Biome"},hacker:{fr:"💻 Additionnels — Hacker",en:"💻 Additional — Hacker"},general:{fr:"🎖️ Additionnels — Général",en:"🎖️ Additional — General"}};
+    const OPP_COL_ORDER=["urbain","foret","hacker","general"], OPP_COL_COLORS={urbain:"#FF9F50",foret:"#5ecf6a",hacker:"#a78bfa",general:"#f472b6"};
+    const OPP_ADDITIONAL=["hacker","general"];
+    const oppGroups={}; OPP_COL_ORDER.forEach(k=>oppGroups[k]=[]);
+    oppAvailable.forEach(ch=>{const k=ch.collection||"urbain";(oppGroups[k]=oppGroups[k]||[]).push(ch);});
+
+    function oppCountCol(col){return[...oppSelected].filter(id=>{const ch=oppAvailable.find(x=>x.id===id);return ch&&(ch.collection||"urbain")===col;}).length;}
+
+    OPP_COL_ORDER.forEach(colKey=>{
+      const group=oppGroups[colKey]; if(!group||!group.length) return;
+      const heading=document.createElement("div"); heading.setAttribute("data-heading","1");
+      heading.style.cssText="margin:16px 0 6px;padding:5px 12px;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;border-left:3px solid "+(OPP_COL_COLORS[colKey]||"#FF9F50")+";border-radius:0 6px 6px 0;background:rgba(255,255,255,.04);color:var(--text);display:flex;align-items:center;gap:6px;";
+      heading.textContent=(lang==="fr")?OPP_COL_LABELS[colKey].fr:OPP_COL_LABELS[colKey].en;
+      if(draftList) draftList.appendChild(heading);
+      group.forEach(ch=>{
+        const charCol=ch.collection||"urbain";
+        const row=document.createElement("div"); row.className="toggle";
+        row.setAttribute("data-char-id",ch.id); row.setAttribute("data-collection",charCol);
+        const left=document.createElement("div"); left.className="lbl";
+        const nd=document.createElement("div"); nd.className="t"; nd.textContent=t(ch.name,lang);
+        const dd=document.createElement("div"); dd.className="d"; dd.textContent=t(ch.class,lang)+" — HP "+(ch.hp?.max??"?");
+        left.appendChild(nd); left.appendChild(dd);
+        const sw=document.createElement("div"); sw.className="switch"; sw.setAttribute("role","switch"); sw.setAttribute("tabindex","0"); sw.setAttribute("aria-checked","false");
+        oppSwitchMap[ch.id]=sw;
+        sw.addEventListener("click",()=>{
+          if(oppSelected.has(ch.id)){oppSelected.delete(ch.id);}
+          else{
+            if(oppSelected.size>=oppMaxPick) return;
+            if(OPP_ADDITIONAL.includes(charCol)&&oppCountCol(charCol)>=1) return;
+            oppSelected.add(ch.id);
+          }
+          oppRefreshAll();
+          // Update confirm button text
+          if(oppConfirm) oppConfirm.textContent=(lang==="fr"?"Valider "+oppSelected.size+" / "+oppMaxPick+" unités adverses":"Confirm "+oppSelected.size+" / "+oppMaxPick+" opponent units");
+          oppConfirm.disabled=oppSelected.size!==oppMaxPick;
+          oppConfirm.style.opacity=oppSelected.size!==oppMaxPick?"0.5":"1";
+        });
+        row.appendChild(left); row.appendChild(sw); if(draftList) draftList.appendChild(row);
+      });
+    });
+    oppRefreshAll();
+
+    // Replace confirm/skip buttons
+    const btnArea=draftCard?.querySelector("[style*='margin-top:12px']")||draftCard;
+    const existConfirm=qs("#confirmDraft"), existSkip=qs("#skipDraft");
+    if(existConfirm) existConfirm.style.display="none";
+    if(existSkip) existSkip.style.display="none";
+
+    const oppBtnWrap=document.createElement("div");
+    oppBtnWrap.style.cssText="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;";
+
+    const oppConfirm=document.createElement("button");
+    oppConfirm.className="btn-accent";
+    oppConfirm.textContent=lang==="fr"?"Valider 0 / 3 unités adverses":"Confirm 0 / 3 opponent units";
+    oppConfirm.disabled=true; oppConfirm.style.opacity="0.5";
+    oppConfirm.addEventListener("click",()=>{
+      if(oppSelected.size!==oppMaxPick) return;
+      saveOppDraft({activeIds:[...oppSelected]});
+      const firstId=myIds[0]||available[0]?.id;
+      if(firstId) location.href="character.html?id="+encodeURIComponent(firstId);
+      else location.reload();
+    });
+
+    const oppSkip=document.createElement("button");
+    oppSkip.textContent=lang==="fr"?"Passer (toutes les unités adverses)":"Skip (all opponent units)";
+    oppSkip.addEventListener("click",()=>{
+      saveOppDraft({activeIds:null});
+      const firstId=myIds[0]||available[0]?.id;
+      if(firstId) location.href="character.html?id="+encodeURIComponent(firstId);
+      else location.reload();
+    });
+
+    oppBtnWrap.appendChild(oppConfirm); oppBtnWrap.appendChild(oppSkip);
+    if(draftList) draftList.after(oppBtnWrap);
   }
 
   let toShow = available;
@@ -735,6 +865,32 @@ async function initIndex(){
     `;
     list.appendChild(a);
   });
+
+  // ── Bouton "Tout réinitialiser" ───────────────────────────────────────────
+  const resetAllBtn = document.createElement("button");
+  resetAllBtn.className = "btn-danger";
+  resetAllBtn.style.cssText = "margin:20px auto 80px;display:block;";
+  resetAllBtn.textContent = lang === "fr" ? "🔄 Tout réinitialiser" : "🔄 Reset all";
+  resetAllBtn.addEventListener("click", () => {
+    if(!confirm(lang==="fr"?"Réinitialiser tous les personnages ?":" Reset all characters?")) return;
+    // Reset HP + toggles for every char
+    toShow.forEach(c => {
+      const defToggles = {};
+      (c.toggles||[]).forEach(tg => {
+        if(tg.type==="visual_keys") defToggles[tg.id]=Array.from({length:tg.maxKeys||2},()=>true);
+        else defToggles[tg.id]=false;
+      });
+      localStorage.setItem(STORAGE_PREFIX+"state:"+c.id, JSON.stringify({hp:c.hp?.max??0,toggles:defToggles}));
+    });
+    // Clear shared state
+    localStorage.setItem(STORAGE_PREFIX+"shields", JSON.stringify([true,true,true]));
+    localStorage.removeItem(STORAGE_PREFIX+"shield-assignments");
+    localStorage.removeItem(STORAGE_PREFIX+"blue-shield-by-tech");
+    localStorage.removeItem(STORAGE_PREFIX+"cu-badges");
+    localStorage.removeItem(STORAGE_PREFIX+"copied-cu");
+    location.reload();
+  });
+  list.after(resetAllBtn);
 }
 
 /* ------------------------------
@@ -855,27 +1011,8 @@ if (ultToggleContainer) {
     document.head.appendChild(_cs);
   }
 
-
-  // Fallback CU data map (in case characters.json lacks cu_targets/cu_rearmable)
-  const _CU_FALLBACK = {
-    "johanna":    {cu_targets:"ally",       cu_rearmable:false},
-    "rhoney":     {cu_targets:"ally",       cu_rearmable:false},
-    "goki":       {cu_targets:"ally",       cu_rearmable:false},
-    "genbu":      {cu_targets:"enemy",      cu_rearmable:false},
-    "akuma":      {cu_targets:"enemy",      cu_rearmable:true},
-    "gr33n_sc4m": {cu_targets:"copy_enemy", cu_rearmable:true},
-    "bl4ck_n3on": {cu_targets:"copy_ally",  cu_rearmable:true},
-    "fuyu":       {cu_targets:null,         cu_rearmable:false},
-    "goryo":      {cu_targets:null,         cu_rearmable:false},
-    "shojo":      {cu_targets:null,         cu_rearmable:false},
-    "sojobo":     {cu_targets:null,         cu_rearmable:false},
-    "sheepard":   {cu_targets:null,         cu_rearmable:false},
-  };
-  function _cuTargets(ch){ return ch.cu_targets !== undefined ? ch.cu_targets : (_CU_FALLBACK[ch.id]?.cu_targets ?? null); }
-  function _cuRearmable(ch){ return ch.cu_rearmable !== undefined ? ch.cu_rearmable : (_CU_FALLBACK[ch.id]?.cu_rearmable ?? true); }
-
-  const _isGr33nScam = _cuTargets(c) === "copy_enemy";
-  const _isBl4ckN3on = _cuTargets(c) === "copy_ally";
+  const _isGr33nScam = c.cu_targets === "copy_enemy";
+  const _isBl4ckN3on = c.cu_targets === "copy_ally";
 
   // Get active chars — campFilter relative to a given camp (not necessarily c.camp)
   function _cuCharsOf(camp, excludeSelf){
@@ -970,7 +1107,7 @@ if (ultToggleContainer) {
         return {targets:copied.targets, rearmable:copied.rearmable,
                 title:copied.title, body:copied.body, sourceId:copied.sourceId, sourceCamp:copied.sourceCamp};
     }
-    return {targets:_cuTargets(c), rearmable:_cuRearmable(c), sourceCamp:null};
+    return {targets:c.cu_targets, rearmable:c.cu_rearmable, sourceCamp:null};
   }
 
   function _refreshUltCardText(){
@@ -1034,17 +1171,13 @@ if (ultToggleContainer) {
   // Receive: ALL active enemies
   function _showCuReceiveModal(){
     const dr=localStorage.getItem(STORAGE_PREFIX+"draft"), draft=dr?JSON.parse(dr):null;
-    const _srRaw=localStorage.getItem(STORAGE_PREFIX+"setup");
-    const _sr=_srRaw?JSON.parse(_srRaw):null;
-    const _isSingle=_sr?.mode==="single";
     const enemyCamp=(c.camp||"mechkawaii")==="mechkawaii"?"prodrome":"mechkawaii";
-    // Mode single: show ALL enemy CUs with cu_targets (not filtered by draft)
-    // Mode multi: only active enemies in draft
-    // Only Prodrome CUs that target enemies (=Mechkawaii) are relevant here
+    // Show Prodrome CUs that target enemies — filtered by oppDraft if available
+    const oppDraft=getOppDraft();
     const sources=chars.filter(ch=>
       (ch.camp||"mechkawaii")===enemyCamp &&
       _cuTargets(ch)==="enemy" &&
-      (_isSingle || !draft?.activeIds || draft.activeIds.includes(ch.id))
+      (!oppDraft?.activeIds || oppDraft.activeIds.includes(ch.id))
     );
     if(!sources.length){
       alert(lang==="fr"?"Aucun coup unique adverse applicable.":"No applicable enemy ultimate.");
@@ -1074,8 +1207,8 @@ if (ultToggleContainer) {
         sourceName:t(source.name,lang),
         title:t(source.texts?.ultimate_title,lang),
         body:t(source.texts?.ultimate_body,lang),
-        targets:_cuTargets(source)||null,
-        rearmable:_cuRearmable(source)!==false,
+        targets:source.cu_targets||null,
+        rearmable:source.cu_rearmable!==false,
         // KEY FIX: store the source's camp so targeting works correctly
         sourceCamp:source.camp||"mechkawaii",
       });
@@ -1098,8 +1231,8 @@ if (ultToggleContainer) {
         sourceName:t(source.name,lang),
         title:t(source.texts?.ultimate_title,lang),
         body:t(source.texts?.ultimate_body,lang),
-        targets:_cuTargets(source)||null,
-        rearmable:_cuRearmable(source)!==false,
+        targets:source.cu_targets||null,
+        rearmable:source.cu_rearmable!==false,
         sourceCamp:source.camp||"mechkawaii",
       });
       _refreshUltCardText();
@@ -1185,7 +1318,7 @@ if (ultToggleContainer) {
           if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
           if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
           setCuBadges(map);
-          if(!_cuRearmable(c)){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
+          if(!c.cu_rearmable){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
           _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang),"#2ecc71");
         });
         return;
@@ -1200,13 +1333,13 @@ if (ultToggleContainer) {
           if(!Array.isArray(map[target.id])) map[target.id]=[map[target.id]];
           if(!map[target.id].find(b=>b.sourceId===c.id)) map[target.id].push(badge);
           setCuBadges(map);
-          if(!_cuRearmable(c)){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
+          if(!c.cu_rearmable){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
           _flash((lang==="fr"?"Badge assigné à ":"Badge assigned to ")+t(target.name,lang),"#2ecc71");
         });
         return;
       }
       // Mode multi + cible ennemie : pas de modal — la victime applique via son CU_vide
-      if(!_cuRearmable(c)){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
+      if(!c.cu_rearmable){state.toggles["ultimate_used"]=true;setState(c.id,state);_applyLock(true);}
       _flash(
         lang==="fr"
           ? "Coup unique activé — la cible doit appliquer l'effet sur sa fiche."
@@ -1496,6 +1629,7 @@ if (shieldsDisplay) {
     setBlueShieldByTech({});
     clearAllCuBadges();
     clearCopiedCu();
+    localStorage.removeItem(STORAGE_PREFIX+"opp-draft");
     location.reload();
   });
 
