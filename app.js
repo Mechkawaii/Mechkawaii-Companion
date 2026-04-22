@@ -1011,12 +1011,10 @@ if (ultToggleContainer) {
     document.head.appendChild(_cs);
   }
 
-
-  // CU helpers — read directly from character data
   function _cuTargets(ch){ return (ch && ch.cu_targets != null) ? ch.cu_targets : null; }
   function _cuRearmable(ch){ return (ch && ch.cu_rearmable !== undefined) ? ch.cu_rearmable : true; }
 
-  const _isGr33nScam = _cuTargets(c) === "copy_enemy";
+    const _isGr33nScam = _cuTargets(c) === "copy_enemy";
   const _isBl4ckN3on = _cuTargets(c) === "copy_ally";
 
   // Get active chars — campFilter relative to a given camp (not necessarily c.camp)
