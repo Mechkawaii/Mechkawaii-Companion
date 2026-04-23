@@ -8,6 +8,7 @@
 
   const PREFIX = "mechkawaii:";
   const BACKUP_IDS_KEY = PREFIX + "tabs-active-ids";
+  const BACKUP_SETUP_KEY = PREFIX + "tabs-setup-backup";
   let repairQueued = false;
 
   function safeParse(raw) {
@@ -39,7 +40,30 @@
     }
   }
 
+  function rememberSetup() {
+    const setup = safeParse(localStorage.getItem(PREFIX + "setup"));
+    if (setup && typeof setup === "object") {
+      localStorage.setItem(BACKUP_SETUP_KEY, JSON.stringify(setup));
+    }
+  }
+
+  function restoreSessionFromBackup() {
+    const draft = safeParse(localStorage.getItem(PREFIX + "draft"));
+    const backupIds = safeParse(localStorage.getItem(BACKUP_IDS_KEY));
+    if ((!Array.isArray(draft?.activeIds) || draft.activeIds.length === 0) && Array.isArray(backupIds) && backupIds.length > 0) {
+      localStorage.setItem(PREFIX + "draft", JSON.stringify({ activeIds: backupIds }));
+    }
+
+    const setup = safeParse(localStorage.getItem(PREFIX + "setup"));
+    const backupSetup = safeParse(localStorage.getItem(BACKUP_SETUP_KEY));
+    if (!setup && backupSetup && typeof backupSetup === "object") {
+      localStorage.setItem(PREFIX + "setup", JSON.stringify(backupSetup));
+    }
+  }
+
   function getActiveIds() {
+    restoreSessionFromBackup();
+
     const draft = safeParse(localStorage.getItem(PREFIX + "draft"));
     if (Array.isArray(draft?.activeIds) && draft.activeIds.length > 0) {
       localStorage.setItem(BACKUP_IDS_KEY, JSON.stringify(draft.activeIds));
@@ -63,6 +87,7 @@
     const wrapper = document.querySelector(".unit-tabs-container");
     if (!tabsContainer || !wrapper) return;
 
+    restoreSessionFromBackup();
     const setup = safeParse(localStorage.getItem(PREFIX + "setup"));
     const activeIds = getActiveIds();
 
@@ -107,6 +132,9 @@
   async function forceRender() {
     const currentCharId = getCurrentCharId();
     if (!currentCharId) return;
+
+    rememberSetup();
+    restoreSessionFromBackup();
 
     const allChars = await getAllChars();
     if (!allChars.length) return;
@@ -154,8 +182,11 @@
   }
 
   function patchTabs() {
+    rememberSetup();
+
     if (typeof initUnitTabs === "function") {
       window.initUnitTabs = function (currentCharId, allChars, lang) {
+        rememberSetup();
         renderTabs(currentCharId, allChars, lang);
       };
     }
