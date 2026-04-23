@@ -999,23 +999,26 @@ async function initIndex(){
   resetAllBtn.className = "btn-danger";
   resetAllBtn.style.cssText = "margin:20px auto 80px;display:block;";
   resetAllBtn.textContent = lang === "fr" ? "🔄 Tout réinitialiser" : "🔄 Reset all";
-  resetAllBtn.addEventListener("click", () => {
+  resetAllBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if(!confirm(lang==="fr"?"Réinitialiser tous les personnages ?":" Reset all characters?")) return;
-    // Reset HP + toggles for every char
-    toShow.forEach(c => {
-      const defToggles = {};
-      (c.toggles||[]).forEach(tg => {
-        if(tg.type==="visual_keys") defToggles[tg.id]=Array.from({length:tg.maxKeys||2},()=>true);
-        else defToggles[tg.id]=false;
-      });
-      localStorage.setItem(STORAGE_PREFIX+"state:"+c.id, JSON.stringify({hp:c.hp?.max??0,toggles:defToggles}));
-    });
-    // Clear shared state
-    localStorage.setItem(STORAGE_PREFIX+"shields", JSON.stringify([true,true,true]));
-    localStorage.removeItem(STORAGE_PREFIX+"shield-assignments");
-    localStorage.removeItem(STORAGE_PREFIX+"blue-shield-by-tech");
-    localStorage.removeItem(STORAGE_PREFIX+"cu-badges");
-    localStorage.removeItem(STORAGE_PREFIX+"copied-cu");
+
+    const keepSetup = localStorage.getItem(STORAGE_PREFIX + "setup");
+    const keepDraft = localStorage.getItem(STORAGE_PREFIX + "draft");
+    const keepOppDraft = localStorage.getItem(STORAGE_PREFIX + "opp-draft");
+
+    localStorage.removeItem(STORAGE_PREFIX + "shields");
+    localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
+    localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
+    localStorage.removeItem(STORAGE_PREFIX + "cu-badges");
+    localStorage.removeItem(STORAGE_PREFIX + "copied-cu");
+    chars.forEach(ch => localStorage.removeItem(STORAGE_PREFIX + "state:" + ch.id));
+
+    if (keepSetup !== null) localStorage.setItem(STORAGE_PREFIX + "setup", keepSetup);
+    if (keepDraft !== null) localStorage.setItem(STORAGE_PREFIX + "draft", keepDraft);
+    if (keepOppDraft !== null) localStorage.setItem(STORAGE_PREFIX + "opp-draft", keepOppDraft);
+
     location.reload();
   });
   list.after(resetAllBtn);
