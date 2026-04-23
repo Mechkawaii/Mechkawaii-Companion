@@ -23,10 +23,10 @@
 
       const setupRaw = localStorage.getItem(PREFIX + "setup");
       const draftRaw = localStorage.getItem(PREFIX + "draft");
-      if (!setupRaw || !draftRaw) return;
+      if (!setupRaw) return;
 
       const setup = JSON.parse(setupRaw);
-      const draft = JSON.parse(draftRaw);
+      const draft = draftRaw ? JSON.parse(draftRaw) : null;
 
       let tabCharacters = [];
 
