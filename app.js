@@ -372,6 +372,47 @@ function getCopiedCu(){
 function setCopiedCu(data){ localStorage.setItem(STORAGE_PREFIX+"copied-cu",JSON.stringify(data)); }
 function clearCopiedCu(){ localStorage.removeItem(STORAGE_PREFIX+"copied-cu"); }
 
+/* Session storage cleanup (shared across pages) */
+function clearSessionStorage(opts = {}){
+  const cfg = {
+    setup: false,
+    draft: false,
+    oppDraft: false,
+    shared: false,     // shields + assignments + blue shield
+    cu: false,         // cu-badges + copied-cu
+    states: false,     // all per-character states
+    splash: false,     // splash dismissed flag
+    ...opts
+  };
+
+  if(cfg.setup) localStorage.removeItem(STORAGE_PREFIX + "setup");
+  if(cfg.draft) localStorage.removeItem(STORAGE_PREFIX + "draft");
+  if(cfg.oppDraft) localStorage.removeItem(STORAGE_PREFIX + "opp-draft");
+
+  if(cfg.shared){
+    localStorage.removeItem(STORAGE_PREFIX + "shields");
+    localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
+    localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
+  }
+
+  if(cfg.cu){
+    localStorage.removeItem(STORAGE_PREFIX + "cu-badges");
+    localStorage.removeItem(STORAGE_PREFIX + "copied-cu");
+  }
+
+  if(cfg.states){
+    for(let i = localStorage.length - 1; i >= 0; i--){
+      const key = localStorage.key(i);
+      if(key && key.startsWith(STORAGE_PREFIX + "state:")){
+        localStorage.removeItem(key);
+      }
+    }
+  }
+
+  if(cfg.splash) localStorage.removeItem(STORAGE_PREFIX + "splashDismissed");
+}
+window.mkwClearStorage = clearSessionStorage;
+
 
 // Pour le rendu (glow, tabs, etc) on aime aussi une vue "par cible"
 function getBlueShieldAssignments(){
@@ -548,29 +589,36 @@ async function initIndex(){
   }
 
   function clearSetup(){
-    localStorage.removeItem(STORAGE_PREFIX + "setup");
-    localStorage.removeItem(STORAGE_PREFIX + "draft");
-    localStorage.removeItem(STORAGE_PREFIX + "shields");
-    localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
-      localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
-    localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
+    clearSessionStorage({
+      setup: true,
+      draft: true,
+      oppDraft: true,
+      shared: true,
+      cu: true,
+      states: true
+    });
     location.reload();
   }
 
   if(changeSetupBtn){
     changeSetupBtn.addEventListener("click", ()=>{
-      localStorage.removeItem(STORAGE_PREFIX + "setup");
-      localStorage.removeItem(STORAGE_PREFIX + "shields");
-      localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
-      localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
-      localStorage.removeItem(STORAGE_PREFIX + "opp-draft");
+      clearSessionStorage({
+        setup: true,
+        oppDraft: true,
+        shared: true,
+        cu: true,
+        states: true
+      });
       location.reload();
     });
   }
 
   if(changeDraftBtn){
     changeDraftBtn.addEventListener("click", ()=>{
-      localStorage.removeItem(STORAGE_PREFIX + "draft");
+      clearSessionStorage({
+        draft: true,
+        oppDraft: true
+      });
       location.reload();
     });
   }
@@ -666,6 +714,18 @@ async function initIndex(){
   function saveOppDraft(obj){
     localStorage.setItem(STORAGE_PREFIX + "opp-draft", JSON.stringify(obj));
   }
+  function getOppDraft(){
+    try{ const r=localStorage.getItem(STORAGE_PREFIX+"opp-draft"); return r?JSON.parse(r):null; }catch(e){return null;}
+  }
+  function confirmDraftSelection(ids){
+    saveDraft({activeIds:ids});
+    if(setup.mode==="multi" && !getOppDraft()){
+      showOppDraftScreen(ids);
+    } else {
+      location.href="character.html?id="+encodeURIComponent(ids[0]);
+    }
+  }
+  window.mkwConfirmDraftSelection = confirmDraftSelection;
 
   if(!draft){
     if(draftCard) draftCard.style.display="block"; if(setupCard) setupCard.style.display="none";
@@ -720,17 +780,11 @@ async function initIndex(){
     qs("#confirmDraft")?.addEventListener("click",()=>{
       if(selected.size!==maxPick){if(draftError)draftError.textContent=lang==="fr"?"Sélectionne exactement "+maxPick+" unités.":"Select exactly "+maxPick+" units.";return;}
       const ids=[...selected];
-      saveDraft({activeIds:ids});
-      // Mode single: ask for opponent units before starting
-      if(setup.mode==="single" && !getOppDraft()){
-        showOppDraftScreen(ids);
-      } else {
-        location.href="character.html?id="+encodeURIComponent(ids[0]);
-      }
+      confirmDraftSelection(ids);
     });
     qs("#skipDraft")?.addEventListener("click",()=>{
       saveDraft({activeIds:null});
-      if(setup.mode==="single" && !getOppDraft()){
+      if(setup.mode==="multi" && !getOppDraft()){
         showOppDraftScreen([]);
       } else {
         const firstId=available[0]?.id;
@@ -747,11 +801,17 @@ async function initIndex(){
     if(draftCard) draftCard.style.display="none";
     list.innerHTML="";
 
-    // Build opponent chars (all chars NOT in myIds)
-    const oppCamp=setup.mode==="single"
-      ? (chars.find(ch=>myIds.includes(ch.id))?.camp==="mechkawaii"?"prodrome":"mechkawaii")
-      : null;
-    const oppAvailable=chars.filter(ch=>!myIds.includes(ch.id));
+    // Build opponent chars (opposite camp only)
+    const myCamp =
+      chars.find(ch => myIds.includes(ch.id))?.camp ||
+      setup.camp ||
+      "mechkawaii";
+
+    const oppCamp = myCamp === "mechkawaii" ? "prodrome" : "mechkawaii";
+
+    const oppAvailable = chars.filter(ch =>
+      (ch.camp || "mechkawaii") === oppCamp
+    );
     const oppMaxPick=3;
 
     // Inject screen into draftCard
@@ -761,14 +821,27 @@ async function initIndex(){
     // Rebuild draftList
     if(draftList) draftList.innerHTML="";
     const oppSelected=new Set();
-    const oppSwitchMap={};
+    const oppCardMap={};
 
     function oppRefreshAll(){
-      Object.keys(oppSwitchMap).forEach(id=>{
-        const sw=oppSwitchMap[id],isOn=oppSelected.has(id);
-        sw.className="switch"+(isOn?" on":""); sw.setAttribute("aria-checked",isOn?"true":"false");
-        if(!isOn&&oppSelected.size>=oppMaxPick){sw.style.opacity="0.35";sw.style.pointerEvents="none";}
-        else{sw.style.opacity="";sw.style.pointerEvents="";}
+      Object.keys(oppCardMap).forEach(id=>{
+        const card = oppCardMap[id];
+        const ch = oppAvailable.find(x=>x.id===id);
+        const charCol = (ch?.collection || "urbain");
+        const isOn = oppSelected.has(id);
+        const colColor = OPP_COL_COLORS[charCol] || "#FF9F50";
+
+        card.classList.toggle("selected", isOn);
+        card.style.borderColor = isOn ? colColor : "";
+        card.style.boxShadow = isOn ? ("0 0 18px " + colColor + "33") : "";
+
+        let blocked=false;
+        if(!isOn){
+          if(oppSelected.size>=oppMaxPick) blocked=true;
+          if(OPP_ADDITIONAL.includes(charCol)&&oppCountCol(charCol)>=1) blocked=true;
+        }
+        card.style.opacity = blocked ? "0.3" : "";
+        card.style.pointerEvents = blocked ? "none" : "";
       });
     }
 
@@ -787,17 +860,52 @@ async function initIndex(){
       heading.style.cssText="margin:16px 0 6px;padding:5px 12px;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;border-left:3px solid "+(OPP_COL_COLORS[colKey]||"#FF9F50")+";border-radius:0 6px 6px 0;background:rgba(255,255,255,.04);color:var(--text);display:flex;align-items:center;gap:6px;";
       heading.textContent=(lang==="fr")?OPP_COL_LABELS[colKey].fr:OPP_COL_LABELS[colKey].en;
       if(draftList) draftList.appendChild(heading);
+
+      const rowEl = document.createElement("div");
+      rowEl.className = "draft-col-row";
+
       group.forEach(ch=>{
         const charCol=ch.collection||"urbain";
-        const row=document.createElement("div"); row.className="toggle";
-        row.setAttribute("data-char-id",ch.id); row.setAttribute("data-collection",charCol);
-        const left=document.createElement("div"); left.className="lbl";
-        const nd=document.createElement("div"); nd.className="t"; nd.textContent=t(ch.name,lang);
-        const dd=document.createElement("div"); dd.className="d"; dd.textContent=t(ch.class,lang)+" — HP "+(ch.hp?.max??"?");
-        left.appendChild(nd); left.appendChild(dd);
-        const sw=document.createElement("div"); sw.className="switch"; sw.setAttribute("role","switch"); sw.setAttribute("tabindex","0"); sw.setAttribute("aria-checked","false");
-        oppSwitchMap[ch.id]=sw;
-        sw.addEventListener("click",()=>{
+        const camp=(ch.camp||"mechkawaii").toLowerCase();
+
+        const cardEl=document.createElement("div");
+        cardEl.className="draft-card camp-"+(camp==="prodrome"?"prodrome":"mechkawaii");
+        cardEl.dataset.charId=ch.id;
+        oppCardMap[ch.id]=cardEl;
+
+        const imgWrap=document.createElement("div");
+        imgWrap.className="draft-card-img-wrap";
+        const fullSrc=ch.images?.full;
+        if(fullSrc){
+          const img=document.createElement("img");
+          img.src=fullSrc;
+          img.alt=t(ch.name,lang);
+          img.className="draft-card-img";
+          img.onerror=()=>{imgWrap.innerHTML='<div class="draft-card-initial">'+t(ch.name,lang).charAt(0)+'</div>';};
+          imgWrap.appendChild(img);
+        } else {
+          imgWrap.innerHTML='<div class="draft-card-initial">'+t(ch.name,lang).charAt(0)+'</div>';
+        }
+        const check=document.createElement("div");
+        check.className="draft-card-check";
+        check.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+        imgWrap.appendChild(check);
+
+        const info=document.createElement("div");
+        info.className="draft-card-info";
+        const nameEl=document.createElement("div");
+        nameEl.className="draft-card-name";
+        nameEl.textContent=t(ch.name,lang);
+        const classEl=document.createElement("div");
+        classEl.className="draft-card-class-label";
+        classEl.textContent=t(ch.class,lang)+" · HP "+(ch.hp?.max??"?");
+        info.appendChild(nameEl);
+        info.appendChild(classEl);
+
+        cardEl.appendChild(imgWrap);
+        cardEl.appendChild(info);
+
+        cardEl.addEventListener("click",()=>{
           if(oppSelected.has(ch.id)){oppSelected.delete(ch.id);}
           else{
             if(oppSelected.size>=oppMaxPick) return;
@@ -810,8 +918,9 @@ async function initIndex(){
           oppConfirm.disabled=oppSelected.size!==oppMaxPick;
           oppConfirm.style.opacity=oppSelected.size!==oppMaxPick?"0.5":"1";
         });
-        row.appendChild(left); row.appendChild(sw); if(draftList) draftList.appendChild(row);
+        rowEl.appendChild(cardEl);
       });
+      if(draftList) draftList.appendChild(rowEl);
     });
     oppRefreshAll();
 
@@ -1217,39 +1326,76 @@ if (ultToggleContainer) {
   }
 
   // Gr33n_Sc4m: copy from ALL Mechkawaii — stores sourceCamp for correct targeting
-  function _showGr33nCopyModal(){
-    const myCamp=c.camp||"mechkawaii";
-    const enemyCamp=myCamp==="mechkawaii"?"prodrome":"mechkawaii";
-    const setupRaw=localStorage.getItem(STORAGE_PREFIX+"setup"), setupObj=setupRaw?JSON.parse(setupRaw):null;
-    const dr=localStorage.getItem(STORAGE_PREFIX+"draft"), draft=dr?JSON.parse(dr):null;
-    const oppDraft=getOppDraft();
-    const activeEnemyIds =
-      setupObj?.mode==="multi"
-        ? (Array.isArray(oppDraft?.activeIds)&&oppDraft.activeIds.length?oppDraft.activeIds:null)
-        : (Array.isArray(draft?.activeIds)&&draft.activeIds.length?draft.activeIds:null);
-    const sources=chars.filter(ch=>
-      (ch.camp||"mechkawaii")===enemyCamp &&
-      (!activeEnemyIds || activeEnemyIds.includes(ch.id))
-    );
-    if(!sources.length){alert(lang==="fr"?"Aucune unité disponible.":"No unit available.");return;}
-    _showCuGridModal(lang==="fr"?"Copier le coup unique de...":"Copy ultimate from...",sources,source=>{
-      setCopiedCu({
-        forChar:c.id,
-        sourceId:source.id,
-        sourceName:t(source.name,lang),
-        title:t(source.texts?.ultimate_title,lang),
-        body:t(source.texts?.ultimate_body,lang),
-        targets:_cuTargets(source)||null,
-        rearmable:_cuRearmable(source)!==false,
-        // KEY FIX: store the source's camp so targeting works correctly
-        sourceCamp:source.camp||"mechkawaii",
+ function _showGr33nCopyModal(){
+  const myCamp = c.camp || "mechkawaii";
+  const enemyCamp = myCamp === "mechkawaii" ? "prodrome" : "mechkawaii";
+
+  const setupRaw = localStorage.getItem(STORAGE_PREFIX + "setup");
+  const setup = setupRaw ? JSON.parse(setupRaw) : null;
+
+  const draftRaw = localStorage.getItem(STORAGE_PREFIX + "draft");
+  const draft = draftRaw ? JSON.parse(draftRaw) : null;
+
+  const oppDraft = getOppDraft();
+
+  let activeEnemyIds = null;
+
+  if (setup?.mode === "multi") {
+    if (Array.isArray(oppDraft?.activeIds) && oppDraft.activeIds.length) {
+      activeEnemyIds = oppDraft.activeIds;
+    }
+  } else {
+    if (Array.isArray(draft?.activeIds) && draft.activeIds.length) {
+      activeEnemyIds = draft.activeIds.filter(id => {
+        const ch = chars.find(x => x.id === id);
+        return (ch?.camp || "mechkawaii") === enemyCamp;
       });
-      _refreshUltCardText();
-      _flash((lang==="fr"?"Coup unique copié : ":"Ultimate copied: ")+t(source.texts?.ultimate_title,lang),"#a78bfa");
-    });
+    }
   }
 
-  // Bl4ck_N3on: copy from active allies
+  const sources = chars.filter(ch => {
+    const camp = ch.camp || "mechkawaii";
+    if (camp !== enemyCamp) return false;
+
+    if (Array.isArray(activeEnemyIds) && activeEnemyIds.length) {
+      return activeEnemyIds.includes(ch.id);
+    }
+
+    return true;
+  });
+
+  if (!sources.length) {
+    alert(lang === "fr" ? "Aucune unité ennemie disponible." : "No enemy unit available.");
+    return;
+  }
+
+  _showCuGridModal(
+    lang === "fr" ? "Copier le coup unique de..." : "Copy ultimate from...",
+    sources,
+    source => {
+      setCopiedCu({
+        forChar: c.id,
+        sourceId: source.id,
+        sourceName: t(source.name, lang),
+        title: t(source.texts?.ultimate_title, lang),
+        body: t(source.texts?.ultimate_body, lang),
+        targets: _cuTargets(source) || null,
+        rearmable: _cuRearmable(source) !== false,
+        sourceCamp: source.camp || "mechkawaii",
+      });
+
+      _refreshUltCardText();
+
+      _flash(
+        (lang === "fr" ? "Coup unique copié : " : "Ultimate copied: ") +
+        t(source.texts?.ultimate_title, lang),
+        "#a78bfa"
+      );
+    }
+  );
+}
+
+      // Bl4ck_N3on: copy from active allies
   function _showBl4ckCopyModal(){
     const dr=localStorage.getItem(STORAGE_PREFIX+"draft"), draft=dr?JSON.parse(dr):null;
     const myCamp=c.camp||"mechkawaii";
@@ -1661,7 +1807,7 @@ if (shieldsDisplay) {
     setBlueShieldByTech({});
     clearAllCuBadges();
     clearCopiedCu();
-    localStorage.removeItem(STORAGE_PREFIX+"opp-draft");
+    clearSessionStorage({ oppDraft: true });
     location.reload();
   });
 
@@ -1910,19 +2056,16 @@ document.addEventListener("DOMContentLoaded", async ()=>{
 
   const backToSplash = document.getElementById("backToSplash");
   if(backToSplash){
-    backToSplash.addEventListener("click", async ()=>{
-      localStorage.removeItem(STORAGE_PREFIX + "setup");
-      localStorage.removeItem(STORAGE_PREFIX + "draft");
-      localStorage.removeItem(STORAGE_PREFIX + "shields");
-      localStorage.removeItem(STORAGE_PREFIX + "shield-assignments");
-      localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
-    localStorage.removeItem(STORAGE_PREFIX + "blue-shield-by-tech");
-
-      const chars = await loadCharacters();
-      window.__cachedChars = chars;
-      chars.forEach(c => localStorage.removeItem(STORAGE_PREFIX + "state:" + c.id));
-
-      localStorage.removeItem(SPLASH_KEY);
+    backToSplash.addEventListener("click", ()=>{
+      clearSessionStorage({
+        setup: true,
+        draft: true,
+        oppDraft: true,
+        shared: true,
+        cu: true,
+        states: true,
+        splash: true
+      });
       location.reload();
     });
   }

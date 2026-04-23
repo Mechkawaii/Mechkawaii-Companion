@@ -290,6 +290,10 @@
     newConfirm.addEventListener("click", function() {
       if (selected.size !== maxPick) return;
       var ids = [...selected];
+      if (typeof window.mkwConfirmDraftSelection === "function") {
+        window.mkwConfirmDraftSelection(ids);
+        return;
+      }
       localStorage.setItem(PREFIX + "draft", JSON.stringify({ activeIds: ids }));
       location.href = "character.html?id=" + encodeURIComponent(ids[0]);
     });
