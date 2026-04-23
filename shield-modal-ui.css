@@ -1,0 +1,172 @@
+/* =====================================
+   Shield assignment modal UI (safe)
+   ===================================== */
+
+.mkw-shield-modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(4, 6, 12, 0.72) !important;
+  backdrop-filter: blur(10px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 18px !important;
+  z-index: 1200 !important;
+}
+
+.mkw-shield-modal-content {
+  width: min(920px, 100%) !important;
+  max-height: min(86vh, 900px) !important;
+  overflow-y: auto !important;
+  background: linear-gradient(180deg, rgba(19,19,26,0.98), rgba(11,11,16,0.98)) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.45) !important;
+  padding: 0 !important;
+}
+
+.mkw-shield-modal-head {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  background:
+    radial-gradient(circle at top, rgba(59,130,246,0.16), transparent 55%),
+    linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+}
+
+.mkw-shield-modal-title {
+  margin: 0 !important;
+  color: var(--text) !important;
+  font-size: clamp(20px, 3vw, 26px);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.mkw-shield-modal-subtitle {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.mkw-shield-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  padding: 18px 20px 20px;
+}
+
+.mkw-shield-choice {
+  width: 100% !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  border-radius: 18px !important;
+  overflow: hidden !important;
+  text-align: left !important;
+  border: 1px solid var(--border) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.1)) !important;
+  box-shadow: none !important;
+  transition: transform .18s ease, border-color .2s ease, box-shadow .2s ease !important;
+}
+
+.mkw-shield-choice:hover {
+  border-color: rgba(59,130,246,0.55) !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.25) !important;
+  transform: translateY(-2px);
+}
+
+.mkw-shield-choice:focus-visible {
+  outline: 2px solid var(--shield) !important;
+  outline-offset: 2px;
+}
+
+.mkw-shield-choice__visual {
+  height: 132px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+  background:
+    radial-gradient(circle at top, rgba(255,210,0,0.15), transparent 58%),
+    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.18));
+}
+
+.mkw-shield-choice__visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 10px;
+  filter: drop-shadow(0 8px 18px rgba(0,0,0,0.28));
+}
+
+.mkw-shield-choice__body {
+  padding: 12px 14px 14px;
+}
+
+.mkw-shield-choice__name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.mkw-shield-choice__meta {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mkw-shield-choice__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.mkw-shield-choice--prodrome .mkw-shield-choice__visual {
+  background:
+    radial-gradient(circle at top, rgba(255,77,77,0.16), transparent 58%),
+    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.18));
+}
+
+.mkw-shield-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 20px 20px;
+}
+
+.mkw-shield-cancel {
+  min-width: 150px !important;
+}
+
+@media (max-width: 640px) {
+  .mkw-shield-modal-overlay {
+    padding: 10px !important;
+  }
+
+  .mkw-shield-modal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 14px 14px 16px;
+  }
+
+  .mkw-shield-choice__visual {
+    height: 108px;
+  }
+
+  .mkw-shield-choice__body {
+    padding: 10px 10px 12px;
+  }
+
+  .mkw-shield-modal-head,
+  .mkw-shield-modal-actions {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
