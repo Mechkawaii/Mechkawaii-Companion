@@ -316,6 +316,12 @@ function getShieldAssignments(){
 function setShieldAssignments(assignments){
   localStorage.setItem(STORAGE_PREFIX + "shield-assignments", JSON.stringify(assignments));
 }
+function getOppDraft(){
+  try{
+    const raw = localStorage.getItem(STORAGE_PREFIX + "opp-draft");
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
 
 async function loadCharacters(){
   const res = await fetch("./data/characters.json", {cache:"no-store"});
