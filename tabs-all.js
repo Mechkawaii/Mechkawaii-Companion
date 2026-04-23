@@ -7,6 +7,7 @@
   "use strict";
 
   const PREFIX = "mechkawaii:";
+  const BACKUP_IDS_KEY = PREFIX + "tabs-active-ids";
   let repairQueued = false;
 
   function safeParse(raw) {
@@ -38,9 +39,23 @@
     }
   }
 
-  function shouldShowTabs() {
+  function getActiveIds() {
     const draft = safeParse(localStorage.getItem(PREFIX + "draft"));
-    return Array.isArray(draft?.activeIds) && draft.activeIds.length > 0;
+    if (Array.isArray(draft?.activeIds) && draft.activeIds.length > 0) {
+      localStorage.setItem(BACKUP_IDS_KEY, JSON.stringify(draft.activeIds));
+      return draft.activeIds;
+    }
+
+    const backupIds = safeParse(localStorage.getItem(BACKUP_IDS_KEY));
+    if (Array.isArray(backupIds) && backupIds.length > 0) {
+      return backupIds;
+    }
+
+    return [];
+  }
+
+  function shouldShowTabs() {
+    return getActiveIds().length > 0;
   }
 
   function renderTabs(currentCharId, allChars, lang) {
@@ -49,21 +64,26 @@
     if (!tabsContainer || !wrapper) return;
 
     const setup = safeParse(localStorage.getItem(PREFIX + "setup"));
-    const draft = safeParse(localStorage.getItem(PREFIX + "draft"));
+    const activeIds = getActiveIds();
 
-    if (!Array.isArray(draft?.activeIds) || draft.activeIds.length === 0) {
+    if (!activeIds.length) {
       wrapper.classList.remove("visible");
       document.body.classList.remove("tabs-visible");
       tabsContainer.innerHTML = "";
       return;
     }
 
-    let tabCharacters = allChars.filter(c => draft.activeIds.includes(c.id));
+    let tabCharacters = allChars.filter(c => activeIds.includes(c.id));
 
     if (setup?.mode === "multi") {
       const current = allChars.find(c => c.id === currentCharId);
       const camp = setup.camp || current?.camp;
       tabCharacters = tabCharacters.filter(c => (c.camp || "mechkawaii") === camp);
+    }
+
+    if (!tabCharacters.length) {
+      const current = allChars.find(c => c.id === currentCharId);
+      if (current) tabCharacters = [current];
     }
 
     if (!tabCharacters.length) {
