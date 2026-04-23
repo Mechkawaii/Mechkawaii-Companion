@@ -1847,12 +1847,19 @@ if (resetBtn) {
 /* ------------------------------
    MODAL SHIELD
 ------------------------------ */
+const SHIELD_MODAL_STYLES = {
+  overlay: "position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;",
+  content: "background:white;border-radius:10px;padding:20px;max-width:420px;width:90%;max-height:80vh;overflow-y:auto;color:black;",
+  actionBtn: "width:100%;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:6px;cursor:pointer;background:white;color:black;transition:all .2s ease;",
+  closeBtn: "width:100%;padding:10px;margin-top:16px;border:2px solid #999;border-radius:6px;cursor:pointer;background:#f5f5f5;color:black;"
+};
+
 function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
   const modal = document.createElement('div');
-  modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;`;
+  modal.style.cssText = SHIELD_MODAL_STYLES.overlay;
 
   const content = document.createElement('div');
-  content.style.cssText = `background:white;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:80vh;overflow-y:auto;color:black;`;
+  content.style.cssText = SHIELD_MODAL_STYLES.content;
 
   const title = document.createElement('h2');
   title.textContent = tr("shield_assign");
@@ -1889,7 +1896,7 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
       btn.style.cursor = 'not-allowed';
       btn.title = (getLang()==='fr') ? 'Déjà protégé par un bouclier bleu' : 'Already protected by a blue shield';
     }
-    btn.style.cssText = `width:100%;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:6px;cursor:pointer;background:white;color:black;transition:all .2s ease;`;
+    btn.style.cssText = SHIELD_MODAL_STYLES.actionBtn;
 
     btn.addEventListener('mouseover', ()=>{ btn.style.borderColor='#3b82f6'; btn.style.background='#eff6ff'; });
     btn.addEventListener('mouseout', ()=>{ btn.style.borderColor='#ddd'; btn.style.background='white'; });
@@ -1914,7 +1921,7 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
 
   const closeBtn = document.createElement('button');
   closeBtn.textContent = tr("cancel");
-  closeBtn.style.cssText = `width:100%;padding:10px;margin-top:16px;border:2px solid #999;border-radius:6px;cursor:pointer;background:#f5f5f5;color:black;`;
+  closeBtn.style.cssText = SHIELD_MODAL_STYLES.closeBtn;
   closeBtn.addEventListener('click', ()=>document.body.removeChild(modal));
   content.appendChild(closeBtn);
 
@@ -1927,10 +1934,10 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
 ------------------------------ */
 function showBlueShieldAssignmentModal(currentTechId, lang, allChars){
   const modal = document.createElement('div');
-  modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;`;
+  modal.style.cssText = SHIELD_MODAL_STYLES.overlay;
 
   const content = document.createElement('div');
-  content.style.cssText = `background:white;border-radius:8px;padding:20px;max-width:420px;width:90%;max-height:80vh;overflow-y:auto;color:black;`;
+  content.style.cssText = SHIELD_MODAL_STYLES.content;
 
   const title = document.createElement('h2');
   title.textContent = (getLang()==="fr") ? "Bouclier du Technicien" : "Technician Shield";
@@ -1995,7 +2002,7 @@ function showBlueShieldAssignmentModal(currentTechId, lang, allChars){
     const isTakenByOther = !!alreadyTech && alreadyTech !== currentTechId;
 
     btn.textContent = isCurrent ? `✅ ${t(char.name, lang)}` : t(char.name, lang);
-    btn.style.cssText = `width:100%;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:6px;cursor:pointer;background:white;color:black;transition:all .2s ease;`;
+    btn.style.cssText = SHIELD_MODAL_STYLES.actionBtn;
 
     if(currentTargetId && !isCurrent){
       // tech déjà utilisé => pas de nouvel assign
@@ -2048,7 +2055,7 @@ function showBlueShieldAssignmentModal(currentTechId, lang, allChars){
 
   const closeBtn = document.createElement('button');
   closeBtn.textContent = tr("cancel");
-  closeBtn.style.cssText = `width:100%;padding:10px;margin-top:16px;border:2px solid #999;border-radius:6px;cursor:pointer;background:#f5f5f5;color:black;`;
+  closeBtn.style.cssText = SHIELD_MODAL_STYLES.closeBtn;
   closeBtn.addEventListener('click', ()=>document.body.removeChild(modal));
   content.appendChild(closeBtn);
 
