@@ -10,6 +10,15 @@
 
   const PREFIX = "mechkawaii:";
 
+  function safeParse(raw) {
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch (_) {
+      return null;
+    }
+  }
+
   /* -------------------------------------------------------
      On réécrit initUnitTabs après que app.js l'a définie
   ------------------------------------------------------- */
@@ -21,33 +30,32 @@
       const unitTabsWrapper = document.querySelector(".unit-tabs-container");
       if (!tabsContainer || !unitTabsWrapper) return;
 
-      const setupRaw = localStorage.getItem(PREFIX + "setup");
-      const draftRaw = localStorage.getItem(PREFIX + "draft");
-      if (!setupRaw) return;
+      const setup = safeParse(localStorage.getItem(PREFIX + "setup"));
+      const draft = safeParse(localStorage.getItem(PREFIX + "draft"));
 
-      const setup = JSON.parse(setupRaw);
-      const draft = draftRaw ? JSON.parse(draftRaw) : null;
+      if (!Array.isArray(draft?.activeIds) || draft.activeIds.length === 0) {
+        unitTabsWrapper.classList.remove("visible");
+        document.body.classList.remove("tabs-visible");
+        tabsContainer.innerHTML = "";
+        return;
+      }
 
-      let tabCharacters = [];
+      const currentChar = allChars.find(c => c.id === currentCharId);
+      const currentCamp = currentChar?.camp || "mechkawaii";
 
-      if (setup.mode === "single") {
-        if (Array.isArray(draft.activeIds) && draft.activeIds.length) {
-          // ✅ Plus d'exclusion du perso courant
-          tabCharacters = allChars.filter(c => draft.activeIds.includes(c.id));
-        }
-      } else {
-        const currentCamp = setup.camp || "mechkawaii";
-        if (Array.isArray(draft.activeIds) && draft.activeIds.length) {
-          tabCharacters = allChars.filter(c =>
-            draft.activeIds.includes(c.id) &&
-            (c.camp || "mechkawaii") === currentCamp
-          );
-        }
+      let tabCharacters = allChars.filter(c => draft.activeIds.includes(c.id));
+
+      // Ne filtrer par camp qu'en mode multi si le setup est encore disponible.
+      // Ainsi, un reset partiel n'efface plus les tabs sur la fiche personnage.
+      if (setup?.mode === "multi") {
+        const activeCamp = setup.camp || currentCamp;
+        tabCharacters = tabCharacters.filter(c => (c.camp || "mechkawaii") === activeCamp);
       }
 
       if (tabCharacters.length === 0) {
         unitTabsWrapper.classList.remove("visible");
         document.body.classList.remove("tabs-visible");
+        tabsContainer.innerHTML = "";
         return;
       }
 
@@ -57,7 +65,6 @@
       tabsContainer.innerHTML = "";
       tabCharacters.forEach(char => {
         const tab = createCharacterTab(char, lang);
-        // Marquer le perso courant comme actif
         if (char.id === currentCharId) {
           tab.classList.add("active");
         }
@@ -66,8 +73,6 @@
     };
   }
 
-  // app.js définit initUnitTabs en dehors du DOMContentLoaded,
-  // donc on peut l'écraser directement après le chargement du script
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", patchTabs);
   } else {
