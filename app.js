@@ -925,12 +925,28 @@ async function initIndex(){
     oppRefreshAll();
 
     // Replace confirm/skip buttons
-    const btnArea=draftCard?.querySelector("[style*='margin-top:12px']")||draftCard;
     const existConfirm=qs("#confirmDraft"), existSkip=qs("#skipDraft");
-    if(existConfirm) existConfirm.style.display="none";
-    if(existSkip) existSkip.style.display="none";
+    if(existConfirm){
+      existConfirm.disabled = true;
+      existConfirm.style.pointerEvents = "none";
+      existConfirm.style.display = "none";
+    }
+    if(existSkip){
+      existSkip.disabled = true;
+      existSkip.style.pointerEvents = "none";
+      existSkip.style.display = "none";
+    }
+    const legacyConfirm = qs("#draftConfirmNew");
+    if(legacyConfirm){
+      legacyConfirm.disabled = true;
+      legacyConfirm.style.pointerEvents = "none";
+      legacyConfirm.style.display = "none";
+    }
+    const existingOppWrap = qs("#oppDraftBtnWrap");
+    if(existingOppWrap) existingOppWrap.remove();
 
     const oppBtnWrap=document.createElement("div");
+    oppBtnWrap.id = "oppDraftBtnWrap";
     oppBtnWrap.style.cssText="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;";
 
     const oppConfirm=document.createElement("button");
