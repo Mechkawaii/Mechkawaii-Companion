@@ -34,6 +34,9 @@
         if (Array.isArray(draft.activeIds) && draft.activeIds.length) {
           // ✅ Plus d'exclusion du perso courant
           tabCharacters = allChars.filter(c => draft.activeIds.includes(c.id));
+        } else {
+          // Fallback: garder les tabs même si draft.activeIds est vide/absent
+          tabCharacters = allChars;
         }
       } else {
         const currentCamp = setup.camp || "mechkawaii";
@@ -42,6 +45,9 @@
             draft.activeIds.includes(c.id) &&
             (c.camp || "mechkawaii") === currentCamp
           );
+        } else {
+          // Fallback: garder les tabs du camp courant si draft.activeIds est vide/absent
+          tabCharacters = allChars.filter(c => (c.camp || "mechkawaii") === currentCamp);
         }
       }
 
