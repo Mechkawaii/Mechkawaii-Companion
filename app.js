@@ -1799,17 +1799,45 @@ if (shieldsDisplay) {
     }
   }
 
-  qs("#resetBtn")?.addEventListener("click", ()=>{
+  const resetBtn = qs("#resetBtn");
+if (resetBtn) {
+  resetBtn.textContent = tr("reset_char");
+
+  const parent = resetBtn.parentElement;
+  if (parent) {
+    parent.style.display = "flex";
+    parent.style.gap = "10px";
+    parent.style.flexWrap = "wrap";
+    parent.style.alignItems = "center";
+  }
+
+  resetBtn.addEventListener("click", ()=>{
     const fresh = { hp: c.hp?.max ?? 0, toggles: {...defaultToggles} };
     setState(c.id, fresh);
-    setSharedShields([true, true, true]);
-    setShieldAssignments({});
-    setBlueShieldByTech({});
-    clearAllCuBadges();
-    clearCopiedCu();
-    clearSessionStorage({ oppDraft: true });
     location.reload();
   });
+
+  if (!qs("#resetAllCharsBtn")) {
+    const resetAllBtn = document.createElement("button");
+    resetAllBtn.id = "resetAllCharsBtn";
+    resetAllBtn.className = resetBtn.className;
+    resetAllBtn.textContent = tr("reset_all");
+
+    resetAllBtn.addEventListener("click", ()=>{
+      clearSessionStorage({
+        setup: true,
+        draft: true,
+        oppDraft: true,
+        shared: true,
+        cu: true,
+        states: true
+      });
+      location.reload();
+    });
+
+    parent?.appendChild(resetAllBtn);
+  }
+}
 
   qs("#backBtn")?.addEventListener("click", ()=>{ location.href = "./index.html"; });
 
