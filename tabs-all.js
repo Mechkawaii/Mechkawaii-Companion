@@ -1,12 +1,13 @@
 /* =========================================================
-   MECHKAWAII — Onglets : affiche les 3 persos (tabs-all.js)
-   Version robuste : se reconstruit même après reset
+   MECHKAWAII — Onglets : affiche les persos joués
+   Version robuste : se reconstruit même si un autre script les vide
    ========================================================= */
 
 (function () {
   "use strict";
 
   const PREFIX = "mechkawaii:";
+  let repairQueued = false;
 
   function safeParse(raw) {
     if (!raw) return null;
@@ -17,7 +18,9 @@
     try {
       const url = new URL(window.location.href);
       return url.searchParams.get("id");
-    } catch (_) { return null; }
+    } catch (_) {
+      return null;
+    }
   }
 
   async function getAllChars() {
@@ -33,6 +36,11 @@
     } catch (_) {
       return [];
     }
+  }
+
+  function shouldShowTabs() {
+    const draft = safeParse(localStorage.getItem(PREFIX + "draft"));
+    return Array.isArray(draft?.activeIds) && draft.activeIds.length > 0;
   }
 
   function renderTabs(currentCharId, allChars, lang) {
@@ -83,10 +91,46 @@
     const allChars = await getAllChars();
     if (!allChars.length) return;
 
-    const lang = localStorage.getItem(PREFIX + "lang") || "fr";
     if (typeof createCharacterTab !== "function") return;
 
+    const lang = localStorage.getItem(PREFIX + "lang") || "fr";
     renderTabs(currentCharId, allChars, lang);
+  }
+
+  function queueRepair() {
+    if (repairQueued) return;
+    repairQueued = true;
+    requestAnimationFrame(() => {
+      repairQueued = false;
+      forceRender();
+    });
+  }
+
+  function installObserver() {
+    const tabsContainer = document.querySelector("#unitTabs");
+    const wrapper = document.querySelector(".unit-tabs-container");
+    if (!tabsContainer || !wrapper || tabsContainer.dataset.tabsObserverInstalled === "1") return;
+
+    tabsContainer.dataset.tabsObserverInstalled = "1";
+
+    const observer = new MutationObserver(() => {
+      if (shouldShowTabs() && tabsContainer.children.length === 0) {
+        queueRepair();
+      }
+      if (shouldShowTabs() && !wrapper.classList.contains("visible")) {
+        queueRepair();
+      }
+    });
+
+    observer.observe(tabsContainer, { childList: true });
+    observer.observe(wrapper, { attributes: true, attributeFilter: ["class"] });
+    observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    setInterval(() => {
+      if (shouldShowTabs() && tabsContainer.children.length === 0) {
+        queueRepair();
+      }
+    }, 300);
   }
 
   function patchTabs() {
@@ -96,16 +140,16 @@
       };
     }
 
-    // 🔥 reconstruction automatique
     forceRender();
+    installObserver();
 
-    // 🔥 après reset bouton
     const resetBtn = document.querySelector("#resetBtn");
     if (resetBtn && !resetBtn.dataset.tabsFix) {
       resetBtn.dataset.tabsFix = "1";
       resetBtn.addEventListener("click", () => {
         setTimeout(forceRender, 0);
         setTimeout(forceRender, 50);
+        setTimeout(forceRender, 150);
       });
     }
   }
@@ -117,4 +161,5 @@
   }
 
   window.addEventListener("pageshow", forceRender);
+  window.addEventListener("storage", queueRepair);
 })();
