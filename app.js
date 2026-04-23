@@ -316,6 +316,12 @@ function getShieldAssignments(){
 function setShieldAssignments(assignments){
   localStorage.setItem(STORAGE_PREFIX + "shield-assignments", JSON.stringify(assignments));
 }
+function getOppDraft(){
+  try{
+    const raw = localStorage.getItem(STORAGE_PREFIX + "opp-draft");
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
 
 async function loadCharacters(){
   const res = await fetch("./data/characters.json", {cache:"no-store"});
@@ -659,9 +665,6 @@ async function initIndex(){
   }
   function saveOppDraft(obj){
     localStorage.setItem(STORAGE_PREFIX + "opp-draft", JSON.stringify(obj));
-  }
-  function getOppDraft(){
-    try{ const r=localStorage.getItem(STORAGE_PREFIX+"opp-draft"); return r?JSON.parse(r):null; }catch(e){return null;}
   }
 
   if(!draft){
@@ -1201,7 +1204,17 @@ if (ultToggleContainer) {
   function _showGr33nCopyModal(){
     const myCamp=c.camp||"mechkawaii";
     const enemyCamp=myCamp==="mechkawaii"?"prodrome":"mechkawaii";
-    const sources=chars.filter(ch=>(ch.camp||"mechkawaii")!==myCamp);
+    const setupRaw=localStorage.getItem(STORAGE_PREFIX+"setup"), setupObj=setupRaw?JSON.parse(setupRaw):null;
+    const dr=localStorage.getItem(STORAGE_PREFIX+"draft"), draft=dr?JSON.parse(dr):null;
+    const oppDraft=getOppDraft();
+    const activeEnemyIds =
+      setupObj?.mode==="multi"
+        ? (Array.isArray(oppDraft?.activeIds)&&oppDraft.activeIds.length?oppDraft.activeIds:null)
+        : (Array.isArray(draft?.activeIds)&&draft.activeIds.length?draft.activeIds:null);
+    const sources=chars.filter(ch=>
+      (ch.camp||"mechkawaii")===enemyCamp &&
+      (!activeEnemyIds || activeEnemyIds.includes(ch.id))
+    );
     if(!sources.length){alert(lang==="fr"?"Aucune unité disponible.":"No unit available.");return;}
     _showCuGridModal(lang==="fr"?"Copier le coup unique de...":"Copy ultimate from...",sources,source=>{
       setCopiedCu({
