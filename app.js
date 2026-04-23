@@ -154,7 +154,7 @@ terrain_desc_route: "Quand une unité se trouve sur un terrain route, elle a un 
     char_keys: "Clés de réparation",
     char_movement: "Déplacement",
     char_attack: "Attaque",
-    reset_char: "Réinitialiser",
+    reset_char: "Réinitialiser le personnage",
     back_list: "← Retour à la liste",
 
     shield_remove: "Retirer le bouclier",
@@ -218,7 +218,7 @@ terrain_desc_route: "A unit on a road gets a free move next turn in addition to 
     char_keys: "Repair keys",
     char_movement: "Movement",
     char_attack: "Attack",
-    reset_char: "Reset",
+    reset_char: "Reset character",
     back_list: "← Back to list",
 
     shield_remove: "Remove shield",
