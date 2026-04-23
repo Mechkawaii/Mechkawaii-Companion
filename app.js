@@ -154,7 +154,7 @@ terrain_desc_route: "Quand une unité se trouve sur un terrain route, elle a un 
     char_keys: "Clés de réparation",
     char_movement: "Déplacement",
     char_attack: "Attaque",
-    reset_char: "Réinitialiser",
+    reset_char: "Réinitialiser le personnage",
     back_list: "← Retour à la liste",
 
     shield_remove: "Retirer le bouclier",
@@ -218,7 +218,7 @@ terrain_desc_route: "A unit on a road gets a free move next turn in addition to 
     char_keys: "Repair keys",
     char_movement: "Movement",
     char_attack: "Attack",
-    reset_char: "Reset",
+    reset_char: "Reset character",
     back_list: "← Back to list",
 
     shield_remove: "Remove shield",
@@ -315,6 +315,12 @@ function getShieldAssignments(){
 }
 function setShieldAssignments(assignments){
   localStorage.setItem(STORAGE_PREFIX + "shield-assignments", JSON.stringify(assignments));
+}
+function getOppDraft(){
+  try{
+    const raw = localStorage.getItem(STORAGE_PREFIX + "opp-draft");
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
 }
 
 async function loadCharacters(){
@@ -660,9 +666,6 @@ async function initIndex(){
   function saveOppDraft(obj){
     localStorage.setItem(STORAGE_PREFIX + "opp-draft", JSON.stringify(obj));
   }
-  function getOppDraft(){
-    try{ const r=localStorage.getItem(STORAGE_PREFIX+"opp-draft"); return r?JSON.parse(r):null; }catch(e){return null;}
-  }
 
   if(!draft){
     if(draftCard) draftCard.style.display="block"; if(setupCard) setupCard.style.display="none";
@@ -813,12 +816,28 @@ async function initIndex(){
     oppRefreshAll();
 
     // Replace confirm/skip buttons
-    const btnArea=draftCard?.querySelector("[style*='margin-top:12px']")||draftCard;
     const existConfirm=qs("#confirmDraft"), existSkip=qs("#skipDraft");
-    if(existConfirm) existConfirm.style.display="none";
-    if(existSkip) existSkip.style.display="none";
+    if(existConfirm){
+      existConfirm.disabled = true;
+      existConfirm.style.pointerEvents = "none";
+      existConfirm.style.display = "none";
+    }
+    if(existSkip){
+      existSkip.disabled = true;
+      existSkip.style.pointerEvents = "none";
+      existSkip.style.display = "none";
+    }
+    const legacyConfirm = qs("#draftConfirmNew");
+    if(legacyConfirm){
+      legacyConfirm.disabled = true;
+      legacyConfirm.style.pointerEvents = "none";
+      legacyConfirm.style.display = "none";
+    }
+    const existingOppWrap = qs("#oppDraftBtnWrap");
+    if(existingOppWrap) existingOppWrap.remove();
 
     const oppBtnWrap=document.createElement("div");
+    oppBtnWrap.id = "oppDraftBtnWrap";
     oppBtnWrap.style.cssText="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;";
 
     const oppConfirm=document.createElement("button");
@@ -1201,7 +1220,17 @@ if (ultToggleContainer) {
   function _showGr33nCopyModal(){
     const myCamp=c.camp||"mechkawaii";
     const enemyCamp=myCamp==="mechkawaii"?"prodrome":"mechkawaii";
-    const sources=chars.filter(ch=>(ch.camp||"mechkawaii")!==myCamp);
+    const setupRaw=localStorage.getItem(STORAGE_PREFIX+"setup"), setupObj=setupRaw?JSON.parse(setupRaw):null;
+    const dr=localStorage.getItem(STORAGE_PREFIX+"draft"), draft=dr?JSON.parse(dr):null;
+    const oppDraft=getOppDraft();
+    const activeEnemyIds =
+      setupObj?.mode==="multi"
+        ? (Array.isArray(oppDraft?.activeIds)&&oppDraft.activeIds.length?oppDraft.activeIds:null)
+        : (Array.isArray(draft?.activeIds)&&draft.activeIds.length?draft.activeIds:null);
+    const sources=chars.filter(ch=>
+      (ch.camp||"mechkawaii")===enemyCamp &&
+      (!activeEnemyIds || activeEnemyIds.includes(ch.id))
+    );
     if(!sources.length){alert(lang==="fr"?"Aucune unité disponible.":"No unit available.");return;}
     _showCuGridModal(lang==="fr"?"Copier le coup unique de...":"Copy ultimate from...",sources,source=>{
       setCopiedCu({
@@ -1624,17 +1653,35 @@ if (shieldsDisplay) {
     }
   }
 
-  qs("#resetBtn")?.addEventListener("click", ()=>{
-    const fresh = { hp: c.hp?.max ?? 0, toggles: {...defaultToggles} };
-    setState(c.id, fresh);
-    setSharedShields([true, true, true]);
-    setShieldAssignments({});
-    setBlueShieldByTech({});
-    clearAllCuBadges();
-    clearCopiedCu();
-    localStorage.removeItem(STORAGE_PREFIX+"opp-draft");
-    location.reload();
-  });
+  const resetBtn = qs("#resetBtn");
+  if(resetBtn){
+    resetBtn.type = "button";
+    resetBtn.textContent = lang==="fr" ? "Réinitialiser le personnage" : "Reset character";
+    resetBtn.addEventListener("click", (e)=>{
+      e.preventDefault();
+      const fresh = { hp: c.hp?.max ?? 0, toggles: {...defaultToggles} };
+      setState(c.id, fresh);
+      location.reload();
+    });
+
+    if(!qs("#resetAllCharsBtn")){
+      const resetAllBtn = document.createElement("button");
+      resetAllBtn.id = "resetAllCharsBtn";
+      resetAllBtn.type = "button";
+      resetAllBtn.className = "btn-danger";
+      resetAllBtn.textContent = lang==="fr" ? "Tout réinitialiser" : "Reset all";
+      resetAllBtn.addEventListener("click", (e)=>{
+        e.preventDefault();
+        clearSessionStorage({
+          shared: true,
+          cu: true,
+          states: true
+        });
+        location.reload();
+      });
+      resetBtn.after(resetAllBtn);
+    }
+  }
 
   qs("#backBtn")?.addEventListener("click", ()=>{ location.href = "./index.html"; });
 
@@ -1644,12 +1691,19 @@ if (shieldsDisplay) {
 /* ------------------------------
    MODAL SHIELD
 ------------------------------ */
+const SHIELD_MODAL_STYLES = {
+  overlay: "position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;",
+  content: "background:white;border-radius:10px;padding:20px;max-width:420px;width:90%;max-height:80vh;overflow-y:auto;color:black;",
+  actionBtn: "width:100%;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:6px;cursor:pointer;background:white;color:black;transition:all .2s ease;",
+  closeBtn: "width:100%;padding:10px;margin-top:16px;border:2px solid #999;border-radius:6px;cursor:pointer;background:#f5f5f5;color:black;"
+};
+
 function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
   const modal = document.createElement('div');
-  modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;`;
+  modal.style.cssText = SHIELD_MODAL_STYLES.overlay;
 
   const content = document.createElement('div');
-  content.style.cssText = `background:white;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:80vh;overflow-y:auto;color:black;`;
+  content.style.cssText = SHIELD_MODAL_STYLES.content;
 
   const title = document.createElement('h2');
   title.textContent = tr("shield_assign");
@@ -1686,7 +1740,7 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
       btn.style.cursor = 'not-allowed';
       btn.title = (getLang()==='fr') ? 'Déjà protégé par un bouclier bleu' : 'Already protected by a blue shield';
     }
-    btn.style.cssText = `width:100%;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:6px;cursor:pointer;background:white;color:black;transition:all .2s ease;`;
+    btn.style.cssText = SHIELD_MODAL_STYLES.actionBtn;
 
     btn.addEventListener('mouseover', ()=>{ btn.style.borderColor='#3b82f6'; btn.style.background='#eff6ff'; });
     btn.addEventListener('mouseout', ()=>{ btn.style.borderColor='#ddd'; btn.style.background='white'; });
@@ -1711,7 +1765,7 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
 
   const closeBtn = document.createElement('button');
   closeBtn.textContent = tr("cancel");
-  closeBtn.style.cssText = `width:100%;padding:10px;margin-top:16px;border:2px solid #999;border-radius:6px;cursor:pointer;background:#f5f5f5;color:black;`;
+  closeBtn.style.cssText = SHIELD_MODAL_STYLES.closeBtn;
   closeBtn.addEventListener('click', ()=>document.body.removeChild(modal));
   content.appendChild(closeBtn);
 
@@ -1724,10 +1778,10 @@ function showShieldAssignmentModal(shieldIndex, currentCharId, lang, allChars){
 ------------------------------ */
 function showBlueShieldAssignmentModal(currentTechId, lang, allChars){
   const modal = document.createElement('div');
-  modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;`;
+  modal.style.cssText = SHIELD_MODAL_STYLES.overlay;
 
   const content = document.createElement('div');
-  content.style.cssText = `background:white;border-radius:8px;padding:20px;max-width:420px;width:90%;max-height:80vh;overflow-y:auto;color:black;`;
+  content.style.cssText = SHIELD_MODAL_STYLES.content;
 
   const title = document.createElement('h2');
   title.textContent = (getLang()==="fr") ? "Bouclier du Technicien" : "Technician Shield";
@@ -1792,7 +1846,7 @@ function showBlueShieldAssignmentModal(currentTechId, lang, allChars){
     const isTakenByOther = !!alreadyTech && alreadyTech !== currentTechId;
 
     btn.textContent = isCurrent ? `✅ ${t(char.name, lang)}` : t(char.name, lang);
-    btn.style.cssText = `width:100%;padding:10px;margin:8px 0;border:2px solid #ddd;border-radius:6px;cursor:pointer;background:white;color:black;transition:all .2s ease;`;
+    btn.style.cssText = SHIELD_MODAL_STYLES.actionBtn;
 
     if(currentTargetId && !isCurrent){
       // tech déjà utilisé => pas de nouvel assign
@@ -1845,7 +1899,7 @@ function showBlueShieldAssignmentModal(currentTechId, lang, allChars){
 
   const closeBtn = document.createElement('button');
   closeBtn.textContent = tr("cancel");
-  closeBtn.style.cssText = `width:100%;padding:10px;margin-top:16px;border:2px solid #999;border-radius:6px;cursor:pointer;background:#f5f5f5;color:black;`;
+  closeBtn.style.cssText = SHIELD_MODAL_STYLES.closeBtn;
   closeBtn.addEventListener('click', ()=>document.body.removeChild(modal));
   content.appendChild(closeBtn);
 
