@@ -16,6 +16,10 @@
     try { return JSON.parse(raw); } catch (_) { return null; }
   }
 
+  function isCharacterPage() {
+    return /character\.html$/i.test(window.location.pathname);
+  }
+
   function getCurrentCharId() {
     try {
       const url = new URL(window.location.href);
@@ -41,6 +45,7 @@
   }
 
   function rememberSetup() {
+    if (!isCharacterPage()) return;
     const setup = safeParse(localStorage.getItem(PREFIX + "setup"));
     if (setup && typeof setup === "object") {
       localStorage.setItem(BACKUP_SETUP_KEY, JSON.stringify(setup));
@@ -48,6 +53,8 @@
   }
 
   function restoreSessionFromBackup() {
+    if (!isCharacterPage()) return;
+
     const draft = safeParse(localStorage.getItem(PREFIX + "draft"));
     const backupIds = safeParse(localStorage.getItem(BACKUP_IDS_KEY));
     if ((!Array.isArray(draft?.activeIds) || draft.activeIds.length === 0) && Array.isArray(backupIds) && backupIds.length > 0) {
@@ -66,12 +73,14 @@
 
     const draft = safeParse(localStorage.getItem(PREFIX + "draft"));
     if (Array.isArray(draft?.activeIds) && draft.activeIds.length > 0) {
-      localStorage.setItem(BACKUP_IDS_KEY, JSON.stringify(draft.activeIds));
+      if (isCharacterPage()) {
+        localStorage.setItem(BACKUP_IDS_KEY, JSON.stringify(draft.activeIds));
+      }
       return draft.activeIds;
     }
 
     const backupIds = safeParse(localStorage.getItem(BACKUP_IDS_KEY));
-    if (Array.isArray(backupIds) && backupIds.length > 0) {
+    if (isCharacterPage() && Array.isArray(backupIds) && backupIds.length > 0) {
       return backupIds;
     }
 
@@ -154,6 +163,8 @@
   }
 
   async function forceRender() {
+    if (!isCharacterPage()) return;
+
     const currentCharId = getCurrentCharId();
     if (!currentCharId) return;
 
@@ -170,6 +181,7 @@
   }
 
   function queueRepair() {
+    if (!isCharacterPage()) return;
     if (repairQueued) return;
     repairQueued = true;
     requestAnimationFrame(() => {
@@ -179,6 +191,8 @@
   }
 
   function installObserver() {
+    if (!isCharacterPage()) return;
+
     const tabsContainer = document.querySelector("#unitTabs");
     const wrapper = document.querySelector(".unit-tabs-container");
     if (!tabsContainer || !wrapper || tabsContainer.dataset.tabsObserverInstalled === "1") return;
@@ -206,6 +220,8 @@
   }
 
   function patchTabs() {
+    if (!isCharacterPage()) return;
+
     rememberSetup();
 
     if (typeof initUnitTabs === "function") {
