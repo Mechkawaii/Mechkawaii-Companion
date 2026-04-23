@@ -82,6 +82,29 @@
     return getActiveIds().length > 0;
   }
 
+  function bindDirectNavigation(tab, charId) {
+    if (!tab || !charId) return;
+
+    tab.style.cursor = "pointer";
+    tab.dataset.charId = charId;
+
+    const goToChar = (e) => {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      location.href = "character.html?id=" + encodeURIComponent(charId);
+    };
+
+    tab.onclick = goToChar;
+    tab.addEventListener("click", goToChar);
+    tab.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        goToChar(e);
+      }
+    });
+  }
+
   function renderTabs(currentCharId, allChars, lang) {
     const tabsContainer = document.querySelector("#unitTabs");
     const wrapper = document.querySelector(".unit-tabs-container");
@@ -124,6 +147,7 @@
 
     tabCharacters.forEach(char => {
       const tab = createCharacterTab(char, lang);
+      bindDirectNavigation(tab, char.id);
       if (char.id === currentCharId) tab.classList.add("active");
       tabsContainer.appendChild(tab);
     });
