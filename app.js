@@ -1826,12 +1826,17 @@ if (resetBtn) {
     resetAllBtn.className = resetBtn.className;
     resetAllBtn.textContent = tr("reset_all");
 
-    clearSessionStorage({
-  shared: true,
-  cu: true,
-  states: true
-});
-location.reload();
+    resetAllBtn.addEventListener("click", ()=>{
+      clearSessionStorage({
+        setup: true,
+        draft: true,
+        oppDraft: true,
+        shared: true,
+        cu: true,
+        states: true
+      });
+      location.reload();
+    });
 
     parent?.appendChild(resetAllBtn);
   }
