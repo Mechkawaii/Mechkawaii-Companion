@@ -8,29 +8,39 @@
   function qs(sel){ return document.querySelector(sel); }
   function qsa(sel){ return Array.from(document.querySelectorAll(sel)); }
 
-  function getLang(){
-    return localStorage.getItem(STORAGE_PREFIX + "lang") || "fr";
-  }
-
-  function getCurrentCharId(){
-    return new URL(location.href).searchParams.get("id");
-  }
+  function getLang(){ return localStorage.getItem(STORAGE_PREFIX + "lang") || "fr"; }
+  function getCurrentCharId(){ return new URL(location.href).searchParams.get("id"); }
 
   function readJson(key, fallback){
-    try{
-      const raw = localStorage.getItem(key);
-      return raw ? JSON.parse(raw) : fallback;
-    }catch(e){
-      return fallback;
-    }
+    try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch(e){ return fallback; }
   }
 
-  function getState(charId){
-    return readJson(STORAGE_PREFIX + "state:" + charId, null);
-  }
+  function getState(charId){ return readJson(STORAGE_PREFIX + "state:" + charId, null); }
+  function setState(charId, state){ localStorage.setItem(STORAGE_PREFIX + "state:" + charId, JSON.stringify(state)); }
 
-  function setState(charId, state){
-    localStorage.setItem(STORAGE_PREFIX + "state:" + charId, JSON.stringify(state));
+  function ensureRepairStyles(){
+    if (document.getElementById("mkwRepairKeyStyles")) return;
+    const style = document.createElement("style");
+    style.id = "mkwRepairKeyStyles";
+    style.textContent = `
+      @keyframes mkwHealGlow {
+        0% { box-shadow: 0 0 0 rgba(70,255,145,0); transform: translateZ(0); }
+        35% { box-shadow: 0 0 0 3px rgba(70,255,145,.35), 0 0 28px rgba(70,255,145,.85); transform: translateY(-1px); }
+        100% { box-shadow: 0 0 0 rgba(70,255,145,0); transform: translateZ(0); }
+      }
+      @keyframes mkwHeartPulse {
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(70,255,145,0)); }
+        40% { transform: scale(1.28); filter: drop-shadow(0 0 10px rgba(70,255,145,.95)); }
+        70% { transform: scale(1.08); }
+      }
+      .mkw-heal-glow { animation: mkwHealGlow .9s ease-out both !important; border-color: rgba(70,255,145,.75) !important; }
+      .mkw-heart-pulse { animation: mkwHeartPulse .8s ease-out both !important; }
+      .mkw-repair-target--max { opacity: .42 !important; filter: grayscale(.75); cursor: not-allowed !important; }
+      .mkw-repair-target--max:hover { background: rgba(255,255,255,.05) !important; }
+      .mkw-repair-max-badge { font-size: 10px; font-weight: 900; color: #111; background: #cfd3d8; border-radius: 999px; padding: 3px 7px; white-space: nowrap; }
+    `;
+    document.head.appendChild(style);
   }
 
   async function loadCharactersSafe(){
@@ -61,9 +71,7 @@
     return cls[lang] || cls.fr || "";
   }
 
-  function getCharHpMax(char){
-    return Number(char?.hp?.max ?? 0);
-  }
+  function getCharHpMax(char){ return Number(char?.hp?.max ?? 0); }
 
   function ensureStateForChar(char){
     const id = char.id;
@@ -71,13 +79,7 @@
     const existing = getState(id);
     if (existing && typeof existing === "object") {
       const hp = existing.hp || {};
-      return {
-        ...existing,
-        hp: {
-          max: Number(hp.max ?? max),
-          cur: Number(hp.cur ?? hp.max ?? max)
-        }
-      };
+      return { ...existing, hp: { max: Number(hp.max ?? max), cur: Number(hp.cur ?? hp.max ?? max) } };
     }
     return { hp: { max, cur: max }, toggles: {} };
   }
@@ -91,14 +93,10 @@
     });
   }
 
-  function getRepairKeysState(){
-    const buttons = getRepairKeyButtons();
-    return buttons.map(btn => btn.dataset.active !== "false");
-  }
+  function getRepairKeysState(){ return getRepairKeyButtons().map(btn => btn.dataset.active !== "false"); }
 
   function setRepairKeysState(state){
-    const buttons = getRepairKeyButtons();
-    buttons.forEach((btn, index) => {
+    getRepairKeyButtons().forEach((btn, index) => {
       const active = !!state[index];
       btn.dataset.active = active ? "true" : "false";
       btn.style.backgroundImage = `url('${active ? KEY_ICON_ON : KEY_ICON_OFF}')`;
@@ -118,6 +116,27 @@
     setState(currentId, currentState);
   }
 
+  function triggerHealAnimation(targetId){
+    if (targetId !== getCurrentCharId()) return;
+    const hpCard = qs("#hpCard");
+    const hearts = qsa("#hpHearts .heart");
+    const lastHeart = hearts[hearts.length - 1];
+
+    if (hpCard) {
+      hpCard.classList.remove("mkw-heal-glow");
+      void hpCard.offsetWidth;
+      hpCard.classList.add("mkw-heal-glow");
+      setTimeout(() => hpCard.classList.remove("mkw-heal-glow"), 950);
+    }
+
+    if (lastHeart) {
+      lastHeart.classList.remove("mkw-heart-pulse");
+      void lastHeart.offsetWidth;
+      lastHeart.classList.add("mkw-heart-pulse");
+      setTimeout(() => lastHeart.classList.remove("mkw-heart-pulse"), 850);
+    }
+  }
+
   function refreshHpDisplayIfCurrent(targetId, targetState){
     if (targetId !== getCurrentCharId()) return;
     const curEl = qs("#hpCur");
@@ -135,6 +154,7 @@
         heartsEl.appendChild(img);
       }
     }
+    triggerHealAnimation(targetId);
     window.dispatchEvent(new CustomEvent("mechkawaii:hp-updated", { detail: { charId: targetId, state: targetState } }));
   }
 
@@ -146,11 +166,10 @@
     setTimeout(() => toast.remove(), 1800);
   }
 
-  function closeModal(modal){
-    modal?.remove();
-  }
+  function closeModal(modal){ modal?.remove(); }
 
   async function openRepairModal(keyIndex){
+    ensureRepairStyles();
     const lang = getLang();
     const currentId = getCurrentCharId();
     const chars = await loadCharactersSafe();
@@ -179,9 +198,7 @@
 
     const subtitle = document.createElement("div");
     subtitle.style.cssText = "color:rgba(255,255,255,.72);font-size:13px;line-height:1.35;margin-bottom:14px;";
-    subtitle.textContent = lang === "fr"
-      ? "Choisis une unité alliée : elle récupère 1 PV."
-      : "Choose an allied unit: it recovers 1 HP.";
+    subtitle.textContent = lang === "fr" ? "Choisis une unité alliée : elle récupère 1 PV." : "Choose an allied unit: it recovers 1 HP.";
 
     panel.appendChild(title);
     panel.appendChild(subtitle);
@@ -191,6 +208,8 @@
       const isMax = state.hp.cur >= state.hp.max;
       const btn = document.createElement("button");
       btn.type = "button";
+      btn.className = isMax ? "mkw-repair-target--max" : "";
+      btn.disabled = isMax;
       btn.style.cssText = "width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:11px;margin:8px 0;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;";
 
       const portrait = document.createElement("img");
@@ -200,18 +219,26 @@
 
       const info = document.createElement("div");
       info.style.cssText = "flex:1;min-width:0;";
-      info.innerHTML = `
-        <div style="font-weight:900;">${getCharName(char, lang)}</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.62);">${getCharClass(char, lang)}</div>
-      `;
+      info.innerHTML = `<div style="font-weight:900;">${getCharName(char, lang)}</div><div style="font-size:12px;color:rgba(255,255,255,.62);">${getCharClass(char, lang)}</div>`;
+
+      const hpWrap = document.createElement("div");
+      hpWrap.style.cssText = "display:flex;flex-direction:column;align-items:flex-end;gap:5px;";
 
       const hp = document.createElement("div");
       hp.style.cssText = "font-weight:900;color:#ffd24d;white-space:nowrap;";
       hp.textContent = `${state.hp.cur}/${state.hp.max}`;
+      hpWrap.appendChild(hp);
+
+      if (isMax) {
+        const badge = document.createElement("div");
+        badge.className = "mkw-repair-max-badge";
+        badge.textContent = lang === "fr" ? "PV max" : "Max HP";
+        hpWrap.appendChild(badge);
+      }
 
       btn.appendChild(portrait);
       btn.appendChild(info);
-      btn.appendChild(hp);
+      btn.appendChild(hpWrap);
 
       btn.addEventListener("click", () => {
         const latest = ensureStateForChar(char);
@@ -231,7 +258,6 @@
 
         closeModal(modal);
         showToast(lang === "fr" ? "+1 PV réparé." : "+1 HP repaired.");
-        setTimeout(() => location.reload(), 160);
       });
 
       panel.appendChild(btn);
@@ -245,15 +271,14 @@
 
     panel.appendChild(cancel);
     modal.appendChild(panel);
-    modal.addEventListener("click", (event) => {
-      if (event.target === modal) closeModal(modal);
-    });
+    modal.addEventListener("click", (event) => { if (event.target === modal) closeModal(modal); });
     document.body.appendChild(modal);
   }
 
   function patchRepairKeys(){
     const currentId = getCurrentCharId();
     if (!currentId) return;
+    ensureRepairStyles();
 
     const buttons = getRepairKeyButtons();
     if (!buttons.length) return;
