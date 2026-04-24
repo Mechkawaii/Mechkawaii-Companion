@@ -1,0 +1,25 @@
+{
+  "name": "Mechkawaii Companion",
+  "short_name": "Mechkawaii",
+  "description": "Companion app for Mechkawaii board game.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#05060a",
+  "theme_color": "#05060a",
+  "icons": [
+    {
+      "src": "./assets/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/heart.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
