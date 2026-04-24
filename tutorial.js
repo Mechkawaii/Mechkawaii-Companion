@@ -4,11 +4,11 @@
   const SHEEPARD_SRC = "./assets/sheepard.svg";
 
   const STEPS = [
-    { target: ".hp-section", title: "Centre de commandement", kicker: "PV · Boucliers · Réparation", text: "Soldat, ici tu surveilles l’état complet de ton unité." },
-    { target: "#shieldsDisplay", title: "Réserve de boucliers", kicker: "Défense partagée", text: "Attribue les boucliers intelligemment. Chaque décision compte." },
-    { target: "#repairKeysDisplay", title: "Clés de réparation", kicker: "Ressource limitée", text: "Les réparations ne sont pas infinies. Utilise-les avec stratégie." },
-    { target: "#unitTabs", title: "Escouade active", kicker: "Navigation rapide", text: "Change d’unité rapidement pour garder l’avantage." },
-    { target: "#resetBtn", title: "Réinitialisation", kicker: "Sans panique", text: "Tu peux réinitialiser cette unité sans impacter le reste." }
+    { target: ".hp-section", title: "Centre de commandement", kicker: "PV · Boucliers · Réparation", text: "Soldat, ici tu surveilles l’état complet de ton unité.", pad: 18 },
+    { target: ".shields-section", title: "Réserve de boucliers", kicker: "Défense partagée", text: "Attribue les boucliers intelligemment. Chaque décision compte.", pad: 16 },
+    { target: ".repair-section", title: "Clés de réparation", kicker: "Ressource limitée", text: "Les réparations ne sont pas infinies. Utilise-les avec stratégie.", pad: 16 },
+    { target: "#unitTabs", title: "Escouade active", kicker: "Navigation rapide", text: "Change d’unité rapidement pour garder l’avantage.", pad: 12 },
+    { target: "#resetBtn", title: "Réinitialisation", kicker: "Sans panique", text: "Tu peux réinitialiser cette unité sans impacter le reste.", pad: 12 }
   ];
 
   let currentStep = 0;
@@ -17,6 +17,7 @@
   let highlight = null;
   let tooltip = null;
   let activeTarget = null;
+  let activeStep = null;
   let tutorialButton = null;
   let previousBodyOverflow = "";
   let previousHtmlOverflow = "";
@@ -57,6 +58,7 @@
     highlight = null;
     tooltip = null;
     activeTarget = null;
+    activeStep = null;
     unlockPage();
     if (tutorialButton) tutorialButton.style.display = "block";
   }
@@ -92,28 +94,28 @@
     if (!activeTarget || !highlight || !tooltip || !overlay) return;
 
     const rect = activeTarget.getBoundingClientRect();
-    const pad = 10;
-    const top = rect.top - pad;
-    const left = rect.left - pad;
-    const right = rect.right + pad;
-    const bottom = rect.bottom + pad;
+    const pad = Number(activeStep?.pad ?? 12);
+    const top = Math.max(4, rect.top - pad);
+    const left = Math.max(4, rect.left - pad);
+    const right = Math.min(window.innerWidth - 4, rect.right + pad);
+    const bottom = Math.min(window.innerHeight - 4, rect.bottom + pad);
 
     overlay.style.clipPath = `polygon(0% 0%,0% 100%,${left}px 100%,${left}px ${top}px,${right}px ${top}px,${right}px ${bottom}px,${left}px ${bottom}px,${left}px 100%,100% 100%,100% 0%)`;
 
-    highlight.style.top = rect.top + "px";
-    highlight.style.left = rect.left + "px";
-    highlight.style.width = rect.width + "px";
-    highlight.style.height = rect.height + "px";
+    highlight.style.top = top + "px";
+    highlight.style.left = left + "px";
+    highlight.style.width = (right - left) + "px";
+    highlight.style.height = (bottom - top) + "px";
 
-    placeTooltip(rect);
+    placeTooltip({ top, left, right, bottom, width: right - left, height: bottom - top });
   }
 
   function renderTooltip(step) {
     const isLast = currentStep === STEPS.length - 1;
 
     tooltip.innerHTML = `
-      <div style="display:flex;gap:14px;align-items:flex-start;">
-        <img src="${SHEEPARD_SRC}" style="width:clamp(64px,18vw,80px);height:clamp(64px,18vw,80px);border-radius:16px;object-fit:cover;border:3px solid rgba(255,255,255,.3);background:#000;flex:0 0 auto;box-shadow:0 0 12px rgba(255,210,77,.4);">
+      <div style="display:flex;gap:16px;align-items:flex-start;">
+        <img src="${SHEEPARD_SRC}" style="width:clamp(96px,9vw,128px);height:clamp(96px,9vw,128px);border-radius:18px;object-fit:cover;border:3px solid rgba(255,255,255,.3);background:#000;flex:0 0 auto;box-shadow:0 0 16px rgba(255,210,77,.45);">
         <div style="flex:1;min-width:0;">
           <div style="font-size:11px;font-weight:900;color:#ffd24d;text-transform:uppercase;">Général Sheepard</div>
           <div style="font-weight:900;margin-top:4px;font-size:17px;">${step.title}</div>
@@ -145,6 +147,7 @@
     if (!target) return;
 
     activeTarget = target;
+    activeStep = step;
     target.scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
     renderTooltip(step);
 
@@ -175,7 +178,7 @@
     document.body.appendChild(highlight);
 
     tooltip = document.createElement("div");
-    tooltip.style.cssText = "position:fixed;width:min(380px,calc(100vw - 28px));background:#111;color:#fff;padding:16px;border-radius:14px;z-index:3002;box-shadow:0 18px 40px rgba(0,0,0,.55);pointer-events:auto";
+    tooltip.style.cssText = "position:fixed;width:min(520px,calc(100vw - 28px));background:#111;color:#fff;padding:16px;border-radius:14px;z-index:3002;box-shadow:0 18px 40px rgba(0,0,0,.55);pointer-events:auto";
     tooltip.addEventListener("click", (event) => event.stopPropagation());
     document.body.appendChild(tooltip);
 
