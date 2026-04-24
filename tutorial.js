@@ -4,7 +4,7 @@
   const SHEEPARD_SRC = "./assets/sheepard.svg";
 
   const STEPS = [
-    { target: "#hpCard", title: "Centre de commandement", kicker: "PV · Boucliers · Réparation", text: "Soldat, ici tu surveilles l’état complet de ton unité." },
+    { target: ".hp-section", title: "Centre de commandement", kicker: "PV · Boucliers · Réparation", text: "Soldat, ici tu surveilles l’état complet de ton unité." },
     { target: "#shieldsDisplay", title: "Réserve de boucliers", kicker: "Défense partagée", text: "Attribue les boucliers intelligemment. Chaque décision compte." },
     { target: "#repairKeysDisplay", title: "Clés de réparation", kicker: "Ressource limitée", text: "Les réparations ne sont pas infinies. Utilise-les avec stratégie." },
     { target: "#unitTabs", title: "Escouade active", kicker: "Navigation rapide", text: "Change d’unité rapidement pour garder l’avantage." },
@@ -92,8 +92,8 @@
     const isLast = currentStep === STEPS.length - 1;
 
     tooltip.innerHTML = `
-      <div style="display:flex;gap:16px;align-items:flex-start;">
-        <img src="${SHEEPARD_SRC}" style="width:80px;height:80px;border-radius:16px;object-fit:cover;border:3px solid rgba(255,255,255,.3);background:#000;flex:0 0 auto;box-shadow:0 0 12px rgba(255,210,77,.4);">
+      <div style="display:flex;gap:14px;align-items:flex-start;">
+        <img src="${SHEEPARD_SRC}" style="width:clamp(64px,18vw,80px);height:clamp(64px,18vw,80px);border-radius:16px;object-fit:cover;border:3px solid rgba(255,255,255,.3);background:#000;flex:0 0 auto;box-shadow:0 0 12px rgba(255,210,77,.4);">
         <div style="flex:1;min-width:0;">
           <div style="font-size:11px;font-weight:900;color:#ffd24d;text-transform:uppercase;">Général Sheepard</div>
           <div style="font-weight:900;margin-top:4px;font-size:17px;">${step.title}</div>
