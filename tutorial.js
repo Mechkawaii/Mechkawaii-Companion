@@ -92,11 +92,11 @@
     const isLast = currentStep === STEPS.length - 1;
 
     tooltip.innerHTML = `
-      <div style="display:flex;gap:12px;align-items:flex-start;">
-        <img src="${SHEEPARD_SRC}" style="width:56px;height:56px;border-radius:12px;object-fit:cover;border:2px solid rgba(255,255,255,.2);background:#000;flex:0 0 auto;">
+      <div style="display:flex;gap:16px;align-items:flex-start;">
+        <img src="${SHEEPARD_SRC}" style="width:80px;height:80px;border-radius:16px;object-fit:cover;border:3px solid rgba(255,255,255,.3);background:#000;flex:0 0 auto;box-shadow:0 0 12px rgba(255,210,77,.4);">
         <div style="flex:1;min-width:0;">
           <div style="font-size:11px;font-weight:900;color:#ffd24d;text-transform:uppercase;">Général Sheepard</div>
-          <div style="font-weight:900;margin-top:4px;">${step.title}</div>
+          <div style="font-weight:900;margin-top:4px;font-size:17px;">${step.title}</div>
           <div style="margin-top:6px;line-height:1.4;">${step.text}</div>
         </div>
       </div>
@@ -153,7 +153,7 @@
     document.body.appendChild(highlight);
 
     tooltip = document.createElement("div");
-    tooltip.style.cssText = "position:fixed;width:min(360px,calc(100vw - 28px));background:#111;color:#fff;padding:16px;border-radius:12px;z-index:3002;box-shadow:0 18px 40px rgba(0,0,0,.55)";
+    tooltip.style.cssText = "position:fixed;width:min(380px,calc(100vw - 28px));background:#111;color:#fff;padding:16px;border-radius:14px;z-index:3002;box-shadow:0 18px 40px rgba(0,0,0,.55)";
     tooltip.addEventListener("click", (event) => event.stopPropagation());
     document.body.appendChild(tooltip);
 
