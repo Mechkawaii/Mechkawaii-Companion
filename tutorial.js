@@ -4,11 +4,41 @@
   const SHEEPARD_SRC = "./assets/sheepard.svg";
 
   const STEPS = [
-    { target: ".hp-section", title: "Centre de commandement", kicker: "PV · Boucliers · Réparation", text: "Soldat, ici tu surveilles l’état complet de ton unité.", pad: 18 },
-    { target: ".shields-section", title: "Réserve de boucliers", kicker: "Défense partagée", text: "Attribue les boucliers intelligemment. Chaque décision compte.", pad: 16 },
-    { target: ".repair-section", title: "Clés de réparation", kicker: "Ressource limitée", text: "Les réparations ne sont pas infinies. Utilise-les avec stratégie.", pad: 16 },
-    { target: "#unitTabs", title: "Escouade active", kicker: "Navigation rapide", text: "Change d’unité rapidement pour garder l’avantage.", pad: 12 },
-    { target: "#resetBtn", title: "Réinitialisation", kicker: "Sans panique", text: "Tu peux réinitialiser cette unité sans impacter le reste.", pad: 12 }
+    {
+      target: ".hp-section",
+      title: "Points de vie",
+      kicker: "Fonctionnement des PV",
+      text: "Les PV indiquent l’état de ton unité. S’ils tombent à 0, l’unité devient Hors Service (HS). Une unité ne peut jamais dépasser le nombre de PV indiqué sur sa carte.",
+      pad: 18
+    },
+    {
+      target: ".shields-section",
+      title: "Se protéger",
+      kicker: "Boucliers",
+      text: "Un bouclier absorbe 1 PV de dégâts. Il disparaît au début de ton prochain tour ou s’il est détruit par une attaque. Une fois utilisé, le jeton bouclier est retiré de la partie.",
+      pad: 16
+    },
+    {
+      target: ".repair-section",
+      title: "Réparer",
+      kicker: "Clés de réparation",
+      text: "Chaque unité dispose de 2 clés de réparation en début de partie. Une clé permet de redonner 1 PV ou de relever une unité alliée HS avec 1 PV. Une fois utilisée, elle est retirée de la partie.",
+      pad: 16
+    },
+    {
+      target: "#unitTabs",
+      title: "Tes 3 unités",
+      kicker: "Phase de combat",
+      text: "À ton tour, tu choisis les actions de chacune de tes 3 unités, dans l’ordre de ton choix : se déplacer, attaquer, réparer, se protéger ou utiliser une action spéciale.",
+      pad: 12
+    },
+    {
+      target: "#resetBtn",
+      title: "Réinitialisation",
+      kicker: "Outil Companion",
+      text: "Ce bouton remet cette fiche dans son état de départ pour recommencer proprement une partie ou corriger une erreur de manipulation.",
+      pad: 12
+    }
   ];
 
   let currentStep = 0;
