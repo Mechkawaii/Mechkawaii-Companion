@@ -37,13 +37,13 @@
   let currentStep = 0;
   let overlay = null;
   let highlight = null;
-  let spotlight = null;
   let tooltip = null;
   let activeTarget = null;
   let lockApplied = false;
   let savedOverflowBody = "";
   let savedOverflowHtml = "";
   let keyHandler = null;
+  let tutorialButton = null;
 
   function isCharacterPage() {
     return document.body && document.body.classList.contains("page-character");
@@ -59,9 +59,9 @@
     const style = document.createElement("style");
     style.id = "mkwTutorialStyles";
     style.textContent = `
-      @keyframes mkwTutorialPulse {
-        0%, 100% { transform: scale(1); box-shadow: 0 0 0 4px rgba(0,0,0,.45), 0 0 22px rgba(255,77,252,.85); }
-        50% { transform: scale(1.055); box-shadow: 0 0 0 5px rgba(0,0,0,.45), 0 0 32px rgba(255,77,252,1); }
+      @keyframes mkwTutorialBtnIdle {
+        0%, 100% { transform: translateY(0); filter: brightness(1); }
+        50% { transform: translateY(-2px); filter: brightness(1.08); }
       }
       @keyframes mkwTutorialPop {
         from { opacity: 0; transform: translateY(8px) scale(.97); }
@@ -69,11 +69,11 @@
       }
       @keyframes mkwTutorialScan {
         0% { transform: translateX(-110%); opacity: 0; }
-        20% { opacity: .55; }
+        20% { opacity: .5; }
         100% { transform: translateX(110%); opacity: 0; }
       }
       .mkw-tutorial-btn {
-        animation: mkwTutorialPulse 2.8s ease-in-out infinite !important;
+        animation: mkwTutorialBtnIdle 3s ease-in-out infinite !important;
       }
       .mkw-tutorial-tooltip {
         animation: mkwTutorialPop .2s ease-out both !important;
@@ -84,7 +84,7 @@
         inset: 0;
         border-radius: inherit;
         padding: 1px;
-        background: linear-gradient(135deg, rgba(255,77,252,.95), rgba(255,210,77,.65), rgba(80,150,255,.45));
+        background: linear-gradient(135deg, rgba(255,77,252,.75), rgba(255,210,77,.55), rgba(255,255,255,.22));
         -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
         -webkit-mask-composite: xor;
         mask-composite: exclude;
@@ -103,8 +103,8 @@
         top: 0;
         bottom: 0;
         width: 40%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,.16), transparent);
-        animation: mkwTutorialScan 2.6s ease-in-out infinite;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.13), transparent);
+        animation: mkwTutorialScan 2.8s ease-in-out infinite;
       }
       .mkw-tutorial-step-dot {
         width: 7px;
@@ -114,7 +114,7 @@
       }
       .mkw-tutorial-step-dot.active {
         background: #ffd24d;
-        box-shadow: 0 0 10px rgba(255,210,77,.85);
+        box-shadow: 0 0 10px rgba(255,210,77,.75);
       }
       .mkw-tutorial-button {
         border: 1px solid rgba(255,255,255,.14);
@@ -125,22 +125,15 @@
         font-weight: 800;
         cursor: pointer;
       }
-      .mkw-tutorial-button:hover:not(:disabled) {
-        background: rgba(255,255,255,.12);
-      }
-      .mkw-tutorial-button:disabled {
-        opacity: .35;
-        cursor: not-allowed;
-      }
+      .mkw-tutorial-button:hover:not(:disabled) { background: rgba(255,255,255,.12); }
+      .mkw-tutorial-button:disabled { opacity: .35; cursor: not-allowed; }
       .mkw-tutorial-button.primary {
         color: #111;
         border-color: rgba(255,210,77,.65);
         background: linear-gradient(180deg, #ffe16f, #ffbf2e);
-        box-shadow: 0 0 14px rgba(255,210,77,.28);
+        box-shadow: 0 0 14px rgba(255,210,77,.24);
       }
-      .mkw-tutorial-button.primary:hover {
-        filter: brightness(1.06);
-      }
+      .mkw-tutorial-button.primary:hover { filter: brightness(1.06); }
     `;
     document.head.appendChild(style);
   }
@@ -152,16 +145,16 @@
     forceStyle(btn, "right", "14px");
     forceStyle(btn, "left", "auto");
     forceStyle(btn, "bottom", "auto");
-    forceStyle(btn, "width", "48px");
-    forceStyle(btn, "height", "48px");
-    forceStyle(btn, "min-width", "48px");
-    forceStyle(btn, "min-height", "48px");
-    forceStyle(btn, "border-radius", "50%");
-    forceStyle(btn, "border", "3px solid #ffffff");
-    forceStyle(btn, "background", "radial-gradient(circle at 30% 20%, #ffd24d 0%, #ff4dfc 42%, #12121a 100%)");
-    forceStyle(btn, "color", "#111111");
-    forceStyle(btn, "font-weight", "900");
-    forceStyle(btn, "font-size", "24px");
+    forceStyle(btn, "width", "54px");
+    forceStyle(btn, "height", "42px");
+    forceStyle(btn, "min-width", "54px");
+    forceStyle(btn, "min-height", "42px");
+    forceStyle(btn, "border-radius", "14px");
+    forceStyle(btn, "border", "2px solid rgba(255,255,255,.75)");
+    forceStyle(btn, "background", "linear-gradient(180deg, rgba(255,255,255,.18), rgba(0,0,0,.18)), #f2b35d");
+    forceStyle(btn, "color", "#15110c");
+    forceStyle(btn, "font-weight", "950");
+    forceStyle(btn, "font-size", "22px");
     forceStyle(btn, "line-height", "1");
     forceStyle(btn, "display", "flex");
     forceStyle(btn, "align-items", "center");
@@ -173,6 +166,7 @@
     forceStyle(btn, "padding", "0");
     forceStyle(btn, "margin", "0");
     forceStyle(btn, "z-index", "2147483647");
+    forceStyle(btn, "box-shadow", "0 4px 0 rgba(0,0,0,.45), 0 0 18px rgba(242,179,93,.45)");
   }
 
   function injectTutorialButton() {
@@ -187,6 +181,7 @@
       document.body.appendChild(btn);
     }
 
+    tutorialButton = btn;
     btn.textContent = "ⓘ";
     btn.setAttribute("aria-label", "Tutoriel");
     btn.title = "Tutoriel";
@@ -196,6 +191,13 @@
       btn.dataset.tutorialBound = "1";
       btn.addEventListener("click", startTutorial);
     }
+  }
+
+  function setTutorialButtonVisible(visible) {
+    if (!tutorialButton) tutorialButton = document.getElementById("tutorialBtn");
+    if (!tutorialButton) return;
+    forceStyle(tutorialButton, "display", visible ? "flex" : "none");
+    forceStyle(tutorialButton, "pointer-events", visible ? "auto" : "none");
   }
 
   function lockScroll() {
@@ -223,14 +225,13 @@
   function removeTutorial() {
     overlay?.remove();
     highlight?.remove();
-    spotlight?.remove();
     tooltip?.remove();
     overlay = null;
     highlight = null;
-    spotlight = null;
     tooltip = null;
     activeTarget = null;
     unlockScroll();
+    setTutorialButtonVisible(true);
     window.removeEventListener("resize", updateOverlayPosition);
     window.removeEventListener("orientationchange", updateOverlayPosition);
     window.removeEventListener("wheel", preventManualScroll, { passive: false });
@@ -245,12 +246,13 @@
     removeTutorial();
     lockScroll();
     addGlobalStyles();
+    setTutorialButtonVisible(false);
 
     overlay = document.createElement("div");
     Object.assign(overlay.style, {
       position: "fixed",
       inset: "0",
-      background: "radial-gradient(circle at center, rgba(255,77,252,.10), transparent 36%), rgba(4,6,14,.72)",
+      background: "radial-gradient(circle at center, rgba(255,77,252,.10), transparent 34%), rgba(4,6,14,.74)",
       backdropFilter: "blur(2px)",
       zIndex: "3000",
       touchAction: "none"
@@ -258,24 +260,13 @@
     overlay.addEventListener("click", removeTutorial);
     document.body.appendChild(overlay);
 
-    spotlight = document.createElement("div");
-    Object.assign(spotlight.style, {
-      position: "fixed",
-      pointerEvents: "none",
-      zIndex: "3001",
-      borderRadius: "22px",
-      boxShadow: "0 0 0 9999px rgba(0,0,0,.24)",
-      transition: "all .2s ease"
-    });
-    document.body.appendChild(spotlight);
-
     highlight = document.createElement("div");
     Object.assign(highlight.style, {
       position: "fixed",
       border: "2px solid #ff4dfc",
       borderRadius: "22px",
-      boxShadow: "0 0 0 1px rgba(255,255,255,.22), 0 0 28px rgba(255,77,252,.72), inset 0 0 18px rgba(255,77,252,.16)",
-      background: "rgba(255,77,252,.07)",
+      boxShadow: "0 0 0 1px rgba(255,255,255,.22), 0 0 28px rgba(255,77,252,.72), inset 0 0 18px rgba(255,77,252,.10)",
+      background: "rgba(255,77,252,.05)",
       pointerEvents: "none",
       zIndex: "3002",
       transition: "all .2s ease"
@@ -326,19 +317,17 @@
   }
 
   function updateOverlayPosition() {
-    if (!activeTarget || !highlight || !tooltip || !spotlight) return;
+    if (!activeTarget || !highlight || !tooltip) return;
     const rect = activeTarget.getBoundingClientRect();
     const top = Math.max(8, rect.top - 8);
     const left = Math.max(8, rect.left - 8);
     const width = Math.min(window.innerWidth - left - 8, rect.width + 16);
     const height = Math.min(window.innerHeight - top - 8, rect.height + 16);
 
-    [highlight, spotlight].forEach((el) => {
-      el.style.top = `${top}px`;
-      el.style.left = `${left}px`;
-      el.style.width = `${width}px`;
-      el.style.height = `${height}px`;
-    });
+    highlight.style.top = `${top}px`;
+    highlight.style.left = `${left}px`;
+    highlight.style.width = `${width}px`;
+    highlight.style.height = `${height}px`;
 
     placeTooltip({ top, left, width, height, bottom: top + height, right: left + width });
   }
@@ -386,6 +375,18 @@
     document.getElementById("tutorialNext")?.addEventListener("click", goNext);
   }
 
+  function centerTargetThenRender(step, target, attemptsLeft = 4) {
+    target.scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
+    renderTooltip(step);
+
+    requestAnimationFrame(() => {
+      updateOverlayPosition();
+      if (attemptsLeft > 0) {
+        setTimeout(() => centerTargetThenRender(step, target, attemptsLeft - 1), 70);
+      }
+    });
+  }
+
   function showStep() {
     const step = STEPS[currentStep];
     if (!step) return removeTutorial();
@@ -397,15 +398,7 @@
     }
 
     activeTarget = target;
-    target.scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
-    renderTooltip(step);
-
-    requestAnimationFrame(() => {
-      updateOverlayPosition();
-      setTimeout(updateOverlayPosition, 80);
-      setTimeout(updateOverlayPosition, 180);
-      setTimeout(updateOverlayPosition, 320);
-    });
+    centerTargetThenRender(step, target);
   }
 
   function startTutorial() {
