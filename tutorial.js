@@ -18,51 +18,61 @@
     return document.body && document.body.classList.contains("page-character");
   }
 
+  function forceStyle(el, prop, value) {
+    el.style.setProperty(prop, value, "important");
+  }
+
+  function applyButtonStyles(btn) {
+    forceStyle(btn, "position", "fixed");
+    forceStyle(btn, "top", "76px");
+    forceStyle(btn, "right", "14px");
+    forceStyle(btn, "left", "auto");
+    forceStyle(btn, "bottom", "auto");
+    forceStyle(btn, "width", "48px");
+    forceStyle(btn, "height", "48px");
+    forceStyle(btn, "min-width", "48px");
+    forceStyle(btn, "min-height", "48px");
+    forceStyle(btn, "border-radius", "50%");
+    forceStyle(btn, "border", "3px solid #ffffff");
+    forceStyle(btn, "background", "#ff4dfc");
+    forceStyle(btn, "color", "#111111");
+    forceStyle(btn, "font-weight", "900");
+    forceStyle(btn, "font-size", "24px");
+    forceStyle(btn, "line-height", "1");
+    forceStyle(btn, "display", "flex");
+    forceStyle(btn, "align-items", "center");
+    forceStyle(btn, "justify-content", "center");
+    forceStyle(btn, "visibility", "visible");
+    forceStyle(btn, "opacity", "1");
+    forceStyle(btn, "pointer-events", "auto");
+    forceStyle(btn, "cursor", "pointer");
+    forceStyle(btn, "box-shadow", "0 0 0 4px rgba(0,0,0,.45), 0 0 22px rgba(255,77,252,.9)");
+    forceStyle(btn, "padding", "0");
+    forceStyle(btn, "margin", "0");
+    forceStyle(btn, "z-index", "2147483647");
+    forceStyle(btn, "transform", "none");
+  }
+
   function injectTutorialButton() {
     if (!isCharacterPage()) return;
-    if (document.getElementById("tutorialBtn")) return;
 
-    const btn = document.createElement("button");
-    btn.id = "tutorialBtn";
-    btn.type = "button";
+    let btn = document.getElementById("tutorialBtn");
+    if (!btn) {
+      btn = document.createElement("button");
+      btn.id = "tutorialBtn";
+      btn.type = "button";
+      document.body.appendChild(btn);
+    }
+
     btn.textContent = "ⓘ";
     btn.setAttribute("aria-label", "Tutoriel");
     btn.title = "Tutoriel";
+    applyButtonStyles(btn);
 
-    Object.assign(btn.style, {
-      position: "fixed",
-      top: "14px",
-      right: "14px",
-      width: "42px",
-      height: "42px",
-      borderRadius: "50%",
-      border: "2px solid rgba(255,77,252,.75)",
-      background: "#12121a",
-      color: "#fff",
-      fontWeight: "900",
-      fontSize: "20px",
-      display: "inline-flex",
-      alignItems: "center",
-      justifyContent: "center",
-      cursor: "pointer",
-      boxShadow: "0 0 14px rgba(255,77,252,.55)",
-      padding: "0",
-      zIndex: "2500"
-    });
-
-    btn.addEventListener("mouseenter", () => {
-      btn.style.background = "#ff4dfc";
-      btn.style.color = "#111";
-      btn.style.transform = "scale(1.05)";
-    });
-    btn.addEventListener("mouseleave", () => {
-      btn.style.background = "#12121a";
-      btn.style.color = "#fff";
-      btn.style.transform = "scale(1)";
-    });
-    btn.addEventListener("click", startTutorial);
-
-    document.body.appendChild(btn);
+    if (btn.dataset.tutorialBound !== "1") {
+      btn.dataset.tutorialBound = "1";
+      btn.addEventListener("click", startTutorial);
+    }
   }
 
   function removeTutorial() {
@@ -78,39 +88,24 @@
     removeTutorial();
 
     overlay = document.createElement("div");
-    Object.assign(overlay.style, {
-      position: "fixed",
-      inset: "0",
-      background: "rgba(5, 8, 18, 0.62)",
-      zIndex: "3000"
-    });
+    Object.assign(overlay.style, { position: "fixed", inset: "0", background: "rgba(5, 8, 18, 0.62)", zIndex: "3000" });
     overlay.addEventListener("click", removeTutorial);
     document.body.appendChild(overlay);
 
     highlight = document.createElement("div");
     Object.assign(highlight.style, {
-      position: "fixed",
-      border: "2px solid #ff4dfc",
-      borderRadius: "16px",
-      boxShadow: "0 0 20px rgba(255,77,252,.55)",
-      background: "rgba(255,77,252,.08)",
-      pointerEvents: "none",
-      zIndex: "3001",
-      transition: "all .18s ease"
+      position: "fixed", border: "2px solid #ff4dfc", borderRadius: "16px",
+      boxShadow: "0 0 20px rgba(255,77,252,.55)", background: "rgba(255,77,252,.08)",
+      pointerEvents: "none", zIndex: "3001", transition: "all .18s ease"
     });
     document.body.appendChild(highlight);
 
     tooltip = document.createElement("div");
     Object.assign(tooltip.style, {
-      position: "fixed",
-      maxWidth: "320px",
-      padding: "16px",
-      borderRadius: "16px",
+      position: "fixed", maxWidth: "320px", padding: "16px", borderRadius: "16px",
       border: "1px solid rgba(255,255,255,.12)",
       background: "linear-gradient(180deg, rgba(24,24,32,.98), rgba(14,14,20,.98))",
-      color: "#fff",
-      boxShadow: "0 18px 36px rgba(0,0,0,.45)",
-      zIndex: "3002"
+      color: "#fff", boxShadow: "0 18px 36px rgba(0,0,0,.45)", zIndex: "3002"
     });
     tooltip.addEventListener("click", (e) => e.stopPropagation());
     document.body.appendChild(tooltip);
@@ -121,12 +116,10 @@
     const tooltipRect = tooltip.getBoundingClientRect();
     let top = rect.bottom + pad;
     let left = rect.left;
-
     if (top + tooltipRect.height > window.innerHeight - pad) top = rect.top - tooltipRect.height - pad;
     if (left + tooltipRect.width > window.innerWidth - pad) left = window.innerWidth - tooltipRect.width - pad;
     if (left < pad) left = pad;
     if (top < pad) top = pad;
-
     tooltip.style.top = `${top}px`;
     tooltip.style.left = `${left}px`;
   }
@@ -168,17 +161,9 @@
       `;
 
       placeTooltip(rect);
-
-      document.getElementById("tutorialPrev")?.addEventListener("click", () => {
-        currentStep = Math.max(0, currentStep - 1);
-        showStep();
-      });
+      document.getElementById("tutorialPrev")?.addEventListener("click", () => { currentStep = Math.max(0, currentStep - 1); showStep(); });
       document.getElementById("tutorialClose")?.addEventListener("click", removeTutorial);
-      document.getElementById("tutorialNext")?.addEventListener("click", () => {
-        currentStep += 1;
-        if (currentStep >= STEPS.length) removeTutorial();
-        else showStep();
-      });
+      document.getElementById("tutorialNext")?.addEventListener("click", () => { currentStep += 1; if (currentStep >= STEPS.length) removeTutorial(); else showStep(); });
     });
   }
 
@@ -189,14 +174,12 @@
     showStep();
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", injectTutorialButton);
-  } else {
-    injectTutorialButton();
-  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", injectTutorialButton);
+  else injectTutorialButton();
 
   setTimeout(injectTutorialButton, 250);
   setTimeout(injectTutorialButton, 1000);
+  setInterval(injectTutorialButton, 2000);
 
   window.startTutorial = startTutorial;
 })();
