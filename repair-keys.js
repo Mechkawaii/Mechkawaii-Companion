@@ -41,6 +41,45 @@
     window.dispatchEvent(new CustomEvent("mechkawaii:hp-updated", { detail: { charId: char?.id, hp: hpCur } }));
   }
 
+  function dispatchShieldUpdate(charId){
+    window.dispatchEvent(new CustomEvent("mechkawaii:shield-updated", { detail: { charId } }));
+  }
+
+  function getBlueShieldByTech(){ return readJson(PREFIX + "blue-shield-by-tech", {}); }
+  function setBlueShieldByTech(map){ writeJson(PREFIX + "blue-shield-by-tech", map); }
+
+  function setBlueShieldForSharedShield(index, targetCharId){
+    const map = getBlueShieldByTech();
+    map["shared-shield-" + index] = targetCharId;
+    setBlueShieldByTech(map);
+    syncCurrentShieldGlow(targetCharId);
+    dispatchShieldUpdate(targetCharId);
+  }
+
+  function removeBlueShieldForSharedShield(index){
+    const map = getBlueShieldByTech();
+    const oldTarget = map["shared-shield-" + index];
+    delete map["shared-shield-" + index];
+    setBlueShieldByTech(map);
+    syncCurrentShieldGlow(oldTarget);
+    dispatchShieldUpdate(oldTarget);
+  }
+
+  function syncCurrentShieldGlow(targetCharId){
+    if (!targetCharId || targetCharId !== getCurrentCharId()) return;
+    const map = getBlueShieldByTech();
+    const isShielded = Object.values(map).includes(targetCharId);
+    const hpCard = qs("#hpCard");
+    const portrait = qs("#charPortrait");
+    const topbar = qs(".topbar");
+    [hpCard, portrait, topbar].forEach(el => {
+      if (!el) return;
+      el.classList.toggle("has-shield", isShielded);
+      el.classList.toggle("is-shielded", isShielded);
+      el.classList.toggle("shielded", isShielded);
+    });
+  }
+
   function getName(char, lang){
     const n = char?.name;
     if (!n) return char?.id || "?";
@@ -244,6 +283,7 @@
         delete assignments[index];
         setSharedShields(shields);
         setShieldAssignments(assignments);
+        removeBlueShieldForSharedShield(index);
         btn.dataset.active = "true";
         btn.style.backgroundImage = `url('${ICONS.shieldOn}')`;
         btn.classList.add("is-on");
@@ -268,6 +308,7 @@
         assignments[index] = char.id;
         setSharedShields(shields);
         setShieldAssignments(assignments);
+        setBlueShieldForSharedShield(index, char.id);
         btn.dataset.active = "false";
         btn.style.backgroundImage = `url('${ICONS.shieldOff}')`;
         btn.classList.remove("is-on");
@@ -303,6 +344,7 @@
         openShieldModal(index, btn);
       }, true);
     });
+    syncCurrentShieldGlow(getCurrentCharId());
   }
 
   function init(){ patchButtons(); setTimeout(patchButtons, 250); setTimeout(patchButtons, 900); setInterval(patchButtons, 2000); }
