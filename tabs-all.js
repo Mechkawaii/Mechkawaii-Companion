@@ -253,4 +253,9 @@
 
   window.addEventListener("pageshow", forceRender);
   window.addEventListener("storage", queueRepair);
+  window.addEventListener("mechkawaii:hp-updated", () => {
+    setTimeout(forceRender, 0);
+    setTimeout(forceRender, 80);
+    setTimeout(forceRender, 180);
+  });
 })();
