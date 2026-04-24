@@ -5,11 +5,11 @@
 
   const STEPS = [
     {
-      target: ".hp-section",
+      target: ".hp",
       title: "Points de vie",
       kicker: "Fonctionnement des PV",
       text: "Les PV indiquent l’état de ton unité. S’ils tombent à 0, l’unité devient Hors Service (HS). Une unité ne peut jamais dépasser le nombre de PV indiqué sur sa carte.",
-      pad: 18
+      pad: 14
     },
     {
       target: ".shields-section",
@@ -53,6 +53,8 @@
   let previousHtmlOverflow = "";
   let scrollLocked = false;
 
+  function isMobile(){ return window.innerWidth <= 700; }
+
   function lockPage() {
     if (scrollLocked) return;
     previousBodyOverflow = document.body.style.overflow || "";
@@ -71,6 +73,7 @@
 
   function blockScroll(event) {
     if (!overlay) return;
+    if (tooltip && tooltip.contains(event.target)) return;
     event.preventDefault();
   }
 
@@ -99,6 +102,10 @@
     if (blockedKeys.includes(event.key)) event.preventDefault();
   }
 
+  function rectsOverlap(a, b) {
+    return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
+  }
+
   function placeTooltip(rect) {
     if (!tooltip) return;
 
@@ -107,17 +114,40 @@
     const tabsContainer = document.querySelector("#unitTabsContainer");
     const tabsRect = tabsContainer ? tabsContainer.getBoundingClientRect() : null;
     const safeBottom = tabsRect ? Math.max(0, tabsRect.top - pad) : window.innerHeight - pad;
+    const safeTop = pad;
+    const maxLeft = window.innerWidth - tooltipRect.width - pad;
+    const centeredLeft = Math.max(pad, Math.min((window.innerWidth - tooltipRect.width) / 2, maxLeft));
+    const targetLeft = Math.max(pad, Math.min(rect.left, maxLeft));
 
-    let left = Math.max(pad, Math.min(rect.left, window.innerWidth - tooltipRect.width - pad));
-    let top = rect.bottom + pad;
+    const candidates = [
+      { top: rect.bottom + pad, left: targetLeft },
+      { top: rect.top - tooltipRect.height - pad, left: targetLeft },
+      { top: safeTop, left: centeredLeft },
+      { top: safeBottom - tooltipRect.height, left: centeredLeft }
+    ];
 
-    if (top + tooltipRect.height > safeBottom) top = rect.top - tooltipRect.height - pad;
-    if (top < pad) top = Math.max(pad, safeBottom - tooltipRect.height - pad);
+    let chosen = candidates.find(pos => {
+      const candidateRect = {
+        top: pos.top,
+        left: pos.left,
+        right: pos.left + tooltipRect.width,
+        bottom: pos.top + tooltipRect.height
+      };
+      return pos.top >= safeTop && candidateRect.bottom <= safeBottom && !rectsOverlap(candidateRect, rect);
+    });
 
-    tooltip.style.left = left + "px";
+    if (!chosen) {
+      const spaceAbove = rect.top - safeTop;
+      const spaceBelow = safeBottom - rect.bottom;
+      chosen = spaceAbove >= spaceBelow
+        ? { top: safeTop, left: centeredLeft }
+        : { top: Math.max(safeTop, safeBottom - tooltipRect.height), left: centeredLeft };
+    }
+
+    tooltip.style.left = Math.max(pad, Math.min(chosen.left, maxLeft)) + "px";
     tooltip.style.right = "auto";
     tooltip.style.bottom = "auto";
-    tooltip.style.top = top + "px";
+    tooltip.style.top = Math.max(safeTop, Math.min(chosen.top, safeBottom - tooltipRect.height)) + "px";
   }
 
   function updateOverlayPosition() {
@@ -142,17 +172,20 @@
 
   function renderTooltip(step) {
     const isLast = currentStep === STEPS.length - 1;
+    const portraitSize = isMobile() ? "clamp(64px,18vw,82px)" : "clamp(96px,9vw,128px)";
+    const textSize = isMobile() ? "15px" : "16px";
+    const titleSize = isMobile() ? "18px" : "17px";
 
     tooltip.innerHTML = `
-      <div style="display:flex;gap:16px;align-items:flex-start;">
-        <img src="${SHEEPARD_SRC}" style="width:clamp(96px,9vw,128px);height:clamp(96px,9vw,128px);border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.3);background:#000;flex:0 0 auto;box-shadow:0 0 16px rgba(255,210,77,.45);">
+      <div style="display:flex;gap:14px;align-items:flex-start;">
+        <img src="${SHEEPARD_SRC}" style="width:${portraitSize};height:${portraitSize};border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.3);background:#000;flex:0 0 auto;box-shadow:0 0 16px rgba(255,210,77,.45);">
         <div style="flex:1;min-width:0;">
           <div style="font-size:11px;font-weight:900;color:#ffd24d;text-transform:uppercase;">Général Sheepard</div>
-          <div style="font-weight:900;margin-top:4px;font-size:17px;">${step.title}</div>
-          <div style="margin-top:6px;line-height:1.4;">${step.text}</div>
+          <div style="font-weight:900;margin-top:4px;font-size:${titleSize};">${step.title}</div>
+          <div style="margin-top:6px;line-height:1.35;font-size:${textSize};">${step.text}</div>
         </div>
       </div>
-      <div style="display:flex;justify-content:space-between;margin-top:14px;gap:10px;">
+      <div style="display:flex;justify-content:space-between;margin-top:12px;gap:10px;">
         <button id="prev" ${currentStep === 0 ? "disabled" : ""}>←</button>
         <button id="next">${isLast ? "Terminer" : "Suivant"}</button>
       </div>
@@ -178,7 +211,7 @@
 
     activeTarget = target;
     activeStep = step;
-    target.scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
+    target.scrollIntoView({ behavior: "auto", block: isMobile() ? "start" : "center", inline: "center" });
     renderTooltip(step);
 
     requestAnimationFrame(() => {
@@ -208,7 +241,7 @@
     document.body.appendChild(highlight);
 
     tooltip = document.createElement("div");
-    tooltip.style.cssText = "position:fixed;width:min(520px,calc(100vw - 28px));background:#111;color:#fff;padding:16px;border-radius:14px;z-index:3002;box-shadow:0 18px 40px rgba(0,0,0,.55);pointer-events:auto";
+    tooltip.style.cssText = "position:fixed;width:min(520px,calc(100vw - 28px));max-height:42vh;overflow:auto;background:#111;color:#fff;padding:16px;border-radius:14px;z-index:3002;box-shadow:0 18px 40px rgba(0,0,0,.55);pointer-events:auto;-webkit-overflow-scrolling:touch";
     tooltip.addEventListener("click", (event) => event.stopPropagation());
     document.body.appendChild(tooltip);
 
