@@ -17,6 +17,38 @@
   let tooltip = null;
   let activeTarget = null;
 
+  function updateOverlayPosition() {
+    if (!activeTarget || !highlight || !tooltip || !overlay) return;
+
+    const rect = activeTarget.getBoundingClientRect();
+
+    const pad = 10;
+    const top = rect.top - pad;
+    const left = rect.left - pad;
+    const right = rect.right + pad;
+    const bottom = rect.bottom + pad;
+
+    overlay.style.clipPath = `
+      polygon(
+        0% 0%,
+        0% 100%,
+        ${left}px 100%,
+        ${left}px ${top}px,
+        ${right}px ${top}px,
+        ${right}px ${bottom}px,
+        ${left}px ${bottom}px,
+        ${left}px 100%,
+        100% 100%,
+        100% 0%
+      )
+    `;
+
+    highlight.style.top = rect.top + "px";
+    highlight.style.left = rect.left + "px";
+    highlight.style.width = rect.width + "px";
+    highlight.style.height = rect.height + "px";
+  }
+
   function renderTooltip(step) {
     const isLast = currentStep === STEPS.length - 1;
 
@@ -53,18 +85,14 @@
 
     renderTooltip(step);
 
-    const rect = target.getBoundingClientRect();
-    highlight.style.top = rect.top + "px";
-    highlight.style.left = rect.left + "px";
-    highlight.style.width = rect.width + "px";
-    highlight.style.height = rect.height + "px";
+    updateOverlayPosition();
   }
 
   function startTutorial() {
     currentStep = 0;
 
     overlay = document.createElement("div");
-    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:3000";
+    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:3000;transition:clip-path .25s ease";
     document.body.appendChild(overlay);
 
     highlight = document.createElement("div");
