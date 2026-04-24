@@ -13,20 +13,58 @@
 
   let currentStep = 0;
   let overlay = null;
+  let blocker = null;
   let highlight = null;
   let tooltip = null;
   let activeTarget = null;
   let tutorialButton = null;
+  let previousBodyOverflow = "";
+  let previousHtmlOverflow = "";
+  let scrollLocked = false;
+
+  function lockPage() {
+    if (scrollLocked) return;
+    previousBodyOverflow = document.body.style.overflow || "";
+    previousHtmlOverflow = document.documentElement.style.overflow || "";
+    document.body.style.setProperty("overflow", "hidden", "important");
+    document.documentElement.style.setProperty("overflow", "hidden", "important");
+    scrollLocked = true;
+  }
+
+  function unlockPage() {
+    if (!scrollLocked) return;
+    document.body.style.overflow = previousBodyOverflow;
+    document.documentElement.style.overflow = previousHtmlOverflow;
+    scrollLocked = false;
+  }
+
+  function blockScroll(event) {
+    if (!overlay) return;
+    event.preventDefault();
+  }
 
   function cleanupTutorial() {
+    window.removeEventListener("wheel", blockScroll, { passive: false });
+    window.removeEventListener("touchmove", blockScroll, { passive: false });
+    window.removeEventListener("keydown", blockKeyboardScroll);
+
     overlay?.remove();
+    blocker?.remove();
     highlight?.remove();
     tooltip?.remove();
     overlay = null;
+    blocker = null;
     highlight = null;
     tooltip = null;
     activeTarget = null;
+    unlockPage();
     if (tutorialButton) tutorialButton.style.display = "block";
+  }
+
+  function blockKeyboardScroll(event) {
+    if (!overlay) return;
+    const blockedKeys = ["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "];
+    if (blockedKeys.includes(event.key)) event.preventDefault();
   }
 
   function placeTooltip(rect) {
@@ -41,13 +79,8 @@
     let left = Math.max(pad, Math.min(rect.left, window.innerWidth - tooltipRect.width - pad));
     let top = rect.bottom + pad;
 
-    if (top + tooltipRect.height > safeBottom) {
-      top = rect.top - tooltipRect.height - pad;
-    }
-
-    if (top < pad) {
-      top = Math.max(pad, safeBottom - tooltipRect.height - pad);
-    }
+    if (top + tooltipRect.height > safeBottom) top = rect.top - tooltipRect.height - pad;
+    if (top < pad) top = Math.max(pad, safeBottom - tooltipRect.height - pad);
 
     tooltip.style.left = left + "px";
     tooltip.style.right = "auto";
@@ -65,20 +98,7 @@
     const right = rect.right + pad;
     const bottom = rect.bottom + pad;
 
-    overlay.style.clipPath = `
-      polygon(
-        0% 0%,
-        0% 100%,
-        ${left}px 100%,
-        ${left}px ${top}px,
-        ${right}px ${top}px,
-        ${right}px ${bottom}px,
-        ${left}px ${bottom}px,
-        ${left}px 100%,
-        100% 100%,
-        100% 0%
-      )
-    `;
+    overlay.style.clipPath = `polygon(0% 0%,0% 100%,${left}px 100%,${left}px ${top}px,${right}px ${top}px,${right}px ${bottom}px,${left}px ${bottom}px,${left}px 100%,100% 100%,100% 0%)`;
 
     highlight.style.top = rect.top + "px";
     highlight.style.left = rect.left + "px";
@@ -113,10 +133,7 @@
     });
 
     document.getElementById("next")?.addEventListener("click", () => {
-      if (isLast) {
-        cleanupTutorial();
-        return;
-      }
+      if (isLast) return cleanupTutorial();
       currentStep++;
       showStep();
     });
@@ -141,11 +158,16 @@
   function startTutorial() {
     cleanupTutorial();
     currentStep = 0;
+    lockPage();
     if (tutorialButton) tutorialButton.style.display = "none";
 
+    blocker = document.createElement("div");
+    blocker.style.cssText = "position:fixed;inset:0;z-index:2999;background:transparent;touch-action:none;";
+    blocker.addEventListener("click", (event) => event.preventDefault());
+    document.body.appendChild(blocker);
+
     overlay = document.createElement("div");
-    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:3000;transition:clip-path .25s ease";
-    overlay.addEventListener("click", cleanupTutorial);
+    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:3000;transition:clip-path .25s ease;pointer-events:none;touch-action:none";
     document.body.appendChild(overlay);
 
     highlight = document.createElement("div");
@@ -153,9 +175,13 @@
     document.body.appendChild(highlight);
 
     tooltip = document.createElement("div");
-    tooltip.style.cssText = "position:fixed;width:min(380px,calc(100vw - 28px));background:#111;color:#fff;padding:16px;border-radius:14px;z-index:3002;box-shadow:0 18px 40px rgba(0,0,0,.55)";
+    tooltip.style.cssText = "position:fixed;width:min(380px,calc(100vw - 28px));background:#111;color:#fff;padding:16px;border-radius:14px;z-index:3002;box-shadow:0 18px 40px rgba(0,0,0,.55);pointer-events:auto";
     tooltip.addEventListener("click", (event) => event.stopPropagation());
     document.body.appendChild(tooltip);
+
+    window.addEventListener("wheel", blockScroll, { passive: false });
+    window.addEventListener("touchmove", blockScroll, { passive: false });
+    window.addEventListener("keydown", blockKeyboardScroll);
 
     showStep();
   }
