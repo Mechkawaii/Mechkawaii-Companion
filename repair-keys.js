@@ -259,8 +259,10 @@
     const team = getCurrentTeam(chars);
     const shields = getSharedShields();
     const assignments = getShieldAssignments();
-    const assignedId = assignments[index];
-    const isAvailable = btn.dataset.active !== "false" && shields[index] !== false;
+    const assignedId = assignments[index] || getBlueShieldByTech()["shared-shield-" + index];
+    const isAlreadyAssigned = !!assignedId || shields[index] === false || btn.dataset.active === "false";
+    const isAvailable = !isAlreadyAssigned;
+
     const { modal, panel } = openBaseModal(isAvailable ? (lang === "fr" ? "Assigner un bouclier" : "Assign a shield") : (lang === "fr" ? "Bouclier assigné" : "Assigned shield"), isAvailable ? (lang === "fr" ? "Choisis une unité alliée à protéger." : "Choose an allied unit to protect.") : (lang === "fr" ? "Tu peux retirer ce bouclier et le remettre dans la réserve." : "You can remove this shield and return it to the pool."));
 
     if (!isAvailable) {
