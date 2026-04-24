@@ -34,6 +34,47 @@
   let highlight = null;
   let tooltip = null;
 
+  function injectTutorialButton() {
+    if (!document.body.classList.contains("page-character")) return;
+    if (document.getElementById("tutorialBtn")) return;
+
+    const controls = document.querySelector(".topbar .controls");
+    if (!controls) return;
+
+    const btn = document.createElement("button");
+    btn.id = "tutorialBtn";
+    btn.type = "button";
+    btn.textContent = "ⓘ";
+    btn.setAttribute("aria-label", "Tutoriel");
+    btn.title = "Tutoriel";
+    btn.style.width = "34px";
+    btn.style.height = "34px";
+    btn.style.borderRadius = "50%";
+    btn.style.border = "2px solid rgba(255,77,252,.65)";
+    btn.style.background = "#12121a";
+    btn.style.color = "#fff";
+    btn.style.fontWeight = "900";
+    btn.style.fontSize = "16px";
+    btn.style.display = "inline-flex";
+    btn.style.alignItems = "center";
+    btn.style.justifyContent = "center";
+    btn.style.cursor = "pointer";
+    btn.style.boxShadow = "0 0 10px rgba(255,77,252,.4)";
+    btn.style.padding = "0";
+    btn.style.marginRight = "8px";
+    btn.addEventListener("mouseenter", () => {
+      btn.style.background = "#ff4dfc";
+      btn.style.color = "#111";
+    });
+    btn.addEventListener("mouseleave", () => {
+      btn.style.background = "#12121a";
+      btn.style.color = "#fff";
+    });
+    btn.addEventListener("click", startTutorial);
+
+    controls.prepend(btn);
+  }
+
   function removeTutorial() {
     overlay?.remove();
     highlight?.remove();
@@ -156,10 +197,7 @@
     showStep();
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const btn = document.getElementById("tutorialBtn");
-    if (btn) btn.addEventListener("click", startTutorial);
-  });
+  document.addEventListener("DOMContentLoaded", injectTutorialButton);
 
   window.startTutorial = startTutorial;
 })();
