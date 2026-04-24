@@ -145,7 +145,7 @@
 
     tooltip.innerHTML = `
       <div style="display:flex;gap:16px;align-items:flex-start;">
-        <img src="${SHEEPARD_SRC}" style="width:clamp(96px,9vw,128px);height:clamp(96px,9vw,128px);border-radius:18px;object-fit:cover;border:3px solid rgba(255,255,255,.3);background:#000;flex:0 0 auto;box-shadow:0 0 16px rgba(255,210,77,.45);">
+        <img src="${SHEEPARD_SRC}" style="width:clamp(96px,9vw,128px);height:clamp(96px,9vw,128px);border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.3);background:#000;flex:0 0 auto;box-shadow:0 0 16px rgba(255,210,77,.45);">
         <div style="flex:1;min-width:0;">
           <div style="font-size:11px;font-weight:900;color:#ffd24d;text-transform:uppercase;">Général Sheepard</div>
           <div style="font-weight:900;margin-top:4px;font-size:17px;">${step.title}</div>
