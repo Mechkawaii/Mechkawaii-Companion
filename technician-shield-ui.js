@@ -94,6 +94,7 @@
         color: #fff !important;
         cursor: pointer !important;
         box-shadow: none !important;
+        min-height: 70px !important;
       }
 
       .mkw-tech-shield-target:hover {
@@ -132,24 +133,25 @@
     document.head.appendChild(style);
   }
 
-  function looksLikeModalButton(button) {
-    if (!button || button.dataset.techShieldUi === "1") return false;
-    if (button.classList.contains("mkw-protect-target")) return false;
-    if (button.closest("#mkwCompanionMenuPanel")) return false;
-    if (button.closest("#mkwHistoryPanel")) return false;
-    if (button.closest("#mkwEnergyCard")) return false;
-    if (button.closest("#unitTabsContainer")) return false;
-
-    const text = normalize(button.textContent || "");
-    if (!text || text.includes("annuler") || text.includes("cancel") || text.includes("retirer") || text.includes("remove")) return false;
-
-    const dialogLike = button.closest("[role='dialog'], dialog, .modal, .backdrop, [class*='modal'], [class*='backdrop']");
-    const fixedParent = button.closest("div") && getComputedStyle(button.closest("div")).position === "fixed";
-    return !!dialogLike || !!fixedParent;
+  function excluded(el) {
+    if (!el || el.dataset.techShieldUi === "1") return true;
+    if (el.classList?.contains("mkw-protect-target")) return true;
+    if (el.closest("#mkwCompanionMenuPanel")) return true;
+    if (el.closest("#mkwHistoryPanel")) return true;
+    if (el.closest("#mkwEnergyCard")) return true;
+    if (el.closest("#unitTabsContainer")) return true;
+    if (el.closest("#mkwTurnBanner")) return true;
+    if (el.closest("#mkwFirstPlayerPanel")) return true;
+    return false;
   }
 
-  function findCharForButton(button, chars) {
-    const raw = normalize(button.textContent || "");
+  function isBadText(el) {
+    const text = normalize(el.textContent || "");
+    return !text || text.includes("annuler") || text.includes("cancel") || text.includes("retirer") || text.includes("remove") || text.includes("utiliser") || text.includes("use");
+  }
+
+  function findCharForElement(el, chars) {
+    const raw = normalize(el.textContent || "");
     if (!raw) return null;
     return chars.find(char => {
       const name = normalize(getName(char));
@@ -157,10 +159,25 @@
     }) || null;
   }
 
-  function enhanceButton(button, char) {
-    button.dataset.techShieldUi = "1";
-    button.classList.add("mkw-tech-shield-target");
-    button.innerHTML = `
+  function isClickableCandidate(el) {
+    if (!el || excluded(el) || isBadText(el)) return false;
+    if (el.matches("button, [role='button'], label, .toggle, .btn, .button, [onclick]")) return true;
+    const cs = getComputedStyle(el);
+    return cs.cursor === "pointer";
+  }
+
+  function getBestTarget(el) {
+    if (!el) return null;
+    return el.closest("button, [role='button'], label, .toggle, .btn, .button, [onclick]") || el;
+  }
+
+  function enhanceElement(el, char) {
+    const target = getBestTarget(el);
+    if (!target || excluded(target) || target.dataset.techShieldUi === "1") return;
+
+    target.dataset.techShieldUi = "1";
+    target.classList.add("mkw-tech-shield-target");
+    target.innerHTML = `
       <img class="mkw-tech-shield-portrait" src="${getPortrait(char)}" alt="">
       <div class="mkw-tech-shield-info">
         <div class="mkw-tech-shield-name">${getName(char)}</div>
@@ -169,16 +186,35 @@
     `;
   }
 
+  function getPossibleTargets() {
+    const selectors = [
+      "button",
+      "[role='button']",
+      "label",
+      ".toggle",
+      ".btn",
+      ".button",
+      "[onclick]",
+      "div",
+      "li"
+    ];
+    return Array.from(document.querySelectorAll(selectors.join(",")));
+  }
+
   async function enhanceExistingModals() {
     ensureStyles();
     const chars = getEligibleChars(await loadChars());
     if (!chars.length) return;
 
-    Array.from(document.querySelectorAll("button")).forEach(button => {
-      if (!looksLikeModalButton(button)) return;
-      const char = findCharForButton(button, chars);
+    getPossibleTargets().forEach(el => {
+      if (!isClickableCandidate(el)) return;
+      const char = findCharForElement(el, chars);
       if (!char) return;
-      enhanceButton(button, char);
+
+      const rect = el.getBoundingClientRect();
+      if (rect.width < 70 || rect.height < 22) return;
+
+      enhanceElement(el, char);
     });
   }
 
@@ -186,9 +222,14 @@
     ensureStyles();
     const observer = new MutationObserver(() => {
       clearTimeout(observer._mkwTimer);
-      observer._mkwTimer = setTimeout(enhanceExistingModals, 30);
+      observer._mkwTimer = setTimeout(enhanceExistingModals, 20);
     });
-    observer.observe(document.body, { childList: true, subtree: true });
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["style", "class"] });
+    document.addEventListener("click", () => {
+      setTimeout(enhanceExistingModals, 20);
+      setTimeout(enhanceExistingModals, 120);
+      setTimeout(enhanceExistingModals, 300);
+    }, true);
     setTimeout(enhanceExistingModals, 250);
   }
 
