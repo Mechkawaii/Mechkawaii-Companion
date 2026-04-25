@@ -68,8 +68,15 @@
   function setSharedShields(shields) { writeJson(PREFIX + "shields", shields); }
   function getShieldAssignments() { return readJson(PREFIX + "shield-assignments", {}); }
   function setShieldAssignments(assignments) { writeJson(PREFIX + "shield-assignments", assignments); }
-  function getBlueShieldByTech() { return readJson(PREFIX + "blue-shield-by-tech", {}); }
-  function setBlueShieldByTech(map) { writeJson(PREFIX + "blue-shield-by-tech", map); }
+
+  function cleanClassicPollutionFromTechMap(index) {
+    const techMap = readJson(PREFIX + "blue-shield-by-tech", {});
+    const key = "shared-shield-" + index;
+    if (Object.prototype.hasOwnProperty.call(techMap, key)) {
+      delete techMap[key];
+      writeJson(PREFIX + "blue-shield-by-tech", techMap);
+    }
+  }
 
   function setShieldGlow(targetId, enabled) {
     if (!targetId || targetId !== getCurrentCharId()) return;
@@ -101,14 +108,9 @@
   function getShieldIndexForTarget(targetId) {
     if (!targetId) return -1;
     const assignments = getShieldAssignments();
-    const blueMap = getBlueShieldByTech();
 
     for (const key of Object.keys(assignments)) {
       if (assignments[key] === targetId) return Number(key);
-    }
-
-    for (const key of Object.keys(blueMap)) {
-      if (blueMap[key] === targetId) return Number(String(key).replace("shared-shield-", ""));
     }
 
     return -1;
@@ -152,15 +154,13 @@
   function assignShield(index, targetCharId, btn) {
     const shields = getSharedShields();
     const assignments = getShieldAssignments();
-    const blueMap = getBlueShieldByTech();
 
     shields[index] = false;
     assignments[index] = targetCharId;
-    blueMap["shared-shield-" + index] = targetCharId;
 
     setSharedShields(shields);
     setShieldAssignments(assignments);
-    setBlueShieldByTech(blueMap);
+    cleanClassicPollutionFromTechMap(index);
 
     if (btn) {
       btn.dataset.active = "false";
@@ -176,17 +176,16 @@
   function removeShield(index) {
     const shields = getSharedShields();
     const assignments = getShieldAssignments();
-    const blueMap = getBlueShieldByTech();
-    const oldTarget = assignments[index] || blueMap["shared-shield-" + index];
+    const oldTarget = assignments[index];
 
-    // Retirer un bouclier enlève la protection, mais le jeton reste défaussé.
+    // Retirer un bouclier classique enlève la protection, mais le jeton reste défaussé.
+    // Ne pas toucher au bouclier du Technicien.
     shields[index] = false;
     delete assignments[index];
-    delete blueMap["shared-shield-" + index];
 
     setSharedShields(shields);
     setShieldAssignments(assignments);
-    setBlueShieldByTech(blueMap);
+    cleanClassicPollutionFromTechMap(index);
     hideShieldButton(index);
     setShieldGlow(oldTarget, false);
     ensureCurrentRemoveButton();
@@ -279,9 +278,7 @@
 
     const currentIndex = getShieldIndexForTarget(getCurrentCharId());
     const assignments = getShieldAssignments();
-    const blueMap = getBlueShieldByTech();
-    const keys = Object.keys(assignments);
-    const fallbackIndex = Number(keys[0] ?? Object.keys(blueMap)[0]?.replace("shared-shield-", "") ?? 0);
+    const fallbackIndex = Number(Object.keys(assignments)[0] ?? 0);
     const index = currentIndex >= 0 ? currentIndex : fallbackIndex;
     if (!Number.isFinite(index)) return false;
 
