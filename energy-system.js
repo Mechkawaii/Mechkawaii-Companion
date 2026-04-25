@@ -15,7 +15,8 @@
       actionUsed: "Action utilisée : {action}.",
       energyRestored: "Énergie restaurée pour le tour.",
       move: "Se déplacer",
-      attack: "Attaque effectuée",
+      attackTitle: "Tir et corps à corps",
+      attack: "Tir et corps à corps effectué",
       classAction: "Action de classe effectuée",
       unavailable: "Action indisponible"
     },
@@ -27,7 +28,8 @@
       actionUsed: "Action used: {action}",
       energyRestored: "Energy restored for this turn.",
       move: "Move",
-      attack: "Attack done",
+      attackTitle: "Ranged & Melee",
+      attack: "Ranged & melee done",
       classAction: "Class action done",
       unavailable: "Unavailable action"
     }
@@ -57,13 +59,13 @@
       #mkwEnergyCard { display:none !important; }
       .mkw-energy-inline-status { display:inline-flex; align-items:center; gap:8px; margin-left:10px; vertical-align:middle; }
       .mkw-energy-inline-status img { width:86px; max-width:32vw; height:auto; display:block; }
-      .mkw-energy-header-action { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; }
-      .mkw-energy-header-action .section-title { margin:0; }
-      .mkw-header-energy-tools { display:flex; align-items:center; gap:10px; flex:0 0 auto; }
+      .mkw-energy-header-action { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; min-width:0; }
+      .mkw-energy-header-action .section-title { margin:0; min-width:0; flex:1 1 auto; line-height:1.15; }
+      .mkw-header-energy-tools { display:flex; align-items:center; gap:10px; flex:0 0 auto; min-width:max-content; }
       .mkw-header-energy-tools img { width:86px; max-width:34vw; height:auto; display:block; }
       .mkw-energy-switch { position:relative; display:inline-flex; align-items:center; gap:10px; cursor:pointer; user-select:none; font-weight:900; color:var(--text,#fff); flex:0 0 auto; }
       .mkw-energy-switch input { position:absolute; opacity:0; pointer-events:none; }
-      .mkw-energy-slider { width:52px; height:30px; border-radius:999px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.09); box-shadow:inset 0 0 0 1px rgba(0,0,0,.12); position:relative; transition:.18s ease; }
+      .mkw-energy-slider { width:52px; height:30px; border-radius:999px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.09); box-shadow:inset 0 0 0 1px rgba(0,0,0,.12); position:relative; transition:.18s ease; flex:0 0 auto; }
       .mkw-energy-slider::after { content:""; position:absolute; width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,.86); left:3px; top:3px; transition:.18s ease; box-shadow:0 4px 10px rgba(0,0,0,.35); }
       .mkw-energy-switch input:checked + .mkw-energy-slider { background:rgba(255,210,77,.9); border-color:rgba(255,210,77,.95); box-shadow:0 0 18px rgba(255,210,77,.22); }
       .mkw-energy-switch input:checked + .mkw-energy-slider::after { transform:translateX(22px); background:#111; }
@@ -74,7 +76,18 @@
       .mkw-road-title-inline { font-weight:900; color:var(--text,#fff); }
       .mkw-road-help-inline { color:var(--muted); font-size:12px; line-height:1.3; margin-top:3px; }
       .mkw-energy-disabled-action { opacity:.38 !important; filter:grayscale(.75) !important; cursor:not-allowed !important; }
-      @media (max-width:560px){ .mkw-energy-inline-status { display:flex; margin-left:0; margin-top:8px; } .mkw-energy-inline-status img { width:92px; } .mkw-header-energy-tools img { width:76px; } .mkw-energy-switch-label{ display:none; } }
+      @media (max-width:560px){
+        .mkw-energy-inline-status { display:flex; margin-left:0; margin-top:8px; }
+        .mkw-energy-inline-status img { width:92px; }
+        .mkw-energy-header-action { gap:8px; }
+        .mkw-energy-header-action .section-title { font-size:15px; }
+        .mkw-header-energy-tools { gap:6px; }
+        .mkw-header-energy-tools img { width:58px; max-width:18vw; }
+        .mkw-energy-slider { width:44px; height:26px; }
+        .mkw-energy-slider::after { width:18px; height:18px; left:3px; top:3px; }
+        .mkw-energy-switch input:checked + .mkw-energy-slider::after { transform:translateX(18px); }
+        .mkw-energy-switch-label{ display:none; }
+      }
     `;
     document.head.appendChild(style);
   }
@@ -239,8 +252,6 @@
         const pressed = btn.getAttribute("aria-pressed") === "true" || btn.classList.contains("used") || btn.classList.contains("is-used");
         if(pressed) return;
         blockIfCannotSpend(event, "ultimate");
-        // Ne pas dépenser ici : certains coups uniques ouvrent une modale.
-        // La dépense se fait seulement via mechkawaii:energy-action-validated avec action="ultimate".
       }, true);
     });
   }
@@ -260,7 +271,7 @@
     const costs = getCostsForId(id) || {};
     addEnergyCostToCardHeader(getMovementCard(), "move", Number(costs.move || 0), true, tr("move"));
     addRoadToggle();
-    addEnergyCostToCardHeader(getAttackCard(), "ranged_attack", Number(costs.ranged_attack || 0), true, null);
+    addEnergyCostToCardHeader(getAttackCard(), "ranged_attack", Number(costs.ranged_attack || 0), true, tr("attackTitle"));
     addEnergyCostToHeader("#classActionTitle", "class_action", Number(costs.class_action || 0), true);
     addEnergyCostToHeader("#ultTitle", "ultimate", Number(costs.ultimate || 0), false);
     bindExistingButtons();
