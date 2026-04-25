@@ -98,6 +98,57 @@
     btn.style.display = "none";
   }
 
+  function getShieldIndexForTarget(targetId) {
+    if (!targetId) return -1;
+    const assignments = getShieldAssignments();
+    const blueMap = getBlueShieldByTech();
+
+    for (const key of Object.keys(assignments)) {
+      if (assignments[key] === targetId) return Number(key);
+    }
+
+    for (const key of Object.keys(blueMap)) {
+      if (blueMap[key] === targetId) return Number(String(key).replace("shared-shield-", ""));
+    }
+
+    return -1;
+  }
+
+  function ensureCurrentRemoveButton() {
+    const currentId = getCurrentCharId();
+    const section = qs(".shields-section") || qs("#hpCard .card-b") || qs("#hpCard");
+    if (!section || !currentId) return;
+
+    const existing = qs("#mkwCurrentShieldRemove");
+    const index = getShieldIndexForTarget(currentId);
+
+    if (index < 0) {
+      existing?.remove();
+      return;
+    }
+
+    if (existing) {
+      existing.dataset.shieldIndex = String(index);
+      existing.style.display = "block";
+      return;
+    }
+
+    const button = document.createElement("button");
+    button.id = "mkwCurrentShieldRemove";
+    button.type = "button";
+    button.className = "mkw-current-shield-remove";
+    button.dataset.shieldIndex = String(index);
+    button.textContent = getLang() === "fr" ? "Retirer le bouclier" : "Remove shield";
+    button.addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      const idx = Number(button.dataset.shieldIndex);
+      if (Number.isFinite(idx)) removeShield(idx);
+    });
+
+    section.appendChild(button);
+  }
+
   function assignShield(index, targetCharId, btn) {
     const shields = getSharedShields();
     const assignments = getShieldAssignments();
@@ -118,6 +169,7 @@
     }
 
     setShieldGlow(targetCharId, true);
+    ensureCurrentRemoveButton();
     dispatchShieldUpdate(targetCharId);
   }
 
@@ -137,6 +189,7 @@
     setBlueShieldByTech(blueMap);
     hideShieldButton(index);
     setShieldGlow(oldTarget, false);
+    ensureCurrentRemoveButton();
     dispatchShieldUpdate(oldTarget);
   }
 
@@ -157,6 +210,8 @@
       .mkw-protect-class { font-size: 12px; color: rgba(255,255,255,.62); margin-top: 2px; }
       .mkw-protect-value { font-weight: 950; color: #ffd24d; white-space: nowrap; }
       .mkw-protect-cancel { width: 100%; margin-top: 12px; padding: 12px; border-radius: 15px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.08); color: #fff; font-weight: 900; cursor: pointer; }
+      .mkw-current-shield-remove { margin-top: 10px; padding: 10px 12px; width: 100%; border-radius: 12px; border: 1px solid rgba(80,150,255,.45); background: rgba(80,150,255,.12); color: var(--text, #fff); font-weight: 900; cursor: pointer; }
+      .mkw-current-shield-remove:hover { background: rgba(80,150,255,.18); }
     `;
     document.head.appendChild(style);
   }
@@ -222,10 +277,12 @@
     const txt = (btn.textContent || "").toLowerCase();
     if (!txt.includes("retirer") && !txt.includes("remove")) return false;
 
+    const currentIndex = getShieldIndexForTarget(getCurrentCharId());
     const assignments = getShieldAssignments();
     const blueMap = getBlueShieldByTech();
     const keys = Object.keys(assignments);
-    const index = Number(keys[0] ?? Object.keys(blueMap)[0]?.replace("shared-shield-", "") ?? 0);
+    const fallbackIndex = Number(keys[0] ?? Object.keys(blueMap)[0]?.replace("shared-shield-", "") ?? 0);
+    const index = currentIndex >= 0 ? currentIndex : fallbackIndex;
     if (!Number.isFinite(index)) return false;
 
     event.preventDefault();
@@ -235,11 +292,16 @@
     removeShield(index);
     const modal = btn.closest(".mkw-protect-backdrop, dialog, [role='dialog']") || btn.closest("div");
     if (modal && modal.classList.contains("mkw-protect-backdrop")) modal.remove();
-    else setTimeout(() => location.reload(), 30);
+    else if (!btn.id || btn.id !== "mkwCurrentShieldRemove") setTimeout(() => location.reload(), 30);
     return true;
   }
 
   function init() {
+    ensureStyles();
+    ensureCurrentRemoveButton();
+    setTimeout(ensureCurrentRemoveButton, 120);
+    setTimeout(ensureCurrentRemoveButton, 400);
+
     document.addEventListener("click", event => {
       if (handleRemoveClick(event)) return;
       if (!isShieldButton(event.target)) return;
@@ -254,6 +316,11 @@
       if (btn.dataset.active === "false" || btn.style.display === "none") return;
       openProtectModal(getShieldIndex(btn), btn);
     }, true);
+
+    window.addEventListener("mechkawaii:shield-updated", () => {
+      setTimeout(ensureCurrentRemoveButton, 0);
+      setTimeout(ensureCurrentRemoveButton, 100);
+    });
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
