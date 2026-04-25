@@ -91,7 +91,12 @@
   }
 
   function getCurrentEnergy(id){ const max = Number(energyData?.maxEnergy || 3); const state = readJson(getEnergyKey(id), null); if(!state || typeof state.current !== "number") return max; return Math.max(0, Math.min(max, Number(state.current))); }
-  function setCurrentEnergy(id, current){ const max = Number(energyData?.maxEnergy || 3); writeJson(getEnergyKey(id), { current: Math.max(0, Math.min(max, Number(current))), max }); }
+  function setCurrentEnergy(id, current){
+    const max = Number(energyData?.maxEnergy || 3);
+    const next = Math.max(0, Math.min(max, Number(current)));
+    writeJson(getEnergyKey(id), { current: next, max });
+    window.dispatchEvent(new CustomEvent("mechkawaii:energy-updated", { detail:{ charId:id, current:next, max } }));
+  }
   function resetEnergy(id){ setCurrentEnergy(id, Number(energyData?.maxEnergy || 3)); writeJson(getActionKey(id), { token:getRoundToken(), used:{} }); }
   function getActionState(id){ const token = getRoundToken(); const state = readJson(getActionKey(id), { token, used:{} }); if(state.token !== token) return { token, used:{} }; return state; }
   function saveActionState(id, state){ writeJson(getActionKey(id), state); }
@@ -102,11 +107,25 @@
   function canUseAction(id, action, cost){ const actionState = getActionState(id); const usedCount = Number(actionState.used?.[action] || 0); const maxUses = maxUsesForAction(id, action); if(usedCount >= maxUses) return { ok:false, reason:"used" }; if(getCurrentEnergy(id) < cost) return { ok:false, reason:"energy" }; return { ok:true }; }
   function notify(message){ const root = document.querySelector("#mkwToastRoot"); if(root){ const el = document.createElement("div"); el.className = "mkw-toast"; el.textContent = message; root.appendChild(el); setTimeout(() => el.remove(), 2700); } }
 
-  function spendAction(id, action, cost, options = {}){ cost = Number(cost || 0); if(cost <= 0) return true; if(!isCurrentCampTurn()) { notify(tr("unavailable")); return false; } const check = canUseAction(id, action, cost); if(!check.ok){ notify(check.reason === "energy" ? tr("notEnough") : tr("alreadyUsed")); return false; } const actionState = getActionState(id); actionState.used[action] = Number(actionState.used?.[action] || 0) + 1; saveActionState(id, actionState); setCurrentEnergy(id, getCurrentEnergy(id) - cost); if(!options.silent) notify(tr("actionUsed", { action:getActionName(action) })); render(); return true; }
-  function unspendAction(id, action, cost){ cost = Number(cost || 0); const actionState = getActionState(id); const current = Number(actionState.used?.[action] || 0); if(current <= 0) return; actionState.used[action] = current - 1; if(actionState.used[action] <= 0) delete actionState.used[action]; saveActionState(id, actionState); setCurrentEnergy(id, getCurrentEnergy(id) + cost); render(); }
+  function spendAction(id, action, cost, options = {}){
+    cost = Number(cost || 0);
+    if(cost <= 0) return true;
+    if(!isCurrentCampTurn()) { notify(tr("unavailable")); return false; }
+    const check = canUseAction(id, action, cost);
+    if(!check.ok){ notify(check.reason === "energy" ? tr("notEnough") : tr("alreadyUsed")); return false; }
+    const actionState = getActionState(id);
+    actionState.used[action] = Number(actionState.used?.[action] || 0) + 1;
+    saveActionState(id, actionState);
+    setCurrentEnergy(id, getCurrentEnergy(id) - cost);
+    updateEnergyStatus();
+    if(!options.silent) notify(tr("actionUsed", { action:getActionName(action) }));
+    render();
+    return true;
+  }
+  function unspendAction(id, action, cost){ cost = Number(cost || 0); const actionState = getActionState(id); const current = Number(actionState.used?.[action] || 0); if(current <= 0) return; actionState.used[action] = current - 1; if(actionState.used[action] <= 0) delete actionState.used[action]; saveActionState(id, actionState); setCurrentEnergy(id, getCurrentEnergy(id) + cost); updateEnergyStatus(); render(); }
 
   function ensureEnergyStatusNearName(){ const title = document.querySelector("#charName"); if(!title) return null; let wrap = document.querySelector("#mkwEnergyInlineStatus"); if(!wrap){ wrap = document.createElement("span"); wrap.id = "mkwEnergyInlineStatus"; wrap.className = "mkw-energy-inline-status"; title.insertAdjacentElement("afterend", wrap); } return wrap; }
-  function updateEnergyStatus(){ const id = currentId(); const wrap = ensureEnergyStatusNearName(); if(!id || !wrap) return; const energy = getCurrentEnergy(id); const max = Number(energyData?.maxEnergy || 3); const src = getAssetFor(energy); wrap.innerHTML = src ? `<img src="${src}" alt="${energy}/${max}">` : `${energy}/${max}`; }
+  function updateEnergyStatus(){ const id = currentId(); const wrap = ensureEnergyStatusNearName(); if(!id || !wrap || !energyData) return; const energy = getCurrentEnergy(id); const max = Number(energyData?.maxEnergy || 3); const src = getAssetFor(energy); wrap.innerHTML = src ? `<img src="${src}" alt="${energy}/${max}" data-energy-current="${energy}">` : `${energy}/${max}`; }
   function clearOldInline(){ document.querySelectorAll(".mkw-energy-cost-row, .mkw-energy-action-line, .mkw-road-toggle-inline, .mkw-energy-header-action").forEach(el => { if(el.classList.contains("mkw-energy-header-action")){ const title = el.querySelector(".section-title"); if(title) el.replaceWith(title); else el.remove(); } else el.remove(); }); const oldCard = document.querySelector("#mkwEnergyCard"); if(oldCard) oldCard.remove(); }
 
   function makeSwitch(id, action, cost, labelText){ const actionState = getActionState(id); const used = Number(actionState.used?.[action] || 0) > 0; const check = canUseAction(id, action, cost); const label = document.createElement("label"); label.className = "mkw-energy-switch"; label.classList.toggle("is-disabled", !used && (!check.ok || !isCurrentCampTurn())); label.innerHTML = `<input type="checkbox" ${used ? "checked" : ""}><span class="mkw-energy-slider"></span>${labelText ? `<span class="mkw-energy-switch-label">${labelText}</span>` : ""}`; const input = label.querySelector("input"); input.addEventListener("change", event => { if(event.target.checked){ const ok = spendAction(id, action, cost); if(!ok) event.target.checked = false; } else { unspendAction(id, action, cost); } }); return label; }
@@ -115,26 +134,27 @@
   function appendCost(selector, action){ const id = currentId(); const costs = getCostsForId(id); if(!costs) return; const cost = Number(costs[action] ?? 0); const container = document.querySelector(selector); if(!container) return; container.appendChild(costRow(action, cost)); }
 
   function getMovementCard(){ return Array.from(document.querySelectorAll(".card")).find(c => c.querySelector("#movementDesc") || c.querySelector("#movementImg")); }
-  function addMoveToggleToHeader(cost){
-    if(Number(cost || 0) <= 0) return;
-    const card = getMovementCard();
-    const header = card?.querySelector(".card-h");
-    const title = header?.querySelector(".section-title");
-    if(!header || !title) return;
-    title.textContent = tr("move");
-    const wrap = document.createElement("div");
-    wrap.className = "mkw-energy-header-action";
-    title.replaceWith(wrap);
-    wrap.appendChild(title);
-    wrap.appendChild(makeSwitch(currentId(), "move", Number(cost || 0), ""));
-  }
-
+  function addMoveToggleToHeader(cost){ if(Number(cost || 0) <= 0) return; const card = getMovementCard(); const header = card?.querySelector(".card-h"); const title = header?.querySelector(".section-title"); if(!header || !title) return; title.textContent = tr("move"); const wrap = document.createElement("div"); wrap.className = "mkw-energy-header-action"; title.replaceWith(wrap); wrap.appendChild(title); wrap.appendChild(makeSwitch(currentId(), "move", Number(cost || 0), "")); }
   function addRoadToggle(){ const card = getMovementCard(); const body = card?.querySelector(".card-b"); if(!body) return; const id = currentId(); const roadState = readJson(getRoadKey(id), { token:getRoundToken(), enabled:false, used:false }); const isActive = roadState.token === getRoundToken() && !!roadState.enabled; const wrap = document.createElement("div"); wrap.className = "mkw-road-toggle-inline"; wrap.innerHTML = `<div class="mkw-road-toggle-text"><div class="mkw-road-title-inline">${tr("roadToggle")}</div><div class="mkw-road-help-inline">${tr("roadHelp")}</div></div>`; const sw = document.createElement("label"); sw.className = "mkw-energy-switch"; sw.innerHTML = `<input type="checkbox" ${isActive ? "checked" : ""}><span class="mkw-energy-slider"></span>`; sw.querySelector("input")?.addEventListener("change", event => { writeJson(getRoadKey(id), { token:getRoundToken(), enabled:!!event.target.checked, used:false }); render(); }); wrap.appendChild(sw); body.appendChild(wrap); }
 
-  function bindExistingButtons(){ const id = currentId(); const costs = getCostsForId(id); if(!costs) return; document.querySelectorAll("#repairKeysDisplay button, #repairKeysDisplay .key-button").forEach(btn => { if(btn.dataset.energyBound === "1") return; btn.dataset.energyBound = "1"; btn.addEventListener("click", event => { if(!spendAction(id, "repair", Number(costs.repair || 0), { silent:true })){ event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation(); } }, true); }); document.querySelectorAll("#shieldsDisplay button, #shieldsDisplay .shield-button, #shieldsDisplay .key-button").forEach(btn => { if(btn.dataset.energyBound === "1") return; btn.dataset.energyBound = "1"; btn.addEventListener("click", event => { const text = (btn.textContent || "").toLowerCase(); if(text.includes("retirer") || text.includes("remove")) return; if(!spendAction(id, "protect", Number(costs.protect || 0), { silent:true })){ event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation(); } }, true); }); document.querySelectorAll("#ultToggleContainer button, #ultToggleContainer [role='button']").forEach(btn => { if(btn.dataset.energyBound === "1") return; btn.dataset.energyBound = "1"; btn.addEventListener("click", event => { const pressed = btn.getAttribute("aria-pressed") === "true" || btn.classList.contains("used") || btn.classList.contains("is-used"); if(pressed) return; if(!spendAction(id, "ultimate", Number(costs.ultimate || 0), { silent:true })){ event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation(); } }, true); }); }
+  function bindExistingButtons(){
+    const id = currentId(); const costs = getCostsForId(id); if(!costs) return;
+    document.querySelectorAll("#repairKeysDisplay button, #repairKeysDisplay .key-button").forEach(btn => {
+      if(btn.dataset.energyBound === "1") return; btn.dataset.energyBound = "1";
+      btn.addEventListener("click", event => { if(!spendAction(id, "repair", Number(costs.repair || 0), { silent:true })){ event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation(); } }, true);
+    });
+    document.querySelectorAll("#shieldsDisplay button, #shieldsDisplay .shield-button, #shieldsDisplay .key-button").forEach(btn => {
+      if(btn.dataset.energyBound === "1") return; btn.dataset.energyBound = "1";
+      btn.addEventListener("click", event => { const text = (btn.textContent || "").toLowerCase(); if(text.includes("retirer") || text.includes("remove")) return; if(!spendAction(id, "protect", Number(costs.protect || 0), { silent:true })){ event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation(); } }, true);
+    });
+    document.querySelectorAll("#ultToggleContainer button, #ultToggleContainer [role='button']").forEach(btn => {
+      if(btn.dataset.energyBound === "1") return; btn.dataset.energyBound = "1";
+      btn.addEventListener("click", event => { const pressed = btn.getAttribute("aria-pressed") === "true" || btn.classList.contains("used") || btn.classList.contains("is-used"); if(pressed) return; if(!spendAction(id, "ultimate", Number(costs.ultimate || 0), { silent:true })){ event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation(); } }, true);
+    });
+  }
 
   function render(){ if(!energyData) return; const id = currentId(); if(!id) return; clearOldInline(); updateEnergyStatus(); appendCost(".shields-section", "protect"); appendCost(".repair-section", "repair"); const costs = getCostsForId(id) || {}; const moveCardBody = getMovementCard()?.querySelector(".card-b"); if(moveCardBody) moveCardBody.appendChild(costRow("move", Number(costs.move || 0))); addMoveToggleToHeader(Number(costs.move || 0)); addRoadToggle(); const attackCardBody = Array.from(document.querySelectorAll(".card .card-b")).find(b => b.querySelector("#attackDesc") || b.querySelector("#attackImg")); if(attackCardBody) attackCardBody.appendChild(costRow("ranged_attack", Number(costs.ranged_attack || 0), { toggle:true, label:tr("attack") })); const classActionBody = document.querySelector("#classActionBody")?.parentElement; if(classActionBody) classActionBody.appendChild(costRow("class_action", Number(costs.class_action || 0), { toggle:true, label:tr("classAction") })); const ultBody = document.querySelector("#ultToggleContainer")?.parentElement; if(ultBody) ultBody.appendChild(costRow("ultimate", Number(costs.ultimate || 0))); bindExistingButtons(); }
 
-  async function init(){ ensureStyles(); await loadEnergyData(); const id = currentId(); if(id && !readJson(getEnergyKey(id), null)) resetEnergy(id); render(); window.addEventListener("mechkawaii:turn-start", event => { const camp = event?.detail?.currentCamp; if(!camp || camp === getCharCamp()){ resetEnergy(currentId()); notify(tr("energyRestored")); } render(); }); window.addEventListener("mechkawaii:game-flow-updated", render); window.addEventListener("mechkawaii:shield-updated", () => setTimeout(render, 80)); window.addEventListener("pageshow", render); setTimeout(render, 300); setTimeout(render, 900); }
+  async function init(){ ensureStyles(); await loadEnergyData(); const id = currentId(); if(id && !readJson(getEnergyKey(id), null)) resetEnergy(id); render(); window.addEventListener("mechkawaii:turn-start", event => { const camp = event?.detail?.currentCamp; if(!camp || camp === getCharCamp()){ resetEnergy(currentId()); notify(tr("energyRestored")); } render(); }); window.addEventListener("mechkawaii:game-flow-updated", render); window.addEventListener("mechkawaii:energy-updated", event => { if(event?.detail?.charId === currentId()) updateEnergyStatus(); }); window.addEventListener("mechkawaii:shield-updated", () => setTimeout(render, 80)); window.addEventListener("pageshow", render); setTimeout(render, 300); setTimeout(render, 900); }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
