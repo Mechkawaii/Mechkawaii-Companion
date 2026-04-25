@@ -85,18 +85,17 @@
     window.dispatchEvent(new CustomEvent("mechkawaii:shield-updated", { detail: { charId } }));
   }
 
-  function showShieldButton(index) {
-    const btn = getShieldButtonByIndex(index);
-    if (!btn) return;
-    btn.dataset.active = "true";
-    btn.classList.add("is-on");
-    btn.style.display = "";
-    btn.style.backgroundImage = `url('${SHIELD_ON}')`;
-  }
-
   function getShieldButtonByIndex(index) {
     const buttons = qsa("#shieldsDisplay .shield-button, #shieldsDisplay .key-button, #shieldsDisplay button, .shields-section .shield-button");
     return buttons[index] || null;
+  }
+
+  function hideShieldButton(index) {
+    const btn = getShieldButtonByIndex(index);
+    if (!btn) return;
+    btn.dataset.active = "false";
+    btn.classList.remove("is-on");
+    btn.style.display = "none";
   }
 
   function assignShield(index, targetCharId, btn) {
@@ -128,14 +127,15 @@
     const blueMap = getBlueShieldByTech();
     const oldTarget = assignments[index] || blueMap["shared-shield-" + index];
 
-    shields[index] = true;
+    // Retirer un bouclier enlève la protection, mais le jeton reste défaussé.
+    shields[index] = false;
     delete assignments[index];
     delete blueMap["shared-shield-" + index];
 
     setSharedShields(shields);
     setShieldAssignments(assignments);
     setBlueShieldByTech(blueMap);
-    showShieldButton(index);
+    hideShieldButton(index);
     setShieldGlow(oldTarget, false);
     dispatchShieldUpdate(oldTarget);
   }
@@ -234,7 +234,6 @@
 
     removeShield(index);
     const modal = btn.closest(".mkw-protect-backdrop, dialog, [role='dialog']") || btn.closest("div");
-    const overlay = btn.closest("body > div") || modal;
     if (modal && modal.classList.contains("mkw-protect-backdrop")) modal.remove();
     else setTimeout(() => location.reload(), 30);
     return true;
