@@ -13,14 +13,26 @@
 #hpCard .hp-shields-wrapper,
 #hpCard .hp-section,
 #hpCard .shields-section,
-#hpCard .repair-section {
+#hpCard .repair-section,
+#hpCard .keys-display,
+#hpCard .shields-display,
+#shieldsDisplay {
   border: 0 !important;
   outline: 0 !important;
   box-shadow: none !important;
   background: transparent !important;
 }
 
-/* Remove the individual frame around shield icons */
+/* Remove every visual frame around shield icons, without touching modal buttons */
+.shields-section #shieldsDisplay,
+.shields-section #shieldsDisplay *,
+.shields-section .shield-button,
+.shields-section .key-button {
+  border-color: transparent !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
 #shieldsDisplay .shield-button,
 #shieldsDisplay .key-button,
 #shieldsDisplay button.shield-button,
@@ -29,6 +41,18 @@
   outline: 0 !important;
   box-shadow: none !important;
   background-color: transparent !important;
+}
+
+#shieldsDisplay .shield-button::before,
+#shieldsDisplay .shield-button::after,
+#shieldsDisplay .key-button::before,
+#shieldsDisplay .key-button::after,
+.shields-section .shield-button::before,
+.shields-section .shield-button::after {
+  content: none !important;
+  display: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
 }
 
 #shieldsDisplay .shield-button:hover,
