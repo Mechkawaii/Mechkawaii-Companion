@@ -83,6 +83,16 @@
   transition: all 0.2s ease !important;
 }
 
+/* Used shields disappear: no shield_off / dotted icon visible */
+#shieldsDisplay .shield-button[data-active="false"],
+#shieldsDisplay button.shield-button[data-active="false"],
+.shields-section .shield-button[data-active="false"],
+#shieldsDisplay .shield-button:not(.is-on)[aria-pressed="true"],
+#shieldsDisplay button.shield-button:not(.is-on)[aria-pressed="true"],
+.shields-section .shield-button:not(.is-on)[aria-pressed="true"] {
+  display: none !important;
+}
+
 #shieldsDisplay .shield-button:hover,
 #shieldsDisplay button.shield-button:hover,
 .shields-section .shield-button:hover {
