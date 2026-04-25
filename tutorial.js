@@ -33,7 +33,8 @@
       title: "Tes 3 unités",
       kicker: "Phase de combat",
       text: "À ton tour, tu choisis les actions de chacune de tes 3 unités, dans l’ordre de ton choix : se déplacer, attaquer, réparer, se protéger ou utiliser une action spéciale.",
-      pad: 12
+      pad: 12,
+      allowTabsOverlap: true
     },
     {
       target: "#resetBtn",
@@ -123,6 +124,8 @@
     const tabsTop = getTabsSafeTop();
     let desiredTop = Number(step?.mobileTop ?? 105);
 
+    if (step?.target === "#unitTabs") return;
+
     if (step?.target === "#resetBtn") {
       const safeBottom = tabsTop - 88;
       const wouldBeBottom = desiredTop + rect.height;
@@ -193,7 +196,8 @@
     const top = Math.max(10, rect.top - pad - mobileExtraTop);
     const left = Math.max(10, rect.left - pad);
     const right = Math.min(window.innerWidth - 10, rect.right + pad);
-    const bottom = Math.min(getTabsSafeTop() - 10, rect.bottom + pad + mobileExtraBottom, window.innerHeight - 10);
+    const bottomLimit = activeStep?.allowTabsOverlap ? window.innerHeight - 10 : getTabsSafeTop() - 10;
+    const bottom = Math.min(bottomLimit, rect.bottom + pad + mobileExtraBottom, window.innerHeight - 10);
 
     overlay.style.clipPath = `polygon(0% 0%,0% 100%,${left}px 100%,${left}px ${top}px,${right}px ${top}px,${right}px ${bottom}px,${left}px ${bottom}px,${left}px 100%,100% 100%,100% 0%)`;
 
