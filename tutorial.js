@@ -40,7 +40,8 @@
       title: "Réinitialisation",
       kicker: "Outil Companion",
       text: "Ce bouton remet cette fiche dans son état de départ pour recommencer proprement une partie ou corriger une erreur de manipulation.",
-      pad: 12
+      pad: 14,
+      mobileTop: 120
     }
   ];
 
@@ -109,11 +110,25 @@
     return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
   }
 
+  function getTabsSafeTop() {
+    const tabsContainer = document.querySelector("#unitTabsContainer");
+    const tabsRect = tabsContainer ? tabsContainer.getBoundingClientRect() : null;
+    return tabsRect ? tabsRect.top : window.innerHeight;
+  }
+
   function positionTargetForMobile(target, step) {
     if (!isMobile() || !target) return;
 
-    const desiredTop = Number(step?.mobileTop ?? 105);
     const rect = target.getBoundingClientRect();
+    const tabsTop = getTabsSafeTop();
+    let desiredTop = Number(step?.mobileTop ?? 105);
+
+    if (step?.target === "#resetBtn") {
+      const safeBottom = tabsTop - 88;
+      const wouldBeBottom = desiredTop + rect.height;
+      if (wouldBeBottom > safeBottom) desiredTop = Math.max(82, safeBottom - rect.height);
+    }
+
     const delta = rect.top - desiredTop;
 
     if (Math.abs(delta) > 6) {
@@ -178,14 +193,14 @@
     const top = Math.max(10, rect.top - pad - mobileExtraTop);
     const left = Math.max(10, rect.left - pad);
     const right = Math.min(window.innerWidth - 10, rect.right + pad);
-    const bottom = Math.min(window.innerHeight - 10, rect.bottom + pad + mobileExtraBottom);
+    const bottom = Math.min(getTabsSafeTop() - 10, rect.bottom + pad + mobileExtraBottom, window.innerHeight - 10);
 
     overlay.style.clipPath = `polygon(0% 0%,0% 100%,${left}px 100%,${left}px ${top}px,${right}px ${top}px,${right}px ${bottom}px,${left}px ${bottom}px,${left}px 100%,100% 100%,100% 0%)`;
 
     highlight.style.top = top + "px";
     highlight.style.left = left + "px";
     highlight.style.width = (right - left) + "px";
-    highlight.style.height = (bottom - top) + "px";
+    highlight.style.height = Math.max(0, bottom - top) + "px";
 
     placeTooltip({ top, left, right, bottom, width: right - left, height: bottom - top });
   }
@@ -233,7 +248,7 @@
     activeStep = step;
 
     if (isMobile()) {
-      target.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
+      target.scrollIntoView({ behavior: "auto", block: step?.target === "#resetBtn" ? "center" : "nearest", inline: "center" });
       positionTargetForMobile(target, step);
     } else {
       target.scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
