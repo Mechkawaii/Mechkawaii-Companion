@@ -80,6 +80,33 @@
     const style = document.createElement("style");
     style.id = STYLE_ID;
     style.textContent = `
+      .mkw-tech-shield-modal {
+        background: linear-gradient(180deg,#1a1a24,#101018) !important;
+        color: #fff !important;
+        border: 1px solid rgba(255,255,255,.15) !important;
+        border-radius: 20px !important;
+        box-shadow: 0 22px 55px rgba(0,0,0,.58) !important;
+      }
+
+      .mkw-tech-shield-modal * {
+        color: inherit;
+      }
+
+      .mkw-tech-shield-modal h1,
+      .mkw-tech-shield-modal h2,
+      .mkw-tech-shield-modal h3,
+      .mkw-tech-shield-modal strong,
+      .mkw-tech-shield-modal b {
+        color: #fff !important;
+      }
+
+      .mkw-tech-shield-modal p,
+      .mkw-tech-shield-modal small,
+      .mkw-tech-shield-modal .hint,
+      .mkw-tech-shield-modal .subtitle {
+        color: rgba(255,255,255,.72) !important;
+      }
+
       .mkw-tech-shield-target {
         width: 100% !important;
         display: flex !important;
@@ -129,6 +156,14 @@
         margin-top: 2px !important;
         line-height: 1.2 !important;
       }
+
+      .mkw-tech-shield-modal button:not(.mkw-tech-shield-target) {
+        color: #fff !important;
+        border-color: rgba(255,255,255,.18) !important;
+        background: rgba(255,255,255,.08) !important;
+        border-radius: 15px !important;
+        font-weight: 900 !important;
+      }
     `;
     document.head.appendChild(style);
   }
@@ -171,9 +206,33 @@
     return el.closest("button, [role='button'], label, .toggle, .btn, .button, [onclick]") || el;
   }
 
+  function findModalRoot(el) {
+    if (!el) return null;
+    const explicit = el.closest("[role='dialog'], dialog, .modal, .backdrop, [class*='modal'], [class*='backdrop']");
+    if (explicit) return explicit;
+
+    let node = el.parentElement;
+    while (node && node !== document.body) {
+      const cs = getComputedStyle(node);
+      const rect = node.getBoundingClientRect();
+      if ((cs.position === "fixed" || cs.position === "absolute") && rect.width > 240 && rect.height > 160) return node;
+      node = node.parentElement;
+    }
+    return null;
+  }
+
+  function enhanceModalAround(el) {
+    const modal = findModalRoot(el);
+    if (!modal || modal.dataset.techShieldModal === "1") return;
+    modal.dataset.techShieldModal = "1";
+    modal.classList.add("mkw-tech-shield-modal");
+  }
+
   function enhanceElement(el, char) {
     const target = getBestTarget(el);
     if (!target || excluded(target) || target.dataset.techShieldUi === "1") return;
+
+    enhanceModalAround(target);
 
     target.dataset.techShieldUi = "1";
     target.classList.add("mkw-tech-shield-target");
