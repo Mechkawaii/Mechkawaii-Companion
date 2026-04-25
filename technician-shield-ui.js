@@ -5,8 +5,26 @@
   const STYLE_ID = "mkwTechnicianShieldUiStyles";
   let cachedChars = null;
 
+  const I18N = {
+    fr: {
+      title: "Bouclier du Technicien",
+      help: "Choisis un allié pour lui donner un bouclier bleu.",
+      cancel: "Annuler"
+    },
+    en: {
+      title: "Technician Shield",
+      help: "Choose an ally to give them a blue shield.",
+      cancel: "Cancel"
+    }
+  };
+
   function getLang() {
     return localStorage.getItem(PREFIX + "lang") || "fr";
+  }
+
+  function tr(key) {
+    const lang = getLang();
+    return (I18N[lang] && I18N[lang][key]) || I18N.fr[key] || key;
   }
 
   function readJson(key, fallback) {
@@ -18,12 +36,8 @@
     }
   }
 
-  function normalize(value) {
-    return String(value || "")
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "");
+  function writeJson(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
   }
 
   function textOf(value, lang) {
@@ -44,6 +58,10 @@
     return char?.images?.portrait || char?.portrait || char?.icon || "./assets/heart.png";
   }
 
+  function currentId() {
+    return new URL(location.href).searchParams.get("id") || "";
+  }
+
   async function loadChars() {
     if (Array.isArray(cachedChars)) return cachedChars;
     if (Array.isArray(window.__cachedChars)) {
@@ -60,14 +78,14 @@
     return Array.isArray(draft?.activeIds) ? draft.activeIds : null;
   }
 
-  function getCurrentCamp(chars) {
-    const id = new URL(location.href).searchParams.get("id");
-    return chars.find(c => c.id === id)?.camp || null;
+  function getCurrentChar(chars) {
+    return chars.find(c => c.id === currentId()) || null;
   }
 
   function getEligibleChars(chars) {
+    const current = getCurrentChar(chars);
     const draftIds = getDraftIds();
-    const camp = getCurrentCamp(chars);
+    const camp = current?.camp || null;
     return chars.filter(char => {
       if (draftIds && !draftIds.includes(char.id)) return false;
       if (camp && (char.camp || "mechkawaii") !== camp) return false;
@@ -75,221 +93,130 @@
     });
   }
 
+  function isTechnicianChar(char) {
+    const fr = String(char?.class?.fr || char?.class || "").toLowerCase();
+    const en = String(char?.class?.en || "").toLowerCase();
+    return /\btechnicien\b/.test(fr) || /\btechnician\b/.test(en);
+  }
+
   function ensureStyles() {
     if (document.getElementById(STYLE_ID)) return;
     const style = document.createElement("style");
     style.id = STYLE_ID;
     style.textContent = `
-      .mkw-tech-shield-modal {
-        background: linear-gradient(180deg,#1a1a24,#101018) !important;
-        color: #fff !important;
-        border: 1px solid rgba(255,255,255,.15) !important;
-        border-radius: 20px !important;
-        box-shadow: 0 22px 55px rgba(0,0,0,.58) !important;
+      .mkw-tech-shield-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 9400;
+        background: rgba(0,0,0,.68);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
       }
-
-      .mkw-tech-shield-modal * {
-        color: inherit;
+      .mkw-tech-shield-panel {
+        width: min(460px, 100%);
+        max-height: 82vh;
+        overflow: auto;
+        background: linear-gradient(180deg,#1a1a24,#101018);
+        color: #fff;
+        border: 1px solid rgba(255,255,255,.15);
+        border-radius: 20px;
+        box-shadow: 0 22px 55px rgba(0,0,0,.58);
+        padding: 16px;
       }
-
-      .mkw-tech-shield-modal h1,
-      .mkw-tech-shield-modal h2,
-      .mkw-tech-shield-modal h3,
-      .mkw-tech-shield-modal strong,
-      .mkw-tech-shield-modal b {
-        color: #fff !important;
-      }
-
-      .mkw-tech-shield-modal p,
-      .mkw-tech-shield-modal small,
-      .mkw-tech-shield-modal .hint,
-      .mkw-tech-shield-modal .subtitle {
-        color: rgba(255,255,255,.72) !important;
-      }
-
+      .mkw-tech-shield-title { font-weight: 950; font-size: 19px; margin-bottom: 6px; color: #fff; }
+      .mkw-tech-shield-help { color: rgba(255,255,255,.72); font-size: 13px; line-height: 1.35; margin-bottom: 14px; }
       .mkw-tech-shield-target {
-        width: 100% !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 12px !important;
-        text-align: left !important;
-        padding: 11px !important;
-        margin: 8px 0 !important;
-        border-radius: 15px !important;
-        border: 1px solid rgba(255,255,255,.14) !important;
-        background: rgba(255,255,255,.065) !important;
-        color: #fff !important;
-        cursor: pointer !important;
-        box-shadow: none !important;
-        min-height: 70px !important;
+        width: 100%; display: flex; align-items: center; gap: 12px; text-align: left;
+        padding: 11px; margin: 8px 0; border-radius: 15px;
+        border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.065);
+        color: #fff; cursor: pointer; box-shadow: none; min-height: 70px;
       }
-
-      .mkw-tech-shield-target:hover {
-        background: rgba(80,150,255,.12) !important;
-        border-color: rgba(80,150,255,.52) !important;
-      }
-
+      .mkw-tech-shield-target:hover { background: rgba(80,150,255,.12); border-color: rgba(80,150,255,.52); }
       .mkw-tech-shield-portrait {
-        width: 48px !important;
-        height: 48px !important;
-        object-fit: contain !important;
-        border-radius: 12px !important;
-        background: rgba(255,255,255,.08) !important;
-        flex: 0 0 auto !important;
-        padding: 4px !important;
+        width: 48px; height: 48px; object-fit: contain; border-radius: 12px;
+        background: rgba(255,255,255,.08); flex: 0 0 auto; padding: 4px;
       }
-
-      .mkw-tech-shield-info {
-        flex: 1 !important;
-        min-width: 0 !important;
-      }
-
-      .mkw-tech-shield-name {
-        font-weight: 950 !important;
-        color: #fff !important;
-        line-height: 1.15 !important;
-      }
-
-      .mkw-tech-shield-class {
-        font-size: 12px !important;
-        color: rgba(255,255,255,.62) !important;
-        margin-top: 2px !important;
-        line-height: 1.2 !important;
-      }
-
-      .mkw-tech-shield-modal button:not(.mkw-tech-shield-target) {
-        color: #fff !important;
-        border-color: rgba(255,255,255,.18) !important;
-        background: rgba(255,255,255,.08) !important;
-        border-radius: 15px !important;
-        font-weight: 900 !important;
+      .mkw-tech-shield-info { flex: 1; min-width: 0; }
+      .mkw-tech-shield-name { font-weight: 950; color: #fff; line-height: 1.15; }
+      .mkw-tech-shield-class { font-size: 12px; color: rgba(255,255,255,.62); margin-top: 2px; line-height: 1.2; }
+      .mkw-tech-shield-cancel {
+        width: 100%; margin-top: 12px; padding: 12px; border-radius: 15px;
+        border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.08);
+        color: #fff; font-weight: 900; cursor: pointer;
       }
     `;
     document.head.appendChild(style);
   }
 
-  function excluded(el) {
-    if (!el || el.dataset.techShieldUi === "1") return true;
-    if (el.classList?.contains("mkw-protect-target")) return true;
-    if (el.closest("#mkwCompanionMenuPanel")) return true;
-    if (el.closest("#mkwHistoryPanel")) return true;
-    if (el.closest("#mkwEnergyCard")) return true;
-    if (el.closest("#unitTabsContainer")) return true;
-    if (el.closest("#mkwTurnBanner")) return true;
-    if (el.closest("#mkwFirstPlayerPanel")) return true;
-    return false;
+  function closeModal() {
+    document.querySelector(".mkw-tech-shield-backdrop")?.remove();
   }
 
-  function isBadText(el) {
-    const text = normalize(el.textContent || "");
-    return !text || text.includes("annuler") || text.includes("cancel") || text.includes("retirer") || text.includes("remove") || text.includes("utiliser") || text.includes("use");
+  function applyShield(technicianId, targetId) {
+    const byTech = readJson(PREFIX + "blue-shield-by-tech", {});
+    byTech[technicianId] = targetId;
+    writeJson(PREFIX + "blue-shield-by-tech", byTech);
+    window.dispatchEvent(new CustomEvent("mechkawaii:shield-updated", { detail: { charId: targetId, type: "technician" } }));
+    closeModal();
+    setTimeout(() => location.reload(), 60);
   }
 
-  function findCharForElement(el, chars) {
-    const raw = normalize(el.textContent || "");
-    if (!raw) return null;
-    return chars.find(char => {
-      const name = normalize(getName(char));
-      return name && raw.includes(name);
-    }) || null;
-  }
-
-  function isClickableCandidate(el) {
-    if (!el || excluded(el) || isBadText(el)) return false;
-    if (el.matches("button, [role='button'], label, .toggle, .btn, .button, [onclick]")) return true;
-    const cs = getComputedStyle(el);
-    return cs.cursor === "pointer";
-  }
-
-  function getBestTarget(el) {
-    if (!el) return null;
-    return el.closest("button, [role='button'], label, .toggle, .btn, .button, [onclick]") || el;
-  }
-
-  function findModalRoot(el) {
-    if (!el) return null;
-    const explicit = el.closest("[role='dialog'], dialog, .modal, .backdrop, [class*='modal'], [class*='backdrop']");
-    if (explicit) return explicit;
-
-    let node = el.parentElement;
-    while (node && node !== document.body) {
-      const cs = getComputedStyle(node);
-      const rect = node.getBoundingClientRect();
-      if ((cs.position === "fixed" || cs.position === "absolute") && rect.width > 240 && rect.height > 160) return node;
-      node = node.parentElement;
-    }
-    return null;
-  }
-
-  function enhanceModalAround(el) {
-    const modal = findModalRoot(el);
-    if (!modal || modal.dataset.techShieldModal === "1") return;
-    modal.dataset.techShieldModal = "1";
-    modal.classList.add("mkw-tech-shield-modal");
-  }
-
-  function enhanceElement(el, char) {
-    const target = getBestTarget(el);
-    if (!target || excluded(target) || target.dataset.techShieldUi === "1") return;
-
-    enhanceModalAround(target);
-
-    target.dataset.techShieldUi = "1";
-    target.classList.add("mkw-tech-shield-target");
-    target.innerHTML = `
-      <img class="mkw-tech-shield-portrait" src="${getPortrait(char)}" alt="">
-      <div class="mkw-tech-shield-info">
-        <div class="mkw-tech-shield-name">${getName(char)}</div>
-        <div class="mkw-tech-shield-class">${getClass(char)}</div>
-      </div>
-    `;
-  }
-
-  function getPossibleTargets() {
-    const selectors = [
-      "button",
-      "[role='button']",
-      "label",
-      ".toggle",
-      ".btn",
-      ".button",
-      "[onclick]",
-      "div",
-      "li"
-    ];
-    return Array.from(document.querySelectorAll(selectors.join(",")));
-  }
-
-  async function enhanceExistingModals() {
+  async function openModal() {
     ensureStyles();
-    const chars = getEligibleChars(await loadChars());
-    if (!chars.length) return;
+    closeModal();
+    const chars = await loadChars();
+    const current = getCurrentChar(chars);
+    if (!current || !isTechnicianChar(current)) return;
+    const team = getEligibleChars(chars);
 
-    getPossibleTargets().forEach(el => {
-      if (!isClickableCandidate(el)) return;
-      const char = findCharForElement(el, chars);
-      if (!char) return;
+    const backdrop = document.createElement("div");
+    backdrop.className = "mkw-tech-shield-backdrop";
+    const panel = document.createElement("div");
+    panel.className = "mkw-tech-shield-panel";
+    panel.innerHTML = `<div class="mkw-tech-shield-title">${tr("title")}</div><div class="mkw-tech-shield-help">${tr("help")}</div>`;
 
-      const rect = el.getBoundingClientRect();
-      if (rect.width < 70 || rect.height < 22) return;
-
-      enhanceElement(el, char);
+    team.forEach(char => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "mkw-tech-shield-target";
+      row.innerHTML = `<img class="mkw-tech-shield-portrait" src="${getPortrait(char)}" alt=""><div class="mkw-tech-shield-info"><div class="mkw-tech-shield-name">${getName(char)}</div><div class="mkw-tech-shield-class">${getClass(char)}</div></div>`;
+      row.addEventListener("click", () => applyShield(current.id, char.id));
+      panel.appendChild(row);
     });
+
+    const cancel = document.createElement("button");
+    cancel.type = "button";
+    cancel.className = "mkw-tech-shield-cancel";
+    cancel.textContent = tr("cancel");
+    cancel.addEventListener("click", closeModal);
+    panel.appendChild(cancel);
+    backdrop.appendChild(panel);
+    backdrop.addEventListener("click", event => { if (event.target === backdrop) closeModal(); });
+    document.body.appendChild(backdrop);
+  }
+
+  function isTrigger(button) {
+    if (!button || button.closest(".mkw-tech-shield-backdrop")) return false;
+    const card = button.closest(".card");
+    if (!card || !card.querySelector("#classActionTitle")) return false;
+    const title = document.querySelector("#classActionTitle")?.textContent?.toLowerCase() || "";
+    const body = document.querySelector("#classActionBody")?.textContent?.toLowerCase() || "";
+    const text = `${button.textContent || ""} ${title} ${body}`.toLowerCase();
+    return /technicien|technician/.test(title) && /bouclier|shield|assigner|assign|proteger|protéger|protect/.test(text);
   }
 
   function init() {
     ensureStyles();
-    const observer = new MutationObserver(() => {
-      clearTimeout(observer._mkwTimer);
-      observer._mkwTimer = setTimeout(enhanceExistingModals, 20);
-    });
-    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["style", "class"] });
-    document.addEventListener("click", () => {
-      setTimeout(enhanceExistingModals, 20);
-      setTimeout(enhanceExistingModals, 120);
-      setTimeout(enhanceExistingModals, 300);
+    document.addEventListener("click", event => {
+      const button = event.target.closest && event.target.closest("button, [role='button']");
+      if (!isTrigger(button)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      openModal();
     }, true);
-    setTimeout(enhanceExistingModals, 250);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
