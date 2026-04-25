@@ -5,6 +5,26 @@
   const STYLE_ID = "mkwProtectModalStyles";
   const SHIELD_ON = "./assets/icons/shield_on.svg";
 
+  const I18N = {
+    fr: {
+      protectTitle: "Se protéger",
+      protectHelp: "Applique un bouclier à un allié ou à soi-même.",
+      cancel: "Annuler",
+      removeShield: "Retirer le bouclier"
+    },
+    en: {
+      protectTitle: "Protect",
+      protectHelp: "Apply a shield to an ally or to this unit.",
+      cancel: "Cancel",
+      removeShield: "Remove shield"
+    }
+  };
+
+  function tr(key) {
+    const lang = getLang();
+    return (I18N[lang] && I18N[lang][key]) || I18N.fr[key] || key;
+  }
+
   function qs(sel, root = document) { return root.querySelector(sel); }
   function qsa(sel, root = document) { return Array.from(root.querySelectorAll(sel)); }
 
@@ -131,6 +151,7 @@
 
     if (existing) {
       existing.dataset.shieldIndex = String(index);
+      existing.textContent = tr("removeShield");
       existing.style.display = "block";
       return;
     }
@@ -140,7 +161,7 @@
     button.type = "button";
     button.className = "mkw-current-shield-remove";
     button.dataset.shieldIndex = String(index);
-    button.textContent = getLang() === "fr" ? "Retirer le bouclier" : "Remove shield";
+    button.textContent = tr("removeShield");
     button.addEventListener("click", event => {
       event.preventDefault();
       event.stopPropagation();
@@ -242,7 +263,7 @@
 
     const panel = document.createElement("div");
     panel.className = "mkw-protect-panel";
-    panel.innerHTML = `<div class="mkw-protect-title">Se protéger</div><div class="mkw-protect-help">Applique un bouclier à un allié ou à soi-même.</div>`;
+    panel.innerHTML = `<div class="mkw-protect-title">${tr("protectTitle")}</div><div class="mkw-protect-help">${tr("protectHelp")}</div>`;
 
     team.forEach(char => {
       const max = Number(char?.hp?.max ?? 0);
@@ -261,7 +282,7 @@
     const cancel = document.createElement("button");
     cancel.type = "button";
     cancel.className = "mkw-protect-cancel";
-    cancel.textContent = "Annuler";
+    cancel.textContent = tr("cancel");
     cancel.addEventListener("click", () => { resetClickedShield(btn); backdrop.remove(); });
 
     panel.appendChild(cancel);
