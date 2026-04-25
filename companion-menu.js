@@ -63,6 +63,15 @@
         padding: 0;
       }
 
+      #mkwCompanionMenuButton .mkw-menu-icon {
+        display: block;
+        line-height: 1;
+        width: 1em;
+        height: 1em;
+        transform: translateY(-1px);
+        text-align: center;
+      }
+
       #mkwCompanionMenuBackdrop {
         position: fixed;
         inset: 0;
@@ -233,7 +242,7 @@
       btn = document.createElement("button");
       btn.id = "mkwCompanionMenuButton";
       btn.type = "button";
-      btn.textContent = "☰";
+      btn.innerHTML = '<span class="mkw-menu-icon" aria-hidden="true">⚙</span>';
       btn.setAttribute("aria-label", tr("menu"));
       btn.addEventListener("click", openMenu);
     }
