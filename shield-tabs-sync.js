@@ -49,8 +49,8 @@
   }
 
   function getShieldedIds() {
-    const byTech = readJson(PREFIX + "blue-shield-by-tech", {});
-    return new Set(Object.values(byTech).filter(Boolean));
+    const classicAssignments = readJson(PREFIX + "shield-assignments", {});
+    return new Set(Object.values(classicAssignments).filter(Boolean));
   }
 
   function syncTabs(pulseId) {
