@@ -19,6 +19,9 @@
       repairTitle: "Réparer",
       repairKicker: "Clés de réparation",
       repairText: "Chaque unité dispose de 2 clés de réparation en début de partie. Une clé permet de redonner 1 PV ou de relever une unité alliée HS avec 1 PV. Une fois utilisée, elle est retirée de la partie.",
+      cuBadgeTitle: "Badges de Coup Unique",
+      cuBadgeKicker: "Effets permanents",
+      cuBadgeText: "Cette zone affiche les Coups Uniques permanents appliqués à l’unité, qu’ils viennent d’un allié ou d’un ennemi. En cliquant dessus, tu peux recevoir un Coup Unique du camp adverse.",
       tabsTitle: "Tes 3 unités",
       tabsKicker: "Phase de combat",
       tabsText: "À ton tour, tu choisis les actions de chacune de tes 3 unités, dans l’ordre de ton choix : se déplacer, attaquer, réparer, se protéger ou utiliser une action spéciale."
@@ -37,6 +40,9 @@
       repairTitle: "Repair",
       repairKicker: "Repair Keys",
       repairText: "Each unit starts the game with 2 Repair Keys. A key restores 1 HP or brings an allied KO unit back with 1 HP. Once used, it is removed from the game.",
+      cuBadgeTitle: "Ultimate Ability Badges",
+      cuBadgeKicker: "Permanent effects",
+      cuBadgeText: "This area shows the permanent Ultimate Abilities applied to this unit, whether they come from an ally or an enemy. Tap it to receive an Ultimate Ability from the opposing camp.",
       tabsTitle: "Your 3 units",
       tabsKicker: "Combat phase",
       tabsText: "On your turn, choose actions for each of your 3 units in any order: move, attack, repair, protect, or use a special action."
@@ -53,6 +59,7 @@
     { target: ".hp-section", titleKey: "hpTitle", kickerKey: "hpKicker", textKey: "hpText", pad: 12, mobileTop: 118 },
     { target: ".shields-section", titleKey: "shieldTitle", kickerKey: "shieldKicker", textKey: "shieldText", pad: 16, mobileTop: 110 },
     { target: ".repair-section", titleKey: "repairTitle", kickerKey: "repairKicker", textKey: "repairText", pad: 16, mobileTop: 110 },
+    { target: ".cu-badges,#cuBadges,.cu-badge-zone,.cu-badge,.copied-cu,[data-cu-badges],[data-cu-badge],.topbar .controls", titleKey: "cuBadgeTitle", kickerKey: "cuBadgeKicker", textKey: "cuBadgeText", pad: 14, mobileTop: 96 },
     { target: "#unitTabs", titleKey: "tabsTitle", kickerKey: "tabsKicker", textKey: "tabsText", pad: 12, allowTabsOverlap: true }
   ];
 
@@ -122,6 +129,19 @@
     const tabsContainer = document.querySelector("#unitTabsContainer");
     const tabsRect = tabsContainer ? tabsContainer.getBoundingClientRect() : null;
     return tabsRect ? tabsRect.top : window.innerHeight;
+  }
+
+  function isVisibleTarget(el) {
+    if (!el) return false;
+    const rect = el.getBoundingClientRect();
+    const cs = getComputedStyle(el);
+    return rect.width > 0 && rect.height > 0 && cs.display !== "none" && cs.visibility !== "hidden";
+  }
+
+  function findTarget(step) {
+    if (!step?.target) return null;
+    const candidates = Array.from(document.querySelectorAll(step.target));
+    return candidates.find(isVisibleTarget) || candidates[0] || null;
   }
 
   function positionTargetForMobile(target, step) {
@@ -218,7 +238,7 @@
 
   function showStep() {
     const step = STEPS[currentStep];
-    const target = document.querySelector(step?.target);
+    const target = findTarget(step);
     if (!target) return;
     activeTarget = target;
     activeStep = step;
