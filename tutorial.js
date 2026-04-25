@@ -2,37 +2,83 @@
   "use strict";
 
   const SHEEPARD_SRC = "./assets/sheepard.svg";
+  const STORAGE_PREFIX = "mechkawaii:";
+
+  const I18N = {
+    fr: {
+      sheepard: "Général Sheepard",
+      prev: "←",
+      next: "Suivant",
+      finish: "Terminer",
+      hpTitle: "Points de vie",
+      hpKicker: "Fonctionnement des PV",
+      hpText: "Les PV indiquent l’état de ton unité. S’ils tombent à 0, l’unité devient Hors Service (HS). Une unité ne peut jamais dépasser le nombre de PV indiqué sur sa carte.",
+      shieldTitle: "Se protéger",
+      shieldKicker: "Boucliers",
+      shieldText: "Un bouclier absorbe 1 PV de dégâts. Il disparaît au début de ton prochain tour ou s’il est détruit par une attaque. Une fois utilisé, le jeton bouclier est retiré de la partie.",
+      repairTitle: "Réparer",
+      repairKicker: "Clés de réparation",
+      repairText: "Chaque unité dispose de 2 clés de réparation en début de partie. Une clé permet de redonner 1 PV ou de relever une unité alliée HS avec 1 PV. Une fois utilisée, elle est retirée de la partie.",
+      tabsTitle: "Tes 3 unités",
+      tabsKicker: "Phase de combat",
+      tabsText: "À ton tour, tu choisis les actions de chacune de tes 3 unités, dans l’ordre de ton choix : se déplacer, attaquer, réparer, se protéger ou utiliser une action spéciale."
+    },
+    en: {
+      sheepard: "General Sheepard",
+      prev: "←",
+      next: "Next",
+      finish: "Finish",
+      hpTitle: "Health Points",
+      hpKicker: "HP basics",
+      hpText: "HP shows your unit’s condition. If it drops to 0, the unit becomes Out of Action (KO). A unit can never exceed the HP value shown on its card.",
+      shieldTitle: "Protect",
+      shieldKicker: "Shields",
+      shieldText: "A shield absorbs 1 HP of damage. It disappears at the start of your next turn or if it is destroyed by an attack. Once used, the shield token is removed from the game.",
+      repairTitle: "Repair",
+      repairKicker: "Repair Keys",
+      repairText: "Each unit starts the game with 2 Repair Keys. A key restores 1 HP or brings an allied KO unit back with 1 HP. Once used, it is removed from the game.",
+      tabsTitle: "Your 3 units",
+      tabsKicker: "Combat phase",
+      tabsText: "On your turn, choose actions for each of your 3 units in any order: move, attack, repair, protect, or use a special action."
+    }
+  };
+
+  function getLang(){ return localStorage.getItem(STORAGE_PREFIX + "lang") || "fr"; }
+  function tr(key){
+    const lang = getLang();
+    return (I18N[lang] && I18N[lang][key]) || I18N.fr[key] || key;
+  }
 
   const STEPS = [
     {
       target: ".hp-section",
-      title: "Points de vie",
-      kicker: "Fonctionnement des PV",
-      text: "Les PV indiquent l’état de ton unité. S’ils tombent à 0, l’unité devient Hors Service (HS). Une unité ne peut jamais dépasser le nombre de PV indiqué sur sa carte.",
+      titleKey: "hpTitle",
+      kickerKey: "hpKicker",
+      textKey: "hpText",
       pad: 12,
       mobileTop: 118
     },
     {
       target: ".shields-section",
-      title: "Se protéger",
-      kicker: "Boucliers",
-      text: "Un bouclier absorbe 1 PV de dégâts. Il disparaît au début de ton prochain tour ou s’il est détruit par une attaque. Une fois utilisé, le jeton bouclier est retiré de la partie.",
+      titleKey: "shieldTitle",
+      kickerKey: "shieldKicker",
+      textKey: "shieldText",
       pad: 16,
       mobileTop: 110
     },
     {
       target: ".repair-section",
-      title: "Réparer",
-      kicker: "Clés de réparation",
-      text: "Chaque unité dispose de 2 clés de réparation en début de partie. Une clé permet de redonner 1 PV ou de relever une unité alliée HS avec 1 PV. Une fois utilisée, elle est retirée de la partie.",
+      titleKey: "repairTitle",
+      kickerKey: "repairKicker",
+      textKey: "repairText",
       pad: 16,
       mobileTop: 110
     },
     {
       target: "#unitTabs",
-      title: "Tes 3 unités",
-      kicker: "Phase de combat",
-      text: "À ton tour, tu choisis les actions de chacune de tes 3 unités, dans l’ordre de ton choix : se déplacer, attaquer, réparer, se protéger ou utiliser une action spéciale.",
+      titleKey: "tabsTitle",
+      kickerKey: "tabsKicker",
+      textKey: "tabsText",
       pad: 12,
       allowTabsOverlap: true
     }
@@ -202,14 +248,14 @@
       <div style="display:flex;gap:14px;align-items:flex-start;">
         <img src="${SHEEPARD_SRC}" style="width:${portraitSize};height:${portraitSize};border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.3);background:#000;flex:0 0 auto;box-shadow:0 0 16px rgba(255,210,77,.45);">
         <div style="flex:1;min-width:0;">
-          <div style="font-size:11px;font-weight:900;color:#ffd24d;text-transform:uppercase;">Général Sheepard</div>
-          <div style="font-weight:900;margin-top:4px;font-size:${titleSize};">${step.title}</div>
-          <div style="margin-top:6px;line-height:1.35;font-size:${textSize};">${step.text}</div>
+          <div style="font-size:11px;font-weight:900;color:#ffd24d;text-transform:uppercase;">${tr("sheepard")}</div>
+          <div style="font-weight:900;margin-top:4px;font-size:${titleSize};">${tr(step.titleKey)}</div>
+          <div style="margin-top:6px;line-height:1.35;font-size:${textSize};">${tr(step.textKey)}</div>
         </div>
       </div>
       <div style="display:flex;justify-content:space-between;margin-top:12px;gap:10px;">
-        <button id="prev" ${currentStep === 0 ? "disabled" : ""}>←</button>
-        <button id="next">${isLast ? "Terminer" : "Suivant"}</button>
+        <button id="prev" ${currentStep === 0 ? "disabled" : ""}>${tr("prev")}</button>
+        <button id="next">${isLast ? tr("finish") : tr("next")}</button>
       </div>
     `;
 
