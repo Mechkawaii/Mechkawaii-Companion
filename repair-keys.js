@@ -39,6 +39,12 @@
     window.dispatchEvent(new CustomEvent("mechkawaii:hp-updated", { detail: { charId: char?.id, hp: hpCur } }));
   }
 
+  function dispatchRepairValidated(){
+    window.dispatchEvent(new CustomEvent("mechkawaii:energy-action-validated", {
+      detail: { charId: getCurrentCharId(), action: "repair" }
+    }));
+  }
+
   function getName(char, lang){
     const n = char?.name;
     if (!n) return char?.id || "?";
@@ -200,6 +206,7 @@
         btn.classList.remove("is-on");
         animateConsume(btn);
         saveRepairKeyState(index, false);
+        dispatchRepairValidated();
         modal.remove();
         updateCurrentHpUI(char, newHp);
         dispatchHpUpdate(char, newHp);
@@ -213,6 +220,7 @@
   function patchRepairKeys(){
     ensureStyles();
     qsa("#repairKeysDisplay .key-button, #repairKeysDisplay button").forEach((btn, index) => {
+      btn.dataset.energyBound = "1";
       if (btn.dataset.mkwRepairKeyPatched === "1") return;
       btn.dataset.mkwRepairKeyPatched = "1";
       btn.addEventListener("click", event => {
