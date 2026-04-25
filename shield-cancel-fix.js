@@ -112,9 +112,12 @@
     window.dispatchEvent(new CustomEvent("mechkawaii:shield-updated", { detail: { charId } }));
   }
 
+  function getSharedShieldButtons() {
+    return qsa("#shieldsDisplay .shield-button, #shieldsDisplay .key-button, #shieldsDisplay button");
+  }
+
   function getShieldButtonByIndex(index) {
-    const buttons = qsa("#shieldsDisplay .shield-button, #shieldsDisplay .key-button, #shieldsDisplay button, .shields-section .shield-button");
-    return buttons[index] || null;
+    return getSharedShieldButtons()[index] || null;
   }
 
   function hideShieldButton(index) {
@@ -236,11 +239,15 @@
     document.head.appendChild(style);
   }
 
-  function getShieldButton(el) { return el.closest("#shieldsDisplay .shield-button, #shieldsDisplay .key-button, #shieldsDisplay button, .shields-section .shield-button"); }
-  function isShieldButton(el) { return !!(el && el.closest && getShieldButton(el)); }
+  function getShieldButton(el) {
+    if (!el || !el.closest) return null;
+    // Uniquement les boucliers orange de la réserve partagée.
+    // Ne pas inclure les boutons de la section entière, sinon le bouclier Technicien est capturé.
+    return el.closest("#shieldsDisplay .shield-button, #shieldsDisplay .key-button, #shieldsDisplay button");
+  }
+  function isShieldButton(el) { return !!getShieldButton(el); }
   function getShieldIndex(btn) {
-    const buttons = qsa("#shieldsDisplay .shield-button, #shieldsDisplay .key-button, #shieldsDisplay button, .shields-section .shield-button");
-    return Math.max(0, buttons.indexOf(btn));
+    return Math.max(0, getSharedShieldButtons().indexOf(btn));
   }
 
   function resetClickedShield(btn) {
