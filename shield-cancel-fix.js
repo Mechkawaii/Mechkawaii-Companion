@@ -113,7 +113,13 @@
   }
 
   function getSharedShieldButtons() {
-    return qsa("#shieldsDisplay .shield-button, #shieldsDisplay .key-button, #shieldsDisplay button");
+    return qsa("#shieldsDisplay .shield-button, #shieldsDisplay .key-button, #shieldsDisplay button").filter(btn => !isRemoveShieldButton(btn));
+  }
+
+  function isRemoveShieldButton(btn) {
+    if (!btn) return false;
+    const txt = (btn.textContent || "").toLowerCase();
+    return btn.id === "mkwCurrentShieldRemove" || txt.includes("retirer") || txt.includes("remove");
   }
 
   function getShieldButtonByIndex(index) {
@@ -241,9 +247,9 @@
 
   function getShieldButton(el) {
     if (!el || !el.closest) return null;
-    // Uniquement les boucliers orange de la réserve partagée.
-    // Ne pas inclure les boutons de la section entière, sinon le bouclier Technicien est capturé.
-    return el.closest("#shieldsDisplay .shield-button, #shieldsDisplay .key-button, #shieldsDisplay button");
+    const btn = el.closest("#shieldsDisplay .shield-button, #shieldsDisplay .key-button, #shieldsDisplay button");
+    if (!btn || isRemoveShieldButton(btn)) return null;
+    return btn;
   }
   function isShieldButton(el) { return !!getShieldButton(el); }
   function getShieldIndex(btn) {
