@@ -20,16 +20,37 @@
   background: transparent !important;
 }
 
-/* Shield area: no extra wrapper frame */
-#shieldsDisplay,
-.shields-section .shields-display {
+/* Remove the extra rounded wrapper around shield buttons only */
+.shields-section .toggle-visual-keys,
+.shields-section .keys-display,
+.shields-section .shields-display,
+.shields-section #shieldsDisplay,
+#shieldsDisplay {
+  padding: 0 !important;
+  margin: 8px 0 0 0 !important;
   border: 0 !important;
   outline: 0 !important;
+  border-radius: 0 !important;
   box-shadow: none !important;
   background: transparent !important;
+  backdrop-filter: none !important;
   display: flex !important;
   flex-wrap: wrap !important;
   gap: 8px !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+/* If app.js injects an additional wrapper inside #shieldsDisplay, neutralize only that wrapper */
+#shieldsDisplay > div:not(:has(button)),
+#shieldsDisplay > span:not(:has(button)) {
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 
 /* Shield buttons should look like repair key buttons */
