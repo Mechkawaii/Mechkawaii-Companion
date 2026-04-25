@@ -5,25 +5,28 @@
 
   const STEPS = [
     {
-      target: ".hp",
+      target: ".hp-section",
       title: "Points de vie",
       kicker: "Fonctionnement des PV",
       text: "Les PV indiquent l’état de ton unité. S’ils tombent à 0, l’unité devient Hors Service (HS). Une unité ne peut jamais dépasser le nombre de PV indiqué sur sa carte.",
-      pad: 14
+      pad: 12,
+      mobileTop: 118
     },
     {
       target: ".shields-section",
       title: "Se protéger",
       kicker: "Boucliers",
       text: "Un bouclier absorbe 1 PV de dégâts. Il disparaît au début de ton prochain tour ou s’il est détruit par une attaque. Une fois utilisé, le jeton bouclier est retiré de la partie.",
-      pad: 16
+      pad: 16,
+      mobileTop: 110
     },
     {
       target: ".repair-section",
       title: "Réparer",
       kicker: "Clés de réparation",
       text: "Chaque unité dispose de 2 clés de réparation en début de partie. Une clé permet de redonner 1 PV ou de relever une unité alliée HS avec 1 PV. Une fois utilisée, elle est retirée de la partie.",
-      pad: 16
+      pad: 16,
+      mobileTop: 110
     },
     {
       target: "#unitTabs",
@@ -106,22 +109,37 @@
     return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
   }
 
+  function positionTargetForMobile(target, step) {
+    if (!isMobile() || !target) return;
+
+    const desiredTop = Number(step?.mobileTop ?? 105);
+    const rect = target.getBoundingClientRect();
+    const delta = rect.top - desiredTop;
+
+    if (Math.abs(delta) > 6) {
+      window.scrollBy({ top: delta, left: 0, behavior: "auto" });
+    }
+  }
+
   function placeTooltip(rect) {
     if (!tooltip) return;
 
-    const pad = 14;
+    const pad = isMobile() ? 18 : 14;
     const tooltipRect = tooltip.getBoundingClientRect();
     const tabsContainer = document.querySelector("#unitTabsContainer");
     const tabsRect = tabsContainer ? tabsContainer.getBoundingClientRect() : null;
     const safeBottom = tabsRect ? Math.max(0, tabsRect.top - pad) : window.innerHeight - pad;
-    const safeTop = pad;
+    const safeTop = isMobile() ? 22 : pad;
     const maxLeft = window.innerWidth - tooltipRect.width - pad;
     const centeredLeft = Math.max(pad, Math.min((window.innerWidth - tooltipRect.width) / 2, maxLeft));
     const targetLeft = Math.max(pad, Math.min(rect.left, maxLeft));
 
+    const mobileBelowGap = isMobile() ? 22 : pad;
+    const mobileAboveGap = isMobile() ? 22 : pad;
+
     const candidates = [
-      { top: rect.bottom + pad, left: targetLeft },
-      { top: rect.top - tooltipRect.height - pad, left: targetLeft },
+      { top: rect.bottom + mobileBelowGap, left: targetLeft },
+      { top: rect.top - tooltipRect.height - mobileAboveGap, left: targetLeft },
       { top: safeTop, left: centeredLeft },
       { top: safeBottom - tooltipRect.height, left: centeredLeft }
     ];
@@ -155,10 +173,12 @@
 
     const rect = activeTarget.getBoundingClientRect();
     const pad = Number(activeStep?.pad ?? 12);
-    const top = Math.max(4, rect.top - pad);
-    const left = Math.max(4, rect.left - pad);
-    const right = Math.min(window.innerWidth - 4, rect.right + pad);
-    const bottom = Math.min(window.innerHeight - 4, rect.bottom + pad);
+    const mobileExtraTop = isMobile() && activeStep?.target === ".hp-section" ? 2 : 0;
+    const mobileExtraBottom = isMobile() && activeStep?.target === ".hp-section" ? 8 : 0;
+    const top = Math.max(10, rect.top - pad - mobileExtraTop);
+    const left = Math.max(10, rect.left - pad);
+    const right = Math.min(window.innerWidth - 10, rect.right + pad);
+    const bottom = Math.min(window.innerHeight - 10, rect.bottom + pad + mobileExtraBottom);
 
     overlay.style.clipPath = `polygon(0% 0%,0% 100%,${left}px 100%,${left}px ${top}px,${right}px ${top}px,${right}px ${bottom}px,${left}px ${bottom}px,${left}px 100%,100% 100%,100% 0%)`;
 
@@ -172,9 +192,9 @@
 
   function renderTooltip(step) {
     const isLast = currentStep === STEPS.length - 1;
-    const portraitSize = isMobile() ? "clamp(64px,18vw,82px)" : "clamp(96px,9vw,128px)";
-    const textSize = isMobile() ? "15px" : "16px";
-    const titleSize = isMobile() ? "18px" : "17px";
+    const portraitSize = isMobile() ? "clamp(58px,16vw,76px)" : "clamp(96px,9vw,128px)";
+    const textSize = isMobile() ? "14px" : "16px";
+    const titleSize = isMobile() ? "17px" : "17px";
 
     tooltip.innerHTML = `
       <div style="display:flex;gap:14px;align-items:flex-start;">
@@ -211,12 +231,20 @@
 
     activeTarget = target;
     activeStep = step;
-    target.scrollIntoView({ behavior: "auto", block: isMobile() ? "start" : "center", inline: "center" });
+
+    if (isMobile()) {
+      target.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
+      positionTargetForMobile(target, step);
+    } else {
+      target.scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
+    }
+
     renderTooltip(step);
 
     requestAnimationFrame(() => {
+      positionTargetForMobile(target, step);
       updateOverlayPosition();
-      setTimeout(updateOverlayPosition, 80);
+      setTimeout(() => { positionTargetForMobile(target, step); updateOverlayPosition(); }, 80);
       setTimeout(updateOverlayPosition, 180);
     });
   }
