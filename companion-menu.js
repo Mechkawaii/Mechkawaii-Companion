@@ -206,8 +206,8 @@
           <div class="mkw-menu-title">${tr("menu")}</div>
           <button class="mkw-menu-close" type="button">${tr("close")}</button>
         </div>
-        <button class="mkw-menu-item" type="button" data-action="tutorial"><span>ⓘ ${tr("tutorial")}</span><span>›</span></button>
-        <button class="mkw-menu-item" type="button" data-action="history"><span>📜 ${tr("history")}</span><span>›</span></button>
+        <button class="mkw-menu-item" type="button" data-action="tutorial"><span>${tr("tutorial")}</span><span>›</span></button>
+        <button class="mkw-menu-item" type="button" data-action="history"><span>${tr("history")}</span><span>›</span></button>
         <div class="mkw-menu-section-label">${tr("language")}</div>
         <div class="mkw-menu-lang-row">
           <button class="mkw-menu-lang ${lang === "fr" ? "is-active" : ""}" type="button" data-lang="fr">${tr("french")}</button>
