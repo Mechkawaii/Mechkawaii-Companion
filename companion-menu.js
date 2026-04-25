@@ -52,24 +52,25 @@
         border: 1px solid rgba(255,255,255,.18);
         background: rgba(18,18,26,.94);
         color: #fff;
-        font-size: 22px;
-        font-weight: 950;
-        line-height: 1;
         box-shadow: 0 12px 28px rgba(0,0,0,.25);
         cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+        display: inline-grid;
+        place-items: center;
         padding: 0;
+        overflow: hidden;
       }
 
       #mkwCompanionMenuButton .mkw-menu-icon {
+        width: 22px;
+        height: 22px;
         display: block;
-        line-height: 1;
-        width: 1em;
-        height: 1em;
-        transform: translateY(-1px);
-        text-align: center;
+      }
+
+      #mkwCompanionMenuButton .mkw-menu-icon svg {
+        width: 22px;
+        height: 22px;
+        display: block;
+        stroke: currentColor;
       }
 
       #mkwCompanionMenuBackdrop {
@@ -234,6 +235,24 @@
     });
   }
 
+  function menuIconSvg() {
+    return `
+      <span class="mkw-menu-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+          <circle cx="12" cy="12" r="3.2"></circle>
+          <path d="M12 2.8v2.1"></path>
+          <path d="M12 19.1v2.1"></path>
+          <path d="M4.2 4.2l1.5 1.5"></path>
+          <path d="M18.3 18.3l1.5 1.5"></path>
+          <path d="M2.8 12h2.1"></path>
+          <path d="M19.1 12h2.1"></path>
+          <path d="M4.2 19.8l1.5-1.5"></path>
+          <path d="M18.3 5.7l1.5-1.5"></path>
+        </svg>
+      </span>
+    `;
+  }
+
   function ensureButton() {
     let btn = document.querySelector("#mkwCompanionMenuButton");
     const slot = document.querySelector("#mkw-char-menu-slot");
@@ -242,7 +261,7 @@
       btn = document.createElement("button");
       btn.id = "mkwCompanionMenuButton";
       btn.type = "button";
-      btn.innerHTML = '<span class="mkw-menu-icon" aria-hidden="true">⚙</span>';
+      btn.innerHTML = menuIconSvg();
       btn.setAttribute("aria-label", tr("menu"));
       btn.addEventListener("click", openMenu);
     }
