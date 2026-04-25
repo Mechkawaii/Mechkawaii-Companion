@@ -44,10 +44,8 @@
       }
 
       #mkwCompanionMenuButton {
-        position: fixed;
-        top: calc(14px + env(safe-area-inset-top, 0px));
-        right: 12px;
-        z-index: 2600;
+        position: static;
+        z-index: 1;
         width: 44px;
         height: 44px;
         border-radius: 14px;
@@ -57,8 +55,12 @@
         font-size: 22px;
         font-weight: 950;
         line-height: 1;
-        box-shadow: 0 12px 28px rgba(0,0,0,.35);
+        box-shadow: 0 12px 28px rgba(0,0,0,.25);
         cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
       }
 
       #mkwCompanionMenuBackdrop {
@@ -68,7 +70,7 @@
         background: rgba(0,0,0,.56);
         display: flex;
         align-items: flex-start;
-        justify-content: flex-end;
+        justify-content: center;
         padding: calc(66px + env(safe-area-inset-top, 0px)) 12px 12px;
       }
 
@@ -80,6 +82,14 @@
         border-radius: 20px;
         box-shadow: 0 24px 60px rgba(0,0,0,.55);
         padding: 14px;
+      }
+
+      @media (min-width: 760px) {
+        #mkwCompanionMenuBackdrop {
+          align-items: flex-start;
+          justify-content: center;
+          padding-top: 76px;
+        }
       }
 
       .mkw-menu-head {
@@ -216,19 +226,31 @@
   }
 
   function ensureButton() {
-    if (document.querySelector("#mkwCompanionMenuButton")) return;
-    const btn = document.createElement("button");
-    btn.id = "mkwCompanionMenuButton";
-    btn.type = "button";
-    btn.textContent = "☰";
-    btn.setAttribute("aria-label", tr("menu"));
-    btn.addEventListener("click", openMenu);
-    document.body.appendChild(btn);
+    let btn = document.querySelector("#mkwCompanionMenuButton");
+    const slot = document.querySelector("#mkw-char-menu-slot");
+
+    if (!btn) {
+      btn = document.createElement("button");
+      btn.id = "mkwCompanionMenuButton";
+      btn.type = "button";
+      btn.textContent = "☰";
+      btn.setAttribute("aria-label", tr("menu"));
+      btn.addEventListener("click", openMenu);
+    }
+
+    if (slot && btn.parentNode !== slot) {
+      slot.appendChild(btn);
+    } else if (!slot && !btn.parentNode) {
+      document.body.appendChild(btn);
+    }
   }
 
   function init() {
     ensureStyles();
     ensureButton();
+    window.addEventListener("mechkawaii:nav-row-ready", ensureButton);
+    setTimeout(ensureButton, 100);
+    setTimeout(ensureButton, 400);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
