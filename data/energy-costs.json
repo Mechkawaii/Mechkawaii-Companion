@@ -1,10 +1,10 @@
 {
   "maxEnergy": 3,
   "assets": {
-    "0": "./assets/energy/energy_0.svg",
-    "1": "./assets/energy/energy_1.svg",
-    "2": "./assets/energy/energy_2.svg",
-    "3": "./assets/energy/energy_3.svg"
+    "0": "./assets/energy/energy_0.png",
+    "1": "./assets/energy/energy_1.png",
+    "2": "./assets/energy/energy_2.png",
+    "3": "./assets/energy/energy_3.png"
   },
   "actions": {
     "move": { "fr": "Déplacement", "en": "Move" },
