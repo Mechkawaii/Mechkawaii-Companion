@@ -1,1 +1,51 @@
-/* Neutralized: shield visual polish disabled to preserve stable shield behavior. */
+/* =========================================================
+   MECHKAWAII — HP / Shields / Repair visual cleanup
+   Visual-only: no gameplay logic.
+   ========================================================= */
+
+/* Keep only the base card frame for the whole resources section */
+#hpCard {
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+#hpCard .card-b,
+#hpCard .hp-shields-wrapper,
+#hpCard .hp-section,
+#hpCard .shields-section,
+#hpCard .repair-section {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Remove the individual frame around shield icons */
+#shieldsDisplay .shield-button,
+#shieldsDisplay .key-button,
+#shieldsDisplay button.shield-button,
+.shields-section .shield-button {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+#shieldsDisplay .shield-button:hover,
+#shieldsDisplay .key-button:hover,
+#shieldsDisplay button.shield-button:hover,
+.shields-section .shield-button:hover {
+  border: 0 !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+#shieldsDisplay .shield-button:focus,
+#shieldsDisplay .shield-button:focus-visible,
+#shieldsDisplay .key-button:focus,
+#shieldsDisplay .key-button:focus-visible,
+.shields-section .shield-button:focus,
+.shields-section .shield-button:focus-visible {
+  outline: 0 !important;
+  box-shadow: none !important;
+}
