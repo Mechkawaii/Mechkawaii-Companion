@@ -10,10 +10,31 @@
   const BACKUP_IDS_KEY = PREFIX + "tabs-active-ids";
   const BACKUP_SETUP_KEY = PREFIX + "tabs-setup-backup";
   let repairQueued = false;
+  let pendingHpFeedback = null;
 
   function safeParse(raw) {
     if (!raw) return null;
     try { return JSON.parse(raw); } catch (_) { return null; }
+  }
+
+  function ensureTabFeedbackStyles() {
+    if (document.getElementById("mkwTabFeedbackStyles")) return;
+    const style = document.createElement("style");
+    style.id = "mkwTabFeedbackStyles";
+    style.textContent = `
+      @keyframes mkwTabHealGlow {
+        0% { transform: translateY(0) scale(1); box-shadow: 0 0 0 rgba(70,255,145,0); }
+        35% { transform: translateY(-3px) scale(1.04); box-shadow: 0 0 0 3px rgba(70,255,145,.30), 0 0 22px rgba(70,255,145,.85); }
+        100% { transform: translateY(0) scale(1); box-shadow: 0 0 0 rgba(70,255,145,0); }
+      }
+      @keyframes mkwTabHeartPulse {
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(70,255,145,0)); }
+        45% { transform: scale(1.32); filter: drop-shadow(0 0 9px rgba(70,255,145,.95)); }
+      }
+      .mkw-tab-heal-glow { animation: mkwTabHealGlow .9s ease-out both !important; }
+      .mkw-tab-heart-pulse { animation: mkwTabHeartPulse .75s ease-out both !important; transform-origin:center; }
+    `;
+    document.head.appendChild(style);
   }
 
   function isCharacterPage() {
@@ -114,6 +135,26 @@
     });
   }
 
+  function pulseTab(charId) {
+    if (!charId) return;
+    ensureTabFeedbackStyles();
+    const tab = document.querySelector(`#unitTabs [data-char-id="${CSS.escape(charId)}"]`);
+    if (!tab) return;
+
+    tab.classList.remove("mkw-tab-heal-glow");
+    void tab.offsetWidth;
+    tab.classList.add("mkw-tab-heal-glow");
+    setTimeout(() => tab.classList.remove("mkw-tab-heal-glow"), 950);
+
+    const heart = tab.querySelector(".heart, img[src*='pv'], img[src*='heart']");
+    if (heart) {
+      heart.classList.remove("mkw-tab-heart-pulse");
+      void heart.offsetWidth;
+      heart.classList.add("mkw-tab-heart-pulse");
+      setTimeout(() => heart.classList.remove("mkw-tab-heart-pulse"), 850);
+    }
+  }
+
   function renderTabs(currentCharId, allChars, lang) {
     const tabsContainer = document.querySelector("#unitTabs");
     const wrapper = document.querySelector(".unit-tabs-container");
@@ -160,6 +201,12 @@
       if (char.id === currentCharId) tab.classList.add("active");
       tabsContainer.appendChild(tab);
     });
+
+    if (pendingHpFeedback) {
+      const targetId = pendingHpFeedback;
+      pendingHpFeedback = null;
+      setTimeout(() => pulseTab(targetId), 40);
+    }
   }
 
   async function forceRender() {
@@ -222,6 +269,7 @@
   function patchTabs() {
     if (!isCharacterPage()) return;
 
+    ensureTabFeedbackStyles();
     rememberSetup();
 
     if (typeof initUnitTabs === "function") {
@@ -253,4 +301,10 @@
 
   window.addEventListener("pageshow", forceRender);
   window.addEventListener("storage", queueRepair);
+  window.addEventListener("mechkawaii:hp-updated", (event) => {
+    pendingHpFeedback = event?.detail?.charId || null;
+    setTimeout(forceRender, 0);
+    setTimeout(forceRender, 80);
+    setTimeout(forceRender, 180);
+  });
 })();
