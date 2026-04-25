@@ -1,9 +1,9 @@
 /* =========================================================
-   MECHKAWAII — HP / Shields / Repair visual cleanup
+   MECHKAWAII — Shield buttons like repair keys
    Visual-only: no gameplay logic.
    ========================================================= */
 
-/* Keep only the base card frame for the whole resources section */
+/* Keep only the normal card frame for the whole resources block */
 #hpCard {
   border: 1px solid var(--border) !important;
   box-shadow: var(--shadow) !important;
@@ -13,63 +13,80 @@
 #hpCard .hp-shields-wrapper,
 #hpCard .hp-section,
 #hpCard .shields-section,
-#hpCard .repair-section,
-#hpCard .keys-display,
-#hpCard .shields-display,
-#shieldsDisplay {
+#hpCard .repair-section {
   border: 0 !important;
   outline: 0 !important;
   box-shadow: none !important;
   background: transparent !important;
 }
 
-/* Remove every visual frame around shield icons, without touching modal buttons */
-.shields-section #shieldsDisplay,
-.shields-section #shieldsDisplay *,
-.shields-section .shield-button,
-.shields-section .key-button {
-  border-color: transparent !important;
-  outline: 0 !important;
-  box-shadow: none !important;
-}
-
-#shieldsDisplay .shield-button,
-#shieldsDisplay .key-button,
-#shieldsDisplay button.shield-button,
-.shields-section .shield-button {
+/* Shield area: no extra wrapper frame */
+#shieldsDisplay,
+.shields-section .shields-display {
   border: 0 !important;
   outline: 0 !important;
   box-shadow: none !important;
-  background-color: transparent !important;
+  background: transparent !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+/* Shield buttons should look like repair key buttons */
+#shieldsDisplay .shield-button,
+#shieldsDisplay button.shield-button,
+.shields-section .shield-button {
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+
+  border: 2px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+
+  background-color: #f5f5f5 !important;
+  background-size: 70% !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+
+  box-shadow: none !important;
+  outline: 0 !important;
+
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+
+  font-size: 0 !important;
+  line-height: 0 !important;
+  color: transparent !important;
+
+  transition: all 0.2s ease !important;
+}
+
+#shieldsDisplay .shield-button:hover,
+#shieldsDisplay button.shield-button:hover,
+.shields-section .shield-button:hover {
+  border-color: rgba(59, 130, 246, 0.5) !important;
+  background-color: #f5f5f5 !important;
+  box-shadow: none !important;
+}
+
+#shieldsDisplay .shield-button:active,
+#shieldsDisplay button.shield-button:active,
+.shields-section .shield-button:active {
+  transform: translateY(1px) !important;
 }
 
 #shieldsDisplay .shield-button::before,
 #shieldsDisplay .shield-button::after,
-#shieldsDisplay .key-button::before,
-#shieldsDisplay .key-button::after,
 .shields-section .shield-button::before,
 .shields-section .shield-button::after {
   content: none !important;
   display: none !important;
-  border: 0 !important;
-  box-shadow: none !important;
-}
-
-#shieldsDisplay .shield-button:hover,
-#shieldsDisplay .key-button:hover,
-#shieldsDisplay button.shield-button:hover,
-.shields-section .shield-button:hover {
-  border: 0 !important;
-  box-shadow: none !important;
-  background-color: transparent !important;
 }
 
 #shieldsDisplay .shield-button:focus,
 #shieldsDisplay .shield-button:focus-visible,
-#shieldsDisplay .key-button:focus,
-#shieldsDisplay .key-button:focus-visible,
 .shields-section .shield-button:focus,
 .shields-section .shield-button:focus-visible {
   outline: 0 !important;
-  box-shadow: none !important;
 }
