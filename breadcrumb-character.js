@@ -14,7 +14,60 @@
     return localStorage.getItem(PREFIX + "lang") || "fr";
   }
 
+  function ensureLayoutStyles() {
+    if (document.getElementById("mkwBreadcrumbMenuLayoutStyles")) return;
+    const style = document.createElement("style");
+    style.id = "mkwBreadcrumbMenuLayoutStyles";
+    style.textContent = `
+      #mkw-char-nav-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 0 0 12px 0;
+        width: 100%;
+      }
+
+      #mkw-char-nav-row #mkw-breadcrumb-char {
+        flex: 1 1 auto;
+        min-width: 0;
+        margin: 0 !important;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      #mkw-char-nav-row #mkw-breadcrumb-char::-webkit-scrollbar {
+        display: none;
+      }
+
+      #mkw-char-menu-slot {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+      }
+
+      @media (max-width: 520px) {
+        #mkw-char-nav-row {
+          gap: 8px;
+          margin-bottom: 10px;
+        }
+
+        #mkw-char-nav-row #mkw-breadcrumb-char {
+          gap: 6px;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   function inject() {
+    ensureLayoutStyles();
+
     // Masquer le bouton retour existant
     const backBtn = document.getElementById("backBtn");
     if (backBtn) backBtn.style.display = "none";
@@ -30,9 +83,11 @@
       if (opts.splash) localStorage.removeItem(PREFIX + "splashDismissed");
     };
 
+    const row = document.createElement("div");
+    row.id = "mkw-char-nav-row";
+
     const bc = document.createElement("nav");
     bc.id = "mkw-breadcrumb-char";
-    bc.style.cssText = "display:flex;align-items:center;gap:8px;margin-bottom:12px;";
 
     // Accueil
     const homeBtn = document.createElement("button");
@@ -51,12 +106,10 @@
       location.href = "./index.html";
     });
 
-    // Séparateur
     const sep1 = document.createElement("span");
     sep1.className = "bc-sep";
     sep1.textContent = ">";
 
-    // Configuration
     const setupBtn = document.createElement("button");
     setupBtn.className = "bc-step bc-done";
     setupBtn.textContent = lang === "en" ? "Setup" : "Configuration";
@@ -70,12 +123,10 @@
       location.href = "./index.html";
     });
 
-    // Séparateur
     const sep2 = document.createElement("span");
     sep2.className = "bc-sep";
     sep2.textContent = ">";
 
-    // Unités
     const unitsBtn = document.createElement("button");
     unitsBtn.className = "bc-step bc-done";
     unitsBtn.textContent = lang === "en" ? "Units" : "Unités";
@@ -87,12 +138,10 @@
       location.href = "./index.html";
     });
 
-    // Séparateur
     const sep3 = document.createElement("span");
     sep3.className = "bc-sep";
     sep3.textContent = ">";
 
-    // Gestion (courant)
     const gestionBtn = document.createElement("button");
     gestionBtn.className = "bc-step bc-current";
     gestionBtn.textContent = lang === "en" ? "Game" : "Gestion";
@@ -106,17 +155,22 @@
     bc.appendChild(sep3);
     bc.appendChild(gestionBtn);
 
-    // Insérer avant #hpCard (premier élément après la topbar sur page-character)
-    bc.style.marginTop = "14px";
-    const hpCard = document.getElementById("hpCard");
-    if (hpCard) {
-      hpCard.parentNode.insertBefore(bc, hpCard);
+    const menuSlot = document.createElement("div");
+    menuSlot.id = "mkw-char-menu-slot";
+
+    row.appendChild(bc);
+    row.appendChild(menuSlot);
+
+    // Insérer avant la topbar, pour avoir le cheminement au-dessus du nom de l'unité
+    const topbar = document.querySelector(".topbar");
+    if (topbar) {
+      topbar.parentNode.insertBefore(row, topbar);
     } else {
-      const topbar = document.querySelector(".topbar");
-      if (topbar?.nextSibling) {
-        topbar.parentNode.insertBefore(bc, topbar.nextSibling);
-      }
+      const hpCard = document.getElementById("hpCard");
+      if (hpCard) hpCard.parentNode.insertBefore(row, hpCard);
     }
+
+    window.dispatchEvent(new CustomEvent("mechkawaii:nav-row-ready"));
   }
 
   if (document.readyState === "loading") {
