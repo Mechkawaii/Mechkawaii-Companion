@@ -2,6 +2,7 @@
   "use strict";
 
   const STYLE_ID = "mkwShieldModalSkinStyles";
+  let lastShieldSnapshot = null;
 
   function ensureStyles() {
     if (document.getElementById(STYLE_ID)) return;
@@ -62,6 +63,50 @@
     return txt.includes("bouclier") || txt.includes("shield");
   }
 
+  function isCancelButton(btn) {
+    const txt = textOf(btn).trim();
+    return txt === "annuler" || txt === "cancel" || txt.includes("annuler") || txt.includes("cancel");
+  }
+
+  function rememberShieldButton(btn) {
+    if (!btn) return;
+    lastShieldSnapshot = {
+      btn,
+      className: btn.className,
+      active: btn.dataset.active,
+      backgroundImage: btn.style.backgroundImage,
+      backgroundColor: btn.style.backgroundColor,
+      opacity: btn.style.opacity,
+      filter: btn.style.filter
+    };
+  }
+
+  function restoreShieldButton() {
+    const snap = lastShieldSnapshot;
+    if (!snap || !snap.btn || !document.body.contains(snap.btn)) return;
+
+    snap.btn.className = snap.className;
+
+    if (snap.active === undefined) delete snap.btn.dataset.active;
+    else snap.btn.dataset.active = snap.active;
+
+    snap.btn.style.backgroundImage = snap.backgroundImage || "";
+    snap.btn.style.backgroundColor = snap.backgroundColor || "";
+    snap.btn.style.opacity = snap.opacity || "";
+    snap.btn.style.filter = snap.filter || "";
+  }
+
+  function installShieldClickMemory() {
+    if (document.documentElement.dataset.mkwShieldClickMemory === "1") return;
+    document.documentElement.dataset.mkwShieldClickMemory = "1";
+
+    document.addEventListener("click", event => {
+      const btn = event.target.closest("#shieldsDisplay .shield-button, #shieldsDisplay .key-button, #shieldsDisplay button, .shields-section .shield-button");
+      if (!btn) return;
+      rememberShieldButton(btn);
+    }, true);
+  }
+
   function choosePanel(root) {
     if (!root || root.nodeType !== 1) return null;
 
@@ -76,13 +121,26 @@
     })[0];
   }
 
+  function installCancelRestore(panel) {
+    panel.querySelectorAll("button").forEach(btn => {
+      if (!isCancelButton(btn) || btn.dataset.mkwShieldCancelRestore === "1") return;
+      btn.dataset.mkwShieldCancelRestore = "1";
+      btn.addEventListener("click", () => {
+        setTimeout(restoreShieldButton, 0);
+        setTimeout(restoreShieldButton, 80);
+      }, true);
+    });
+  }
+
   function skin(root) {
     ensureStyles();
-    const panel = choosePanel(root);
-    if (!panel || panel.dataset.mkwShieldModalSkin === "1") return;
+    installShieldClickMemory();
 
-    panel.dataset.mkwShieldModalSkin = "1";
+    const panel = choosePanel(root);
+    if (!panel) return;
+
     panel.classList.add("mkw-shield-modal-skin");
+    installCancelRestore(panel);
   }
 
   function scan() {
