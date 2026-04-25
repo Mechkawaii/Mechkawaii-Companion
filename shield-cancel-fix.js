@@ -37,6 +37,12 @@
   function getCurrentCharId() { return new URL(location.href).searchParams.get("id"); }
   function getState(id) { return readJson(PREFIX + "state:" + id, null); }
 
+  function dispatchProtectValidated() {
+    window.dispatchEvent(new CustomEvent("mechkawaii:energy-action-validated", {
+      detail: { charId: getCurrentCharId(), action: "protect" }
+    }));
+  }
+
   function getHpCur(char) {
     const state = getState(char.id);
     const max = Number(char?.hp?.max ?? 0);
@@ -198,6 +204,7 @@
       btn.style.display = "none";
     }
 
+    dispatchProtectValidated();
     setShieldGlow(targetCharId, true);
     ensureCurrentRemoveButton();
     dispatchShieldUpdate(targetCharId);
@@ -341,6 +348,7 @@
       event.stopImmediatePropagation();
 
       if (btn.dataset.active === "false" || btn.style.display === "none") return;
+      btn.dataset.energyBound = "1";
       openProtectModal(getShieldIndex(btn), btn);
     }, true);
 
