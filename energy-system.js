@@ -8,36 +8,32 @@
 
   const I18N = {
     fr: {
-      title: "Cellules d’énergie",
-      subtitle: "3 cellules par tour",
-      actions: "Actions du tour",
-      use: "Utiliser",
-      freeRoadMove: "Déplacement gratuit route",
       roadToggle: "Commence sur une route",
-      roadHelp: "Active si l’unité commence son tour sur une route : elle gagne un déplacement gratuit.",
+      roadHelp: "Si l’unité commence son tour sur une route, son déplacement est gratuit.",
+      useAction: "Action effectuée",
+      freeRoadMove: "Déplacement gratuit route",
       notEnough: "Pas assez d’énergie.",
       alreadyUsed: "Cette action a déjà été utilisée ce tour.",
       actionUsed: "Action utilisée : {action}.",
       energyRestored: "Énergie restaurée pour le tour.",
-      freeMoveUsed: "Déplacement gratuit utilisé.",
-      noCost: "0 cellule",
-      cost: "{n} cellule(s)"
+      move: "Déplacement effectué",
+      attack: "Attaque effectuée",
+      classAction: "Action de classe effectuée",
+      unavailable: "Action indisponible"
     },
     en: {
-      title: "Energy Cells",
-      subtitle: "3 cells per turn",
-      actions: "Turn actions",
-      use: "Use",
-      freeRoadMove: "Free road move",
       roadToggle: "Starts on a road",
-      roadHelp: "Enable if this unit starts its turn on a road: it gains one free move.",
+      roadHelp: "If this unit starts its turn on a road, its movement is free.",
+      useAction: "Action done",
+      freeRoadMove: "Free road move",
       notEnough: "Not enough energy.",
       alreadyUsed: "This action has already been used this turn.",
       actionUsed: "Action used: {action}.",
       energyRestored: "Energy restored for this turn.",
-      freeMoveUsed: "Free move used.",
-      noCost: "0 cell",
-      cost: "{n} cell(s)"
+      move: "Movement done",
+      attack: "Attack done",
+      classAction: "Class action done",
+      unavailable: "Unavailable action"
     }
   };
 
@@ -72,28 +68,105 @@
     const style = document.createElement("style");
     style.id = STYLE_ID;
     style.textContent = `
-      #mkwEnergyCard { margin-top:16px; }
-      .mkw-energy-head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-      .mkw-energy-title { font-weight:950; font-size:16px; }
-      .mkw-energy-subtitle { color:var(--muted); font-size:12px; font-weight:750; }
-      .mkw-energy-main { display:grid; grid-template-columns:minmax(140px,220px) 1fr; gap:14px; align-items:start; }
-      .mkw-energy-bar-wrap { display:flex; flex-direction:column; gap:8px; }
-      .mkw-energy-bar { width:100%; min-height:44px; display:flex; align-items:center; justify-content:center; border-radius:14px; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.08); padding:8px; }
-      .mkw-energy-bar img { max-width:100%; height:38px; object-fit:contain; display:block; image-rendering:auto; }
-      .mkw-energy-value { font-weight:950; text-align:center; font-size:13px; color:var(--muted); }
-      .mkw-road-toggle { display:flex; align-items:center; gap:8px; margin-top:4px; font-size:12px; color:var(--muted); font-weight:800; }
-      .mkw-road-toggle input { width:18px; height:18px; }
-      .mkw-road-help { font-size:11px; line-height:1.3; color:var(--muted); opacity:.82; }
-      .mkw-energy-actions-title { font-weight:950; margin-bottom:8px; }
-      .mkw-energy-actions { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:8px; }
-      .mkw-energy-action { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px; border-radius:15px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.055); color:var(--text,#fff); cursor:pointer; text-align:left; }
-      .mkw-energy-action:hover { border-color:rgba(255,210,77,.45); background:rgba(255,210,77,.1); }
-      .mkw-energy-action.is-used { opacity:.55; }
-      .mkw-energy-action.is-disabled { opacity:.38; cursor:not-allowed; filter:grayscale(.4); }
-      .mkw-energy-action-name { font-weight:950; line-height:1.2; }
-      .mkw-energy-action-cost { font-size:11px; color:var(--muted); margin-top:3px; font-weight:800; }
-      .mkw-energy-use { flex:0 0 auto; font-size:11px; font-weight:950; border-radius:999px; padding:6px 8px; background:rgba(255,255,255,.08); }
-      @media (max-width:680px){ .mkw-energy-main{ grid-template-columns:1fr; } .mkw-energy-bar img{ height:34px; } }
+      #mkwEnergyCard { display:none !important; }
+
+      .mkw-energy-inline-status {
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        margin-left:10px;
+        vertical-align:middle;
+      }
+
+      .mkw-energy-inline-status img {
+        width:86px;
+        max-width:32vw;
+        height:auto;
+        display:block;
+      }
+
+      .mkw-energy-cost-row {
+        display:flex;
+        align-items:center;
+        gap:10px;
+        margin-top:10px;
+        flex-wrap:wrap;
+      }
+
+      .mkw-energy-cost-row img {
+        width:96px;
+        max-width:42vw;
+        height:auto;
+        display:block;
+      }
+
+      .mkw-energy-toggle {
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        border:1px solid rgba(255,255,255,.16);
+        background:rgba(255,255,255,.07);
+        color:var(--text,#fff);
+        border-radius:999px;
+        padding:8px 10px;
+        font-weight:900;
+        cursor:pointer;
+        user-select:none;
+      }
+
+      .mkw-energy-toggle input {
+        width:18px;
+        height:18px;
+        accent-color:#ffd24d;
+      }
+
+      .mkw-energy-toggle.is-used {
+        border-color:rgba(255,210,77,.55);
+        background:rgba(255,210,77,.14);
+      }
+
+      .mkw-energy-toggle.is-disabled {
+        opacity:.42;
+        cursor:not-allowed;
+        filter:grayscale(.35);
+      }
+
+      .mkw-road-toggle-inline {
+        margin-top:12px;
+        display:flex;
+        flex-direction:column;
+        gap:4px;
+      }
+
+      .mkw-road-toggle-inline label {
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        font-weight:850;
+        color:var(--text,#fff);
+      }
+
+      .mkw-road-toggle-inline input {
+        width:18px;
+        height:18px;
+        accent-color:#70ff70;
+      }
+
+      .mkw-road-help-inline {
+        color:var(--muted);
+        font-size:12px;
+        line-height:1.3;
+      }
+
+      @media (max-width:560px){
+        .mkw-energy-inline-status {
+          display:flex;
+          margin-left:0;
+          margin-top:8px;
+        }
+        .mkw-energy-inline-status img { width:92px; }
+        .mkw-energy-cost-row img { width:92px; }
+      }
     `;
     document.head.appendChild(style);
   }
@@ -136,6 +209,11 @@
     return energyData?.actions?.[action]?.[lang] || energyData?.actions?.[action]?.fr || action;
   }
 
+  function getAssetFor(value){
+    const n = Math.max(0, Math.min(Number(energyData?.maxEnergy || 3), Number(value || 0)));
+    return energyData?.assets?.[String(n)] || energyData?.assets?.[String(energyData?.maxEnergy || 3)] || "";
+  }
+
   function maxUsesForAction(id, action){
     const defaults = energyData?.defaultRules?.maxUsesPerTurnByAction || {};
     const exception = energyData?.exceptions?.[normalize(id)]?.maxUsesPerTurnByAction || {};
@@ -151,23 +229,7 @@
     return { ok:true };
   }
 
-  function useAction(id, action, cost){
-    const check = canUseAction(id, action, cost);
-    if(!check.ok){
-      notify(check.reason === "energy" ? tr("notEnough") : tr("alreadyUsed"));
-      return false;
-    }
-    const actionState = getActionState(id);
-    actionState.used[action] = Number(actionState.used?.[action] || 0) + 1;
-    saveActionState(id, actionState);
-    setCurrentEnergy(id, getCurrentEnergy(id) - Number(cost || 0));
-    notify(tr("actionUsed", { action:getActionName(action) }));
-    render();
-    return true;
-  }
-
   function notify(message){
-    window.dispatchEvent(new CustomEvent("mechkawaii:energy-feedback", { detail:{ message } }));
     const root = document.querySelector("#mkwToastRoot");
     if(root){
       const el = document.createElement("div");
@@ -178,21 +240,172 @@
     }
   }
 
-  function makeCard(){
-    if(document.querySelector("#mkwEnergyCard")) return;
-    const card = document.createElement("div");
-    card.className = "card";
-    card.id = "mkwEnergyCard";
-    card.innerHTML = `
-      <div class="card-h"><div class="mkw-energy-head"><div><div class="mkw-energy-title"></div><div class="mkw-energy-subtitle"></div></div></div></div>
-      <div class="card-b"><div class="mkw-energy-main"><div class="mkw-energy-bar-wrap"><div class="mkw-energy-bar"></div><div class="mkw-energy-value"></div><label class="mkw-road-toggle"><input type="checkbox" id="mkwRoadStartToggle"><span></span></label><div class="mkw-road-help"></div></div><div><div class="mkw-energy-actions-title"></div><div class="mkw-energy-actions"></div></div></div></div>
-    `;
-    const hpCard = document.querySelector("#hpCard");
-    if(hpCard?.parentNode) hpCard.parentNode.insertBefore(card, hpCard.nextSibling);
-    else document.querySelector(".container")?.appendChild(card);
-    card.querySelector("#mkwRoadStartToggle")?.addEventListener("change", event => {
-      writeJson(getRoadKey(currentId()), { token:getRoundToken(), enabled:!!event.target.checked, used:false });
+  function spendAction(id, action, cost, options = {}){
+    cost = Number(cost || 0);
+    if(cost <= 0) return true;
+    if(!isCurrentCampTurn()) { notify(tr("unavailable")); return false; }
+
+    const check = canUseAction(id, action, cost);
+    if(!check.ok){
+      notify(check.reason === "energy" ? tr("notEnough") : tr("alreadyUsed"));
+      return false;
+    }
+
+    const actionState = getActionState(id);
+    actionState.used[action] = Number(actionState.used?.[action] || 0) + 1;
+    saveActionState(id, actionState);
+    setCurrentEnergy(id, getCurrentEnergy(id) - cost);
+    if(!options.silent) notify(tr("actionUsed", { action:getActionName(action) }));
+    render();
+    return true;
+  }
+
+  function unspendAction(id, action, cost){
+    cost = Number(cost || 0);
+    const actionState = getActionState(id);
+    const current = Number(actionState.used?.[action] || 0);
+    if(current <= 0) return;
+    actionState.used[action] = current - 1;
+    if(actionState.used[action] <= 0) delete actionState.used[action];
+    saveActionState(id, actionState);
+    setCurrentEnergy(id, getCurrentEnergy(id) + cost);
+    render();
+  }
+
+  function ensureEnergyStatusNearName(){
+    const title = document.querySelector("#charName");
+    if(!title) return null;
+    let wrap = document.querySelector("#mkwEnergyInlineStatus");
+    if(!wrap){
+      wrap = document.createElement("span");
+      wrap.id = "mkwEnergyInlineStatus";
+      wrap.className = "mkw-energy-inline-status";
+      title.insertAdjacentElement("afterend", wrap);
+    }
+    return wrap;
+  }
+
+  function updateEnergyStatus(){
+    const id = currentId();
+    const wrap = ensureEnergyStatusNearName();
+    if(!id || !wrap) return;
+    const energy = getCurrentEnergy(id);
+    const max = Number(energyData?.maxEnergy || 3);
+    const src = getAssetFor(energy);
+    wrap.innerHTML = src ? `<img src="${src}" alt="${energy}/${max}">` : `${energy}/${max}`;
+  }
+
+  function clearOldInline(){
+    document.querySelectorAll(".mkw-energy-cost-row, .mkw-road-toggle-inline").forEach(el => el.remove());
+    const oldCard = document.querySelector("#mkwEnergyCard");
+    if(oldCard) oldCard.remove();
+  }
+
+  function costRow(action, cost, opts = {}){
+    const id = currentId();
+    const row = document.createElement("div");
+    row.className = "mkw-energy-cost-row";
+    row.dataset.energyAction = action;
+
+    const src = getAssetFor(cost);
+    if(src){
+      const img = document.createElement("img");
+      img.src = src;
+      img.alt = `${cost}`;
+      row.appendChild(img);
+    }
+
+    if(opts.toggle && Number(cost || 0) > 0){
+      const actionState = getActionState(id);
+      const used = Number(actionState.used?.[action] || 0) > 0;
+      const check = canUseAction(id, action, cost);
+
+      const label = document.createElement("label");
+      label.className = "mkw-energy-toggle";
+      label.classList.toggle("is-used", used);
+      label.classList.toggle("is-disabled", !used && (!check.ok || !isCurrentCampTurn()));
+      label.innerHTML = `<input type="checkbox" ${used ? "checked" : ""}><span>${opts.label || tr("useAction")}</span>`;
+      const input = label.querySelector("input");
+      input.addEventListener("change", event => {
+        if(event.target.checked){
+          const ok = spendAction(id, action, cost);
+          if(!ok) event.target.checked = false;
+        } else {
+          unspendAction(id, action, cost);
+        }
+      });
+      row.appendChild(label);
+    }
+
+    return row;
+  }
+
+  function appendCost(selector, action, options = {}){
+    const id = currentId();
+    const costs = getCostsForId(id);
+    if(!costs) return;
+    const cost = Number(costs[action] ?? 0);
+    const container = document.querySelector(selector);
+    if(!container) return;
+    container.appendChild(costRow(action, cost, options));
+  }
+
+  function addRoadToggle(){
+    const card = Array.from(document.querySelectorAll(".card")).find(c => c.querySelector("#movementDesc") || c.querySelector("#movementImg"));
+    const body = card?.querySelector(".card-b");
+    if(!body) return;
+
+    const id = currentId();
+    const roadState = readJson(getRoadKey(id), { token:getRoundToken(), enabled:false, used:false });
+    const isActive = roadState.token === getRoundToken() && !!roadState.enabled;
+
+    const wrap = document.createElement("div");
+    wrap.className = "mkw-road-toggle-inline";
+    wrap.innerHTML = `<label><input type="checkbox" ${isActive ? "checked" : ""}><span>${tr("roadToggle")}</span></label><div class="mkw-road-help-inline">${tr("roadHelp")}</div>`;
+    wrap.querySelector("input")?.addEventListener("change", event => {
+      writeJson(getRoadKey(id), { token:getRoundToken(), enabled:!!event.target.checked, used:false });
       render();
+    });
+    body.appendChild(wrap);
+  }
+
+  function bindExistingButtons(){
+    const id = currentId();
+    const costs = getCostsForId(id);
+    if(!costs) return;
+
+    document.querySelectorAll("#repairKeysDisplay button, #repairKeysDisplay .key-button").forEach(btn => {
+      if(btn.dataset.energyBound === "1") return;
+      btn.dataset.energyBound = "1";
+      btn.addEventListener("click", event => {
+        if(!spendAction(id, "repair", Number(costs.repair || 0), { silent:true })){
+          event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
+        }
+      }, true);
+    });
+
+    document.querySelectorAll("#shieldsDisplay button, #shieldsDisplay .shield-button, #shieldsDisplay .key-button").forEach(btn => {
+      if(btn.dataset.energyBound === "1") return;
+      btn.dataset.energyBound = "1";
+      btn.addEventListener("click", event => {
+        const text = (btn.textContent || "").toLowerCase();
+        if(text.includes("retirer") || text.includes("remove")) return;
+        if(!spendAction(id, "protect", Number(costs.protect || 0), { silent:true })){
+          event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
+        }
+      }, true);
+    });
+
+    document.querySelectorAll("#ultToggleContainer button, #ultToggleContainer [role='button']").forEach(btn => {
+      if(btn.dataset.energyBound === "1") return;
+      btn.dataset.energyBound = "1";
+      btn.addEventListener("click", event => {
+        const pressed = btn.getAttribute("aria-pressed") === "true" || btn.classList.contains("used") || btn.classList.contains("is-used");
+        if(pressed) return;
+        if(!spendAction(id, "ultimate", Number(costs.ultimate || 0), { silent:true })){
+          event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
+        }
+      }, true);
     });
   }
 
@@ -200,57 +413,27 @@
     if(!energyData) return;
     const id = currentId();
     if(!id) return;
-    makeCard();
-    const card = document.querySelector("#mkwEnergyCard");
-    if(!card) return;
-    const energy = getCurrentEnergy(id);
-    const max = Number(energyData.maxEnergy || 3);
-    card.querySelector(".mkw-energy-title").textContent = tr("title");
-    card.querySelector(".mkw-energy-subtitle").textContent = tr("subtitle");
-    card.querySelector(".mkw-energy-actions-title").textContent = tr("actions");
-    const imgSrc = energyData.assets?.[String(energy)] || energyData.assets?.[String(max)];
-    card.querySelector(".mkw-energy-bar").innerHTML = imgSrc ? `<img src="${imgSrc}" alt="${energy}/${max}">` : "";
-    card.querySelector(".mkw-energy-value").textContent = `${energy} / ${max}`;
-    card.querySelector(".mkw-road-toggle span").textContent = tr("roadToggle");
-    card.querySelector(".mkw-road-help").textContent = tr("roadHelp");
-    const roadState = readJson(getRoadKey(id), { token:getRoundToken(), enabled:false, used:false });
-    const roadToggle = card.querySelector("#mkwRoadStartToggle");
-    if(roadToggle) roadToggle.checked = roadState.token === getRoundToken() && !!roadState.enabled;
 
-    const costs = getCostsForId(id);
-    const actions = card.querySelector(".mkw-energy-actions");
-    actions.innerHTML = "";
+    clearOldInline();
+    updateEnergyStatus();
 
-    if(roadToggle?.checked && !roadState.used){
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "mkw-energy-action";
-      btn.innerHTML = `<div><div class="mkw-energy-action-name">${tr("freeRoadMove")}</div><div class="mkw-energy-action-cost">${tr("noCost")}</div></div><span class="mkw-energy-use">${tr("use")}</span>`;
-      btn.addEventListener("click", () => {
-        writeJson(getRoadKey(id), { token:getRoundToken(), enabled:true, used:true });
-        notify(tr("freeMoveUsed"));
-        render();
-      });
-      actions.appendChild(btn);
-    }
+    appendCost(".shields-section", "protect");
+    appendCost(".repair-section", "repair");
 
-    if(!costs) return;
-    Object.keys(energyData.actions || {}).forEach(action => {
-      const cost = Number(costs[action] ?? 0);
-      const check = canUseAction(id, action, cost);
-      const usedCount = Number(getActionState(id).used?.[action] || 0);
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "mkw-energy-action";
-      btn.classList.toggle("is-used", usedCount > 0);
-      btn.classList.toggle("is-disabled", !check.ok || !isCurrentCampTurn());
-      btn.innerHTML = `<div><div class="mkw-energy-action-name">${getActionName(action)}</div><div class="mkw-energy-action-cost">${cost === 0 ? tr("noCost") : tr("cost", { n:cost })}</div></div><span class="mkw-energy-use">${tr("use")}</span>`;
-      btn.addEventListener("click", () => {
-        if(!isCurrentCampTurn()) return notify(tr("alreadyUsed"));
-        useAction(id, action, cost);
-      });
-      actions.appendChild(btn);
-    });
+    const moveCardBody = Array.from(document.querySelectorAll(".card .card-b")).find(b => b.querySelector("#movementDesc") || b.querySelector("#movementImg"));
+    if(moveCardBody) moveCardBody.appendChild(costRow("move", Number(getCostsForId(id)?.move || 0), { toggle:true, label:tr("move") }));
+    addRoadToggle();
+
+    const attackCardBody = Array.from(document.querySelectorAll(".card .card-b")).find(b => b.querySelector("#attackDesc") || b.querySelector("#attackImg"));
+    if(attackCardBody) attackCardBody.appendChild(costRow("ranged_attack", Number(getCostsForId(id)?.ranged_attack || 0), { toggle:true, label:tr("attack") }));
+
+    const classActionBody = document.querySelector("#classActionBody")?.parentElement;
+    if(classActionBody) classActionBody.appendChild(costRow("class_action", Number(getCostsForId(id)?.class_action || 0), { toggle:true, label:tr("classAction") }));
+
+    const ultBody = document.querySelector("#ultToggleContainer")?.parentElement;
+    if(ultBody) ultBody.appendChild(costRow("ultimate", Number(getCostsForId(id)?.ultimate || 0)));
+
+    bindExistingButtons();
   }
 
   async function init(){
@@ -259,6 +442,7 @@
     const id = currentId();
     if(id && !readJson(getEnergyKey(id), null)) resetEnergy(id);
     render();
+
     window.addEventListener("mechkawaii:turn-start", event => {
       const camp = event?.detail?.currentCamp;
       if(!camp || camp === getCharCamp()){
@@ -268,7 +452,10 @@
       render();
     });
     window.addEventListener("mechkawaii:game-flow-updated", render);
+    window.addEventListener("mechkawaii:shield-updated", () => setTimeout(render, 80));
     window.addEventListener("pageshow", render);
+    setTimeout(render, 300);
+    setTimeout(render, 900);
   }
 
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
