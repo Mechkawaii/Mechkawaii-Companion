@@ -200,7 +200,7 @@
     const oldTarget = assignments[index];
 
     // Retirer un bouclier classique enlève la protection, mais le jeton reste défaussé.
-    // Ne pas toucher au bouclier du Technicien.
+    // Ne jamais toucher au bouclier bleu du Technicien.
     shields[index] = false;
     delete assignments[index];
 
@@ -294,13 +294,12 @@
   function handleRemoveClick(event) {
     const btn = event.target.closest && event.target.closest("button");
     if (!btn) return false;
-    const txt = (btn.textContent || "").toLowerCase();
-    if (!txt.includes("retirer") && !txt.includes("remove")) return false;
 
-    const currentIndex = getShieldIndexForTarget(getCurrentCharId());
-    const assignments = getShieldAssignments();
-    const fallbackIndex = Number(Object.keys(assignments)[0] ?? 0);
-    const index = currentIndex >= 0 ? currentIndex : fallbackIndex;
+    // IMPORTANT : ce patch ne doit gérer QUE le bouton ajouté pour les boucliers classiques.
+    // Les boutons natifs du bouclier bleu Technicien doivent rester gérés par app.js.
+    if (btn.id !== "mkwCurrentShieldRemove") return false;
+
+    const index = Number(btn.dataset.shieldIndex);
     if (!Number.isFinite(index)) return false;
 
     event.preventDefault();
@@ -308,9 +307,6 @@
     event.stopImmediatePropagation();
 
     removeShield(index);
-    const modal = btn.closest(".mkw-protect-backdrop, dialog, [role='dialog']") || btn.closest("div");
-    if (modal && modal.classList.contains("mkw-protect-backdrop")) modal.remove();
-    else if (!btn.id || btn.id !== "mkwCurrentShieldRemove") setTimeout(() => location.reload(), 30);
     return true;
   }
 
