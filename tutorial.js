@@ -35,14 +35,6 @@
       text: "À ton tour, tu choisis les actions de chacune de tes 3 unités, dans l’ordre de ton choix : se déplacer, attaquer, réparer, se protéger ou utiliser une action spéciale.",
       pad: 12,
       allowTabsOverlap: true
-    },
-    {
-      target: "#resetBtn",
-      title: "Réinitialisation",
-      kicker: "Outil Companion",
-      text: "Ce bouton remet cette fiche dans son état de départ pour recommencer proprement une partie ou corriger une erreur de manipulation.",
-      pad: 14,
-      mobileTop: 120
     }
   ];
 
@@ -119,19 +111,10 @@
 
   function positionTargetForMobile(target, step) {
     if (!isMobile() || !target) return;
-
-    const rect = target.getBoundingClientRect();
-    const tabsTop = getTabsSafeTop();
-    let desiredTop = Number(step?.mobileTop ?? 105);
-
     if (step?.target === "#unitTabs") return;
 
-    if (step?.target === "#resetBtn") {
-      const safeBottom = tabsTop - 88;
-      const wouldBeBottom = desiredTop + rect.height;
-      if (wouldBeBottom > safeBottom) desiredTop = Math.max(82, safeBottom - rect.height);
-    }
-
+    const desiredTop = Number(step?.mobileTop ?? 105);
+    const rect = target.getBoundingClientRect();
     const delta = rect.top - desiredTop;
 
     if (Math.abs(delta) > 6) {
@@ -252,7 +235,7 @@
     activeStep = step;
 
     if (isMobile()) {
-      target.scrollIntoView({ behavior: "auto", block: step?.target === "#resetBtn" ? "center" : "nearest", inline: "center" });
+      target.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
       positionTargetForMobile(target, step);
     } else {
       target.scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
