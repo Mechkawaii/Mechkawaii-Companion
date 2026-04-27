@@ -36,6 +36,15 @@
   function getLang() { return localStorage.getItem(PREFIX + "lang") || "fr"; }
   function getCurrentCharId() { return new URL(location.href).searchParams.get("id"); }
   function getState(id) { return readJson(PREFIX + "state:" + id, null); }
+  function getFlow() { return window.mkwGetGameFlowState?.() || readJson(PREFIX + "game-flow", null); }
+  function getRoundToken() { const f = getFlow(); return f?.started ? `${Number(f.roundNumber || 1)}:${f.currentCamp || "mechkawaii"}` : "free"; }
+  function getCurrentCamp() { const f = getFlow(); return f?.currentCamp || window.__currentCharacter?.camp || "mechkawaii"; }
+
+  function dispatchProtectValidated() {
+    window.dispatchEvent(new CustomEvent("mechkawaii:energy-action-validated", {
+      detail: { charId: getCurrentCharId(), action: "protect" }
+    }));
+  }
 
   function getHpCur(char) {
     const state = getState(char.id);
@@ -89,6 +98,22 @@
   function getShieldAssignments() { return readJson(PREFIX + "shield-assignments", {}); }
   function setShieldAssignments(assignments) { writeJson(PREFIX + "shield-assignments", assignments); }
 
+  function setClassicShieldExpiryMeta(index, targetCharId) {
+    const meta = readJson(PREFIX + "shield-expiry-meta", {});
+    meta[String(index)] = {
+      targetId: targetCharId,
+      placedToken: getRoundToken(),
+      expireOnCamp: getCurrentCamp()
+    };
+    writeJson(PREFIX + "shield-expiry-meta", meta);
+  }
+
+  function removeClassicShieldExpiryMeta(index) {
+    const meta = readJson(PREFIX + "shield-expiry-meta", {});
+    delete meta[String(index)];
+    writeJson(PREFIX + "shield-expiry-meta", meta);
+  }
+
   function cleanClassicPollutionFromTechMap(index) {
     const techMap = readJson(PREFIX + "blue-shield-by-tech", {});
     const key = "shared-shield-" + index;
@@ -112,9 +137,18 @@
     window.dispatchEvent(new CustomEvent("mechkawaii:shield-updated", { detail: { charId } }));
   }
 
+  function getSharedShieldButtons() {
+    return qsa("#shieldsDisplay .shield-button, #shieldsDisplay .key-button, #shieldsDisplay button").filter(btn => !isRemoveShieldButton(btn));
+  }
+
+  function isRemoveShieldButton(btn) {
+    if (!btn) return false;
+    const txt = (btn.textContent || "").toLowerCase();
+    return btn.id === "mkwCurrentShieldRemove" || txt.includes("retirer") || txt.includes("remove");
+  }
+
   function getShieldButtonByIndex(index) {
-    const buttons = qsa("#shieldsDisplay .shield-button, #shieldsDisplay .key-button, #shieldsDisplay button, .shields-section .shield-button");
-    return buttons[index] || null;
+    return getSharedShieldButtons()[index] || null;
   }
 
   function hideShieldButton(index) {
@@ -181,6 +215,7 @@
 
     setSharedShields(shields);
     setShieldAssignments(assignments);
+    setClassicShieldExpiryMeta(index, targetCharId);
     cleanClassicPollutionFromTechMap(index);
 
     if (btn) {
@@ -189,6 +224,7 @@
       btn.style.display = "none";
     }
 
+    dispatchProtectValidated();
     setShieldGlow(targetCharId, true);
     ensureCurrentRemoveButton();
     dispatchShieldUpdate(targetCharId);
@@ -200,9 +236,10 @@
     const oldTarget = assignments[index];
 
     // Retirer un bouclier classique enlève la protection, mais le jeton reste défaussé.
-    // Ne pas toucher au bouclier du Technicien.
+    // Ne jamais toucher au bouclier bleu du Technicien.
     shields[index] = false;
     delete assignments[index];
+    removeClassicShieldExpiryMeta(index);
 
     setSharedShields(shields);
     setShieldAssignments(assignments);
@@ -236,11 +273,15 @@
     document.head.appendChild(style);
   }
 
-  function getShieldButton(el) { return el.closest("#shieldsDisplay .shield-button, #shieldsDisplay .key-button, #shieldsDisplay button, .shields-section .shield-button"); }
-  function isShieldButton(el) { return !!(el && el.closest && getShieldButton(el)); }
+  function getShieldButton(el) {
+    if (!el || !el.closest) return null;
+    const btn = el.closest("#shieldsDisplay .shield-button, #shieldsDisplay .key-button, #shieldsDisplay button");
+    if (!btn || isRemoveShieldButton(btn)) return null;
+    return btn;
+  }
+  function isShieldButton(el) { return !!getShieldButton(el); }
   function getShieldIndex(btn) {
-    const buttons = qsa("#shieldsDisplay .shield-button, #shieldsDisplay .key-button, #shieldsDisplay button, .shields-section .shield-button");
-    return Math.max(0, buttons.indexOf(btn));
+    return Math.max(0, getSharedShieldButtons().indexOf(btn));
   }
 
   function resetClickedShield(btn) {
@@ -294,13 +335,12 @@
   function handleRemoveClick(event) {
     const btn = event.target.closest && event.target.closest("button");
     if (!btn) return false;
-    const txt = (btn.textContent || "").toLowerCase();
-    if (!txt.includes("retirer") && !txt.includes("remove")) return false;
 
-    const currentIndex = getShieldIndexForTarget(getCurrentCharId());
-    const assignments = getShieldAssignments();
-    const fallbackIndex = Number(Object.keys(assignments)[0] ?? 0);
-    const index = currentIndex >= 0 ? currentIndex : fallbackIndex;
+    // IMPORTANT : ce patch ne doit gérer QUE le bouton ajouté pour les boucliers classiques.
+    // Les boutons natifs du bouclier bleu Technicien doivent rester gérés par app.js.
+    if (btn.id !== "mkwCurrentShieldRemove") return false;
+
+    const index = Number(btn.dataset.shieldIndex);
     if (!Number.isFinite(index)) return false;
 
     event.preventDefault();
@@ -308,9 +348,6 @@
     event.stopImmediatePropagation();
 
     removeShield(index);
-    const modal = btn.closest(".mkw-protect-backdrop, dialog, [role='dialog']") || btn.closest("div");
-    if (modal && modal.classList.contains("mkw-protect-backdrop")) modal.remove();
-    else if (!btn.id || btn.id !== "mkwCurrentShieldRemove") setTimeout(() => location.reload(), 30);
     return true;
   }
 
@@ -332,6 +369,7 @@
       event.stopImmediatePropagation();
 
       if (btn.dataset.active === "false" || btn.style.display === "none") return;
+      btn.dataset.energyBound = "1";
       openProtectModal(getShieldIndex(btn), btn);
     }, true);
 

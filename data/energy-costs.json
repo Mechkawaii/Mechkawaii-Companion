@@ -1,0 +1,58 @@
+{
+  "maxEnergy": 3,
+  "assets": {
+    "0": "./assets/energy/energy_0.png",
+    "1": "./assets/energy/energy_1.png",
+    "2": "./assets/energy/energy_2.png",
+    "3": "./assets/energy/energy_3.png"
+  },
+  "actions": {
+    "move": { "fr": "Déplacement", "en": "Move" },
+    "ranged_attack": { "fr": "Tirer à distance", "en": "Ranged Attack" },
+    "melee_attack": { "fr": "Attaquer au corps à corps", "en": "Melee Attack" },
+    "class_action": { "fr": "Action de classe", "en": "Class Action" },
+    "ultimate": { "fr": "Coup Unique", "en": "Ultimate Ability" },
+    "repair": { "fr": "Réparer", "en": "Repair" },
+    "protect": { "fr": "Se protéger", "en": "Protect" }
+  },
+  "defaultRules": {
+    "oneUsePerTurn": true,
+    "maxUsesPerTurnByAction": { "move": 1 },
+    "freeMoveIfStartsOnRoad": true
+  },
+  "exceptions": {
+    "meimei": { "maxUsesPerTurnByAction": { "move": 2 } },
+    "gaoro": { "maxUsesPerTurnByAction": { "move": 2 } }
+  },
+  "aliases": {
+    "greenscam": "green scam",
+    "gr33nsc4m": "greenscam",
+    "blackneon": "black neon"
+  },
+  "costs": {
+    "blackneon": { "move": 1, "ranged_attack": 2, "class_action": 0, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 2 },
+    "sheepard": { "move": 1, "ranged_attack": 2, "class_action": 2, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 2 },
+    "greenscam": { "move": 1, "ranged_attack": 2, "class_action": 0, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 2 },
+    "akuma": { "move": 1, "ranged_attack": 2, "class_action": 2, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 2 },
+    "johanna": { "move": 1, "ranged_attack": 2, "class_action": 2, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 2 },
+    "goryo": { "move": 1, "ranged_attack": 2, "class_action": 2, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 2 },
+    "banado": { "move": 1, "ranged_attack": 2, "class_action": 1, "ultimate": 3, "repair": 2, "protect": 1, "melee_attack": 2 },
+    "genbu": { "move": 1, "ranged_attack": 2, "class_action": 1, "ultimate": 3, "repair": 2, "protect": 1, "melee_attack": 2 },
+    "fuyu": { "move": 1, "ranged_attack": 2, "class_action": 2, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 2 },
+    "goki": { "move": 1, "ranged_attack": 2, "class_action": 2, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 2 },
+    "meimei": { "move": 1, "ranged_attack": 2, "class_action": 0, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 2 },
+    "gaoro": { "move": 1, "ranged_attack": 2, "class_action": 0, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 2 },
+    "yamabato": { "move": 1, "ranged_attack": 2, "class_action": 0, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 2 },
+    "gyuki": { "move": 1, "ranged_attack": 2, "class_action": 0, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 2 },
+    "duke": { "move": 1, "ranged_attack": 0, "class_action": 0, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 0 },
+    "shojo": { "move": 1, "ranged_attack": 0, "class_action": 0, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 0 },
+    "khurt": { "move": 1, "ranged_attack": 3, "class_action": 3, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 3 },
+    "samebito": { "move": 1, "ranged_attack": 3, "class_action": 3, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 3 },
+    "faline": { "move": 1, "ranged_attack": 2, "class_action": 0, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 3 },
+    "sojobo": { "move": 1, "ranged_attack": 2, "class_action": 0, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 3 },
+    "rasmus": { "move": 1, "ranged_attack": 2, "class_action": 3, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 2 },
+    "senpoku": { "move": 1, "ranged_attack": 2, "class_action": 3, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 2 },
+    "rhoney": { "move": 1, "ranged_attack": 2, "class_action": 0, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 2 },
+    "sankai": { "move": 1, "ranged_attack": 2, "class_action": 0, "ultimate": 3, "repair": 2, "protect": 2, "melee_attack": 2 }
+  }
+}

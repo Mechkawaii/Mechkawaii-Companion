@@ -17,11 +17,17 @@
   <link rel="stylesheet" href="./breadcrumb.css" />
   <title>Mechkawaii Companion</title>
   <script src="./session-resume.js"></script>
+  <script src="./reset-system.js"></script>
+  <script src="./home-reset-enforcer.js"></script>
   <script>
     // Prevent splash "flash" on reload: apply the state *before* CSS paints
     (function(){
       try{
-        if (localStorage.getItem('mechkawaii:splashDismissed') === '1') {
+        if (sessionStorage.getItem('mechkawaii:forceHomeMenu') === '1' || location.hash === '#home') {
+          localStorage.removeItem('mechkawaii:splashDismissed');
+          document.documentElement.classList.remove('splash-dismissed');
+          sessionStorage.setItem('mechkawaii:skipResumeOnce', '1');
+        } else if (localStorage.getItem('mechkawaii:splashDismissed') === '1') {
           document.documentElement.classList.add('splash-dismissed');
         }
       } catch (e) {}
@@ -245,6 +251,7 @@
 </div>
 
   <script src="./app.js"></script>
+  <script src="./draft-flow-reset.js" defer></script>
   <script src="./presets.js" defer></script>
   <script src="./tabs-all.js" defer></script>
   <script src="./charlist.js" defer></script>

@@ -39,6 +39,12 @@
     window.dispatchEvent(new CustomEvent("mechkawaii:hp-updated", { detail: { charId: char?.id, hp: hpCur } }));
   }
 
+  function dispatchRepairValidated(){
+    window.dispatchEvent(new CustomEvent("mechkawaii:energy-action-validated", {
+      detail: { charId: getCurrentCharId(), action: "repair" }
+    }));
+  }
+
   function getName(char, lang){
     const n = char?.name;
     if (!n) return char?.id || "?";
@@ -179,7 +185,9 @@
     const team = getCurrentTeam(chars);
     const { modal, panel } = openBaseModal(
       lang === "fr" ? "Utiliser une clé de réparation" : "Use a repair key",
-      lang === "fr" ? "Choisis une unité alliée : elle récupère 1 PV." : "Choose an allied unit: it recovers 1 HP."
+      lang === "fr"
+        ? "Donne +1 PV à une unité alliée adjacente ou à soi-même. Permet aussi de relever une unité HS avec 1 PV."
+        : "Give +1 HP to an adjacent allied unit or to this unit. It can also bring back a KO unit with 1 HP."
     );
 
     team.forEach(char => {
@@ -200,6 +208,7 @@
         btn.classList.remove("is-on");
         animateConsume(btn);
         saveRepairKeyState(index, false);
+        dispatchRepairValidated();
         modal.remove();
         updateCurrentHpUI(char, newHp);
         dispatchHpUpdate(char, newHp);
@@ -213,6 +222,7 @@
   function patchRepairKeys(){
     ensureStyles();
     qsa("#repairKeysDisplay .key-button, #repairKeysDisplay button").forEach((btn, index) => {
+      btn.dataset.energyBound = "1";
       if (btn.dataset.mkwRepairKeyPatched === "1") return;
       btn.dataset.mkwRepairKeyPatched = "1";
       btn.addEventListener("click", event => {
