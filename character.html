@@ -37,6 +37,13 @@
     .shields-display{display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;margin-top:8px;}
     #repairKeysDisplay{display:flex;flex-wrap:wrap;gap:8px;}
     #charPortrait .ko-overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;pointer-events:none;}
+    .hp-section,.shields-section,.repair-section{border:1px solid var(--border);border-radius:var(--radius);background:rgba(19,19,26,.72);overflow:hidden;box-shadow:var(--shadow);}
+    .mkw-mini-section-head{padding:var(--space-md);background:rgba(15,15,21,.65);border-bottom:1px solid var(--border);}
+    .mkw-mini-section-title{font-weight:800;letter-spacing:.4px;margin:0;display:flex;flex-direction:column;align-items:flex-start;gap:6px;}
+    .mkw-mini-section-body{padding:var(--space-md);}
+    .mkw-mini-section-body .hp{margin-bottom:12px;}
+    .hp-shields-wrapper{gap:16px !important;}
+    @media (min-width:769px){.hp-section,.shields-section,.repair-section{min-width:0;}}
   </style>
 </head>
 <body class="page-character">
@@ -52,26 +59,31 @@
       <div class="controls"><div class="pill"><span class="small">Lang</span><select id="lang" aria-label="Language"><option value="fr">FR</option><option value="en">EN</option></select></div></div>
     </div>
 
-    <div class="card" id="hpCard" style="margin-top:16px;">
-      <div class="card-h"><div class="section-title" data-i18n="char_hp_card" style="margin: 0;">Points de Vie / Boucliers / Clés de Réparation</div></div>
-      <div class="card-b">
-        <div class="hp-shields-wrapper">
-          <div class="hp-section">
-            <div style="font-weight: 600; margin-bottom: 8px;" data-i18n="char_hp">Points de Vie</div>
+    <div id="hpCard" style="margin-top:16px;">
+      <div class="hp-shields-wrapper">
+        <div class="hp-section">
+          <div class="mkw-mini-section-head"><div class="mkw-mini-section-title" data-i18n="char_hp">Points de Vie</div></div>
+          <div class="mkw-mini-section-body">
             <div class="hp">
               <div id="hpHearts" class="hearts"></div>
               <div style="display:flex; align-items:center; gap:6px;"><span id="hpCur" style="font-weight:800; font-size:18px;">0</span><span id="hpMaxLabel" style="color:var(--muted);">/ 0</span></div>
             </div>
             <div class="hp-ctl" style="margin-top:12px;"><button id="hpMinus">−</button><button id="hpPlus">+</button></div>
           </div>
+        </div>
 
-          <div class="shields-section">
-            <div style="font-weight: 600; margin-bottom: 8px;" data-i18n="char_shields">Boucliers (Réserve partagée)</div>
+        <div class="shields-section">
+          <div class="mkw-mini-section-head"><div class="mkw-mini-section-title" data-resource-title="protect">Se protéger</div></div>
+          <div class="mkw-mini-section-body">
+            <p class="mkw-resource-action-desc" data-resource-desc="protect">Pose un bouclier sur une unité alliée ou sur soi-même. Le bouclier absorbe 1 PV, puis est défaussé.</p>
             <div class="shields-display" id="shieldsDisplay"></div>
           </div>
+        </div>
 
-          <div class="repair-section">
-            <div style="font-weight: 600; margin-bottom: 8px;" data-i18n="char_keys">Clés de réparation</div>
+        <div class="repair-section">
+          <div class="mkw-mini-section-head"><div class="mkw-mini-section-title" data-resource-title="repair">Réparer</div></div>
+          <div class="mkw-mini-section-body">
+            <p class="mkw-resource-action-desc" data-resource-desc="repair">Rend 1 PV à une unité alliée adjacente ou à soi-même. Peut relever une unité HS avec 1 PV.</p>
             <div id="repairKeysDisplay"></div>
           </div>
         </div>
