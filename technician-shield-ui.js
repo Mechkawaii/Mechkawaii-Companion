@@ -108,6 +108,11 @@
     return Number(state.used?.class_action || 0) > 0;
   }
 
+  function isTechnicianActionUsed() {
+    unlockStaleBlueShieldLock();
+    return blueShieldUsedThisTurn() || isClassActionAlreadyUsed();
+  }
+
   function canUseClassAction() {
     unlockStaleBlueShieldLock();
     if (blueShieldUsedThisTurn()) return false;
@@ -159,7 +164,9 @@
       .mkw-tech-shield-name { font-weight: 950; color: #fff; line-height: 1.15; }
       .mkw-tech-shield-class { font-size: 12px; color: rgba(255,255,255,.62); margin-top: 2px; line-height: 1.2; }
       .mkw-tech-shield-cancel { width: 100%; margin-top: 12px; padding: 12px; border-radius: 15px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.08); color: #fff; font-weight: 900; cursor: pointer; }
-      .mkw-tech-class-action-disabled { opacity: .42 !important; filter: grayscale(.65) !important; cursor: not-allowed !important; }
+      .mkw-tech-class-action-disabled,
+      .mkw-tech-blue-shield-disabled { opacity: .42 !important; filter: grayscale(.65) !important; cursor: not-allowed !important; }
+      .mkw-tech-blue-shield-disabled * { cursor: not-allowed !important; }
     `;
     document.head.appendChild(style);
   }
@@ -169,21 +176,57 @@
     document.querySelector(".mkw-tech-shield-backdrop")?.remove();
   }
 
+  function isBlueShieldButton(button) {
+    if (!button || button.closest(".mkw-tech-shield-backdrop")) return false;
+    const card = button.closest(".card");
+    if (!card || !card.querySelector("#classActionTitle")) return false;
+    const title = document.querySelector("#classActionTitle")?.textContent?.toLowerCase() || "";
+    const body = document.querySelector("#classActionBody")?.textContent?.toLowerCase() || "";
+    const text = `${button.textContent || ""} ${title} ${body}`.toLowerCase();
+    return /technicien|technician|bouclier|shield|proteger|protéger|protect/.test(text);
+  }
+
+  function getBlueShieldButtons() {
+    return Array.from(document.querySelectorAll("button, [role='button']")).filter(isBlueShieldButton);
+  }
+
+  function syncBlueShieldButtons() {
+    if (!isCurrentTechnician()) return;
+    const used = isTechnicianActionUsed();
+    const canUse = canUseClassAction();
+    const disabled = used || !canUse;
+
+    getBlueShieldButtons().forEach(button => {
+      button.classList.toggle("mkw-tech-blue-shield-disabled", disabled);
+      button.classList.toggle("mkw-energy-disabled-action", disabled);
+      button.toggleAttribute("aria-disabled", disabled);
+      button.dataset.techShieldDisabled = disabled ? "1" : "0";
+    });
+  }
+
   function syncClassActionToggle() {
     if (!isCurrentTechnician()) return;
     unlockStaleBlueShieldLock();
-    const used = blueShieldUsedThisTurn() || isClassActionAlreadyUsed();
+    const used = isTechnicianActionUsed();
     const canUse = canUseClassAction();
+    const disabled = used || !canUse;
     const input = document.querySelector("#classActionTitle")?.closest(".card")?.querySelector(".mkw-energy-switch input");
     const label = input?.closest(".mkw-energy-switch");
+    const card = document.querySelector("#classActionTitle")?.closest(".card");
+
     if (input) {
       input.checked = used;
-      input.disabled = used || !canUse;
+      input.disabled = disabled;
     }
     if (label) {
-      label.classList.toggle("is-disabled", used || !canUse);
-      label.classList.toggle("mkw-tech-class-action-disabled", used || !canUse);
+      label.classList.toggle("is-disabled", disabled);
+      label.classList.toggle("mkw-tech-class-action-disabled", disabled);
+      label.toggleAttribute("aria-disabled", disabled);
     }
+    if (card) {
+      card.classList.toggle("mkw-tech-class-action-disabled", used);
+    }
+    syncBlueShieldButtons();
   }
 
   function applyShield(technicianId, targetId) {
@@ -261,16 +304,6 @@
     document.body.appendChild(backdrop);
   }
 
-  function isBlueShieldButton(button) {
-    if (!button || button.closest(".mkw-tech-shield-backdrop")) return false;
-    const card = button.closest(".card");
-    if (!card || !card.querySelector("#classActionTitle")) return false;
-    const title = document.querySelector("#classActionTitle")?.textContent?.toLowerCase() || "";
-    const body = document.querySelector("#classActionBody")?.textContent?.toLowerCase() || "";
-    const text = `${button.textContent || ""} ${title} ${body}`.toLowerCase();
-    return /technicien|technician|bouclier|shield|proteger|protéger|protect/.test(text);
-  }
-
   function isClassActionEnergySwitch(target) {
     const card = target?.closest?.(".card");
     if (!card || !card.querySelector("#classActionTitle")) return false;
@@ -331,6 +364,7 @@
     window.addEventListener("mechkawaii:game-flow-updated", () => setTimeout(syncClassActionToggle, 60));
     window.addEventListener("mechkawaii:turn-start", () => setTimeout(syncClassActionToggle, 60));
     window.addEventListener("pageshow", () => setTimeout(syncClassActionToggle, 60));
+    window.addEventListener("mechkawaii:technician-shield-applied", () => setTimeout(syncClassActionToggle, 60));
     setTimeout(syncClassActionToggle, 300);
     setTimeout(syncClassActionToggle, 900);
   }
