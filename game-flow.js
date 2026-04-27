@@ -19,7 +19,7 @@
       expert: "Mode Expert",
       normal: "Mode Normal",
       turnScreenPrefix: "Tour des",
-      turnScreenHelp: "L’arrière-plan est masqué pour laisser le joueur actif préparer son tour.",
+      turnScreenHelp: "C’est au tour de l’adversaire. Cliquez sur le bouton dès qu’il a terminé son tour.",
       turnFinishedPrefix: "Le tour des",
       turnFinishedSuffix: "est terminé"
     },
@@ -36,7 +36,7 @@
       expert: "Expert Mode",
       normal: "Normal Mode",
       turnScreenPrefix: "Turn of",
-      turnScreenHelp: "The background is hidden so the active player can prepare their turn.",
+      turnScreenHelp: "It’s your opponent’s turn. Tap the button once they have finished their turn.",
       turnFinishedPrefix: "The",
       turnFinishedSuffix: "turn is finished"
     }
