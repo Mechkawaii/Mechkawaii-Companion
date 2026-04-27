@@ -10,6 +10,12 @@
     const style = document.createElement("style");
     style.id = STYLE_ID;
     style.textContent = `
+      .unit-tabs-container,
+      .unit-tabs {
+        animation: none !important;
+        transform: none !important;
+      }
+
       .unit-tab {
         border-radius: var(--radius, 16px) !important;
         overflow: hidden !important;
@@ -18,11 +24,22 @@
         background-position: center !important;
         background-repeat: no-repeat !important;
         isolation: isolate !important;
-        transform: translateZ(0);
+        animation: none !important;
+        transform: none;
+        transition:
+          border-color .16s ease,
+          box-shadow .16s ease,
+          filter .16s ease,
+          opacity .16s ease,
+          background-color .16s ease !important;
       }
 
       .unit-tab:not(.active) {
         border-color: var(--border) !important;
+      }
+
+      .unit-tab:hover {
+        transform: translateY(-2px) !important;
       }
 
       .unit-tab[data-camp="mechkawaii"] {
@@ -41,6 +58,8 @@
         pointer-events: none !important;
         box-shadow: inset 0 0 0 1px rgba(255,255,255,.035) !important;
         background: linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,.18)) !important;
+        animation: none !important;
+        transform: none !important;
       }
 
       .unit-tab.active {
@@ -53,6 +72,10 @@
         overflow: hidden !important;
       }
 
+      .unit-tab.mkw-tab-shield-pulse {
+        animation: none !important;
+      }
+
       .unit-tab-visual {
         position: relative !important;
         z-index: 1 !important;
@@ -62,6 +85,7 @@
         align-items: center !important;
         justify-content: center !important;
         margin-bottom: 8px !important;
+        animation: none !important;
       }
 
       .unit-tab-visual img {
@@ -94,6 +118,7 @@
         background: rgba(0, 0, 0, 0.8) !important;
         border: 1px solid var(--border) !important;
         border-radius: var(--radius-full, 999px) !important;
+        animation: none !important;
       }
 
       .unit-tab-name,
@@ -136,6 +161,7 @@
       const char = byId.get(tab.dataset.charId);
       const camp = char?.camp || "mechkawaii";
       tab.dataset.camp = camp === "prodrome" ? "prodrome" : "mechkawaii";
+      tab.classList.remove("mkw-tab-shield-pulse");
     });
   }
 
