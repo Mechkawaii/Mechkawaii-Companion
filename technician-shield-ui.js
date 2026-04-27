@@ -11,14 +11,14 @@
       title: "Bouclier du Technicien",
       help: "Choisis un allié ou toi-même pour lui donner un bouclier bleu.",
       cancel: "Annuler",
-      unavailable: "Action de classe déjà utilisée ce tour.",
+      unavailable: "Bouclier bleu déjà utilisé ce tour.",
       notEnough: "Pas assez d’énergie pour utiliser cette action de classe."
     },
     en: {
       title: "Technician Shield",
       help: "Choose an ally or this unit to give them a blue shield.",
       cancel: "Cancel",
-      unavailable: "Class action already used this turn.",
+      unavailable: "Blue shield already used this turn.",
       notEnough: "Not enough energy to use this class action."
     }
   };
@@ -81,7 +81,27 @@
 
   function getFlow() { return window.mkwGetGameFlowState?.() || readJson(PREFIX + "game-flow", null); }
   function getRoundToken() { const f = getFlow(); return f ? `${f.roundNumber}:${f.currentCamp}` : "free"; }
-  function getActionState(id) { const token = getRoundToken(); const state = readJson(PREFIX + "turn-actions:" + id, { token, used: {} }); return state.token === token ? state : { token, used: {} }; }
+  function blueShieldLockKey(id = currentId()) { return PREFIX + "blue-shield-turn-lock:" + id; }
+
+  function blueShieldUsedThisTurn(id = currentId()) {
+    const state = readJson(blueShieldLockKey(id), null);
+    return !!state && state.token === getRoundToken() && state.used === true;
+  }
+
+  function lockBlueShieldForTurn(id = currentId()) {
+    writeJson(blueShieldLockKey(id), { token: getRoundToken(), used: true });
+  }
+
+  function unlockStaleBlueShieldLock(id = currentId()) {
+    const state = readJson(blueShieldLockKey(id), null);
+    if (state && state.token !== getRoundToken()) localStorage.removeItem(blueShieldLockKey(id));
+  }
+
+  function getActionState(id) {
+    const token = getRoundToken();
+    const state = readJson(PREFIX + "turn-actions:" + id, { token, used: {} });
+    return state.token === token ? state : { token, used: {} };
+  }
 
   function isClassActionAlreadyUsed() {
     const state = getActionState(currentId());
@@ -89,12 +109,16 @@
   }
 
   function canUseClassAction() {
+    unlockStaleBlueShieldLock();
+    if (blueShieldUsedThisTurn()) return false;
     if (isClassActionAlreadyUsed()) return false;
     if (typeof window.mkwCanSpendEnergyAction === "function") return window.mkwCanSpendEnergyAction("class_action");
     return true;
   }
 
   function spendClassAction() {
+    unlockStaleBlueShieldLock();
+    if (blueShieldUsedThisTurn()) return false;
     if (isClassActionAlreadyUsed()) return false;
     if (typeof window.mkwSpendEnergyAction === "function") return !!window.mkwSpendEnergyAction("class_action");
     window.dispatchEvent(new CustomEvent("mechkawaii:energy-action-validated", { detail: { charId: currentId(), action: "class_action" } }));
@@ -147,7 +171,8 @@
 
   function syncClassActionToggle() {
     if (!isCurrentTechnician()) return;
-    const used = isClassActionAlreadyUsed();
+    unlockStaleBlueShieldLock();
+    const used = blueShieldUsedThisTurn() || isClassActionAlreadyUsed();
     const canUse = canUseClassAction();
     const input = document.querySelector("#classActionTitle")?.closest(".card")?.querySelector(".mkw-energy-switch input");
     const label = input?.closest(".mkw-energy-switch");
@@ -163,17 +188,26 @@
 
   function applyShield(technicianId, targetId) {
     if (applyingShield) return;
-    applyingShield = true;
-
-    document.querySelectorAll(".mkw-tech-shield-target").forEach(btn => { btn.disabled = true; });
-
-    if (!spendClassAction()) {
-      applyingShield = false;
-      showToast(isClassActionAlreadyUsed() ? tr("unavailable") : tr("notEnough"));
+    if (blueShieldUsedThisTurn(technicianId) || blueShieldUsedThisTurn()) {
+      showToast(tr("unavailable"));
       syncClassActionToggle();
       closeModal();
       return;
     }
+
+    applyingShield = true;
+    document.querySelectorAll(".mkw-tech-shield-target").forEach(btn => { btn.disabled = true; });
+
+    if (!spendClassAction()) {
+      applyingShield = false;
+      showToast(blueShieldUsedThisTurn() || isClassActionAlreadyUsed() ? tr("unavailable") : tr("notEnough"));
+      syncClassActionToggle();
+      closeModal();
+      return;
+    }
+
+    lockBlueShieldForTurn(technicianId);
+    lockBlueShieldForTurn(currentId());
 
     const byTech = readJson(PREFIX + "blue-shield-by-tech", {});
     byTech[technicianId] = targetId;
@@ -188,9 +222,10 @@
   async function openModal() {
     ensureStyles();
     closeModal();
+    unlockStaleBlueShieldLock();
 
     if (!canUseClassAction()) {
-      showToast(isClassActionAlreadyUsed() ? tr("unavailable") : tr("notEnough"));
+      showToast(blueShieldUsedThisTurn() || isClassActionAlreadyUsed() ? tr("unavailable") : tr("notEnough"));
       syncClassActionToggle();
       return;
     }
@@ -219,18 +254,10 @@
     cancel.type = "button";
     cancel.className = "mkw-tech-shield-cancel";
     cancel.textContent = tr("cancel");
-    cancel.addEventListener("click", () => {
-      closeModal();
-      syncClassActionToggle();
-    });
+    cancel.addEventListener("click", () => { closeModal(); syncClassActionToggle(); });
     panel.appendChild(cancel);
     backdrop.appendChild(panel);
-    backdrop.addEventListener("click", event => {
-      if (event.target === backdrop) {
-        closeModal();
-        syncClassActionToggle();
-      }
-    });
+    backdrop.addEventListener("click", event => { if (event.target === backdrop) { closeModal(); syncClassActionToggle(); } });
     document.body.appendChild(backdrop);
   }
 
@@ -262,7 +289,7 @@
       event.stopImmediatePropagation();
 
       if (!canUseClassAction()) {
-        showToast(isClassActionAlreadyUsed() ? tr("unavailable") : tr("notEnough"));
+        showToast(blueShieldUsedThisTurn() || isClassActionAlreadyUsed() ? tr("unavailable") : tr("notEnough"));
         syncClassActionToggle();
         return;
       }
@@ -288,7 +315,7 @@
       event.stopImmediatePropagation();
 
       if (!canUseClassAction()) {
-        showToast(isClassActionAlreadyUsed() ? tr("unavailable") : tr("notEnough"));
+        showToast(blueShieldUsedThisTurn() || isClassActionAlreadyUsed() ? tr("unavailable") : tr("notEnough"));
         syncClassActionToggle();
         return;
       }
@@ -303,6 +330,7 @@
     window.addEventListener("mechkawaii:energy-updated", () => setTimeout(syncClassActionToggle, 60));
     window.addEventListener("mechkawaii:game-flow-updated", () => setTimeout(syncClassActionToggle, 60));
     window.addEventListener("mechkawaii:turn-start", () => setTimeout(syncClassActionToggle, 60));
+    window.addEventListener("pageshow", () => setTimeout(syncClassActionToggle, 60));
     setTimeout(syncClassActionToggle, 300);
     setTimeout(syncClassActionToggle, 900);
   }
