@@ -11,7 +11,7 @@
       chooseFirstHelp: "Dans les règles officielles, le joueur qui a caressé un animal en dernier commence la partie.",
       mechStarts: "Mechkawaii commence",
       prodStarts: "Prodrome commence",
-      round: "Round",
+      round: "Tour",
       turnOf: "Tour des",
       endTurn: "Fin de tour",
       resetFlow: "Réinitialiser le tour",
@@ -99,8 +99,9 @@
     const state = createState(firstCamp);
     setState(state);
     closeStarter();
+    closeTurnTransition();
     renderBanner();
-    showTurnTransition(state);
+    window.dispatchEvent(new CustomEvent("mechkawaii:turn-start", { detail: state }));
   }
 
   function closeStarter(){ document.querySelector("#mkwFirstPlayerBackdrop")?.remove(); }
@@ -128,6 +129,27 @@
     return `${tr("turnFinishedPrefix")} ${campLabel(camp)} ${tr("turnFinishedSuffix")}`;
   }
 
+  function advanceCurrentCampTurn(){
+    const state = getState();
+    if(!state?.started) return null;
+
+    const current = state.currentCamp;
+    state.playedThisRound = state.playedThisRound || { mechkawaii:false, prodrome:false };
+    state.playedThisRound[current] = true;
+
+    const other = opponent(current);
+    if(state.playedThisRound[other]){
+      state.roundNumber = Number(state.roundNumber || 1) + 1;
+      state.playedThisRound = { mechkawaii:false, prodrome:false };
+      state.currentCamp = state.firstCamp || "mechkawaii";
+    } else {
+      state.currentCamp = other;
+    }
+
+    setState(state);
+    return state;
+  }
+
   function showTurnTransition(state){
     if(!state?.started) return;
     closeTurnTransition();
@@ -144,27 +166,17 @@
     document.body.appendChild(backdrop);
     backdrop.querySelector(".mkw-turn-transition-button")?.addEventListener("click", () => {
       closeTurnTransition();
-      window.dispatchEvent(new CustomEvent("mechkawaii:turn-start", { detail: getState() }));
+      const nextState = advanceCurrentCampTurn();
+      renderBanner();
+      if(nextState) window.dispatchEvent(new CustomEvent("mechkawaii:turn-start", { detail: nextState }));
     });
   }
 
   function endTurn(){
-    const state = getState();
-    if(!state?.started) return showStarter();
-    const current = state.currentCamp;
-    state.playedThisRound = state.playedThisRound || { mechkawaii:false, prodrome:false };
-    state.playedThisRound[current] = true;
-    const other = opponent(current);
-    if(state.playedThisRound[other]){
-      state.roundNumber = Number(state.roundNumber || 1) + 1;
-      state.playedThisRound = { mechkawaii:false, prodrome:false };
-      state.currentCamp = state.firstCamp || "mechkawaii";
-    } else {
-      state.currentCamp = other;
-    }
-    setState(state);
+    const nextState = advanceCurrentCampTurn();
+    if(!nextState) return showStarter();
     renderBanner();
-    showTurnTransition(state);
+    showTurnTransition(nextState);
   }
 
   function resetFlow(){ localStorage.removeItem(FLOW_KEY); closeTurnTransition(); renderBanner(); showStarter(); }
