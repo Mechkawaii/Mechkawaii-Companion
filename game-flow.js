@@ -66,6 +66,7 @@
   function getState(){ return readJson(FLOW_KEY, null); }
   function setState(state){ writeJson(FLOW_KEY, state); window.dispatchEvent(new CustomEvent("mechkawaii:game-flow-updated", { detail: state })); }
   function isPlayerTurn(state){ return !state?.playerCamp || state.currentCamp === state.playerCamp; }
+  function needsStartConfig(state){ return !state?.started || !state.firstCamp || !state.playerCamp; }
 
   function ensureStyles(){
     if(document.getElementById(STYLE_ID)) return;
@@ -130,7 +131,6 @@
   function closeTurnTransition(){ document.querySelector("#mkwTurnTransitionBackdrop")?.remove(); }
 
   function showStarter(){
-    if(getState()?.started) return;
     closeStarter();
     const backdrop = document.createElement("div");
     backdrop.id = "mkwFirstPlayerBackdrop";
@@ -248,7 +248,7 @@
       else document.querySelector(".container")?.prepend(banner);
     }
     const state = getState();
-    if(!state?.started){
+    if(needsStartConfig(state)){
       banner.innerHTML = `<div class="mkw-turn-main"><div class="mkw-turn-title">${tr("chooseFirst")}</div><div class="mkw-turn-sub">${tr("chooseFirstHelp")}</div></div><div class="mkw-turn-actions"><button type="button" class="mkw-end-turn">${tr("chooseFirst")}</button></div>`;
       banner.querySelector("button")?.addEventListener("click", showStarter);
       return;
@@ -271,8 +271,9 @@
 
   function init(){
     ensureStyles();
+    const state = getState();
     renderBanner();
-    if(!getState()?.started) setTimeout(showStarter, 250);
+    if(needsStartConfig(state)) setTimeout(showStarter, 250);
     window.mkwGetGameFlowState = getState;
     window.mkwResetGameFlow = resetFlow;
   }
