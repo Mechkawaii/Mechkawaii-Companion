@@ -71,6 +71,10 @@
         max-width: 34rem !important;
       }
 
+      .mkw-resource-title-wrap {
+        display: none !important;
+      }
+
       @media (max-width: 560px) {
         .mkw-resource-action-head .mkw-resource-energy-cost img {
           width: 72px !important;
@@ -86,7 +90,47 @@
     document.head.appendChild(style);
   }
 
-  function getOrCreateHead(section, titleText, descText) {
+  function isGeneratedTitleText(text, titleText) {
+    const normalized = String(text || "").trim().toLowerCase();
+    const title = String(titleText || "").trim().toLowerCase();
+    return normalized === title || normalized === "boucliers (réserve partagée)" || normalized === "clés de réparation" || normalized === "shields (shared pool)" || normalized === "repair keys";
+  }
+
+  function collectEnergyRow(section) {
+    const rows = Array.from(section.querySelectorAll(".mkw-resource-energy-cost"));
+    if (!rows.length) return null;
+
+    const first = rows[0];
+    rows.slice(1).forEach(row => row.remove());
+    return first;
+  }
+
+  function cleanSection(section, titleText) {
+    const existingHead = section.querySelector(":scope > .mkw-resource-action-head");
+    const energyRow = collectEnergyRow(section);
+
+    Array.from(section.children).forEach(child => {
+      if (child === existingHead) return;
+      if (child === energyRow) return;
+      if (child.classList?.contains("shields-display")) return;
+      if (child.id === "shieldsDisplay") return;
+      if (child.id === "repairKeysDisplay") return;
+      if (child.classList?.contains("mkw-current-shield-remove")) return;
+
+      if (child.classList?.contains("mkw-resource-title-wrap")) {
+        child.remove();
+        return;
+      }
+
+      if (child.tagName === "DIV" && !child.id && !child.className && isGeneratedTitleText(child.textContent, titleText)) {
+        child.remove();
+      }
+    });
+
+    return energyRow;
+  }
+
+  function buildHead(section, titleText, descText, energyRow) {
     let head = section.querySelector(":scope > .mkw-resource-action-head");
     if (!head) {
       head = document.createElement("div");
@@ -94,55 +138,34 @@
       section.insertBefore(head, section.firstChild);
     }
 
-    let title = head.querySelector(".mkw-resource-action-title");
-    if (!title) {
-      title = document.createElement("div");
-      title.className = "mkw-resource-action-title";
-      head.appendChild(title);
-    }
+    head.innerHTML = "";
+
+    const title = document.createElement("div");
+    title.className = "mkw-resource-action-title";
     title.textContent = titleText;
+    head.appendChild(title);
 
-    let desc = head.querySelector(".mkw-resource-action-desc");
-    if (!desc) {
-      desc = document.createElement("p");
-      desc.className = "mkw-resource-action-desc";
+    if (energyRow) {
+      energyRow.classList.add("mkw-resource-energy-cost");
+      head.appendChild(energyRow);
     }
+
+    const desc = document.createElement("p");
+    desc.className = "mkw-resource-action-desc";
     desc.textContent = descText;
+    head.appendChild(desc);
 
-    return { head, title, desc };
-  }
-
-  function moveEnergyCostIntoHead(section, head, desc) {
-    const energyRow = section.querySelector(":scope > .mkw-resource-title-wrap .mkw-resource-energy-cost, :scope > .mkw-resource-energy-cost");
-    if (!energyRow) return;
-
-    const existing = head.querySelector(".mkw-resource-energy-cost");
-    if (existing && existing !== energyRow) existing.remove();
-
-    if (energyRow.parentElement !== head) {
-      head.insertBefore(energyRow, desc);
+    if (section.firstElementChild !== head) {
+      section.insertBefore(head, section.firstChild);
     }
-  }
-
-  function cleanOldTitleWrap(section) {
-    const oldWrap = section.querySelector(":scope > .mkw-resource-title-wrap");
-    if (!oldWrap) return;
-
-    const strayTitle = Array.from(oldWrap.children).find(el => !el.classList.contains("mkw-resource-energy-cost"));
-    strayTitle?.remove();
-
-    if (!oldWrap.children.length) oldWrap.remove();
   }
 
   function applySection(selector, titleText, descText) {
     const section = document.querySelector(selector);
     if (!section) return;
 
-    const { head, desc } = getOrCreateHead(section, titleText, descText);
-    moveEnergyCostIntoHead(section, head, desc);
-
-    if (desc.parentElement !== head) head.appendChild(desc);
-    cleanOldTitleWrap(section);
+    const energyRow = cleanSection(section, titleText);
+    buildHead(section, titleText, descText, energyRow);
   }
 
   function applyLayout() {
@@ -158,7 +181,7 @@
 
   function init() {
     applyLayout();
-    [120, 300, 700, 1200, 2200].forEach(delay => setTimeout(applyLayout, delay));
+    [80, 160, 300, 700, 1200, 2200].forEach(delay => setTimeout(applyLayout, delay));
 
     window.addEventListener("mechkawaii:energy-updated", scheduleApply);
     window.addEventListener("mechkawaii:shield-updated", scheduleApply);
