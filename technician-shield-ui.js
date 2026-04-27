@@ -4,20 +4,21 @@
   const PREFIX = "mechkawaii:";
   const STYLE_ID = "mkwTechnicianShieldUiStyles";
   let cachedChars = null;
+  let applyingShield = false;
 
   const I18N = {
     fr: {
       title: "Bouclier du Technicien",
       help: "Choisis un allié ou toi-même pour lui donner un bouclier bleu.",
       cancel: "Annuler",
-      unavailable: "Action de classe indisponible.",
+      unavailable: "Action de classe déjà utilisée ce tour.",
       notEnough: "Pas assez d’énergie pour utiliser cette action de classe."
     },
     en: {
       title: "Technician Shield",
       help: "Choose an ally or this unit to give them a blue shield.",
       cancel: "Cancel",
-      unavailable: "Class action unavailable.",
+      unavailable: "Class action already used this turn.",
       notEnough: "Not enough energy to use this class action."
     }
   };
@@ -94,7 +95,7 @@
   }
 
   function spendClassAction() {
-    if (isClassActionAlreadyUsed()) return true;
+    if (isClassActionAlreadyUsed()) return false;
     if (typeof window.mkwSpendEnergyAction === "function") return !!window.mkwSpendEnergyAction("class_action");
     window.dispatchEvent(new CustomEvent("mechkawaii:energy-action-validated", { detail: { charId: currentId(), action: "class_action" } }));
     return true;
@@ -128,6 +129,7 @@
       .mkw-tech-shield-help { color: rgba(255,255,255,.72); font-size: 13px; line-height: 1.35; margin-bottom: 14px; }
       .mkw-tech-shield-target { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 11px; margin: 8px 0; border-radius: 15px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.065); color: #fff; cursor: pointer; box-shadow: none; min-height: 70px; }
       .mkw-tech-shield-target:hover { background: rgba(80,150,255,.12); border-color: rgba(80,150,255,.52); }
+      .mkw-tech-shield-target:disabled { opacity: .42; filter: grayscale(.65); cursor: not-allowed; }
       .mkw-tech-shield-portrait { width: 48px; height: 48px; object-fit: contain; border-radius: 12px; background: rgba(255,255,255,.08); flex: 0 0 auto; padding: 4px; }
       .mkw-tech-shield-info { flex: 1; min-width: 0; }
       .mkw-tech-shield-name { font-weight: 950; color: #fff; line-height: 1.15; }
@@ -138,7 +140,10 @@
     document.head.appendChild(style);
   }
 
-  function closeModal() { document.querySelector(".mkw-tech-shield-backdrop")?.remove(); }
+  function closeModal() {
+    applyingShield = false;
+    document.querySelector(".mkw-tech-shield-backdrop")?.remove();
+  }
 
   function syncClassActionToggle() {
     if (!isCurrentTechnician()) return;
@@ -157,8 +162,16 @@
   }
 
   function applyShield(technicianId, targetId) {
+    if (applyingShield) return;
+    applyingShield = true;
+
+    document.querySelectorAll(".mkw-tech-shield-target").forEach(btn => { btn.disabled = true; });
+
     if (!spendClassAction()) {
-      showToast(tr("notEnough"));
+      applyingShield = false;
+      showToast(isClassActionAlreadyUsed() ? tr("unavailable") : tr("notEnough"));
+      syncClassActionToggle();
+      closeModal();
       return;
     }
 
