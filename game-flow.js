@@ -8,14 +8,11 @@
   const I18N = {
     fr: {
       chooseFirst: "Début de partie",
-      chooseFirstHelp: "Choisissez le camp qui commence, puis le camp que vous incarnez dans l’application.",
+      chooseFirstHelp: "Choisissez uniquement le camp qui commence. Ton camp est déjà défini par le choix des unités.",
       firstCampTitle: "Quel camp commence ?",
-      playerCampTitle: "Quel camp joues-tu ?",
       officialRule: "Règle officielle : le joueur qui a caressé un animal en dernier commence.",
       mechStarts: "Les Mechkawaii commencent",
       prodStarts: "Les Prodromes commencent",
-      playMech: "Je joue les Mechkawaii",
-      playProd: "Je joue les Prodromes",
       startGame: "Commencer la partie",
       round: "Tour",
       turnOf: "Tour des",
@@ -32,14 +29,11 @@
     },
     en: {
       chooseFirst: "Game start",
-      chooseFirstHelp: "Choose which camp starts, then the camp you play in the app.",
+      chooseFirstHelp: "Choose only which camp starts. Your camp is already defined by unit selection.",
       firstCampTitle: "Which camp starts?",
-      playerCampTitle: "Which camp do you play?",
       officialRule: "Official rule: the player who last petted an animal starts the game.",
       mechStarts: "Mechkawaii start",
       prodStarts: "Prodromes start",
-      playMech: "I play Mechkawaii",
-      playProd: "I play Prodromes",
       startGame: "Start game",
       round: "Round",
       turnOf: "Turn of",
@@ -63,10 +57,11 @@
   function opponent(camp){ return camp === "mechkawaii" ? "prodrome" : "mechkawaii"; }
   function campLabel(camp){ return camp === "mechkawaii" ? "Mechkawaii" : "Prodromes"; }
   function getSetup(){ return readJson(PREFIX + "setup", {}); }
+  function getPlayerCamp(fallbackCamp){ const setup = getSetup(); return setup?.mode === "multi" ? (setup.camp || fallbackCamp) : (setup.camp || fallbackCamp); }
   function getState(){ return readJson(FLOW_KEY, null); }
   function setState(state){ writeJson(FLOW_KEY, state); window.dispatchEvent(new CustomEvent("mechkawaii:game-flow-updated", { detail: state })); }
   function isPlayerTurn(state){ return !state?.playerCamp || state.currentCamp === state.playerCamp; }
-  function needsStartConfig(state){ return !state?.started || !state.firstCamp || !state.playerCamp; }
+  function needsStartConfig(state){ return !state?.started || !state.firstCamp; }
 
   function ensureStyles(){
     if(document.getElementById(STYLE_ID)) return;
@@ -104,8 +99,9 @@
     document.head.appendChild(style);
   }
 
-  function createState(firstCamp, playerCamp){
+  function createState(firstCamp){
     const setup = getSetup();
+    const playerCamp = getPlayerCamp(firstCamp);
     return {
       started: true,
       firstCamp,
@@ -117,14 +113,14 @@
     };
   }
 
-  function startWith(firstCamp, playerCamp){
-    const state = createState(firstCamp, playerCamp);
+  function startWith(firstCamp){
+    const state = createState(firstCamp);
     setState(state);
     closeStarter();
     closeTurnTransition();
     renderBanner();
     window.dispatchEvent(new CustomEvent("mechkawaii:turn-start", { detail: state }));
-    if(firstCamp !== playerCamp) showTurnTransition(state);
+    if(state.currentCamp !== state.playerCamp) showTurnTransition(state);
   }
 
   function closeStarter(){ document.querySelector("#mkwFirstPlayerBackdrop")?.remove(); }
@@ -146,36 +142,27 @@
           <button class="mkw-first-choice" type="button" data-choice="first" data-camp="prodrome">${tr("prodStarts")}</button>
         </div>
 
-        <div class="mkw-first-block-title">${tr("playerCampTitle")}</div>
-        <div class="mkw-first-choice-grid">
-          <button class="mkw-first-choice" type="button" data-choice="player" data-camp="mechkawaii">${tr("playMech")}</button>
-          <button class="mkw-first-choice" type="button" data-choice="player" data-camp="prodrome">${tr("playProd")}</button>
-        </div>
-
         <button type="button" class="mkw-first-start" disabled>${tr("startGame")}</button>
       </div>
     `;
     document.body.appendChild(backdrop);
 
     let firstCamp = null;
-    let playerCamp = null;
     const startBtn = backdrop.querySelector(".mkw-first-start");
 
     function refresh(){
       backdrop.querySelectorAll("[data-choice='first']").forEach(btn => btn.classList.toggle("is-selected", btn.dataset.camp === firstCamp));
-      backdrop.querySelectorAll("[data-choice='player']").forEach(btn => btn.classList.toggle("is-selected", btn.dataset.camp === playerCamp));
-      startBtn.disabled = !(firstCamp && playerCamp);
+      startBtn.disabled = !firstCamp;
     }
 
-    backdrop.querySelectorAll("[data-choice]").forEach(btn => btn.addEventListener("click", () => {
-      if(btn.dataset.choice === "first") firstCamp = btn.dataset.camp;
-      if(btn.dataset.choice === "player") playerCamp = btn.dataset.camp;
+    backdrop.querySelectorAll("[data-choice='first']").forEach(btn => btn.addEventListener("click", () => {
+      firstCamp = btn.dataset.camp;
       refresh();
     }));
 
     startBtn.addEventListener("click", () => {
-      if(!firstCamp || !playerCamp) return;
-      startWith(firstCamp, playerCamp);
+      if(!firstCamp) return;
+      startWith(firstCamp);
     });
   }
 
@@ -187,6 +174,8 @@
   function advanceCurrentCampTurn(){
     const state = getState();
     if(!state?.started) return null;
+
+    if(!state.playerCamp) state.playerCamp = getPlayerCamp(state.firstCamp);
 
     const current = state.currentCamp;
     state.playedThisRound = state.playedThisRound || { mechkawaii:false, prodrome:false };
@@ -252,6 +241,10 @@
       banner.innerHTML = `<div class="mkw-turn-main"><div class="mkw-turn-title">${tr("chooseFirst")}</div><div class="mkw-turn-sub">${tr("chooseFirstHelp")}</div></div><div class="mkw-turn-actions"><button type="button" class="mkw-end-turn">${tr("chooseFirst")}</button></div>`;
       banner.querySelector("button")?.addEventListener("click", showStarter);
       return;
+    }
+    if(!state.playerCamp) {
+      state.playerCamp = getPlayerCamp(state.firstCamp);
+      setState(state);
     }
     const mode = state.difficulty === "expert" ? tr("expert") : tr("normal");
     const sub = isPlayerTurn(state) ? tr("currentTurn") : tr("opponentTurn");
