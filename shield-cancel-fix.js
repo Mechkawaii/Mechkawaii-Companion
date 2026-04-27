@@ -36,6 +36,9 @@
   function getLang() { return localStorage.getItem(PREFIX + "lang") || "fr"; }
   function getCurrentCharId() { return new URL(location.href).searchParams.get("id"); }
   function getState(id) { return readJson(PREFIX + "state:" + id, null); }
+  function getFlow() { return window.mkwGetGameFlowState?.() || readJson(PREFIX + "game-flow", null); }
+  function getRoundToken() { const f = getFlow(); return f?.started ? `${Number(f.roundNumber || 1)}:${f.currentCamp || "mechkawaii"}` : "free"; }
+  function getCurrentCamp() { const f = getFlow(); return f?.currentCamp || window.__currentCharacter?.camp || "mechkawaii"; }
 
   function dispatchProtectValidated() {
     window.dispatchEvent(new CustomEvent("mechkawaii:energy-action-validated", {
@@ -94,6 +97,22 @@
   function setSharedShields(shields) { writeJson(PREFIX + "shields", shields); }
   function getShieldAssignments() { return readJson(PREFIX + "shield-assignments", {}); }
   function setShieldAssignments(assignments) { writeJson(PREFIX + "shield-assignments", assignments); }
+
+  function setClassicShieldExpiryMeta(index, targetCharId) {
+    const meta = readJson(PREFIX + "shield-expiry-meta", {});
+    meta[String(index)] = {
+      targetId: targetCharId,
+      placedToken: getRoundToken(),
+      expireOnCamp: getCurrentCamp()
+    };
+    writeJson(PREFIX + "shield-expiry-meta", meta);
+  }
+
+  function removeClassicShieldExpiryMeta(index) {
+    const meta = readJson(PREFIX + "shield-expiry-meta", {});
+    delete meta[String(index)];
+    writeJson(PREFIX + "shield-expiry-meta", meta);
+  }
 
   function cleanClassicPollutionFromTechMap(index) {
     const techMap = readJson(PREFIX + "blue-shield-by-tech", {});
@@ -196,6 +215,7 @@
 
     setSharedShields(shields);
     setShieldAssignments(assignments);
+    setClassicShieldExpiryMeta(index, targetCharId);
     cleanClassicPollutionFromTechMap(index);
 
     if (btn) {
@@ -219,6 +239,7 @@
     // Ne jamais toucher au bouclier bleu du Technicien.
     shields[index] = false;
     delete assignments[index];
+    removeClassicShieldExpiryMeta(index);
 
     setSharedShields(shields);
     setShieldAssignments(assignments);
