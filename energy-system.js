@@ -9,7 +9,7 @@
   const I18N = {
     fr: {
       roadToggle: "Commence sur une route",
-      roadHelp: "Si l’unité commence son tour sur une route, son déplacement est gratuit.",
+      roadHelp: "Si l’unité commence son tour sur une route, elle gagne un déplacement gratuit. Ce bonus ne compte pas comme son action Se déplacer.",
       notEnough: "Pas assez d’énergie.",
       alreadyUsed: "Cette action a déjà été utilisée ce tour.",
       actionUsed: "Action utilisée : {action}.",
@@ -22,7 +22,7 @@
     },
     en: {
       roadToggle: "Starts on a road",
-      roadHelp: "If this unit starts its turn on a road, its movement is free.",
+      roadHelp: "If this unit starts its turn on a road, it gains one free move. This bonus does not count as its Move action.",
       notEnough: "Not enough energy.",
       alreadyUsed: "This action has already been used this turn.",
       actionUsed: "Action used: {action}",
@@ -103,7 +103,7 @@
   function maxUsesForAction(id, action){ const defaults = energyData?.defaultRules?.maxUsesPerTurnByAction || {}; const exception = energyData?.exceptions?.[normalize(id)]?.maxUsesPerTurnByAction || {}; return Number(exception[action] ?? defaults[action] ?? 1); }
   function roadMoveIsFree(id){ const road = readJson(getRoadKey(id), { token:getRoundToken(), enabled:false, used:false }); return road.token === getRoundToken() && !!road.enabled && !road.used; }
   function markRoadMoveUsed(id){ const road = readJson(getRoadKey(id), { token:getRoundToken(), enabled:false, used:false }); if(road.token === getRoundToken() && road.enabled && !road.used) writeJson(getRoadKey(id), { token:getRoundToken(), enabled:true, used:true }); }
-  function getActionCostForUse(id, action){ const base = getActionCost(id, action); if(action === "move" && roadMoveIsFree(id)) return 0; return base; }
+  function getActionCostForUse(id, action){ return getActionCost(id, action); }
 
   function canUseAction(id, action, cost){
     cost = Number(cost || 0);
@@ -115,17 +115,28 @@
     return { ok:true };
   }
 
+  function canUseMove(id){
+    if(roadMoveIsFree(id)) return { ok:true, reason:"road_bonus" };
+    return canUseAction(id, "move", getActionCost(id, "move"));
+  }
+
   function notify(message){ const root = document.querySelector("#mkwToastRoot"); if(root){ const el = document.createElement("div"); el.className = "mkw-toast"; el.textContent = message; root.appendChild(el); setTimeout(() => el.remove(), 2700); } }
   function messageForReason(reason){ return reason === "energy" ? tr("notEnough") : reason === "used" ? tr("alreadyUsed") : tr("unavailable"); }
 
   function spendAction(id, action, cost, options = {}){
+    if(action === "move" && roadMoveIsFree(id)){
+      markRoadMoveUsed(id);
+      updateEnergyStatus();
+      render();
+      return true;
+    }
+
     cost = Number(cost || 0);
     const check = canUseAction(id, action, cost);
     if(!check.ok){ notify(messageForReason(check.reason)); return false; }
     const state = getActionState(id);
     state.used[action] = Number(state.used?.[action] || 0) + 1;
     saveActionState(id, state);
-    if(action === "move" && cost === 0) markRoadMoveUsed(id);
     setCurrentEnergy(id, getCurrentEnergy(id) - cost);
     updateEnergyStatus();
     render();
@@ -146,10 +157,9 @@
   }
 
   function spendValidatedAction(action){ return spendAction(currentId(), action, getActionCostForUse(currentId(), action), { silent:true }); }
-  function canSpendValidatedAction(action){ return canUseAction(currentId(), action, getActionCostForUse(currentId(), action)).ok; }
+  function canSpendValidatedAction(action){ if(action === "move") return canUseMove(currentId()).ok; return canUseAction(currentId(), action, getActionCostForUse(currentId(), action)).ok; }
   function blockIfCannotSpend(event, action){
-    const cost = getActionCostForUse(currentId(), action);
-    const check = canUseAction(currentId(), action, cost);
+    const check = action === "move" ? canUseMove(currentId()) : canUseAction(currentId(), action, getActionCostForUse(currentId(), action));
     if(check.ok) return false;
     event.preventDefault();
     event.stopPropagation();
@@ -165,7 +175,7 @@
   function makeSwitch(id, action, displayCost, labelText){
     const cost = getActionCostForUse(id, action);
     const used = Number(getActionState(id).used?.[action] || 0) > 0;
-    const check = canUseAction(id, action, cost);
+    const check = action === "move" ? canUseMove(id) : canUseAction(id, action, cost);
     const disabled = !used && !check.ok;
     const label = document.createElement("label");
     label.className = "mkw-energy-switch";
@@ -232,7 +242,7 @@
   function setButtonAvailability(btn, action){
     const text = (btn.textContent || "").toLowerCase();
     if(text.includes("retirer") || text.includes("remove")) return;
-    const check = canUseAction(currentId(), action, getActionCostForUse(currentId(), action));
+    const check = action === "move" ? canUseMove(currentId()) : canUseAction(currentId(), action, getActionCostForUse(currentId(), action));
     const disabled = !check.ok;
     btn.classList.toggle("mkw-energy-disabled-action", disabled);
     btn.toggleAttribute("aria-disabled", disabled);
