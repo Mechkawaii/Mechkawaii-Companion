@@ -3,6 +3,8 @@
 
   const PREFIX = "mechkawaii:";
   const STYLE_ID = "mkwResetSystemStyles";
+  let resetAllBound = false;
+  let resetUnitBound = false;
 
   const I18N = {
     fr: {
@@ -33,6 +35,15 @@
   function writeJson(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
   function currentId() { return new URL(location.href).searchParams.get("id") || ""; }
 
+  function normalizeText(value) {
+    return String(value || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
   function ensureStyles() {
     if (document.getElementById(STYLE_ID)) return;
     const style = document.createElement("style");
@@ -48,12 +59,13 @@
       .mkw-reset-actions .mkw-reset-danger { border-color: rgba(255,89,119,.7); background: rgba(255,89,119,.18); }
       @media (max-width: 520px) { .mkw-reset-actions button { width: 100%; } }
     `;
-    document.head.appendChild(style);
+    (document.head || document.documentElement).appendChild(style);
   }
 
   function confirmModal({ title, text, confirmText, onConfirm }) {
     ensureStyles();
     document.querySelector(".mkw-reset-backdrop")?.remove();
+
     const backdrop = document.createElement("div");
     backdrop.className = "mkw-reset-backdrop";
     backdrop.innerHTML = `
@@ -76,16 +88,23 @@
     document.body.appendChild(backdrop);
   }
 
+  function forceHomeImmediately() {
+    localStorage.removeItem(PREFIX + "splashDismissed");
+    sessionStorage.setItem(PREFIX + "skipResumeOnce", "1");
+    sessionStorage.setItem(PREFIX + "forceHomeMenu", "1");
+    document.documentElement.classList.remove("splash-dismissed");
+    document.body?.classList.add("has-splash");
+  }
+
   function resetEverything() {
     const lang = localStorage.getItem(PREFIX + "lang");
     for (let i = localStorage.length - 1; i >= 0; i--) {
       const key = localStorage.key(i);
       if (key && key.startsWith(PREFIX)) localStorage.removeItem(key);
     }
-    sessionStorage.setItem(PREFIX + "skipResumeOnce", "1");
-    sessionStorage.setItem(PREFIX + "forceHomeMenu", "1");
     if (lang) localStorage.setItem(PREFIX + "lang", lang);
-    location.replace("./index.html#home");
+    forceHomeImmediately();
+    location.assign("./index.html?reset=" + Date.now() + "#home");
   }
 
   function removeUnitFromObjectMap(key, id) {
@@ -95,7 +114,10 @@
     Object.keys(map).forEach(k => {
       const value = map[k];
       const serialized = JSON.stringify(value);
-      if (k === id || value === id || (serialized && serialized.includes(`\"${id}\"`))) { delete map[k]; changed = true; }
+      if (k === id || value === id || (serialized && serialized.includes(`\"${id}\"`))) {
+        delete map[k];
+        changed = true;
+      }
     });
     if (changed) writeJson(key, map);
   }
@@ -120,7 +142,8 @@
           if (idx >= 0 && idx < shields.length) shields[idx] = true;
         }
       }
-      delete assignments[k]; changed = true;
+      delete assignments[k];
+      changed = true;
     });
     if (changed) writeJson(PREFIX + "shield-assignments", assignments);
     if (Array.isArray(shields)) writeJson(PREFIX + "shields", shields);
@@ -147,38 +170,81 @@
     location.reload();
   }
 
+  function isResetAllButton(el) {
+    const btn = el?.closest?.("button, [role='button'], a");
+    if (!btn) return null;
+    if (btn.matches("#resetSetupBtn, [data-reset-all], .mkw-reset-all")) return btn;
+    const text = normalizeText(btn.textContent || btn.getAttribute("aria-label") || btn.getAttribute("title"));
+    if (text === "tout reinitialiser" || text === "reset everything") return btn;
+    return null;
+  }
+
+  function isResetUnitButton(el) {
+    const btn = el?.closest?.("#resetBtn");
+    return btn || null;
+  }
+
+  function showResetAllConfirm() {
+    confirmModal({ title: tr("resetAllTitle"), text: tr("resetAllText"), confirmText: tr("confirmAll"), onConfirm: resetEverything });
+  }
+
+  function showResetUnitConfirm() {
+    confirmModal({ title: tr("resetUnitTitle"), text: tr("resetUnitText"), confirmText: tr("confirmUnit"), onConfirm: () => resetUnit(currentId()) });
+  }
+
   function bindResetAll() {
+    if (resetAllBound) return;
+    resetAllBound = true;
     document.addEventListener("click", event => {
-      const btn = event.target.closest?.("#resetSetupBtn, [data-reset-all], .mkw-reset-all");
+      if (event.target.closest?.(".mkw-reset-backdrop")) return;
+      const btn = isResetAllButton(event.target);
       if (!btn) return;
-      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
-      confirmModal({ title: tr("resetAllTitle"), text: tr("resetAllText"), confirmText: tr("confirmAll"), onConfirm: resetEverything });
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      showResetAllConfirm();
     }, true);
   }
 
   function bindResetUnit() {
+    if (resetUnitBound) return;
+    resetUnitBound = true;
     document.addEventListener("click", event => {
-      const btn = event.target.closest?.("#resetBtn");
+      if (event.target.closest?.(".mkw-reset-backdrop")) return;
+      const btn = isResetUnitButton(event.target);
       if (!btn) return;
-      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
-      confirmModal({ title: tr("resetUnitTitle"), text: tr("resetUnitText"), confirmText: tr("confirmUnit"), onConfirm: () => resetUnit(currentId()) });
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      showResetUnitConfirm();
     }, true);
   }
 
   function polishUi() {
     const resetBtn = document.querySelector("#resetBtn");
     if (resetBtn && resetBtn.textContent !== tr("resetUnitLabel")) resetBtn.textContent = tr("resetUnitLabel");
-    document.querySelectorAll(".mkw-reset-flow").forEach(btn => { if (!btn.classList.contains("mkw-reset-hidden")) btn.classList.add("mkw-reset-hidden"); });
+    document.querySelectorAll(".mkw-reset-flow").forEach(btn => {
+      if (!btn.classList.contains("mkw-reset-hidden")) btn.classList.add("mkw-reset-hidden");
+    });
   }
 
   function init() {
-    ensureStyles(); bindResetAll(); bindResetUnit(); polishUi();
-    setTimeout(polishUi, 150); setTimeout(polishUi, 600);
+    ensureStyles();
+    bindResetAll();
+    bindResetUnit();
+    polishUi();
+    setTimeout(polishUi, 150);
+    setTimeout(polishUi, 600);
     window.addEventListener("mechkawaii:game-flow-updated", () => setTimeout(polishUi, 0));
     window.addEventListener("pageshow", polishUi);
-    window.mkwResetEverything = resetEverything;
-    window.mkwResetUnit = resetUnit;
   }
+
+  bindResetAll();
+  bindResetUnit();
+
+  window.mkwResetEverything = resetEverything;
+  window.mkwResetUnit = resetUnit;
+  window.mkwShowResetEverythingConfirm = showResetAllConfirm;
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
