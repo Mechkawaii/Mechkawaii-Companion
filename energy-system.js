@@ -5,6 +5,8 @@
   const STYLE_ID = "mkwEnergySystemStyles";
   const ENERGY_DATA_URL = "./data/energy-costs.json";
   let energyData = null;
+  let cachedChars = null;
+  let lastCampResetToken = null;
 
   const I18N = {
     fr: {
@@ -53,11 +55,14 @@
   function getActionKey(id){ return PREFIX + "turn-actions:" + id; }
   function getRoadKey(id){ return PREFIX + "road-start:" + id; }
   function getFlow(){ return window.mkwGetGameFlowState?.() || readJson(PREFIX + "game-flow", null); }
-  function getRoundToken(){ const f = getFlow(); return f ? `${f.roundNumber}:${f.currentCamp}` : "free"; }
+  function getRoundToken(flow = getFlow()){ return flow ? `${flow.roundNumber}:${flow.currentCamp}` : "free"; }
   function getCharCamp(){ return window.__currentCharacter?.camp || null; }
   function isCurrentCampTurn(){ const f = getFlow(); const camp = getCharCamp(); return !f?.started || !camp || f.currentCamp === camp; }
+  function getMaxEnergy(){ return Number(energyData?.maxEnergy || 3); }
 
   async function loadEnergyData(){ if(energyData) return energyData; const res = await fetch(ENERGY_DATA_URL, { cache:"no-store" }); energyData = await res.json(); return energyData; }
+  async function loadChars(){ if(Array.isArray(cachedChars)) return cachedChars; if(Array.isArray(window.__cachedChars)){ cachedChars = window.__cachedChars; return cachedChars; } const res = await fetch("./data/characters.json", { cache:"no-store" }); cachedChars = await res.json(); window.__cachedChars = cachedChars; return cachedChars; }
+  function getActiveIds(){ const ids = new Set(); const draft = readJson(PREFIX + "draft", null); const oppDraft = readJson(PREFIX + "opp-draft", null); if(Array.isArray(draft?.activeIds)) draft.activeIds.forEach(id => ids.add(id)); if(Array.isArray(oppDraft?.activeIds)) oppDraft.activeIds.forEach(id => ids.add(id)); return ids; }
 
   function ensureStyles(){
     if(document.getElementById(STYLE_ID)) return;
@@ -109,14 +114,41 @@
   }
 
   function preloadEnergyImages(){ ["./assets/energy_0.png","./assets/energy_1.png","./assets/energy_2.png","./assets/energy_3.png"].forEach(src => { const img = new Image(); img.src = src; }); }
-  function getCurrentEnergy(id){ const max = Number(energyData?.maxEnergy || 3); const state = readJson(getEnergyKey(id), null); if(!state || typeof state.current !== "number") return max; return Math.max(0, Math.min(max, Number(state.current))); }
-  function setCurrentEnergy(id, current){ const max = Number(energyData?.maxEnergy || 3); const next = Math.max(0, Math.min(max, Number(current))); writeJson(getEnergyKey(id), { current: next, max }); window.dispatchEvent(new CustomEvent("mechkawaii:energy-updated", { detail:{ charId:id, current:next, max } })); }
-  function resetEnergy(id){ setCurrentEnergy(id, Number(energyData?.maxEnergy || 3)); writeJson(getActionKey(id), { token:getRoundToken(), used:{} }); }
+  function getCurrentEnergy(id){ const max = getMaxEnergy(); const state = readJson(getEnergyKey(id), null); if(!state || typeof state.current !== "number") return max; return Math.max(0, Math.min(max, Number(state.current))); }
+  function setCurrentEnergy(id, current){ const max = getMaxEnergy(); const next = Math.max(0, Math.min(max, Number(current))); writeJson(getEnergyKey(id), { current: next, max }); window.dispatchEvent(new CustomEvent("mechkawaii:energy-updated", { detail:{ charId:id, current:next, max } })); }
+  function resetEnergy(id, token = getRoundToken()){ const max = getMaxEnergy(); writeJson(getEnergyKey(id), { current:max, max }); writeJson(getActionKey(id), { token, used:{} }); }
+  function resetRoadStart(id, token = getRoundToken()){ writeJson(getRoadKey(id), { token, enabled:false, used:false }); }
+  async function resetEnergyForActiveCamp(flow = getFlow(), options = {}){
+    if(!flow?.started || !flow.currentCamp) return;
+    const token = getRoundToken(flow);
+    if(!options.force && lastCampResetToken === token) return;
+    lastCampResetToken = token;
+    const max = getMaxEnergy();
+    const chars = await loadChars();
+    const activeIds = getActiveIds();
+    const currentCharId = currentId();
+    let currentCharWasReset = false;
+
+    chars.forEach(char => {
+      if((char.camp || "mechkawaii") !== flow.currentCamp) return;
+      if(activeIds.size && !activeIds.has(char.id)) return;
+      writeJson(getEnergyKey(char.id), { current:max, max });
+      writeJson(getActionKey(char.id), { token, used:{} });
+      resetRoadStart(char.id, token);
+      if(char.id === currentCharId) currentCharWasReset = true;
+    });
+
+    if(currentCharWasReset) {
+      window.dispatchEvent(new CustomEvent("mechkawaii:energy-updated", { detail:{ charId:currentCharId, current:max, max } }));
+    }
+
+    window.dispatchEvent(new CustomEvent("mechkawaii:turn-energy-reset", { detail:{ currentCamp:flow.currentCamp, roundNumber:flow.roundNumber, token } }));
+  }
   function getActionState(id){ const token = getRoundToken(); const state = readJson(getActionKey(id), { token, used:{} }); if(state.token !== token) return { token, used:{} }; return state; }
   function saveActionState(id, state){ writeJson(getActionKey(id), state); }
   function getCostsForId(id){ const data = energyData || {}; const key = normalize(id); const alias = data.aliases?.[key]; return data.costs?.[key] || data.costs?.[alias] || data.costs?.[normalize(alias)] || null; }
   function getActionCost(id, action){ return Number(getCostsForId(id)?.[action] || 0); }
-  function getAssetFor(value){ const n = Math.max(0, Math.min(Number(energyData?.maxEnergy || 3), Number(value || 0))); return energyData?.assets?.[String(n)] || energyData?.assets?.[String(energyData?.maxEnergy || 3)] || ""; }
+  function getAssetFor(value){ const n = Math.max(0, Math.min(getMaxEnergy(), Number(value || 0))); return energyData?.assets?.[String(n)] || energyData?.assets?.[String(getMaxEnergy())] || ""; }
   function maxUsesForAction(id, action){ const defaults = energyData?.defaultRules?.maxUsesPerTurnByAction || {}; const exception = energyData?.exceptions?.[normalize(id)]?.maxUsesPerTurnByAction || {}; return Number(exception[action] ?? defaults[action] ?? 1); }
   function roadMoveIsFree(id){ const road = readJson(getRoadKey(id), { token:getRoundToken(), enabled:false, used:false }); return road.token === getRoundToken() && !!road.enabled && !road.used; }
   function markRoadMoveUsed(id){ const road = readJson(getRoadKey(id), { token:getRoundToken(), enabled:false, used:false }); if(road.token === getRoundToken() && road.enabled && !road.used) writeJson(getRoadKey(id), { token:getRoundToken(), enabled:true, used:true }); }
@@ -131,12 +163,12 @@
   function canSpendValidatedAction(action){ if(action === "move") return canUseMove(currentId()).ok; return canUseAction(currentId(), action, getActionCostForUse(currentId(), action)).ok; }
   function blockIfCannotSpend(event, action){ const check = action === "move" ? canUseMove(currentId()) : canUseAction(currentId(), action, getActionCostForUse(currentId(), action)); if(check.ok) return false; event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation(); notify(messageForReason(check.reason)); return true; }
   function ensureEnergyStatusNearName(){ const title = document.querySelector("#charName"); if(!title) return null; let wrap = document.querySelector("#mkwEnergyInlineStatus"); if(!wrap){ wrap = document.createElement("span"); wrap.id = "mkwEnergyInlineStatus"; wrap.className = "mkw-energy-inline-status"; title.insertAdjacentElement("afterend", wrap); } return wrap; }
-  function updateEnergyStatus(){ const id = currentId(); const wrap = ensureEnergyStatusNearName(); if(!id || !wrap || !energyData) return; const energy = getCurrentEnergy(id); const src = getAssetFor(energy); wrap.innerHTML = src ? `<img src="${src}" alt="${energy}/3" data-energy-current="${energy}" width="86" height="24">` : `${energy}/3`; }
+  function updateEnergyStatus(){ const id = currentId(); const wrap = ensureEnergyStatusNearName(); if(!id || !wrap || !energyData) return; const energy = getCurrentEnergy(id); const src = getAssetFor(energy); wrap.innerHTML = src ? `<img src="${src}" alt="${energy}/${getMaxEnergy()}" data-energy-current="${energy}" width="86" height="24">` : `${energy}/${getMaxEnergy()}`; }
   function clearOldInline(){ document.querySelectorAll(".mkw-energy-header-action, .mkw-road-toggle-inline, .mkw-resource-action-head, .mkw-resource-title-wrap, .mkw-resource-energy-cost, .mkw-resource-main-title").forEach(el => { if(el.classList.contains("mkw-energy-header-action")){ const title = el.querySelector(".section-title"); if(title) el.replaceWith(title); else el.remove(); } else el.remove(); }); const oldCard = document.querySelector("#mkwEnergyCard"); if(oldCard) oldCard.remove(); }
   function makeSwitch(id, action, displayCost, labelText){ const cost = getActionCostForUse(id, action); const used = Number(getActionState(id).used?.[action] || 0) > 0; const check = action === "move" ? canUseMove(id) : canUseAction(id, action, cost); const disabled = !used && !check.ok; const label = document.createElement("label"); label.className = "mkw-energy-switch"; label.classList.toggle("is-disabled", disabled); label.innerHTML = `<input type="checkbox" ${used ? "checked" : ""} ${disabled ? "disabled" : ""}><span class="mkw-energy-slider"></span>${labelText ? `<span class="mkw-energy-switch-label">${labelText}</span>` : ""}`; const input = label.querySelector("input"); input.addEventListener("change", event => { if(event.target.checked){ const ok = spendAction(id, action, cost); if(!ok) event.target.checked = false; } else unspendAction(id, action, cost); }); return label; }
   function getMovementCard(){ return Array.from(document.querySelectorAll(".card")).find(c => c.querySelector("#movementDesc") || c.querySelector("#movementImg")); }
   function getAttackCard(){ return Array.from(document.querySelectorAll(".card")).find(c => c.querySelector("#attackDesc") || c.querySelector("#attackImg")); }
-  function createResourceEnergyRow(action){ const id = currentId(); const cost = getActionCost(id, action); const row = document.createElement("span"); row.className = "mkw-resource-energy-cost"; row.dataset.energyAction = action; const check = canUseAction(id, action, cost); row.classList.toggle("is-energy-disabled", !check.ok); const src = getAssetFor(cost); if(src){ const img = document.createElement("img"); img.src = src; img.alt = `${cost}`; img.width = 86; img.height = 24; row.appendChild(img); } else row.textContent = `${cost}/3`; return row; }
+  function createResourceEnergyRow(action){ const id = currentId(); const cost = getActionCost(id, action); const row = document.createElement("span"); row.className = "mkw-resource-energy-cost"; row.dataset.energyAction = action; const check = canUseAction(id, action, cost); row.classList.toggle("is-energy-disabled", !check.ok); const src = getAssetFor(cost); if(src){ const img = document.createElement("img"); img.src = src; img.alt = `${cost}`; img.width = 86; img.height = 24; row.appendChild(img); } else row.textContent = `${cost}/${getMaxEnergy()}`; return row; }
   function addResourceCost(selector, action, titleText, descText){ const container = document.querySelector(selector); if(!container) return; const title = container.querySelector(`[data-resource-title="${action === "protect" ? "protect" : "repair"}"]`); const desc = container.querySelector(`[data-resource-desc="${action === "protect" ? "protect" : "repair"}"]`); if(title){ title.textContent = titleText; title.appendChild(createResourceEnergyRow(action)); } if(desc) desc.textContent = descText; }
   function addEnergyCostToCardHeader(card, action, cost, includeToggle, titleText){ const header = card?.querySelector(".card-h"); const title = header?.querySelector(".section-title"); if(!header || !title) return; if(titleText) title.textContent = titleText; const wrap = document.createElement("div"); wrap.className = "mkw-energy-header-action"; title.replaceWith(wrap); wrap.appendChild(title); const tools = document.createElement("div"); tools.className = "mkw-header-energy-tools"; const src = getAssetFor(cost); if(src){ const img = document.createElement("img"); img.src = src; img.alt = `${cost}`; tools.appendChild(img); } if(includeToggle && Number(cost || 0) > 0) tools.appendChild(makeSwitch(currentId(), action, Number(cost || 0), "")); wrap.appendChild(tools); }
   function addEnergyCostToHeader(titleSelector, action, cost, includeToggle){ const title = document.querySelector(titleSelector); const header = title?.closest(".card-h"); if(!header || !title) return; const wrap = document.createElement("div"); wrap.className = "mkw-energy-header-action"; title.replaceWith(wrap); wrap.appendChild(title); const tools = document.createElement("div"); tools.className = "mkw-header-energy-tools"; const src = getAssetFor(cost); if(src){ const img = document.createElement("img"); img.src = src; img.alt = `${cost}`; tools.appendChild(img); } if(includeToggle && Number(cost || 0) > 0) tools.appendChild(makeSwitch(currentId(), action, Number(cost || 0), "")); wrap.appendChild(tools); }
@@ -144,8 +176,8 @@
   function setButtonAvailability(btn, action){ const text = (btn.textContent || "").toLowerCase(); if(text.includes("retirer") || text.includes("remove")) return; const check = action === "move" ? canUseMove(currentId()) : canUseAction(currentId(), action, getActionCostForUse(currentId(), action)); const disabled = !check.ok; btn.classList.toggle("mkw-energy-disabled-action", disabled); btn.toggleAttribute("aria-disabled", disabled); }
   function applyActionAvailability(){ document.querySelectorAll("#repairKeysDisplay button, #repairKeysDisplay .key-button").forEach(btn => setButtonAvailability(btn, "repair")); document.querySelectorAll("#shieldsDisplay button, #shieldsDisplay .shield-button, #shieldsDisplay .key-button").forEach(btn => setButtonAvailability(btn, "protect")); document.querySelectorAll("#ultToggleContainer button, #ultToggleContainer [role='button']").forEach(btn => setButtonAvailability(btn, "ultimate")); }
   function bindExistingButtons(){ document.querySelectorAll("#ultToggleContainer button, #ultToggleContainer [role='button']").forEach(btn => { if(btn.dataset.energyBound === "1") return; btn.dataset.energyBound = "1"; btn.addEventListener("click", event => { const pressed = btn.getAttribute("aria-pressed") === "true" || btn.classList.contains("used") || btn.classList.contains("is-used"); if(pressed) return; blockIfCannotSpend(event, "ultimate"); }, true); }); }
-  function exposeEnergyApi(){ window.mkwCanSpendEnergyAction = action => canSpendValidatedAction(action); window.mkwSpendEnergyAction = action => spendValidatedAction(action); window.mkwGetEnergyActionCost = action => getActionCostForUse(currentId(), action); window.mkwValidateUltimateEnergy = () => spendValidatedAction("ultimate"); }
+  function exposeEnergyApi(){ window.mkwCanSpendEnergyAction = action => canSpendValidatedAction(action); window.mkwSpendEnergyAction = action => spendValidatedAction(action); window.mkwGetEnergyActionCost = action => getActionCostForUse(currentId(), action); window.mkwValidateUltimateEnergy = () => spendValidatedAction("ultimate"); window.mkwResetEnergyForActiveCamp = function(force = true){ return resetEnergyForActiveCamp(getFlow(), { force }); }; }
   function render(){ if(!energyData) return; const id = currentId(); if(!id) return; clearOldInline(); updateEnergyStatus(); const costs = getCostsForId(id) || {}; addResourceCost(".shields-section", "protect", tr("protectTitle"), tr("protectText")); addResourceCost(".repair-section", "repair", tr("repairTitle"), tr("repairText")); addEnergyCostToCardHeader(getMovementCard(), "move", Number(costs.move || 0), true, tr("move")); addRoadToggle(); addEnergyCostToCardHeader(getAttackCard(), "ranged_attack", Number(costs.ranged_attack || 0), true, tr("attackTitle")); addEnergyCostToHeader("#classActionTitle", "class_action", Number(costs.class_action || 0), true); addEnergyCostToHeader("#ultTitle", "ultimate", Number(costs.ultimate || 0), false); bindExistingButtons(); applyActionAvailability(); exposeEnergyApi(); }
-  async function init(){ ensureStyles(); preloadEnergyImages(); await loadEnergyData(); const id = currentId(); if(id && !readJson(getEnergyKey(id), null)) resetEnergy(id); exposeEnergyApi(); render(); window.addEventListener("mechkawaii:turn-start", event => { const camp = event?.detail?.currentCamp; if(!camp || camp === getCharCamp()) resetEnergy(currentId()); render(); }); window.addEventListener("mechkawaii:game-flow-updated", render); window.addEventListener("mechkawaii:energy-updated", event => { if(event?.detail?.charId === currentId()){ updateEnergyStatus(); setTimeout(render, 0); } }); window.addEventListener("mechkawaii:energy-action-validated", event => { const action = event?.detail?.action; const charId = event?.detail?.charId || currentId(); if(charId !== currentId() || !action) return; spendValidatedAction(action); }); window.addEventListener("mechkawaii:shield-updated", () => setTimeout(render, 80)); window.addEventListener("pageshow", render); setTimeout(render, 300); setTimeout(render, 900); }
+  async function init(){ ensureStyles(); preloadEnergyImages(); await loadEnergyData(); const id = currentId(); if(id && !readJson(getEnergyKey(id), null)) resetEnergy(id); exposeEnergyApi(); render(); window.addEventListener("mechkawaii:turn-start", event => { resetEnergyForActiveCamp(event.detail || getFlow(), { force:true }).then(render); }); window.addEventListener("mechkawaii:game-flow-updated", event => { resetEnergyForActiveCamp(event.detail || getFlow(), { force:true }).then(render); }); window.addEventListener("mechkawaii:energy-updated", event => { if(event?.detail?.charId === currentId()){ updateEnergyStatus(); setTimeout(render, 0); } }); window.addEventListener("mechkawaii:energy-action-validated", event => { const action = event?.detail?.action; const charId = event?.detail?.charId || currentId(); if(charId !== currentId() || !action) return; spendValidatedAction(action); }); window.addEventListener("mechkawaii:shield-updated", () => setTimeout(render, 80)); document.addEventListener("click", event => { if(!event.target.closest?.(".mkw-end-turn")) return; setTimeout(() => resetEnergyForActiveCamp(getFlow(), { force:true }).then(render), 40); setTimeout(() => resetEnergyForActiveCamp(getFlow(), { force:true }).then(render), 180); }, true); window.addEventListener("pageshow", render); setTimeout(() => resetEnergyForActiveCamp(getFlow(), { force:false }).then(render), 500); setTimeout(render, 300); setTimeout(render, 900); }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
