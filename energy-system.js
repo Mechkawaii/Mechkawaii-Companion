@@ -20,7 +20,9 @@
       classAction: "Action de classe effectuée",
       unavailable: "Action indisponible",
       protectTitle: "Se protéger",
-      repairTitle: "Réparer"
+      protectText: "Pose un bouclier sur une unité alliée ou sur soi-même. Le bouclier absorbe 1 PV, puis est défaussé.",
+      repairTitle: "Réparer",
+      repairText: "Rend 1 PV à une unité alliée adjacente ou à soi-même. Peut relever une unité HS avec 1 PV."
     },
     en: {
       roadToggle: "Starts on a road",
@@ -35,7 +37,9 @@
       classAction: "Class action done",
       unavailable: "Unavailable action",
       protectTitle: "Protect",
-      repairTitle: "Repair"
+      protectText: "Place a shield on an allied unit or on itself. The shield absorbs 1 HP, then is discarded.",
+      repairTitle: "Repair",
+      repairText: "Restore 1 HP to an adjacent allied unit or itself. Can revive a KO unit with 1 HP."
     }
   };
 
@@ -67,13 +71,16 @@
       .mkw-energy-header-action .section-title { margin:0; min-width:0; flex:1 1 auto; line-height:1.15; }
       .mkw-header-energy-tools { display:flex; align-items:center; gap:10px; flex:0 0 auto; min-width:max-content; }
       .mkw-header-energy-tools img { width:86px; max-width:34vw; height:auto; display:block; }
-      .mkw-resource-energy-cost { margin-top:8px; display:flex; align-items:center; justify-content:flex-start; gap:8px; }
-      .mkw-resource-energy-cost img { width:86px; max-width:34vw; height:auto; display:block; }
+
+      .shields-section, .repair-section { min-height:178px !important; }
+      .mkw-resource-action-head { display:flex !important; flex-direction:column !important; align-items:flex-start !important; gap:6px !important; margin:0 0 12px 0 !important; min-height:110px !important; }
+      .mkw-resource-action-title { font-weight:950 !important; color:var(--text,#fff) !important; line-height:1.1 !important; margin:0 !important; }
+      .mkw-resource-energy-cost { margin:0 !important; display:flex !important; align-items:center !important; justify-content:flex-start !important; gap:8px; width:86px !important; min-width:86px !important; height:24px !important; min-height:24px !important; flex:0 0 24px !important; }
+      .mkw-resource-energy-cost img { width:86px !important; max-width:34vw !important; height:24px !important; object-fit:contain !important; object-position:left center !important; display:block !important; }
       .mkw-resource-energy-cost.is-energy-disabled img { opacity:.38; filter:grayscale(.75); }
-      .mkw-resource-title-wrap { display:flex; flex-direction:column; align-items:flex-start; gap:6px; margin-bottom:8px; }
-      .mkw-resource-title-wrap > div:first-child { font-weight:600; margin-bottom:0 !important; }
-      .mkw-resource-title-wrap .mkw-resource-energy-cost { margin-top:0; }
-      .mkw-resource-title-wrap .mkw-resource-energy-cost img { width:86px; max-width:34vw; }
+      .mkw-resource-action-desc { margin:0 !important; color:var(--muted,rgba(255,255,255,.72)) !important; font-size:13px !important; line-height:1.35 !important; max-width:34rem !important; min-height:calc(13px * 1.35 * 3) !important; }
+      .mkw-resource-title-wrap { display:none !important; }
+
       .mkw-energy-switch { position:relative; display:inline-flex; align-items:center; gap:10px; cursor:pointer; user-select:none; font-weight:900; color:var(--text,#fff); flex:0 0 auto; }
       .mkw-energy-switch input { position:absolute; opacity:0; pointer-events:none; }
       .mkw-energy-slider { width:52px; height:30px; border-radius:999px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.09); box-shadow:inset 0 0 0 1px rgba(0,0,0,.12); position:relative; transition:.18s ease; flex:0 0 auto; }
@@ -94,8 +101,11 @@
         .mkw-energy-header-action .section-title { font-size:15px; }
         .mkw-header-energy-tools { gap:6px; }
         .mkw-header-energy-tools img { width:58px; max-width:18vw; }
-        .mkw-resource-energy-cost img { width:72px; max-width:30vw; }
-        .mkw-resource-title-wrap .mkw-resource-energy-cost img { width:72px; max-width:30vw; }
+        .shields-section, .repair-section { min-height:170px !important; }
+        .mkw-resource-action-head { min-height:104px !important; }
+        .mkw-resource-energy-cost { width:72px !important; min-width:72px !important; height:22px !important; min-height:22px !important; flex-basis:22px !important; }
+        .mkw-resource-energy-cost img { width:72px !important; max-width:30vw !important; height:22px !important; }
+        .mkw-resource-action-desc { font-size:12px !important; min-height:calc(12px * 1.35 * 3) !important; }
         .mkw-energy-slider { width:44px; height:26px; }
         .mkw-energy-slider::after { width:18px; height:18px; left:3px; top:3px; }
         .mkw-energy-switch input:checked + .mkw-energy-slider::after { transform:translateX(18px); }
@@ -105,6 +115,7 @@
     document.head.appendChild(style);
   }
 
+  function preloadEnergyImages(){ ["./assets/energy_0.png","./assets/energy_1.png","./assets/energy_2.png","./assets/energy_3.png"].forEach(src => { const img = new Image(); img.src = src; }); }
   function getCurrentEnergy(id){ const max = Number(energyData?.maxEnergy || 3); const state = readJson(getEnergyKey(id), null); if(!state || typeof state.current !== "number") return max; return Math.max(0, Math.min(max, Number(state.current))); }
   function setCurrentEnergy(id, current){ const max = Number(energyData?.maxEnergy || 3); const next = Math.max(0, Math.min(max, Number(current))); writeJson(getEnergyKey(id), { current: next, max }); window.dispatchEvent(new CustomEvent("mechkawaii:energy-updated", { detail:{ charId:id, current:next, max } })); }
   function resetEnergy(id){ setCurrentEnergy(id, Number(energyData?.maxEnergy || 3)); writeJson(getActionKey(id), { token:getRoundToken(), used:{} }); }
@@ -182,8 +193,8 @@
   }
 
   function ensureEnergyStatusNearName(){ const title = document.querySelector("#charName"); if(!title) return null; let wrap = document.querySelector("#mkwEnergyInlineStatus"); if(!wrap){ wrap = document.createElement("span"); wrap.id = "mkwEnergyInlineStatus"; wrap.className = "mkw-energy-inline-status"; title.insertAdjacentElement("afterend", wrap); } return wrap; }
-  function updateEnergyStatus(){ const id = currentId(); const wrap = ensureEnergyStatusNearName(); if(!id || !wrap || !energyData) return; const energy = getCurrentEnergy(id); const src = getAssetFor(energy); wrap.innerHTML = src ? `<img src="${src}" alt="${energy}/3" data-energy-current="${energy}">` : `${energy}/3`; }
-  function clearOldInline(){ document.querySelectorAll(".mkw-energy-header-action, .mkw-road-toggle-inline, .mkw-resource-energy-cost").forEach(el => { if(el.classList.contains("mkw-energy-header-action")){ const title = el.querySelector(".section-title"); if(title) el.replaceWith(title); else el.remove(); } else el.remove(); }); const oldCard = document.querySelector("#mkwEnergyCard"); if(oldCard) oldCard.remove(); }
+  function updateEnergyStatus(){ const id = currentId(); const wrap = ensureEnergyStatusNearName(); if(!id || !wrap || !energyData) return; const energy = getCurrentEnergy(id); const src = getAssetFor(energy); wrap.innerHTML = src ? `<img src="${src}" alt="${energy}/3" data-energy-current="${energy}" width="86" height="24">` : `${energy}/3`; }
+  function clearOldInline(){ document.querySelectorAll(".mkw-energy-header-action, .mkw-road-toggle-inline, .mkw-resource-action-head, .mkw-resource-title-wrap, .mkw-resource-energy-cost").forEach(el => { if(el.classList.contains("mkw-energy-header-action")){ const title = el.querySelector(".section-title"); if(title) el.replaceWith(title); else el.remove(); } else el.remove(); }); const oldCard = document.querySelector("#mkwEnergyCard"); if(oldCard) oldCard.remove(); }
 
   function makeSwitch(id, action, displayCost, labelText){
     const cost = getActionCostForUse(id, action);
@@ -211,22 +222,38 @@
     const check = canUseAction(id, action, cost);
     row.classList.toggle("is-energy-disabled", !check.ok);
     const src = getAssetFor(cost);
-    if(src){ const img = document.createElement("img"); img.src = src; img.alt = `${cost}`; row.appendChild(img); }
+    if(src){ const img = document.createElement("img"); img.src = src; img.alt = `${cost}`; img.width = 86; img.height = 24; row.appendChild(img); }
     else row.textContent = `${cost}/3`;
     return row;
   }
 
-  function addResourceCost(selector, action, titleText){
+  function findResourceTitle(container){
+    return Array.from(container.children).find(el => el.tagName === "DIV" && !el.id && !el.classList.contains("mkw-resource-action-head"));
+  }
+
+  function addResourceCost(selector, action, titleText, descText){
     const container = document.querySelector(selector);
     if(!container) return;
-    const title = Array.from(container.children).find(el => el.tagName === "DIV" && !el.classList.contains("mkw-resource-title-wrap") && !el.id);
-    if(!title) return;
+
+    const legacyTitle = findResourceTitle(container);
+    if(legacyTitle) legacyTitle.remove();
+
+    const head = document.createElement("div");
+    head.className = "mkw-resource-action-head";
+
+    const title = document.createElement("div");
+    title.className = "mkw-resource-action-title";
     title.textContent = titleText;
-    const wrap = document.createElement("div");
-    wrap.className = "mkw-resource-title-wrap";
-    title.replaceWith(wrap);
-    wrap.appendChild(title);
-    wrap.appendChild(createResourceEnergyRow(action));
+    head.appendChild(title);
+
+    head.appendChild(createResourceEnergyRow(action));
+
+    const desc = document.createElement("p");
+    desc.className = "mkw-resource-action-desc";
+    desc.textContent = descText;
+    head.appendChild(desc);
+
+    container.insertBefore(head, container.firstChild);
   }
 
   function addEnergyCostToCardHeader(card, action, cost, includeToggle, titleText){
@@ -319,8 +346,8 @@
     clearOldInline();
     updateEnergyStatus();
     const costs = getCostsForId(id) || {};
-    addResourceCost(".shields-section", "protect", tr("protectTitle"));
-    addResourceCost(".repair-section", "repair", tr("repairTitle"));
+    addResourceCost(".shields-section", "protect", tr("protectTitle"), tr("protectText"));
+    addResourceCost(".repair-section", "repair", tr("repairTitle"), tr("repairText"));
     addEnergyCostToCardHeader(getMovementCard(), "move", Number(costs.move || 0), true, tr("move"));
     addRoadToggle();
     addEnergyCostToCardHeader(getAttackCard(), "ranged_attack", Number(costs.ranged_attack || 0), true, tr("attackTitle"));
@@ -333,6 +360,7 @@
 
   async function init(){
     ensureStyles();
+    preloadEnergyImages();
     await loadEnergyData();
     const id = currentId();
     if(id && !readJson(getEnergyKey(id), null)) resetEnergy(id);
