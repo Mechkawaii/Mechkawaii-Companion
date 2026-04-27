@@ -63,6 +63,9 @@
       .mkw-energy-header-action .section-title { margin:0; min-width:0; flex:1 1 auto; line-height:1.15; }
       .mkw-header-energy-tools { display:flex; align-items:center; gap:10px; flex:0 0 auto; min-width:max-content; }
       .mkw-header-energy-tools img { width:86px; max-width:34vw; height:auto; display:block; }
+      .mkw-resource-energy-cost { margin-top:8px; display:flex; align-items:center; justify-content:flex-start; gap:8px; }
+      .mkw-resource-energy-cost img { width:86px; max-width:34vw; height:auto; display:block; }
+      .mkw-resource-energy-cost.is-energy-disabled img { opacity:.38; filter:grayscale(.75); }
       .mkw-energy-switch { position:relative; display:inline-flex; align-items:center; gap:10px; cursor:pointer; user-select:none; font-weight:900; color:var(--text,#fff); flex:0 0 auto; }
       .mkw-energy-switch input { position:absolute; opacity:0; pointer-events:none; }
       .mkw-energy-slider { width:52px; height:30px; border-radius:999px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.09); box-shadow:inset 0 0 0 1px rgba(0,0,0,.12); position:relative; transition:.18s ease; flex:0 0 auto; }
@@ -83,6 +86,7 @@
         .mkw-energy-header-action .section-title { font-size:15px; }
         .mkw-header-energy-tools { gap:6px; }
         .mkw-header-energy-tools img { width:58px; max-width:18vw; }
+        .mkw-resource-energy-cost img { width:72px; max-width:30vw; }
         .mkw-energy-slider { width:44px; height:26px; }
         .mkw-energy-slider::after { width:18px; height:18px; left:3px; top:3px; }
         .mkw-energy-switch input:checked + .mkw-energy-slider::after { transform:translateX(18px); }
@@ -170,7 +174,7 @@
 
   function ensureEnergyStatusNearName(){ const title = document.querySelector("#charName"); if(!title) return null; let wrap = document.querySelector("#mkwEnergyInlineStatus"); if(!wrap){ wrap = document.createElement("span"); wrap.id = "mkwEnergyInlineStatus"; wrap.className = "mkw-energy-inline-status"; title.insertAdjacentElement("afterend", wrap); } return wrap; }
   function updateEnergyStatus(){ const id = currentId(); const wrap = ensureEnergyStatusNearName(); if(!id || !wrap || !energyData) return; const energy = getCurrentEnergy(id); const src = getAssetFor(energy); wrap.innerHTML = src ? `<img src="${src}" alt="${energy}/3" data-energy-current="${energy}">` : `${energy}/3`; }
-  function clearOldInline(){ document.querySelectorAll(".mkw-energy-header-action, .mkw-road-toggle-inline").forEach(el => { if(el.classList.contains("mkw-energy-header-action")){ const title = el.querySelector(".section-title"); if(title) el.replaceWith(title); else el.remove(); } else el.remove(); }); const oldCard = document.querySelector("#mkwEnergyCard"); if(oldCard) oldCard.remove(); }
+  function clearOldInline(){ document.querySelectorAll(".mkw-energy-header-action, .mkw-road-toggle-inline, .mkw-resource-energy-cost").forEach(el => { if(el.classList.contains("mkw-energy-header-action")){ const title = el.querySelector(".section-title"); if(title) el.replaceWith(title); else el.remove(); } else el.remove(); }); const oldCard = document.querySelector("#mkwEnergyCard"); if(oldCard) oldCard.remove(); }
 
   function makeSwitch(id, action, displayCost, labelText){
     const cost = getActionCostForUse(id, action);
@@ -188,6 +192,31 @@
 
   function getMovementCard(){ return Array.from(document.querySelectorAll(".card")).find(c => c.querySelector("#movementDesc") || c.querySelector("#movementImg")); }
   function getAttackCard(){ return Array.from(document.querySelectorAll(".card")).find(c => c.querySelector("#attackDesc") || c.querySelector("#attackImg")); }
+
+  function addResourceCost(selector, action){
+    const id = currentId();
+    const cost = getActionCost(id, action);
+    const container = document.querySelector(selector);
+    if(!container) return;
+
+    const row = document.createElement("div");
+    row.className = "mkw-resource-energy-cost";
+    row.dataset.energyAction = action;
+    const check = canUseAction(id, action, cost);
+    row.classList.toggle("is-energy-disabled", !check.ok);
+
+    const src = getAssetFor(cost);
+    if(src){
+      const img = document.createElement("img");
+      img.src = src;
+      img.alt = `${cost}`;
+      row.appendChild(img);
+    } else {
+      row.textContent = `${cost}/3`;
+    }
+
+    container.insertBefore(row, container.querySelector("#shieldsDisplay, #repairKeysDisplay") || null);
+  }
 
   function addEnergyCostToCardHeader(card, action, cost, includeToggle, titleText){
     const header = card?.querySelector(".card-h");
@@ -279,6 +308,8 @@
     clearOldInline();
     updateEnergyStatus();
     const costs = getCostsForId(id) || {};
+    addResourceCost(".shields-section", "protect");
+    addResourceCost(".repair-section", "repair");
     addEnergyCostToCardHeader(getMovementCard(), "move", Number(costs.move || 0), true, tr("move"));
     addRoadToggle();
     addEnergyCostToCardHeader(getAttackCard(), "ranged_attack", Number(costs.ranged_attack || 0), true, tr("attackTitle"));
