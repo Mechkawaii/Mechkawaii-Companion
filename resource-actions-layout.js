@@ -52,10 +52,7 @@
       }
 
       .mkw-resource-action-title {
-        font-weight: 950 !important;
-        color: var(--text, #fff) !important;
-        line-height: 1.1 !important;
-        margin: 0 !important;
+        display: none !important;
       }
 
       .mkw-resource-action-head .mkw-resource-energy-cost {
@@ -120,8 +117,8 @@
 
   function cleanGeneratedTitlesEverywhere(section, titleText) {
     Array.from(section.querySelectorAll("div, p, span, strong, b")).forEach(el => {
-      if (el.closest(".mkw-resource-action-head")) return;
       if (el.closest("#shieldsDisplay") || el.closest("#repairKeysDisplay")) return;
+      if (el.classList?.contains("mkw-resource-action-desc")) return;
       if (el.querySelector("img, button, .mkw-resource-energy-cost")) return;
       if (isGeneratedTitleText(el.textContent, titleText)) el.remove();
     });
@@ -164,11 +161,6 @@
     }
 
     head.innerHTML = "";
-
-    const title = document.createElement("div");
-    title.className = "mkw-resource-action-title";
-    title.textContent = titleText;
-    head.appendChild(title);
 
     if (energyRow) {
       energyRow.classList.add("mkw-resource-energy-cost");
