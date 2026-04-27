@@ -21,7 +21,8 @@
     "freeMoveIfStartsOnRoad": true
   },
   "exceptions": {
-    "meimei": { "maxUsesPerTurnByAction": { "move": 2 } }
+    "meimei": { "maxUsesPerTurnByAction": { "move": 2 } },
+    "gaoro": { "maxUsesPerTurnByAction": { "move": 2 } }
   },
   "aliases": {
     "greenscam": "green scam",
