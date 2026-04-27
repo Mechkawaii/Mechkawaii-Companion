@@ -7,10 +7,10 @@
 
   const I18N = {
     fr: {
-      chooseFirst: "Qui commence ?",
-      chooseFirstHelp: "Dans les règles officielles, le joueur qui a caressé un animal en dernier commence la partie.",
-      mechStarts: "Mechkawaii commence",
-      prodStarts: "Prodrome commence",
+      chooseFirst: "Quel camp commence ?",
+      chooseFirstHelp: "Choisissez le camp qui joue le premier. Dans les règles officielles, c’est le joueur qui a caressé un animal en dernier qui commence.",
+      mechStarts: "Les Mechkawaii commencent",
+      prodStarts: "Les Prodromes commencent",
       round: "Tour",
       turnOf: "Tour des",
       endTurn: "Fin de tour",
@@ -24,10 +24,10 @@
       turnFinishedSuffix: "est terminé"
     },
     en: {
-      chooseFirst: "Who starts?",
-      chooseFirstHelp: "Official rule: the player who last petted an animal starts the game.",
-      mechStarts: "Mechkawaii starts",
-      prodStarts: "Prodrome starts",
+      chooseFirst: "Which camp starts?",
+      chooseFirstHelp: "Choose the camp that plays first. Official rule: the player who last petted an animal starts the game.",
+      mechStarts: "Mechkawaii start",
+      prodStarts: "Prodromes start",
       round: "Round",
       turnOf: "Turn of",
       endTurn: "End turn",
