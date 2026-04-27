@@ -45,13 +45,7 @@
     style.textContent = `
       .shields-section,
       .repair-section {
-        opacity: 0 !important;
-      }
-
-      .shields-section.mkw-resource-layout-ready,
-      .repair-section.mkw-resource-layout-ready {
-        opacity: 1 !important;
-        transition: opacity .08s ease !important;
+        min-height: 178px !important;
       }
 
       .mkw-resource-action-head {
@@ -60,6 +54,8 @@
         align-items: flex-start !important;
         gap: 6px !important;
         margin: 0 0 12px 0 !important;
+        min-height: 82px !important;
+        contain: layout paint !important;
       }
 
       .mkw-resource-action-title {
@@ -71,12 +67,19 @@
         display: flex !important;
         align-items: center !important;
         justify-content: flex-start !important;
+        width: 86px !important;
+        height: 24px !important;
+        min-width: 86px !important;
+        min-height: 24px !important;
+        flex: 0 0 24px !important;
       }
 
       .mkw-resource-action-head .mkw-resource-energy-cost img {
         width: 86px !important;
         max-width: 34vw !important;
-        height: auto !important;
+        height: 24px !important;
+        object-fit: contain !important;
+        object-position: left center !important;
         display: block !important;
       }
 
@@ -86,6 +89,7 @@
         font-size: 13px !important;
         line-height: 1.35 !important;
         max-width: 34rem !important;
+        min-height: calc(13px * 1.35 * 2) !important;
       }
 
       .mkw-resource-title-wrap {
@@ -93,18 +97,47 @@
       }
 
       @media (max-width: 560px) {
+        .shields-section,
+        .repair-section {
+          min-height: 170px !important;
+        }
+
+        .mkw-resource-action-head {
+          min-height: 76px !important;
+        }
+
+        .mkw-resource-action-head .mkw-resource-energy-cost {
+          width: 72px !important;
+          min-width: 72px !important;
+          height: 22px !important;
+          min-height: 22px !important;
+          flex-basis: 22px !important;
+        }
+
         .mkw-resource-action-head .mkw-resource-energy-cost img {
           width: 72px !important;
           max-width: 30vw !important;
+          height: 22px !important;
         }
 
         .mkw-resource-action-desc {
           font-size: 12px !important;
+          min-height: calc(12px * 1.35 * 2) !important;
         }
       }
     `;
 
     document.head.appendChild(style);
+  }
+
+  function preloadEnergyImages() {
+    ["./assets/energy_0.png", "./assets/energy_1.png", "./assets/energy_2.png", "./assets/energy_3.png"].forEach(src => {
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = src;
+      document.head.appendChild(link);
+    });
   }
 
   function isGeneratedTitleText(text, titleText) {
@@ -136,8 +169,6 @@
   }
 
   function cleanSection(section, titleText) {
-    section.classList.remove("mkw-resource-layout-ready");
-
     const existingHead = section.querySelector(":scope > .mkw-resource-action-head");
     const energyRow = collectEnergyRow(section);
 
@@ -165,6 +196,12 @@
     return energyRow;
   }
 
+  function createEnergyPlaceholder() {
+    const row = document.createElement("div");
+    row.className = "mkw-resource-energy-cost mkw-resource-energy-placeholder";
+    return row;
+  }
+
   function buildHead(section, descText, energyRow) {
     let head = section.querySelector(":scope > .mkw-resource-action-head");
     if (!head) {
@@ -175,10 +212,9 @@
 
     head.innerHTML = "";
 
-    if (energyRow) {
-      energyRow.classList.add("mkw-resource-energy-cost");
-      head.appendChild(energyRow);
-    }
+    const row = energyRow || createEnergyPlaceholder();
+    row.classList.add("mkw-resource-energy-cost");
+    head.appendChild(row);
 
     const desc = document.createElement("p");
     desc.className = "mkw-resource-action-desc";
@@ -188,8 +224,6 @@
     if (section.firstElementChild !== head) {
       section.insertBefore(head, section.firstChild);
     }
-
-    section.classList.add("mkw-resource-layout-ready");
   }
 
   function applySection(selector, titleText, descText) {
@@ -212,6 +246,8 @@
   }
 
   function init() {
+    ensureStyles();
+    preloadEnergyImages();
     applyLayout();
     [40, 100, 220, 500, 900, 1600].forEach(delay => setTimeout(applyLayout, delay));
 
