@@ -43,6 +43,17 @@
     const style = document.createElement("style");
     style.id = STYLE_ID;
     style.textContent = `
+      .shields-section,
+      .repair-section {
+        opacity: 0 !important;
+      }
+
+      .shields-section.mkw-resource-layout-ready,
+      .repair-section.mkw-resource-layout-ready {
+        opacity: 1 !important;
+        transition: opacity .08s ease !important;
+      }
+
       .mkw-resource-action-head {
         display: flex !important;
         flex-direction: column !important;
@@ -125,6 +136,8 @@
   }
 
   function cleanSection(section, titleText) {
+    section.classList.remove("mkw-resource-layout-ready");
+
     const existingHead = section.querySelector(":scope > .mkw-resource-action-head");
     const energyRow = collectEnergyRow(section);
 
@@ -152,7 +165,7 @@
     return energyRow;
   }
 
-  function buildHead(section, titleText, descText, energyRow) {
+  function buildHead(section, descText, energyRow) {
     let head = section.querySelector(":scope > .mkw-resource-action-head");
     if (!head) {
       head = document.createElement("div");
@@ -175,6 +188,8 @@
     if (section.firstElementChild !== head) {
       section.insertBefore(head, section.firstChild);
     }
+
+    section.classList.add("mkw-resource-layout-ready");
   }
 
   function applySection(selector, titleText, descText) {
@@ -182,7 +197,7 @@
     if (!section) return;
 
     const energyRow = cleanSection(section, titleText);
-    buildHead(section, titleText, descText, energyRow);
+    buildHead(section, descText, energyRow);
   }
 
   function applyLayout() {
@@ -193,12 +208,12 @@
 
   function scheduleApply() {
     clearTimeout(scheduleApply.timer);
-    scheduleApply.timer = setTimeout(applyLayout, 40);
+    scheduleApply.timer = setTimeout(applyLayout, 16);
   }
 
   function init() {
     applyLayout();
-    [80, 160, 300, 700, 1200, 2200].forEach(delay => setTimeout(applyLayout, delay));
+    [40, 100, 220, 500, 900, 1600].forEach(delay => setTimeout(applyLayout, delay));
 
     window.addEventListener("mechkawaii:energy-updated", scheduleApply);
     window.addEventListener("mechkawaii:shield-updated", scheduleApply);
