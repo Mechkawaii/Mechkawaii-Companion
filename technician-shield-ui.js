@@ -81,7 +81,18 @@
 
   function getFlow() { return window.mkwGetGameFlowState?.() || readJson(PREFIX + "game-flow", null); }
   function getRoundToken() { const f = getFlow(); return f ? `${f.roundNumber}:${f.currentCamp}` : "free"; }
+  function getCurrentCamp() { const f = getFlow(); return f?.currentCamp || window.__currentCharacter?.camp || "mechkawaii"; }
   function blueShieldLockKey(id = currentId()) { return PREFIX + "blue-shield-turn-lock:" + id; }
+
+  function setBlueShieldExpiryMeta(technicianId, targetId) {
+    const meta = readJson(PREFIX + "blue-shield-expiry-meta", {});
+    meta[technicianId] = {
+      targetId,
+      placedToken: getRoundToken(),
+      expireOnCamp: getCurrentCamp()
+    };
+    writeJson(PREFIX + "blue-shield-expiry-meta", meta);
+  }
 
   function blueShieldUsedThisTurn(id = currentId()) {
     const state = readJson(blueShieldLockKey(id), null);
@@ -255,6 +266,7 @@
     const byTech = readJson(PREFIX + "blue-shield-by-tech", {});
     byTech[technicianId] = targetId;
     writeJson(PREFIX + "blue-shield-by-tech", byTech);
+    setBlueShieldExpiryMeta(technicianId, targetId);
     window.dispatchEvent(new CustomEvent("mechkawaii:shield-updated", { detail: { charId: targetId, type: "technician" } }));
     window.dispatchEvent(new CustomEvent("mechkawaii:technician-shield-applied", { detail: { technicianId, targetId } }));
     syncClassActionToggle();
