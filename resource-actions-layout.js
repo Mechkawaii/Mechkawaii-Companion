@@ -28,6 +28,15 @@
     return (I18N[lang] && I18N[lang][key]) || I18N.fr[key] || key;
   }
 
+  function normalizeText(text) {
+    return String(text || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
   function ensureStyles() {
     if (document.getElementById(STYLE_ID)) return;
 
@@ -91,9 +100,13 @@
   }
 
   function isGeneratedTitleText(text, titleText) {
-    const normalized = String(text || "").trim().toLowerCase();
-    const title = String(titleText || "").trim().toLowerCase();
-    return normalized === title || normalized === "boucliers (réserve partagée)" || normalized === "clés de réparation" || normalized === "shields (shared pool)" || normalized === "repair keys";
+    const normalized = normalizeText(text);
+    const title = normalizeText(titleText);
+    return normalized === title
+      || normalized === "boucliers (reserve partagee)"
+      || normalized === "cles de reparation"
+      || normalized === "shields (shared pool)"
+      || normalized === "repair keys";
   }
 
   function collectEnergyRow(section) {
@@ -105,9 +118,20 @@
     return first;
   }
 
+  function cleanGeneratedTitlesEverywhere(section, titleText) {
+    Array.from(section.querySelectorAll("div, p, span, strong, b")).forEach(el => {
+      if (el.closest(".mkw-resource-action-head")) return;
+      if (el.closest("#shieldsDisplay") || el.closest("#repairKeysDisplay")) return;
+      if (el.querySelector("img, button, .mkw-resource-energy-cost")) return;
+      if (isGeneratedTitleText(el.textContent, titleText)) el.remove();
+    });
+  }
+
   function cleanSection(section, titleText) {
     const existingHead = section.querySelector(":scope > .mkw-resource-action-head");
     const energyRow = collectEnergyRow(section);
+
+    cleanGeneratedTitlesEverywhere(section, titleText);
 
     Array.from(section.children).forEach(child => {
       if (child === existingHead) return;
@@ -115,6 +139,7 @@
       if (child.classList?.contains("shields-display")) return;
       if (child.id === "shieldsDisplay") return;
       if (child.id === "repairKeysDisplay") return;
+      if (child.id === "mkwCurrentShieldRemove") return;
       if (child.classList?.contains("mkw-current-shield-remove")) return;
 
       if (child.classList?.contains("mkw-resource-title-wrap")) {
@@ -122,7 +147,7 @@
         return;
       }
 
-      if (child.tagName === "DIV" && !child.id && !child.className && isGeneratedTitleText(child.textContent, titleText)) {
+      if (isGeneratedTitleText(child.textContent, titleText) && !child.querySelector("button, img")) {
         child.remove();
       }
     });
