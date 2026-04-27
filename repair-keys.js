@@ -185,7 +185,9 @@
     const team = getCurrentTeam(chars);
     const { modal, panel } = openBaseModal(
       lang === "fr" ? "Utiliser une clé de réparation" : "Use a repair key",
-      lang === "fr" ? "Choisis une unité alliée : elle récupère 1 PV." : "Choose an allied unit: it recovers 1 HP."
+      lang === "fr"
+        ? "Donne +1 PV à une unité alliée adjacente ou à soi-même. Permet aussi de relever une unité HS avec 1 PV."
+        : "Give +1 HP to an adjacent allied unit or to this unit. It can also bring back a KO unit with 1 HP."
     );
 
     team.forEach(char => {
