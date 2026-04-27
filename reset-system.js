@@ -7,7 +7,7 @@
   const I18N = {
     fr: {
       resetAllTitle: "Tout réinitialiser ?",
-      resetAllText: "Cette action remet toute l’application à zéro : configuration, unités choisies, PV, boucliers, énergie, tours, historique et effets actifs. Tu reviendras à l’écran d’accueil.",
+      resetAllText: "Cette action remet toute l’application à zéro : configuration, unités choisies, PV, boucliers, énergie, tours, historique et effets actifs. Tu reviendras au menu d’accueil.",
       resetUnitTitle: "Réinitialiser cette unité ?",
       resetUnitText: "Cette action remet uniquement l’unité active à zéro : PV, clés de réparation, boucliers liés, énergie, actions du tour, Coup Unique et effets actifs.",
       cancel: "Annuler",
@@ -17,7 +17,7 @@
     },
     en: {
       resetAllTitle: "Reset everything?",
-      resetAllText: "This will fully reset the app: setup, selected units, HP, shields, energy, turns, history and active effects. You will return to the home screen.",
+      resetAllText: "This will fully reset the app: setup, selected units, HP, shields, energy, turns, history and active effects. You will return to the home menu.",
       resetUnitTitle: "Reset this unit?",
       resetUnitText: "This will reset only the active unit: HP, repair keys, linked shields, energy, turn actions, Ultimate Ability and active effects.",
       cancel: "Cancel",
@@ -54,7 +54,6 @@
   function confirmModal({ title, text, confirmText, onConfirm }) {
     ensureStyles();
     document.querySelector(".mkw-reset-backdrop")?.remove();
-
     const backdrop = document.createElement("div");
     backdrop.className = "mkw-reset-backdrop";
     backdrop.innerHTML = `
@@ -67,16 +66,13 @@
         </div>
       </div>
     `;
-
     backdrop.querySelector(".mkw-reset-title").textContent = title;
     backdrop.querySelector(".mkw-reset-text").textContent = text;
     backdrop.querySelector(".mkw-reset-cancel").textContent = tr("cancel");
     backdrop.querySelector(".mkw-reset-danger").textContent = confirmText;
-
     backdrop.querySelector(".mkw-reset-cancel").addEventListener("click", () => backdrop.remove());
     backdrop.querySelector(".mkw-reset-danger").addEventListener("click", () => { backdrop.remove(); onConfirm(); });
     backdrop.addEventListener("click", event => { if (event.target === backdrop) backdrop.remove(); });
-
     document.body.appendChild(backdrop);
   }
 
@@ -86,8 +82,10 @@
       const key = localStorage.key(i);
       if (key && key.startsWith(PREFIX)) localStorage.removeItem(key);
     }
+    sessionStorage.setItem(PREFIX + "skipResumeOnce", "1");
+    sessionStorage.setItem(PREFIX + "forceHomeMenu", "1");
     if (lang) localStorage.setItem(PREFIX + "lang", lang);
-    location.href = "./index.html";
+    location.replace("./index.html#home");
   }
 
   function removeUnitFromObjectMap(key, id) {
@@ -97,10 +95,7 @@
     Object.keys(map).forEach(k => {
       const value = map[k];
       const serialized = JSON.stringify(value);
-      if (k === id || value === id || (serialized && serialized.includes(`\"${id}\"`))) {
-        delete map[k];
-        changed = true;
-      }
+      if (k === id || value === id || (serialized && serialized.includes(`\"${id}\"`))) { delete map[k]; changed = true; }
     });
     if (changed) writeJson(key, map);
   }
@@ -125,8 +120,7 @@
           if (idx >= 0 && idx < shields.length) shields[idx] = true;
         }
       }
-      delete assignments[k];
-      changed = true;
+      delete assignments[k]; changed = true;
     });
     if (changed) writeJson(PREFIX + "shield-assignments", assignments);
     if (Array.isArray(shields)) writeJson(PREFIX + "shields", shields);
@@ -157,9 +151,7 @@
     document.addEventListener("click", event => {
       const btn = event.target.closest?.("#resetSetupBtn, [data-reset-all], .mkw-reset-all");
       if (!btn) return;
-      event.preventDefault();
-      event.stopPropagation();
-      event.stopImmediatePropagation();
+      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
       confirmModal({ title: tr("resetAllTitle"), text: tr("resetAllText"), confirmText: tr("confirmAll"), onConfirm: resetEverything });
     }, true);
   }
@@ -168,9 +160,7 @@
     document.addEventListener("click", event => {
       const btn = event.target.closest?.("#resetBtn");
       if (!btn) return;
-      event.preventDefault();
-      event.stopPropagation();
-      event.stopImmediatePropagation();
+      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
       confirmModal({ title: tr("resetUnitTitle"), text: tr("resetUnitText"), confirmText: tr("confirmUnit"), onConfirm: () => resetUnit(currentId()) });
     }, true);
   }
@@ -178,18 +168,12 @@
   function polishUi() {
     const resetBtn = document.querySelector("#resetBtn");
     if (resetBtn && resetBtn.textContent !== tr("resetUnitLabel")) resetBtn.textContent = tr("resetUnitLabel");
-    document.querySelectorAll(".mkw-reset-flow").forEach(btn => {
-      if (!btn.classList.contains("mkw-reset-hidden")) btn.classList.add("mkw-reset-hidden");
-    });
+    document.querySelectorAll(".mkw-reset-flow").forEach(btn => { if (!btn.classList.contains("mkw-reset-hidden")) btn.classList.add("mkw-reset-hidden"); });
   }
 
   function init() {
-    ensureStyles();
-    bindResetAll();
-    bindResetUnit();
-    polishUi();
-    setTimeout(polishUi, 150);
-    setTimeout(polishUi, 600);
+    ensureStyles(); bindResetAll(); bindResetUnit(); polishUi();
+    setTimeout(polishUi, 150); setTimeout(polishUi, 600);
     window.addEventListener("mechkawaii:game-flow-updated", () => setTimeout(polishUi, 0));
     window.addEventListener("pageshow", polishUi);
     window.mkwResetEverything = resetEverything;
