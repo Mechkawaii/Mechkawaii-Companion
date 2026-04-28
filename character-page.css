@@ -377,6 +377,43 @@
   .page-character #mkwEnergyInlineStatus img {
     width: 96px;
   }
+
+  .page-character .topbar {
+    align-items: flex-start;
+  }
+
+  .page-character .topbar > .controls {
+    gap: 6px;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+    max-width: 38%;
+  }
+
+  .page-character .topbar > .controls img,
+  .page-character .topbar > .controls [src*="cu"],
+  .page-character .topbar > .controls [src*="CU"],
+  .page-character .topbar > .controls [src*="ultimate"],
+  .page-character .topbar > .controls [src*="Ultimate"] {
+    width: 34px !important;
+    max-width: 34px !important;
+    height: auto !important;
+    max-height: 34px !important;
+    object-fit: contain !important;
+  }
+
+  .page-character .topbar > .controls button,
+  .page-character .topbar > .controls .badge,
+  .page-character .topbar > .controls [class*="badge"],
+  .page-character .topbar > .controls [class*="cu"],
+  .page-character .topbar > .controls [class*="CU"],
+  .page-character .topbar > .controls [class*="ultimate"] {
+    padding: 4px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    max-width: 42px !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+  }
 }
 
 @media (max-width: 360px) {
