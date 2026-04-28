@@ -2,7 +2,6 @@
   "use strict";
 
   const PREFIX = "mechkawaii:";
-  const STYLE_ID = "mkwEnergySystemStyles";
   const ENERGY_DATA_URL = "./data/energy-costs.json";
   const NO_CLASS_ACTION_TOGGLE_IDS = new Set([
     "johanna",
@@ -76,55 +75,6 @@
   async function loadChars(){ if(Array.isArray(cachedChars)) return cachedChars; if(Array.isArray(window.__cachedChars)){ cachedChars = window.__cachedChars; return cachedChars; } const res = await fetch("./data/characters.json", { cache:"no-store" }); cachedChars = await res.json(); window.__cachedChars = cachedChars; return cachedChars; }
   function getActiveIds(){ const ids = new Set(); const draft = readJson(PREFIX + "draft", null); const oppDraft = readJson(PREFIX + "opp-draft", null); if(Array.isArray(draft?.activeIds)) draft.activeIds.forEach(id => ids.add(id)); if(Array.isArray(oppDraft?.activeIds)) oppDraft.activeIds.forEach(id => ids.add(id)); return ids; }
 
-  function ensureStyles(){
-    if(document.getElementById(STYLE_ID)) return;
-    const style = document.createElement("style");
-    style.id = STYLE_ID;
-    style.textContent = `
-      #mkwEnergyCard { display:none !important; }
-      .mkw-energy-inline-status { display:inline-flex; align-items:center; gap:8px; margin-left:10px; vertical-align:middle; }
-      .mkw-energy-inline-status img { width:86px; max-width:32vw; height:auto; display:block; }
-      .mkw-energy-header-action { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; min-width:0; }
-      .mkw-energy-header-action .section-title { margin:0; min-width:0; flex:1 1 auto; line-height:1.15; }
-      .mkw-header-energy-tools { display:flex; align-items:center; gap:10px; flex:0 0 auto; min-width:max-content; }
-      .mkw-header-energy-tools img { width:86px; max-width:34vw; height:auto; display:block; }
-      .mkw-resource-energy-cost { margin:0 !important; display:flex !important; align-items:center !important; justify-content:flex-start !important; gap:8px; width:86px !important; min-width:86px !important; height:24px !important; min-height:24px !important; flex:0 0 24px !important; }
-      .mkw-resource-energy-cost img { width:86px !important; max-width:34vw !important; height:24px !important; object-fit:contain !important; object-position:left center !important; display:block !important; }
-      .mkw-resource-energy-cost.is-energy-disabled img { opacity:.38; filter:grayscale(.75); }
-      .mkw-resource-action-desc { margin:0 0 12px 0 !important; color:var(--muted,rgba(255,255,255,.72)) !important; font-size:13px !important; line-height:1.35 !important; max-width:34rem !important; }
-      .mkw-resource-action-head, .mkw-resource-title-wrap, .mkw-resource-action-title, .mkw-resource-main-title { display:none !important; }
-      .mkw-energy-switch { position:relative; display:inline-flex; align-items:center; gap:10px; cursor:pointer; user-select:none; font-weight:900; color:var(--text,#fff); flex:0 0 auto; }
-      .mkw-energy-switch input { position:absolute; opacity:0; pointer-events:none; }
-      .mkw-energy-slider { width:52px; height:30px; border-radius:999px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.09); box-shadow:inset 0 0 0 1px rgba(0,0,0,.12); position:relative; transition:.18s ease; flex:0 0 auto; }
-      .mkw-energy-slider::after { content:""; position:absolute; width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,.86); left:3px; top:3px; transition:.18s ease; box-shadow:0 4px 10px rgba(0,0,0,.35); }
-      .mkw-energy-switch input:checked + .mkw-energy-slider { background:rgba(255,210,77,.9); border-color:rgba(255,210,77,.95); box-shadow:0 0 18px rgba(255,210,77,.22); }
-      .mkw-energy-switch input:checked + .mkw-energy-slider::after { transform:translateX(22px); background:#111; }
-      .mkw-energy-switch.is-disabled { opacity:.42; cursor:not-allowed; filter:grayscale(.35); }
-      .mkw-energy-switch-label { font-size:12px; color:var(--muted); font-weight:850; }
-      .mkw-road-toggle-inline { margin-top:12px; display:flex; align-items:center; justify-content:space-between; gap:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,.08); }
-      .mkw-road-toggle-text { min-width:0; }
-      .mkw-road-title-inline { font-weight:900; color:var(--text,#fff); }
-      .mkw-road-help-inline { color:var(--muted); font-size:12px; line-height:1.3; margin-top:3px; }
-      .mkw-energy-disabled-action { opacity:.38 !important; filter:grayscale(.75) !important; cursor:not-allowed !important; }
-      @media (max-width:560px){
-        .mkw-energy-inline-status { display:flex; margin-left:0; margin-top:8px; }
-        .mkw-energy-inline-status img { width:92px; }
-        .mkw-energy-header-action { gap:8px; }
-        .mkw-energy-header-action .section-title { font-size:15px; }
-        .mkw-header-energy-tools { gap:6px; }
-        .mkw-header-energy-tools img { width:58px; max-width:18vw; }
-        .mkw-resource-energy-cost { width:72px !important; min-width:72px !important; height:22px !important; min-height:22px !important; flex-basis:22px !important; }
-        .mkw-resource-energy-cost img { width:72px !important; max-width:30vw !important; height:22px !important; }
-        .mkw-resource-action-desc { font-size:12px !important; }
-        .mkw-energy-slider { width:44px; height:26px; }
-        .mkw-energy-slider::after { width:18px; height:18px; left:3px; top:3px; }
-        .mkw-energy-switch input:checked + .mkw-energy-slider::after { transform:translateX(18px); }
-        .mkw-energy-switch-label{ display:none; }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
   function preloadEnergyImages(){ ["./assets/energy_0.png","./assets/energy_1.png","./assets/energy_2.png","./assets/energy_3.png"].forEach(src => { const img = new Image(); img.src = src; }); }
   function getCurrentEnergy(id){ const max = getMaxEnergy(); const state = readJson(getEnergyKey(id), null); if(!state || typeof state.current !== "number") return max; return Math.max(0, Math.min(max, Number(state.current))); }
   function setCurrentEnergy(id, current){ const max = getMaxEnergy(); const next = Math.max(0, Math.min(max, Number(current))); writeJson(getEnergyKey(id), { current: next, max }); window.dispatchEvent(new CustomEvent("mechkawaii:energy-updated", { detail:{ charId:id, current:next, max } })); }
@@ -190,6 +140,6 @@
   function bindExistingButtons(){ document.querySelectorAll("#ultToggleContainer button, #ultToggleContainer [role='button']").forEach(btn => { if(btn.dataset.energyBound === "1") return; btn.dataset.energyBound = "1"; btn.addEventListener("click", event => { const pressed = btn.getAttribute("aria-pressed") === "true" || btn.classList.contains("used") || btn.classList.contains("is-used"); if(pressed) return; blockIfCannotSpend(event, "ultimate"); }, true); }); }
   function exposeEnergyApi(){ window.mkwCanSpendEnergyAction = action => canSpendValidatedAction(action); window.mkwSpendEnergyAction = action => spendValidatedAction(action); window.mkwGetEnergyActionCost = action => getActionCostForUse(currentId(), action); window.mkwValidateUltimateEnergy = () => spendValidatedAction("ultimate"); window.mkwResetEnergyForActiveCamp = function(force = true){ return resetEnergyForActiveCamp(getFlow(), { force }); }; }
   function render(){ if(!energyData) return; const id = currentId(); if(!id) return; clearOldInline(); updateEnergyStatus(); const costs = getCostsForId(id) || {}; addResourceCost(".shields-section", "protect", tr("protectTitle"), tr("protectText")); addResourceCost(".repair-section", "repair", tr("repairTitle"), tr("repairText")); addEnergyCostToCardHeader(getMovementCard(), "move", Number(costs.move || 0), true, tr("move")); addRoadToggle(); addEnergyCostToCardHeader(getAttackCard(), "ranged_attack", Number(costs.ranged_attack || 0), true, tr("attackTitle")); addEnergyCostToHeader("#classActionTitle", "class_action", Number(costs.class_action || 0), shouldShowClassActionToggle(id)); addEnergyCostToHeader("#ultTitle", "ultimate", Number(costs.ultimate || 0), false); bindExistingButtons(); applyActionAvailability(); exposeEnergyApi(); }
-  async function init(){ ensureStyles(); preloadEnergyImages(); await loadEnergyData(); const id = currentId(); if(id && !readJson(getEnergyKey(id), null)) resetEnergy(id); exposeEnergyApi(); render(); window.addEventListener("mechkawaii:turn-start", event => { resetEnergyForActiveCamp(event.detail || getFlow(), { force:true }).then(render); }); window.addEventListener("mechkawaii:game-flow-updated", event => { resetEnergyForActiveCamp(event.detail || getFlow(), { force:true }).then(render); }); window.addEventListener("mechkawaii:energy-updated", event => { if(event?.detail?.charId === currentId()){ updateEnergyStatus(); setTimeout(render, 0); } }); window.addEventListener("mechkawaii:energy-action-validated", event => { const action = event?.detail?.action; const charId = event?.detail?.charId || currentId(); if(charId !== currentId() || !action) return; spendValidatedAction(action); }); window.addEventListener("mechkawaii:shield-updated", () => setTimeout(render, 80)); document.addEventListener("click", event => { if(!event.target.closest?.(".mkw-end-turn")) return; setTimeout(() => resetEnergyForActiveCamp(getFlow(), { force:true }).then(render), 40); setTimeout(() => resetEnergyForActiveCamp(getFlow(), { force:true }).then(render), 180); }, true); window.addEventListener("pageshow", render); setTimeout(() => resetEnergyForActiveCamp(getFlow(), { force:false }).then(render), 500); setTimeout(render, 300); setTimeout(render, 900); }
+  async function init(){ preloadEnergyImages(); await loadEnergyData(); const id = currentId(); if(id && !readJson(getEnergyKey(id), null)) resetEnergy(id); exposeEnergyApi(); render(); window.addEventListener("mechkawaii:turn-start", event => { resetEnergyForActiveCamp(event.detail || getFlow(), { force:true }).then(render); }); window.addEventListener("mechkawaii:game-flow-updated", event => { resetEnergyForActiveCamp(event.detail || getFlow(), { force:true }).then(render); }); window.addEventListener("mechkawaii:energy-updated", event => { if(event?.detail?.charId === currentId()){ updateEnergyStatus(); setTimeout(render, 0); } }); window.addEventListener("mechkawaii:energy-action-validated", event => { const action = event?.detail?.action; const charId = event?.detail?.charId || currentId(); if(charId !== currentId() || !action) return; spendValidatedAction(action); }); window.addEventListener("mechkawaii:shield-updated", () => setTimeout(render, 80)); document.addEventListener("click", event => { if(!event.target.closest?.(".mkw-end-turn")) return; setTimeout(() => resetEnergyForActiveCamp(getFlow(), { force:true }).then(render), 40); setTimeout(() => resetEnergyForActiveCamp(getFlow(), { force:true }).then(render), 180); }, true); window.addEventListener("pageshow", render); setTimeout(() => resetEnergyForActiveCamp(getFlow(), { force:false }).then(render), 500); setTimeout(render, 300); setTimeout(render, 900); }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
