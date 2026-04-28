@@ -24,6 +24,20 @@
     return localStorage.getItem(PREFIX + "lang") || "fr";
   }
 
+  function getLockConfirmedKey(id = currentId()) {
+    return PREFIX + "ultimate-lock-confirmed:" + id;
+  }
+
+  function isUltimateLockConfirmed(id = currentId()) {
+    return localStorage.getItem(getLockConfirmedKey(id)) === "1";
+  }
+
+  function setUltimateLockConfirmed(id = currentId(), value = true) {
+    if (!id) return;
+    if (value) localStorage.setItem(getLockConfirmedKey(id), "1");
+    else localStorage.removeItem(getLockConfirmedKey(id));
+  }
+
   async function loadCharacters() {
     if (Array.isArray(cachedCharacters)) return cachedCharacters;
     if (Array.isArray(window.__cachedChars)) {
@@ -85,7 +99,8 @@
       energy: raw(PREFIX + "energy:" + id),
       actions: raw(PREFIX + "turn-actions:" + id),
       cuBadges: raw(PREFIX + "cu-badges"),
-      copiedCu: raw(PREFIX + "copied-cu")
+      copiedCu: raw(PREFIX + "copied-cu"),
+      lockConfirmed: raw(getLockConfirmedKey(id))
     };
   }
 
@@ -97,6 +112,7 @@
     setRaw(PREFIX + "turn-actions:" + snap.charId, snap.actions);
     setRaw(PREFIX + "cu-badges", snap.cuBadges);
     setRaw(PREFIX + "copied-cu", snap.copiedCu);
+    setRaw(getLockConfirmedKey(snap.charId), snap.lockConfirmed);
 
     window.dispatchEvent(new CustomEvent("mechkawaii:energy-updated", { detail: { charId: snap.charId } }));
     window.dispatchEvent(new CustomEvent("mechkawaii:game-flow-updated", { detail: {} }));
@@ -162,7 +178,10 @@
     else if (typeof window.mkwValidateUltimateEnergy === "function") ok = window.mkwValidateUltimateEnergy();
 
     pending.spent = !!ok;
-    if (ok) window.dispatchEvent(new CustomEvent("mechkawaii:ultimate-energy-finalized", { detail: { charId: currentId() } }));
+    if (ok) {
+      setUltimateLockConfirmed(currentId(), true);
+      window.dispatchEvent(new CustomEvent("mechkawaii:ultimate-energy-finalized", { detail: { charId: currentId() } }));
+    }
     return ok;
   }
 
@@ -240,8 +259,10 @@
     card.classList.remove("ult-skill-locked");
     removeLegacyLockOverlay(card);
 
+    if (!used) setUltimateLockConfirmed(currentId(), false);
+
     isCurrentUltimateRearmable().then(rearmable => {
-      const locked = used && !rearmable;
+      const locked = used && !rearmable && isUltimateLockConfirmed(currentId());
       card.classList.toggle("ult-skill-locked", locked);
       if (locked) removeLegacyLockOverlay(card);
     });
@@ -274,6 +295,7 @@
         return;
       }
 
+      setUltimateLockConfirmed(currentId(), false);
       pending = {
         token: Date.now(),
         snap: snapshot(),
