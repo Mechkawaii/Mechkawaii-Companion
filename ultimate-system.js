@@ -6,6 +6,7 @@
   let observer = null;
   let glowObserver = null;
   let cachedCharacters = null;
+  let currentUltimateRearmableCache = true;
 
   function currentId() {
     return new URL(location.href).searchParams.get("id") || "";
@@ -60,7 +61,8 @@
     if (!id) return true;
     const chars = await loadCharacters();
     const char = chars.find(item => item.id === id);
-    return char?.cu_rearmable !== false;
+    currentUltimateRearmableCache = char?.cu_rearmable !== false;
+    return currentUltimateRearmableCache;
   }
 
   function removeLegacyLockOverlay(card) {
@@ -147,6 +149,26 @@
       btn.getAttribute("aria-checked") === "true";
   }
 
+  function keepUltimateToggleLocked(trigger) {
+    const container = document.getElementById("ultToggleContainer");
+    const sw = container?.querySelector(".switch") || trigger;
+    if (!sw) return;
+    sw.classList.add("on");
+    sw.classList.add("used");
+    sw.classList.add("is-used");
+    sw.setAttribute("aria-pressed", "true");
+    sw.setAttribute("aria-checked", "true");
+    sw.dataset.active = "true";
+    sw.dataset.locked = "true";
+    const input = sw.querySelector?.("input");
+    if (input) input.checked = true;
+    setTimeout(syncGlow, 0);
+  }
+
+  function isLockedNonRearmableUltimate(trigger) {
+    return isUltimateUsed(trigger) && !currentUltimateRearmableCache && isUltimateLockConfirmed(currentId());
+  }
+
   function isModal(el) {
     return !!el?.closest?.("[role='dialog'], dialog, .modal, .backdrop, [class*='modal'], [class*='backdrop'], .mkw-resource-modal, .mkw-protect-backdrop, .mkw-tech-shield-backdrop");
   }
@@ -180,6 +202,7 @@
     pending.spent = !!ok;
     if (ok) {
       setUltimateLockConfirmed(currentId(), true);
+      keepUltimateToggleLocked(pending.button);
       window.dispatchEvent(new CustomEvent("mechkawaii:ultimate-energy-finalized", { detail: { charId: currentId() } }));
     }
     return ok;
@@ -259,9 +282,9 @@
     card.classList.remove("ult-skill-locked");
     removeLegacyLockOverlay(card);
 
-    if (!used) setUltimateLockConfirmed(currentId(), false);
-
     isCurrentUltimateRearmable().then(rearmable => {
+      if (!used && rearmable) setUltimateLockConfirmed(currentId(), false);
+      if (!rearmable && isUltimateLockConfirmed(currentId())) keepUltimateToggleLocked(sw);
       const locked = used && !rearmable && isUltimateLockConfirmed(currentId());
       card.classList.toggle("ult-skill-locked", locked);
       if (locked) removeLegacyLockOverlay(card);
@@ -274,7 +297,7 @@
 
     if (glowObserver) glowObserver.disconnect();
     glowObserver = new MutationObserver(syncGlow);
-    glowObserver.observe(container, { subtree: true, attributes: true, attributeFilter: ["class", "style", "src"] });
+    glowObserver.observe(container, { subtree: true, attributes: true, attributeFilter: ["class", "style", "src", "aria-pressed", "aria-checked", "data-active"] });
 
     setTimeout(syncGlow, 100);
     setTimeout(syncGlow, 300);
@@ -282,10 +305,20 @@
 
   function init() {
     initGlow();
+    isCurrentUltimateRearmable();
 
     document.addEventListener("click", event => {
       const trigger = getUltimateTrigger(event.target);
       if (!trigger) return;
+
+      if (isLockedNonRearmableUltimate(trigger)) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        keepUltimateToggleLocked(trigger);
+        toast(getLang() === "fr" ? "Ce Coup Unique ne peut pas être réamorcé." : "This Ultimate Ability cannot be reactivated.");
+        return;
+      }
 
       if (!canSpendUltimate()) {
         event.preventDefault();
@@ -295,7 +328,7 @@
         return;
       }
 
-      setUltimateLockConfirmed(currentId(), false);
+      if (!isUltimateUsed(trigger)) setUltimateLockConfirmed(currentId(), false);
       pending = {
         token: Date.now(),
         snap: snapshot(),
@@ -316,7 +349,7 @@
 
     window.addEventListener("mechkawaii:ultimate-cancelled", () => setTimeout(syncGlow, 60));
     window.addEventListener("mechkawaii:energy-updated", () => setTimeout(syncGlow, 60));
-    window.addEventListener("pageshow", () => { initGlow(); setTimeout(syncGlow, 60); });
+    window.addEventListener("pageshow", () => { initGlow(); isCurrentUltimateRearmable(); setTimeout(syncGlow, 60); });
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
