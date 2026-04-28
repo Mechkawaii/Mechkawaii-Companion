@@ -394,10 +394,9 @@
   .page-character .character-hero,
   .page-character .character-header,
   .page-character .char-header,
-  .page-character .hero-character,
-  .page-character [class*="character"] [class*="badge"],
-  .page-character [class*="hero"] [class*="badge"] {
+  .page-character .hero-character {
     min-width: 0 !important;
+    overflow: hidden !important;
   }
 
   .page-character .brand-with-portrait img[src*="cu"],
@@ -410,10 +409,10 @@
   .page-character .topbar > .controls [src*="CU"],
   .page-character .topbar > .controls [src*="ultimate"],
   .page-character .topbar > .controls [src*="Ultimate"] {
-    width: 30px !important;
-    max-width: 30px !important;
+    width: 100px !important;
+    max-width: 100px !important;
     height: auto !important;
-    max-height: 30px !important;
+    max-height: 100px !important;
     object-fit: contain !important;
   }
 
@@ -427,13 +426,23 @@
   .page-character .topbar > .controls [class*="cu"],
   .page-character .topbar > .controls [class*="CU"],
   .page-character .topbar > .controls [class*="ultimate"] {
-    padding: 2px !important;
-    min-width: 30px !important;
-    min-height: 30px !important;
-    max-width: 34px !important;
-    max-height: 34px !important;
+    padding: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: 104px !important;
+    max-height: 104px !important;
     font-size: 9px !important;
     line-height: 1 !important;
+    flex: 0 0 auto !important;
+  }
+
+  .page-character .brand-with-portrait [class*="badge"],
+  .page-character .brand-with-portrait [class*="cu"],
+  .page-character .brand-with-portrait [class*="CU"],
+  .page-character .brand-with-portrait [class*="ultimate"] {
+    position: relative !important;
+    right: 0 !important;
+    transform: none !important;
   }
 
   .page-character #charName,
@@ -441,7 +450,7 @@
   .page-character #mkwEnergyInlineStatus {
     position: relative !important;
     z-index: 2 !important;
-    max-width: calc(100vw - 180px) !important;
+    max-width: calc(100vw - 220px) !important;
   }
 }
 
