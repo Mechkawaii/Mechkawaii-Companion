@@ -2,7 +2,6 @@
   "use strict";
 
   const PREFIX = "mechkawaii:";
-  const STYLE_ID = "mkwUltimateSystemStyles";
   let pending = null;
   let observer = null;
   let glowObserver = null;
@@ -57,41 +56,12 @@
     observer = null;
   }
 
-  function ensureStyles() {
-    if (document.getElementById(STYLE_ID)) return;
-    const style = document.createElement("style");
-    style.id = STYLE_ID;
-    style.textContent = `
-      .mkw-ultimate-energy-toast {
-        position: fixed;
-        left: 50%;
-        bottom: 92px;
-        transform: translateX(-50%);
-        z-index: 99999;
-        background: #111;
-        color: #fff;
-        border: 1px solid rgba(255,255,255,.18);
-        border-radius: 12px;
-        padding: 10px 14px;
-        box-shadow: 0 12px 28px rgba(0,0,0,.45);
-        font-weight: 850;
-        text-align: center;
-        max-width: calc(100vw - 28px);
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
   function toast(message) {
     const el = document.createElement("div");
     el.className = "mkw-ultimate-energy-toast";
     el.textContent = message;
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 2200);
-  }
-
-  function isUltimateTrigger(target) {
-    return !!target?.closest?.("#ultToggleContainer button, #ultToggleContainer [role='button'], #ultToggleContainer .toggle, #ultToggleContainer .switch");
   }
 
   function getUltimateTrigger(target) {
@@ -227,7 +197,6 @@
   }
 
   function init() {
-    ensureStyles();
     initGlow();
 
     document.addEventListener("click", event => {
