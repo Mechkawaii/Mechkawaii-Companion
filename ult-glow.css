@@ -4,6 +4,8 @@
 
 /* Par défaut : illuminé orange */
 #ultCard {
+  position: relative;
+  overflow: hidden;
   border-color: rgba(255, 159, 80, 0.6);
   box-shadow: 0 0 24px rgba(255, 159, 80, 0.2);
   background: rgba(255, 159, 80, 0.6);
@@ -18,12 +20,42 @@
   color: #FFFFFF;
 }
 
-/* Coup unique utilisé : grisé */
-#ultCard.ult-used {
+/* Coup unique utilisé : grisé uniquement si réamorçable */
+#ultCard.ult-used:not(.ult-skill-locked) {
   border-color: rgba(255, 255, 255, 0.08);
   box-shadow: none;
   opacity: 0.45;
   background: rgba(18, 19, 24, 0.6);
+}
+
+/* Coup unique non réamorçable déjà utilisé : overlay PNG propre */
+#ultCard.ult-skill-locked {
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+  opacity: 1;
+  background: rgba(18, 19, 24, 0.78);
+}
+
+#ultCard.ult-skill-locked::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.34);
+}
+
+#ultCard.ult-skill-locked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 13;
+  pointer-events: none;
+  background-image: url("./assets/skill_lock.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: min(72%, 260px) auto;
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.62));
 }
 
 .mkw-ultimate-energy-toast {
