@@ -390,50 +390,21 @@
   }
 
   .page-character .brand-with-portrait {
-    position: relative !important;
     overflow: hidden !important;
     min-width: 0 !important;
-    padding-right: 112px !important;
   }
 
-  .page-character .brand-with-portrait [class*="badge"],
-  .page-character .brand-with-portrait [class*="cu"],
-  .page-character .brand-with-portrait [class*="CU"],
-  .page-character .brand-with-portrait [class*="ultimate"],
-  .page-character .brand-with-portrait img[src*="cu"],
-  .page-character .brand-with-portrait img[src*="CU"],
-  .page-character .brand-with-portrait img[src*="ultimate"],
-  .page-character .brand-with-portrait img[src*="Ultimate"],
+  .page-character .brand-with-portrait img[src*="CU_"],
+  .page-character .brand-with-portrait img[src*="cu_"],
+  .page-character .brand-with-portrait img[src*="coup"],
   .page-character .brand-with-portrait img[src*="Coup"] {
-    position: absolute !important;
-    right: 12px !important;
-    left: auto !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
     width: 96px !important;
     max-width: 96px !important;
-    height: 96px !important;
-    max-height: 96px !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    object-fit: contain !important;
-    overflow: hidden !important;
-    z-index: 1 !important;
-  }
-
-  .page-character .brand-with-portrait [class*="badge"] img,
-  .page-character .brand-with-portrait [class*="cu"] img,
-  .page-character .brand-with-portrait [class*="CU"] img,
-  .page-character .brand-with-portrait [class*="ultimate"] img {
-    position: static !important;
-    transform: none !important;
-    width: 96px !important;
-    max-width: 96px !important;
-    height: 96px !important;
+    height: auto !important;
     max-height: 96px !important;
     object-fit: contain !important;
+    object-position: center !important;
+    flex: 0 0 auto !important;
   }
 
   .page-character .topbar > .controls img,
@@ -453,7 +424,6 @@
   .page-character #mkwEnergyInlineStatus {
     position: relative !important;
     z-index: 2 !important;
-    max-width: calc(100vw - 220px) !important;
   }
 }
 
