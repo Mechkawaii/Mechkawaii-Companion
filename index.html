@@ -35,6 +35,68 @@
   </script>
   <link rel="stylesheet" href="./style.css" />
   <link rel="stylesheet" href="./presets.css" />
+  <style>
+    .device-choice-grid {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .device-choice-btn {
+      min-height: 0;
+      padding: 12px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    .device-choice-btn.btn-accent {
+      border-color: rgba(255, 210, 0, 0.62);
+      background: rgba(255, 210, 0, 0.12);
+      box-shadow: 0 0 22px rgba(255, 210, 0, 0.16);
+    }
+
+    .device-choice-btn img {
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      display: block;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .device-choice-label {
+      font-weight: 950;
+      text-align: center;
+      line-height: 1.15;
+      color: var(--text);
+      pointer-events: none;
+    }
+
+    @media (max-width: 560px) {
+      .device-choice-grid {
+        gap: 10px;
+      }
+
+      .device-choice-btn {
+        padding: 8px;
+        border-radius: 16px;
+      }
+
+      .device-choice-label {
+        font-size: 12px;
+      }
+    }
+  </style>
 </head>
 
 <body class="page-index has-splash">
@@ -68,9 +130,15 @@
           <p class="text" data-i18n="setup_q_devices_desc">
             Si un seul appareil sert à tout le monde, tu verras tous les persos. Sinon, chaque joueur choisit son camp.
           </p>
-          <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-            <button id="modeSingle" class="btn-accent" data-i18n="setup_mode_single">Un seul appareil pour la table</button>
-            <button id="modeMulti" data-i18n="setup_mode_multi">Chaque joueur à son appareil</button>
+          <div class="device-choice-grid">
+            <button id="modeMulti" class="device-choice-btn" aria-label="Chaque joueur à son appareil">
+              <img src="./assets/Two_device.png" alt="Chaque joueur à son appareil">
+              <span class="device-choice-label" data-i18n="setup_mode_multi">Chaque joueur à son appareil</span>
+            </button>
+            <button id="modeSingle" class="device-choice-btn btn-accent" aria-label="Un seul appareil pour la table">
+              <img src="./assets/One_device.png" alt="Un seul appareil pour la table">
+              <span class="device-choice-label" data-i18n="setup_mode_single">Un seul appareil pour la table</span>
+            </button>
           </div>
         </div>
 
