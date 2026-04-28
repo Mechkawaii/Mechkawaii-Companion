@@ -36,11 +36,32 @@
   background: rgba(18, 19, 24, 0.78);
 }
 
+/* Retire les anciens overlays CU_vide / barres rouges hérités */
+#ultCard.ult-skill-locked [src*="CU_vide"],
+#ultCard.ult-skill-locked [src*="cu_vide"],
+#ultCard.ult-skill-locked [src*="cu-vide"],
+#ultCard.ult-skill-locked [src*="CoupUnique_vide"],
+#ultCard.ult-skill-locked [class*="cu-vide"],
+#ultCard.ult-skill-locked [class*="cu_vide"],
+#ultCard.ult-skill-locked [class*="CU_vide"],
+#ultCard.ult-skill-locked [class*="legacy"],
+#ultCard.ult-skill-locked [class*="stripe"],
+#ultCard.ult-skill-locked [class*="diagonal"],
+#ultCard.ult-skill-locked [id*="cu-vide"],
+#ultCard.ult-skill-locked [id*="cu_vide"],
+#ultCard.ult-skill-locked [id*="legacy"],
+#ultCard.ult-skill-locked [id*="stripe"],
+#ultCard.ult-skill-locked [id*="diagonal"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
 #ultCard.ult-skill-locked::before {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 12;
+  z-index: 9998;
   pointer-events: none;
   background: rgba(0, 0, 0, 0.34);
 }
@@ -49,7 +70,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 13;
+  z-index: 9999;
   pointer-events: none;
   background-image: url("./assets/skill_lock.png");
   background-repeat: no-repeat;
