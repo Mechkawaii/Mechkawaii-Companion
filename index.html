@@ -40,34 +40,34 @@
       margin-top: 14px;
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
+      gap: 10px;
       align-items: stretch;
     }
 
     .device-choice-btn {
       min-height: 0;
-      padding: 12px;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--border);
+      padding: 4px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 6px;
       overflow: hidden;
     }
 
     .device-choice-btn.btn-accent {
       border-color: rgba(255, 210, 0, 0.62);
-      background: rgba(255, 210, 0, 0.12);
-      box-shadow: 0 0 22px rgba(255, 210, 0, 0.16);
+      background: rgba(255, 210, 0, 0.1);
+      box-shadow: 0 0 18px rgba(255, 210, 0, 0.14);
     }
 
     .device-choice-btn img {
       width: 100%;
-      max-width: 260px;
+      max-width: none;
       height: auto;
       display: block;
       object-fit: contain;
@@ -80,20 +80,23 @@
       line-height: 1.15;
       color: var(--text);
       pointer-events: none;
+      padding: 0 6px 6px;
     }
 
     @media (max-width: 560px) {
       .device-choice-grid {
-        gap: 10px;
+        gap: 8px;
       }
 
       .device-choice-btn {
-        padding: 8px;
-        border-radius: 16px;
+        padding: 3px;
+        border-radius: 12px;
+        gap: 4px;
       }
 
       .device-choice-label {
-        font-size: 12px;
+        font-size: 11px;
+        padding: 0 4px 5px;
       }
     }
   </style>
