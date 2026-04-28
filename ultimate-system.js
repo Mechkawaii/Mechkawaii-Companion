@@ -5,6 +5,7 @@
   let pending = null;
   let observer = null;
   let glowObserver = null;
+  let cachedCharacters = null;
 
   function currentId() {
     return new URL(location.href).searchParams.get("id") || "";
@@ -21,6 +22,31 @@
 
   function getLang() {
     return localStorage.getItem(PREFIX + "lang") || "fr";
+  }
+
+  async function loadCharacters() {
+    if (Array.isArray(cachedCharacters)) return cachedCharacters;
+    if (Array.isArray(window.__cachedChars)) {
+      cachedCharacters = window.__cachedChars;
+      return cachedCharacters;
+    }
+    try {
+      const res = await fetch("./data/characters.json", { cache: "no-store" });
+      cachedCharacters = await res.json();
+      window.__cachedChars = cachedCharacters;
+      return cachedCharacters;
+    } catch (error) {
+      cachedCharacters = [];
+      return cachedCharacters;
+    }
+  }
+
+  async function isCurrentUltimateRearmable() {
+    const id = currentId();
+    if (!id) return true;
+    const chars = await loadCharacters();
+    const char = chars.find(item => item.id === id);
+    return char?.cu_rearmable !== false;
   }
 
   function snapshot() {
@@ -181,7 +207,14 @@
 
     const sw = container.querySelector(".switch");
     if (!sw) return;
-    card.classList.toggle("ult-used", sw.classList.contains("on"));
+
+    const used = sw.classList.contains("on");
+    card.classList.toggle("ult-used", used);
+    card.classList.remove("ult-skill-locked");
+
+    isCurrentUltimateRearmable().then(rearmable => {
+      card.classList.toggle("ult-skill-locked", used && !rearmable);
+    });
   }
 
   function initGlow() {
