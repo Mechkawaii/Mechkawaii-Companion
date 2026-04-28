@@ -333,6 +333,33 @@
 </div>
 
   <script src="./app.js"></script>
+  <script>
+    (function () {
+      function defaultToTwoDevices() {
+        try {
+          if (localStorage.getItem("mechkawaii:setup")) return;
+          const setupCard = document.getElementById("setupCard");
+          const modeMulti = document.getElementById("modeMulti");
+          const campPick = document.getElementById("campPick");
+          if (!setupCard || !modeMulti || setupCard.style.display === "none") return;
+          if (modeMulti.dataset.defaultApplied === "1") return;
+          modeMulti.dataset.defaultApplied = "1";
+          modeMulti.click();
+          if (campPick) campPick.style.display = "block";
+        } catch (error) {}
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () {
+          setTimeout(defaultToTwoDevices, 0);
+          setTimeout(defaultToTwoDevices, 120);
+        });
+      } else {
+        setTimeout(defaultToTwoDevices, 0);
+        setTimeout(defaultToTwoDevices, 120);
+      }
+    })();
+  </script>
   <script src="./draft-flow-reset.js" defer></script>
   <script src="./presets.js" defer></script>
   <script src="./tabs-all.js" defer></script>
