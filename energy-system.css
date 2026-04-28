@@ -200,20 +200,27 @@
   }
 
   .mkw-energy-header-action {
-    gap: 8px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
   }
 
   .mkw-energy-header-action .section-title {
+    width: 100%;
     font-size: 15px;
+    line-height: 1.18;
   }
 
   .mkw-header-energy-tools {
-    gap: 6px;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 8px;
+    min-width: 0;
   }
 
   .mkw-header-energy-tools img {
-    width: 58px;
-    max-width: 18vw;
+    width: 72px;
+    max-width: 42vw;
   }
 
   .mkw-resource-energy-cost {
