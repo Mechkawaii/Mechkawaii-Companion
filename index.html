@@ -68,14 +68,23 @@
       box-shadow: 0 0 18px rgba(255, 210, 0, 0.14);
     }
 
-    .device-choice-btn img,
-    .faction-choice-btn img {
+    .device-choice-btn img {
       width: 100%;
       max-width: none;
       height: auto;
       display: block;
       object-fit: contain;
       pointer-events: none;
+    }
+
+    .faction-choice-btn img {
+      width: min(74%, 150px);
+      max-width: 150px;
+      height: auto;
+      display: block;
+      object-fit: contain;
+      pointer-events: none;
+      margin: 8px auto 0;
     }
 
     .device-choice-label,
@@ -99,6 +108,12 @@
         padding: 3px;
         border-radius: 12px;
         gap: 4px;
+      }
+
+      .faction-choice-btn img {
+        width: min(68%, 112px);
+        max-width: 112px;
+        margin-top: 6px;
       }
 
       .device-choice-label,
