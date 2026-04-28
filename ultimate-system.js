@@ -7,6 +7,7 @@
   let glowObserver = null;
   let cachedCharacters = null;
   let currentUltimateRearmableCache = true;
+  let syncingGlow = false;
 
   function currentId() {
     return new URL(location.href).searchParams.get("id") || "";
@@ -162,11 +163,10 @@
     sw.dataset.locked = "true";
     const input = sw.querySelector?.("input");
     if (input) input.checked = true;
-    setTimeout(syncGlow, 0);
   }
 
   function isLockedNonRearmableUltimate(trigger) {
-    return isUltimateUsed(trigger) && !currentUltimateRearmableCache && isUltimateLockConfirmed(currentId());
+    return !pending && isUltimateUsed(trigger) && !currentUltimateRearmableCache && isUltimateLockConfirmed(currentId());
   }
 
   function isModal(el) {
@@ -202,7 +202,6 @@
     pending.spent = !!ok;
     if (ok) {
       setUltimateLockConfirmed(currentId(), true);
-      keepUltimateToggleLocked(pending.button);
       window.dispatchEvent(new CustomEvent("mechkawaii:ultimate-energy-finalized", { detail: { charId: currentId() } }));
     }
     return ok;
@@ -218,8 +217,10 @@
     if (!pending) return;
     pending.validated = true;
     setTimeout(() => {
-      spendUltimateOnce();
+      const ok = spendUltimateOnce();
+      const trigger = pending?.button;
       stop();
+      if (ok && trigger) keepUltimateToggleLocked(trigger);
       syncGlow();
     }, 0);
   }
@@ -236,8 +237,8 @@
       btn.addEventListener("click", () => {
         if (!pending) return;
         if (isCancelLike(btn)) handleCancel();
-        else handleValidated();
-      }, true);
+        else setTimeout(handleValidated, 0);
+      }, false);
     });
   }
 
@@ -267,15 +268,27 @@
   }
 
   function syncGlow() {
+    if (syncingGlow) return;
+    syncingGlow = true;
+
     const container = document.getElementById("ultToggleContainer");
-    if (!container) return;
+    if (!container) {
+      syncingGlow = false;
+      return;
+    }
 
     const card = container.closest(".card");
-    if (!card) return;
+    if (!card) {
+      syncingGlow = false;
+      return;
+    }
     card.id = "ultCard";
 
     const sw = container.querySelector(".switch");
-    if (!sw) return;
+    if (!sw) {
+      syncingGlow = false;
+      return;
+    }
 
     const used = sw.classList.contains("on");
     card.classList.toggle("ult-used", used);
@@ -284,10 +297,11 @@
 
     isCurrentUltimateRearmable().then(rearmable => {
       if (!used && rearmable) setUltimateLockConfirmed(currentId(), false);
-      if (!rearmable && isUltimateLockConfirmed(currentId())) keepUltimateToggleLocked(sw);
       const locked = used && !rearmable && isUltimateLockConfirmed(currentId());
       card.classList.toggle("ult-skill-locked", locked);
       if (locked) removeLegacyLockOverlay(card);
+    }).finally(() => {
+      syncingGlow = false;
     });
   }
 
@@ -316,6 +330,7 @@
         event.stopPropagation();
         event.stopImmediatePropagation();
         keepUltimateToggleLocked(trigger);
+        syncGlow();
         toast(getLang() === "fr" ? "Ce Coup Unique ne peut pas être réamorcé." : "This Ultimate Ability cannot be reactivated.");
         return;
       }
@@ -344,8 +359,8 @@
       const btn = event.target?.closest?.("button, [role='button'], [data-ultimate-target]");
       if (!btn || !isModal(btn)) return;
       if (isCancelLike(btn)) handleCancel();
-      else handleValidated();
-    }, true);
+      else setTimeout(handleValidated, 0);
+    }, false);
 
     window.addEventListener("mechkawaii:ultimate-cancelled", () => setTimeout(syncGlow, 60));
     window.addEventListener("mechkawaii:energy-updated", () => setTimeout(syncGlow, 60));
