@@ -20,7 +20,7 @@
 
   const I18N = {
     fr: {
-      roadToggle: "Commence sur une route",
+      roadToggle: "Bonus route",
       roadHelp: "Si l’unité commence son tour sur une route, elle gagne un déplacement gratuit. Ce bonus ne compte pas comme son action Se déplacer.",
       notEnough: "Pas assez d’énergie.",
       alreadyUsed: "Cette action a déjà été utilisée ce tour.",
@@ -37,7 +37,7 @@
       repairText: "Rend 1 PV à une unité alliée adjacente ou à soi-même. Peut relever une unité HS avec 1 PV."
     },
     en: {
-      roadToggle: "Starts on a road",
+      roadToggle: "Road bonus",
       roadHelp: "If this unit starts its turn on a road, it gains one free move. This bonus does not count as its Move action.",
       notEnough: "Not enough energy.",
       alreadyUsed: "This action has already been used this turn.",
