@@ -49,6 +49,33 @@
     return char?.cu_rearmable !== false;
   }
 
+  function removeLegacyLockOverlay(card) {
+    if (!card) return;
+
+    card.querySelectorAll("img, [class], [id], [style]").forEach(el => {
+      const src = String(el.getAttribute("src") || "").toLowerCase();
+      const cls = String(el.className || "").toLowerCase();
+      const id = String(el.id || "").toLowerCase();
+      const style = String(el.getAttribute("style") || "").toLowerCase();
+      const marker = `${src} ${cls} ${id} ${style}`;
+
+      const isLegacyCuVide = marker.includes("cu_vide") ||
+        marker.includes("cu-vide") ||
+        marker.includes("cuvide") ||
+        marker.includes("cu vide") ||
+        marker.includes("ultimate_empty") ||
+        marker.includes("ultimate-empty");
+
+      const isLegacyLockOverlay = marker.includes("legacy") && marker.includes("ult") ||
+        marker.includes("red") && marker.includes("stripe") ||
+        marker.includes("diagonal") && marker.includes("ult") ||
+        marker.includes("lock") && marker.includes("overlay") ||
+        marker.includes("skill") && marker.includes("overlay");
+
+      if (isLegacyCuVide || isLegacyLockOverlay) el.remove();
+    });
+  }
+
   function snapshot() {
     const id = currentId();
     if (!id) return null;
@@ -211,9 +238,12 @@
     const used = sw.classList.contains("on");
     card.classList.toggle("ult-used", used);
     card.classList.remove("ult-skill-locked");
+    removeLegacyLockOverlay(card);
 
     isCurrentUltimateRearmable().then(rearmable => {
-      card.classList.toggle("ult-skill-locked", used && !rearmable);
+      const locked = used && !rearmable;
+      card.classList.toggle("ult-skill-locked", locked);
+      if (locked) removeLegacyLockOverlay(card);
     });
   }
 
@@ -223,7 +253,7 @@
 
     if (glowObserver) glowObserver.disconnect();
     glowObserver = new MutationObserver(syncGlow);
-    glowObserver.observe(container, { subtree: true, attributes: true, attributeFilter: ["class"] });
+    glowObserver.observe(container, { subtree: true, attributes: true, attributeFilter: ["class", "style", "src"] });
 
     setTimeout(syncGlow, 100);
     setTimeout(syncGlow, 300);
