@@ -36,7 +36,8 @@
   <link rel="stylesheet" href="./style.css" />
   <link rel="stylesheet" href="./presets.css" />
   <style>
-    .device-choice-grid {
+    .device-choice-grid,
+    .faction-choice-grid {
       margin-top: 14px;
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -44,7 +45,8 @@
       align-items: stretch;
     }
 
-    .device-choice-btn {
+    .device-choice-btn,
+    .faction-choice-btn {
       min-height: 0;
       padding: 4px;
       border-radius: 14px;
@@ -59,13 +61,15 @@
       overflow: hidden;
     }
 
-    .device-choice-btn.btn-accent {
+    .device-choice-btn.btn-accent,
+    .faction-choice-btn.btn-accent {
       border-color: rgba(255, 210, 0, 0.62);
       background: rgba(255, 210, 0, 0.1);
       box-shadow: 0 0 18px rgba(255, 210, 0, 0.14);
     }
 
-    .device-choice-btn img {
+    .device-choice-btn img,
+    .faction-choice-btn img {
       width: 100%;
       max-width: none;
       height: auto;
@@ -74,7 +78,8 @@
       pointer-events: none;
     }
 
-    .device-choice-label {
+    .device-choice-label,
+    .faction-choice-label {
       font-weight: 950;
       text-align: center;
       line-height: 1.15;
@@ -84,17 +89,20 @@
     }
 
     @media (max-width: 560px) {
-      .device-choice-grid {
+      .device-choice-grid,
+      .faction-choice-grid {
         gap: 8px;
       }
 
-      .device-choice-btn {
+      .device-choice-btn,
+      .faction-choice-btn {
         padding: 3px;
         border-radius: 12px;
         gap: 4px;
       }
 
-      .device-choice-label {
+      .device-choice-label,
+      .faction-choice-label {
         font-size: 11px;
         padding: 0 4px 5px;
       }
@@ -131,11 +139,11 @@
         <div class="rule" style="margin-top:0;">
           <h3 data-i18n="setup_q_devices">1) Combien d'appareil ?</h3>
           <div class="device-choice-grid">
-            <button id="modeMulti" class="device-choice-btn" aria-label="Chaque joueur à son appareil">
+            <button id="modeMulti" class="device-choice-btn btn-accent" aria-label="Chaque joueur à son appareil">
               <img src="./assets/Two_device.png" alt="Chaque joueur à son appareil">
               <span class="device-choice-label" data-i18n="setup_mode_multi">Chaque joueur à son appareil</span>
             </button>
-            <button id="modeSingle" class="device-choice-btn btn-accent" aria-label="Un seul appareil pour la table">
+            <button id="modeSingle" class="device-choice-btn" aria-label="Un seul appareil pour la table">
               <img src="./assets/One_device.png" alt="Un seul appareil pour la table">
               <span class="device-choice-label" data-i18n="setup_mode_single">Un seul appareil pour la table</span>
             </button>
@@ -144,9 +152,15 @@
 
         <div id="campPick" class="rule" style="display:none;">
           <h3 data-i18n="setup_q_camp">2) Choisis ton camp</h3>
-          <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-            <button id="campMech" class="btn-accent" data-i18n="camp_mech">Mechkawaii</button>
-            <button id="campProd" data-i18n="camp_prod">Prodrome</button>
+          <div class="faction-choice-grid">
+            <button id="campMech" class="faction-choice-btn btn-accent" aria-label="Mechkawaii">
+              <img src="./assets/faction_mechkawaii.png" alt="Mechkawaii">
+              <span class="faction-choice-label" data-i18n="camp_mech">Mechkawaii</span>
+            </button>
+            <button id="campProd" class="faction-choice-btn" aria-label="Prodrome">
+              <img src="./assets/faction_prodrome.png" alt="Prodrome">
+              <span class="faction-choice-label" data-i18n="camp_prod">Prodrome</span>
+            </button>
           </div>
          </div>
 
