@@ -4,6 +4,17 @@
   const PREFIX = "mechkawaii:";
   const STYLE_ID = "mkwEnergySystemStyles";
   const ENERGY_DATA_URL = "./data/energy-costs.json";
+  const NO_CLASS_ACTION_TOGGLE_IDS = new Set([
+    "johanna",
+    "goryo",
+    "fuyu",
+    "goki",
+    "khurt",
+    "samebito",
+    "rasmus",
+    "senpoku"
+  ]);
+
   let energyData = null;
   let cachedChars = null;
   let lastCampResetToken = null;
@@ -51,6 +62,7 @@
   function writeJson(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
   function currentId(){ return new URL(location.href).searchParams.get("id") || ""; }
   function normalize(value){ return String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, ""); }
+  function shouldShowClassActionToggle(id = currentId()){ return !NO_CLASS_ACTION_TOGGLE_IDS.has(normalize(id)); }
   function getEnergyKey(id){ return PREFIX + "energy:" + id; }
   function getActionKey(id){ return PREFIX + "turn-actions:" + id; }
   function getRoadKey(id){ return PREFIX + "road-start:" + id; }
@@ -177,7 +189,7 @@
   function applyActionAvailability(){ document.querySelectorAll("#repairKeysDisplay button, #repairKeysDisplay .key-button").forEach(btn => setButtonAvailability(btn, "repair")); document.querySelectorAll("#shieldsDisplay button, #shieldsDisplay .shield-button, #shieldsDisplay .key-button").forEach(btn => setButtonAvailability(btn, "protect")); document.querySelectorAll("#ultToggleContainer button, #ultToggleContainer [role='button']").forEach(btn => setButtonAvailability(btn, "ultimate")); }
   function bindExistingButtons(){ document.querySelectorAll("#ultToggleContainer button, #ultToggleContainer [role='button']").forEach(btn => { if(btn.dataset.energyBound === "1") return; btn.dataset.energyBound = "1"; btn.addEventListener("click", event => { const pressed = btn.getAttribute("aria-pressed") === "true" || btn.classList.contains("used") || btn.classList.contains("is-used"); if(pressed) return; blockIfCannotSpend(event, "ultimate"); }, true); }); }
   function exposeEnergyApi(){ window.mkwCanSpendEnergyAction = action => canSpendValidatedAction(action); window.mkwSpendEnergyAction = action => spendValidatedAction(action); window.mkwGetEnergyActionCost = action => getActionCostForUse(currentId(), action); window.mkwValidateUltimateEnergy = () => spendValidatedAction("ultimate"); window.mkwResetEnergyForActiveCamp = function(force = true){ return resetEnergyForActiveCamp(getFlow(), { force }); }; }
-  function render(){ if(!energyData) return; const id = currentId(); if(!id) return; clearOldInline(); updateEnergyStatus(); const costs = getCostsForId(id) || {}; addResourceCost(".shields-section", "protect", tr("protectTitle"), tr("protectText")); addResourceCost(".repair-section", "repair", tr("repairTitle"), tr("repairText")); addEnergyCostToCardHeader(getMovementCard(), "move", Number(costs.move || 0), true, tr("move")); addRoadToggle(); addEnergyCostToCardHeader(getAttackCard(), "ranged_attack", Number(costs.ranged_attack || 0), true, tr("attackTitle")); addEnergyCostToHeader("#classActionTitle", "class_action", Number(costs.class_action || 0), true); addEnergyCostToHeader("#ultTitle", "ultimate", Number(costs.ultimate || 0), false); bindExistingButtons(); applyActionAvailability(); exposeEnergyApi(); }
+  function render(){ if(!energyData) return; const id = currentId(); if(!id) return; clearOldInline(); updateEnergyStatus(); const costs = getCostsForId(id) || {}; addResourceCost(".shields-section", "protect", tr("protectTitle"), tr("protectText")); addResourceCost(".repair-section", "repair", tr("repairTitle"), tr("repairText")); addEnergyCostToCardHeader(getMovementCard(), "move", Number(costs.move || 0), true, tr("move")); addRoadToggle(); addEnergyCostToCardHeader(getAttackCard(), "ranged_attack", Number(costs.ranged_attack || 0), true, tr("attackTitle")); addEnergyCostToHeader("#classActionTitle", "class_action", Number(costs.class_action || 0), shouldShowClassActionToggle(id)); addEnergyCostToHeader("#ultTitle", "ultimate", Number(costs.ultimate || 0), false); bindExistingButtons(); applyActionAvailability(); exposeEnergyApi(); }
   async function init(){ ensureStyles(); preloadEnergyImages(); await loadEnergyData(); const id = currentId(); if(id && !readJson(getEnergyKey(id), null)) resetEnergy(id); exposeEnergyApi(); render(); window.addEventListener("mechkawaii:turn-start", event => { resetEnergyForActiveCamp(event.detail || getFlow(), { force:true }).then(render); }); window.addEventListener("mechkawaii:game-flow-updated", event => { resetEnergyForActiveCamp(event.detail || getFlow(), { force:true }).then(render); }); window.addEventListener("mechkawaii:energy-updated", event => { if(event?.detail?.charId === currentId()){ updateEnergyStatus(); setTimeout(render, 0); } }); window.addEventListener("mechkawaii:energy-action-validated", event => { const action = event?.detail?.action; const charId = event?.detail?.charId || currentId(); if(charId !== currentId() || !action) return; spendValidatedAction(action); }); window.addEventListener("mechkawaii:shield-updated", () => setTimeout(render, 80)); document.addEventListener("click", event => { if(!event.target.closest?.(".mkw-end-turn")) return; setTimeout(() => resetEnergyForActiveCamp(getFlow(), { force:true }).then(render), 40); setTimeout(() => resetEnergyForActiveCamp(getFlow(), { force:true }).then(render), 180); }, true); window.addEventListener("pageshow", render); setTimeout(() => resetEnergyForActiveCamp(getFlow(), { force:false }).then(render), 500); setTimeout(render, 300); setTimeout(render, 900); }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
