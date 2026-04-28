@@ -389,30 +389,59 @@
     max-width: 38%;
   }
 
+  .page-character .brand-with-portrait,
+  .page-character .brand-with-portrait + *,
+  .page-character .character-hero,
+  .page-character .character-header,
+  .page-character .char-header,
+  .page-character .hero-character,
+  .page-character [class*="character"] [class*="badge"],
+  .page-character [class*="hero"] [class*="badge"] {
+    min-width: 0 !important;
+  }
+
+  .page-character .brand-with-portrait img[src*="cu"],
+  .page-character .brand-with-portrait img[src*="CU"],
+  .page-character .brand-with-portrait img[src*="ultimate"],
+  .page-character .brand-with-portrait img[src*="Ultimate"],
+  .page-character .brand-with-portrait img[src*="Coup"],
   .page-character .topbar > .controls img,
   .page-character .topbar > .controls [src*="cu"],
   .page-character .topbar > .controls [src*="CU"],
   .page-character .topbar > .controls [src*="ultimate"],
   .page-character .topbar > .controls [src*="Ultimate"] {
-    width: 34px !important;
-    max-width: 34px !important;
+    width: 30px !important;
+    max-width: 30px !important;
     height: auto !important;
-    max-height: 34px !important;
+    max-height: 30px !important;
     object-fit: contain !important;
   }
 
+  .page-character .brand-with-portrait [class*="badge"],
+  .page-character .brand-with-portrait [class*="cu"],
+  .page-character .brand-with-portrait [class*="CU"],
+  .page-character .brand-with-portrait [class*="ultimate"],
   .page-character .topbar > .controls button,
   .page-character .topbar > .controls .badge,
   .page-character .topbar > .controls [class*="badge"],
   .page-character .topbar > .controls [class*="cu"],
   .page-character .topbar > .controls [class*="CU"],
   .page-character .topbar > .controls [class*="ultimate"] {
-    padding: 4px !important;
-    min-width: 34px !important;
-    min-height: 34px !important;
-    max-width: 42px !important;
-    font-size: 10px !important;
+    padding: 2px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    max-width: 34px !important;
+    max-height: 34px !important;
+    font-size: 9px !important;
     line-height: 1 !important;
+  }
+
+  .page-character #charName,
+  .page-character #charClass,
+  .page-character #mkwEnergyInlineStatus {
+    position: relative !important;
+    z-index: 2 !important;
+    max-width: calc(100vw - 180px) !important;
   }
 }
 
