@@ -3,7 +3,6 @@
 
   const PREFIX = "mechkawaii:";
   const FLOW_KEY = PREFIX + "game-flow";
-  const STYLE_ID = "mkwGameFlowStyles";
 
   const I18N = {
     fr: {
@@ -62,42 +61,6 @@
   function setState(state){ writeJson(FLOW_KEY, state); window.dispatchEvent(new CustomEvent("mechkawaii:game-flow-updated", { detail: state })); }
   function isPlayerTurn(state){ return !state?.playerCamp || state.currentCamp === state.playerCamp; }
   function needsStartConfig(state){ return !state?.started || !state.firstCamp; }
-
-  function ensureStyles(){
-    if(document.getElementById(STYLE_ID)) return;
-    const style = document.createElement("style");
-    style.id = STYLE_ID;
-    style.textContent = `
-      #mkwTurnBanner { margin: 12px 0 16px; padding: 13px 14px; border-radius: 18px; border: 1px solid rgba(255,255,255,.14); background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.035)); box-shadow: 0 14px 32px rgba(0,0,0,.22); display:flex; align-items:center; justify-content:space-between; gap:12px; }
-      .mkw-turn-main { min-width:0; }
-      .mkw-turn-title { font-weight:950; font-size:16px; }
-      .mkw-turn-sub { margin-top:3px; color:var(--muted); font-size:12px; font-weight:750; }
-      .mkw-turn-actions { display:flex; gap:8px; flex:0 0 auto; }
-      .mkw-turn-actions button { border-radius:13px; border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.08); color:var(--text,#fff); font-weight:900; padding:10px 12px; cursor:pointer; }
-      .mkw-turn-actions .mkw-end-turn { background: rgba(255,210,77,.16); border-color: rgba(255,210,77,.55); }
-      #mkwFirstPlayerBackdrop { position:fixed; inset:0; z-index:9300; background:rgba(0,0,0,.68); display:flex; align-items:center; justify-content:center; padding:18px; }
-      #mkwFirstPlayerPanel { width:min(520px,100%); background:linear-gradient(180deg,#1a1a24,#101018); color:#fff; border:1px solid rgba(255,255,255,.15); border-radius:22px; box-shadow:0 24px 60px rgba(0,0,0,.55); padding:18px; }
-      .mkw-first-title { font-weight:950; font-size:20px; margin-bottom:6px; }
-      .mkw-first-help { color:rgba(255,255,255,.7); line-height:1.35; margin-bottom:12px; font-size:14px; }
-      .mkw-first-block-title { margin-top:14px; margin-bottom:8px; font-size:13px; font-weight:950; color:rgba(255,255,255,.82); text-transform:uppercase; letter-spacing:.05em; }
-      .mkw-first-choice-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-      .mkw-first-choice { width:100%; padding:13px; border-radius:16px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.07); color:#fff; font-weight:950; cursor:pointer; }
-      .mkw-first-choice:hover { border-color:rgba(255,210,77,.55); background:rgba(255,210,77,.12); }
-      .mkw-first-choice.is-selected { border-color:rgba(255,210,77,.86); background:rgba(255,210,77,.18); box-shadow:0 0 22px rgba(255,210,77,.13); }
-      .mkw-first-start { width:100%; margin-top:16px; padding:14px; border-radius:17px; border:1px solid rgba(255,210,77,.62); background:rgba(255,210,77,.16); color:#fff; font-weight:950; cursor:pointer; }
-      .mkw-first-start:disabled { opacity:.38; filter:grayscale(.8); cursor:not-allowed; }
-
-      #mkwTurnTransitionBackdrop { position:fixed; inset:0; z-index:9350; display:flex; align-items:center; justify-content:center; padding:22px; background:rgba(0,0,0,.62); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
-      #mkwTurnTransitionPanel { width:min(620px,100%); text-align:center; color:#fff; background:linear-gradient(180deg, rgba(26,26,36,.96), rgba(10,10,18,.98)); border:1px solid rgba(255,255,255,.16); border-radius:28px; box-shadow:0 28px 80px rgba(0,0,0,.62); padding:28px 20px; }
-      .mkw-turn-transition-round { color:rgba(255,255,255,.62); font-size:13px; font-weight:950; text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px; }
-      .mkw-turn-transition-title { font-size:clamp(34px, 9vw, 72px); line-height:.95; font-weight:1000; text-transform:uppercase; letter-spacing:.02em; text-shadow:0 0 26px rgba(255,77,252,.22); }
-      .mkw-turn-transition-help { margin:14px auto 20px; max-width:420px; color:rgba(255,255,255,.72); font-size:14px; line-height:1.35; }
-      .mkw-turn-transition-button { width:min(360px,100%); border:1px solid rgba(255,210,77,.62); background:rgba(255,210,77,.16); color:#fff; border-radius:18px; padding:14px 16px; font-weight:950; cursor:pointer; box-shadow:0 0 24px rgba(255,210,77,.13); }
-      .mkw-turn-transition-button:hover { background:rgba(255,210,77,.22); }
-      @media (max-width:560px){ #mkwTurnBanner{ align-items:stretch; flex-direction:column; } .mkw-turn-actions button{ width:100%; } #mkwTurnTransitionPanel{ padding:24px 16px; } .mkw-first-choice-grid{ grid-template-columns:1fr; } }
-    `;
-    document.head.appendChild(style);
-  }
 
   function createState(firstCamp){
     const setup = getSetup();
@@ -227,7 +190,6 @@
   function resetFlow(){ localStorage.removeItem(FLOW_KEY); closeTurnTransition(); renderBanner(); showStarter(); }
 
   function renderBanner(){
-    ensureStyles();
     let banner = document.querySelector("#mkwTurnBanner");
     if(!banner){
       banner = document.createElement("div");
@@ -263,7 +225,6 @@
   }
 
   function init(){
-    ensureStyles();
     const state = getState();
     renderBanner();
     if(needsStartConfig(state)) setTimeout(showStarter, 250);
