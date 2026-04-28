@@ -2,7 +2,6 @@
   "use strict";
 
   const PREFIX = "mechkawaii:";
-  const STYLE_ID = "mkwResetSystemStyles";
   let resetAllBound = false;
   let resetUnitBound = false;
 
@@ -44,26 +43,7 @@
       .trim();
   }
 
-  function ensureStyles() {
-    if (document.getElementById(STYLE_ID)) return;
-    const style = document.createElement("style");
-    style.id = STYLE_ID;
-    style.textContent = `
-      .mkw-reset-hidden { display: none !important; }
-      .mkw-reset-backdrop { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 18px; background: rgba(0,0,0,.68); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-      .mkw-reset-panel { width: min(460px, 100%); color: #fff; background: linear-gradient(180deg, #1a1a24, #101018); border: 1px solid rgba(255,255,255,.15); border-radius: 22px; box-shadow: 0 24px 70px rgba(0,0,0,.6); padding: 18px; }
-      .mkw-reset-title { font-size: 20px; font-weight: 950; margin-bottom: 8px; }
-      .mkw-reset-text { color: rgba(255,255,255,.74); font-size: 14px; line-height: 1.4; margin-bottom: 16px; }
-      .mkw-reset-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
-      .mkw-reset-actions button { border-radius: 14px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.08); color: #fff; font-weight: 900; padding: 11px 13px; cursor: pointer; }
-      .mkw-reset-actions .mkw-reset-danger { border-color: rgba(255,89,119,.7); background: rgba(255,89,119,.18); }
-      @media (max-width: 520px) { .mkw-reset-actions button { width: 100%; } }
-    `;
-    (document.head || document.documentElement).appendChild(style);
-  }
-
   function confirmModal({ title, text, confirmText, onConfirm }) {
-    ensureStyles();
     document.querySelector(".mkw-reset-backdrop")?.remove();
 
     const backdrop = document.createElement("div");
@@ -229,7 +209,6 @@
   }
 
   function init() {
-    ensureStyles();
     bindResetAll();
     bindResetUnit();
     polishUi();
