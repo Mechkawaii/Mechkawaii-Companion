@@ -80,6 +80,7 @@
   function setCurrentEnergy(id, current){ const max = getMaxEnergy(); const next = Math.max(0, Math.min(max, Number(current))); writeJson(getEnergyKey(id), { current: next, max }); window.dispatchEvent(new CustomEvent("mechkawaii:energy-updated", { detail:{ charId:id, current:next, max } })); }
   function resetEnergy(id, token = getRoundToken()){ const max = getMaxEnergy(); writeJson(getEnergyKey(id), { current:max, max }); writeJson(getActionKey(id), { token, used:{} }); }
   function resetRoadStart(id, token = getRoundToken()){ writeJson(getRoadKey(id), { token, enabled:false, used:false }); }
+  function isEnergyAlreadySyncedForToken(id, token){ const energy = readJson(getEnergyKey(id), null); const actions = readJson(getActionKey(id), null); return !!energy && typeof energy.current === "number" && !!actions && actions.token === token; }
   async function resetEnergyForActiveCamp(flow = getFlow(), options = {}){
     if(!flow?.started || !flow.currentCamp) return;
     const token = getRoundToken(flow);
@@ -90,13 +91,16 @@
     const activeIds = getActiveIds();
     const currentCharId = currentId();
     let currentCharWasReset = false;
+    let didResetAnyUnit = false;
 
     chars.forEach(char => {
       if((char.camp || "mechkawaii") !== flow.currentCamp) return;
       if(activeIds.size && !activeIds.has(char.id)) return;
+      if(!options.force && isEnergyAlreadySyncedForToken(char.id, token)) return;
       writeJson(getEnergyKey(char.id), { current:max, max });
       writeJson(getActionKey(char.id), { token, used:{} });
       resetRoadStart(char.id, token);
+      didResetAnyUnit = true;
       if(char.id === currentCharId) currentCharWasReset = true;
     });
 
@@ -104,7 +108,9 @@
       window.dispatchEvent(new CustomEvent("mechkawaii:energy-updated", { detail:{ charId:currentCharId, current:max, max } }));
     }
 
-    window.dispatchEvent(new CustomEvent("mechkawaii:turn-energy-reset", { detail:{ currentCamp:flow.currentCamp, roundNumber:flow.roundNumber, token } }));
+    if(didResetAnyUnit) {
+      window.dispatchEvent(new CustomEvent("mechkawaii:turn-energy-reset", { detail:{ currentCamp:flow.currentCamp, roundNumber:flow.roundNumber, token } }));
+    }
   }
   function getActionState(id){ const token = getRoundToken(); const state = readJson(getActionKey(id), { token, used:{} }); if(state.token !== token) return { token, used:{} }; return state; }
   function saveActionState(id, state){ writeJson(getActionKey(id), state); }
