@@ -7,6 +7,7 @@
   const BLUE_BY_TECH_KEY = PREFIX + "blue-shield-by-tech";
   const BLUE_META_KEY = PREFIX + "blue-shield-expiry-meta";
   const LAST_TOKEN_KEY = PREFIX + "blue-shield-expiry-last-token";
+  let isSyncingVisuals = false;
 
   function readJson(key, fallback) {
     try {
@@ -34,18 +35,28 @@
     return new URL(location.href).searchParams.get("id") || "";
   }
 
+  function removeShieldClasses(el) {
+    if (!el) return;
+    el.classList.remove("has-shield", "is-shielded", "shielded", "mkw-tab-shielded", "mkw-tab-shield-pulse");
+  }
+
   function setShieldGlow(targetId, enabled) {
     if (!targetId || targetId !== currentCharId()) return;
 
     [
       document.querySelector("#hpCard"),
       document.querySelector("#charPortrait"),
-      document.querySelector(".topbar")
+      document.querySelector(".topbar"),
+      document.querySelector(".hp-shields-wrapper"),
+      document.querySelector(".hp-section"),
+      document.querySelector(".shields-section")
     ].forEach(el => {
       if (!el) return;
-      el.classList.toggle("has-shield", enabled);
-      el.classList.toggle("is-shielded", enabled);
-      el.classList.toggle("shielded", enabled);
+      if (enabled) {
+        el.classList.add("has-shield", "is-shielded", "shielded");
+      } else {
+        removeShieldClasses(el);
+      }
     });
   }
 
@@ -59,23 +70,36 @@
   }
 
   function syncVisibleShieldState(expiredTargets = []) {
-    const stillShielded = getStillShieldedIds();
-    const currentId = currentCharId();
+    if (isSyncingVisuals) return;
+    isSyncingVisuals = true;
 
-    expiredTargets.forEach(id => {
-      if (!stillShielded.has(id)) setShieldGlow(id, false);
-    });
+    try {
+      const stillShielded = getStillShieldedIds();
+      const currentId = currentCharId();
+      const currentIsShielded = currentId && stillShielded.has(currentId);
 
-    if (currentId && !stillShielded.has(currentId)) {
-      setShieldGlow(currentId, false);
+      document.body.classList.toggle("mkw-current-has-no-shield", !!currentId && !currentIsShielded);
+
+      expiredTargets.forEach(id => {
+        if (!stillShielded.has(id)) setShieldGlow(id, false);
+      });
+
+      if (currentId && !currentIsShielded) {
+        setShieldGlow(currentId, false);
+        document.querySelectorAll(".has-shield, .is-shielded, .shielded").forEach(el => {
+          if (!el.closest?.("#unitTabs")) removeShieldClasses(el);
+        });
+      }
+
+      document.querySelectorAll("#unitTabs [data-char-id]").forEach(tab => {
+        const charId = tab.dataset.charId;
+        const isShielded = stillShielded.has(charId);
+        tab.classList.toggle("mkw-tab-shielded", isShielded);
+        if (!isShielded) tab.classList.remove("mkw-tab-shield-pulse");
+      });
+    } finally {
+      isSyncingVisuals = false;
     }
-
-    document.querySelectorAll("#unitTabs [data-char-id]").forEach(tab => {
-      const charId = tab.dataset.charId;
-      const isShielded = stillShielded.has(charId);
-      tab.classList.toggle("mkw-tab-shielded", isShielded);
-      if (!isShielded) tab.classList.remove("mkw-tab-shield-pulse");
-    });
   }
 
   function dispatchBlueExpiry(expiredTargets) {
@@ -85,19 +109,21 @@
 
     ids.forEach(id => {
       window.dispatchEvent(new CustomEvent("mechkawaii:shield-updated", {
-        detail: { charId: id, type: "technician", expired: true }
+        detail: { charId: id, type: "technician", expired: true, immediate: true }
       }));
     });
 
     if (ids.length) {
       window.dispatchEvent(new CustomEvent("mechkawaii:shields-expired", {
-        detail: { charIds: ids, type: "technician" }
+        detail: { charIds: ids, type: "technician", immediate: true }
       }));
     }
 
     requestAnimationFrame(() => syncVisibleShieldState(ids));
-    setTimeout(() => syncVisibleShieldState(ids), 80);
-    setTimeout(() => syncVisibleShieldState(ids), 220);
+    setTimeout(() => syncVisibleShieldState(ids), 40);
+    setTimeout(() => syncVisibleShieldState(ids), 120);
+    setTimeout(() => syncVisibleShieldState(ids), 260);
+    setTimeout(() => syncVisibleShieldState(ids), 700);
   }
 
   function expireBlueShields() {
@@ -142,9 +168,28 @@
 
   function scheduleExpiry() {
     setTimeout(expireBlueShields, 0);
-    setTimeout(expireBlueShields, 80);
-    setTimeout(expireBlueShields, 220);
-    setTimeout(expireBlueShields, 600);
+    setTimeout(expireBlueShields, 40);
+    setTimeout(expireBlueShields, 120);
+    setTimeout(expireBlueShields, 260);
+    setTimeout(expireBlueShields, 700);
+  }
+
+  function installVisualObserver() {
+    if (document.body?.dataset.blueShieldVisualObserver === "1") return;
+    if (!document.body) return;
+    document.body.dataset.blueShieldVisualObserver = "1";
+
+    const observer = new MutationObserver(() => {
+      clearTimeout(installVisualObserver.timer);
+      installVisualObserver.timer = setTimeout(syncVisibleShieldState, 10);
+    });
+
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["class"]
+    });
   }
 
   function init() {
@@ -153,6 +198,7 @@
       localStorage.setItem(LAST_TOKEN_KEY, tokenFor(flow));
     }
 
+    installVisualObserver();
     window.addEventListener("mechkawaii:game-flow-updated", scheduleExpiry);
     window.addEventListener("mechkawaii:turn-start", scheduleExpiry);
     window.addEventListener("mechkawaii:shield-updated", scheduleExpiry);
