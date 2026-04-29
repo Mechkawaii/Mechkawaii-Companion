@@ -17,7 +17,8 @@
     const alt = String(img?.getAttribute("alt") || el.getAttribute?.("alt") || "").toLowerCase();
     const cls = String(el.className || "").toLowerCase();
     const id = String(el.id || "").toLowerCase();
-    return `${src} ${alt} ${cls} ${id}`;
+    const text = String(el.textContent || "").trim().toLowerCase();
+    return `${src} ${alt} ${cls} ${id} ${text}`;
   }
 
   function isEmptyCuBadge(el) {
@@ -32,22 +33,23 @@
       marker.includes("off");
   }
 
-  function isCuBadgeImage(img) {
-    if (!(img instanceof HTMLImageElement)) return false;
-    if (!img.closest(".page-character .topbar")) return false;
-    if (img.closest("#charPortrait")) return false;
-    if (img.closest("#mkwEnergyInlineStatus")) return false;
-
-    const marker = markerFor(img);
-
+  function isCuMarker(el) {
+    const marker = markerFor(el);
     if (marker.includes("energy_") || marker.includes("pv") || marker.includes("heart") || marker.includes("portrait")) return false;
-
     return marker.includes("cu_") ||
       marker.includes("coup") ||
       marker.includes("unique") ||
       marker.includes("ultimate") ||
       marker.includes("ult") ||
       marker.includes("badge");
+  }
+
+  function isCuBadgeImage(img) {
+    if (!(img instanceof HTMLImageElement)) return false;
+    if (!img.closest(".page-character .topbar")) return false;
+    if (img.closest("#charPortrait")) return false;
+    if (img.closest("#mkwEnergyInlineStatus")) return false;
+    return isCuMarker(img);
   }
 
   function badgeRoot(img) {
@@ -58,6 +60,7 @@
 
   function looksLikeRemoveControl(el, badgeRootEl) {
     if (!(el instanceof Element) || el === badgeRootEl) return false;
+
     const text = String(el.textContent || "").trim().toLowerCase();
     const aria = String(el.getAttribute("aria-label") || "").toLowerCase();
     const title = String(el.getAttribute("title") || "").toLowerCase();
@@ -65,19 +68,42 @@
     const id = String(el.id || "").toLowerCase();
     const marker = `${text} ${aria} ${title} ${cls} ${id}`;
 
+    const rect = el.getBoundingClientRect?.();
+    const badgeRect = badgeRootEl?.getBoundingClientRect?.();
+    const smallCornerControl = rect && badgeRect &&
+      rect.width > 0 && rect.height > 0 &&
+      rect.width <= 28 && rect.height <= 28 &&
+      rect.left >= badgeRect.left + badgeRect.width * 0.45 &&
+      rect.top <= badgeRect.top + badgeRect.height * 0.55;
+
     return text === "×" || text === "x" || text === "✕" || text === "✖" ||
       marker.includes("close") ||
       marker.includes("remove") ||
       marker.includes("delete") ||
       marker.includes("retir") ||
       marker.includes("suppr") ||
-      marker.includes("dismiss");
+      marker.includes("dismiss") ||
+      (smallCornerControl && (el.tagName === "BUTTON" || el.getAttribute("role") === "button" || marker.includes("badge")));
   }
 
   function stripRemoveControls(root) {
     if (!(root instanceof Element)) return;
-    root.querySelectorAll("button, [role='button'], [aria-label], [title], [class], [id]").forEach(el => {
+    root.querySelectorAll("button, [role='button'], [aria-label], [title], [class], [id], span, div").forEach(el => {
       if (looksLikeRemoveControl(el, root)) el.remove();
+    });
+  }
+
+  function stripAllCuRemoveControls(scope = document) {
+    if (!scope?.querySelectorAll) return;
+
+    scope.querySelectorAll(".page-character .topbar img").forEach(img => {
+      if (!isCuBadgeImage(img)) return;
+      stripRemoveControls(badgeRoot(img));
+    });
+
+    scope.querySelectorAll(`.${BADGE_CLASS}, .${EMPTY_BADGE_CLASS}, [class*='badge'], [class*='Badge'], [class*='cu'], [class*='CU'], [class*='ult'], [class*='Ult']`).forEach(el => {
+      if (el.closest("#charPortrait") || el.closest("#mkwEnergyInlineStatus")) return;
+      if (el.closest(".page-character .topbar") && isCuMarker(el)) stripRemoveControls(el);
     });
   }
 
@@ -116,6 +142,8 @@
     isSyncing = true;
 
     try {
+      stripAllCuRemoveControls(document);
+
       const topbar = document.querySelector(".page-character .topbar");
       const brand = document.querySelector(".page-character .brand-with-portrait");
       if (!topbar || !brand) return;
@@ -150,6 +178,7 @@
 
       cleanRow(row);
       sortRow(row);
+      stripAllCuRemoveControls(row);
 
       row.style.display = row.children.length ? "flex" : "none";
       topbar.classList.toggle("has-mobile-cu-badges", row.children.length > 0);
@@ -160,16 +189,25 @@
 
   function scheduleSync() {
     if (isSyncing) return;
+    stripAllCuRemoveControls(document);
     clearTimeout(scheduleSync.timer);
-    scheduleSync.timer = setTimeout(syncBadges, 40);
+    scheduleSync.timer = setTimeout(syncBadges, 20);
   }
 
   function init() {
+    stripAllCuRemoveControls(document);
     syncBadges();
-    [80, 180, 360, 800, 1400, 2400].forEach(delay => setTimeout(syncBadges, delay));
+    [0, 40, 80, 180, 360, 800, 1400, 2400].forEach(delay => setTimeout(syncBadges, delay));
 
-    const observer = new MutationObserver(scheduleSync);
-    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["src", "class", "style"] });
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+          if (node instanceof Element) stripAllCuRemoveControls(node);
+        });
+      });
+      scheduleSync();
+    });
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["src", "class", "style", "aria-label", "title"] });
 
     window.addEventListener("resize", scheduleSync);
     window.addEventListener("pageshow", scheduleSync);
