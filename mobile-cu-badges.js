@@ -3,6 +3,7 @@
 
   const ROW_CLASS = "mkw-mobile-cu-badge-row";
   const BADGE_CLASS = "mkw-mobile-cu-badge";
+  const EMPTY_BADGE_CLASS = "mkw-mobile-cu-badge-empty";
   let isSyncing = false;
 
   function isMobile() {
@@ -40,7 +41,6 @@
     const marker = markerFor(img);
 
     if (marker.includes("energy_") || marker.includes("pv") || marker.includes("heart") || marker.includes("portrait")) return false;
-    if (isEmptyCuBadge(img)) return false;
 
     return marker.includes("cu_") ||
       marker.includes("coup") ||
@@ -81,20 +81,34 @@
     });
   }
 
-  function removeEmptyAndDuplicateBadges(row) {
+  function keyForBadge(el) {
+    const img = el instanceof HTMLImageElement ? el : el.querySelector?.("img");
+    return String(img?.getAttribute("src") || el.getAttribute?.("src") || el.outerHTML || "").toLowerCase();
+  }
+
+  function cleanRow(row) {
     const seen = new Set();
     Array.from(row.children).forEach(child => {
       stripRemoveControls(child);
       const img = child instanceof HTMLImageElement ? child : child.querySelector?.("img");
-      const key = String(img?.getAttribute("src") || child.getAttribute?.("src") || child.outerHTML || "").toLowerCase();
+      const key = keyForBadge(child);
 
-      if (!img || isEmptyCuBadge(child) || seen.has(key)) {
+      if (!img || seen.has(key)) {
         child.remove();
         return;
       }
 
+      child.classList.toggle(EMPTY_BADGE_CLASS, isEmptyCuBadge(child));
       seen.add(key);
     });
+  }
+
+  function sortRow(row) {
+    const children = Array.from(row.children);
+    const emptyBadges = children.filter(isEmptyCuBadge);
+    const fullBadges = children.filter(child => !isEmptyCuBadge(child));
+    [...emptyBadges, ...fullBadges].slice(0, 3).forEach(child => row.appendChild(child));
+    Array.from(row.children).slice(3).forEach(child => child.remove());
   }
 
   function syncBadges() {
@@ -114,28 +128,28 @@
         topbar.appendChild(row);
       }
 
-      removeEmptyAndDuplicateBadges(row);
+      cleanRow(row);
 
       const roots = [];
       topbar.querySelectorAll("img").forEach(img => {
         if (!isCuBadgeImage(img)) return;
         const root = badgeRoot(img);
-        if (isEmptyCuBadge(root)) return;
         stripRemoveControls(root);
         if (!roots.includes(root)) roots.push(root);
       });
 
-      roots.slice(0, 3).forEach(root => {
+      const emptyRoots = roots.filter(isEmptyCuBadge);
+      const fullRoots = roots.filter(root => !isEmptyCuBadge(root));
+
+      [...emptyRoots, ...fullRoots].slice(0, 3).forEach(root => {
         stripRemoveControls(root);
-        if (root.parentElement !== row) {
-          root.classList.add(BADGE_CLASS);
-          row.appendChild(root);
-        } else {
-          root.classList.add(BADGE_CLASS);
-        }
+        root.classList.add(BADGE_CLASS);
+        root.classList.toggle(EMPTY_BADGE_CLASS, isEmptyCuBadge(root));
+        if (root.parentElement !== row) row.appendChild(root);
       });
 
-      removeEmptyAndDuplicateBadges(row);
+      cleanRow(row);
+      sortRow(row);
 
       row.style.display = row.children.length ? "flex" : "none";
       topbar.classList.toggle("has-mobile-cu-badges", row.children.length > 0);
