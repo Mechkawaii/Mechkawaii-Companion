@@ -58,12 +58,18 @@
   }
 
   function isTurnEndClick(target){
-    const el=target?.closest?.(".mkw-end-turn,.mkw-turn-transition-button,.mkw-reset-flow");
-    return !!el;
+    const el=target?.closest?.("button,a,[role='button']");
+    if(!el)return false;
+    if(el.matches(".mkw-end-turn,.mkw-turn-transition-button,.mkw-reset-flow"))return true;
+    const text=(el.textContent||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    return text.includes("fin de tour") || text.includes("end turn") || text.includes("tour des") || text.includes("est termine") || text.includes("turn is finished");
   }
 
   function init(){
     installStyle();
+    document.addEventListener("pointerdown",event=>{
+      if(isTurnEndClick(event.target))forceClearShieldVisuals();
+    },true);
     document.addEventListener("click",event=>{
       if(isTurnEndClick(event.target))forceClearShieldVisuals();
     },true);
