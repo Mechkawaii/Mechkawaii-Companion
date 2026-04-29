@@ -3,9 +3,32 @@
 
   const ROW_CLASS = "mkw-mobile-cu-badge-row";
   const BADGE_CLASS = "mkw-mobile-cu-badge";
+  let isSyncing = false;
 
   function isMobile() {
     return window.matchMedia && window.matchMedia("(max-width: 560px)").matches;
+  }
+
+  function markerFor(el) {
+    if (!el) return "";
+    const img = el instanceof HTMLImageElement ? el : el.querySelector?.("img");
+    const src = String(img?.getAttribute("src") || el.getAttribute?.("src") || "").toLowerCase();
+    const alt = String(img?.getAttribute("alt") || el.getAttribute?.("alt") || "").toLowerCase();
+    const cls = String(el.className || "").toLowerCase();
+    const id = String(el.id || "").toLowerCase();
+    return `${src} ${alt} ${cls} ${id}`;
+  }
+
+  function isEmptyCuBadge(el) {
+    const marker = markerFor(el);
+    return marker.includes("cu_vide") ||
+      marker.includes("cu-vide") ||
+      marker.includes("cuvide") ||
+      marker.includes("cu vide") ||
+      marker.includes("empty") ||
+      marker.includes("vide") ||
+      marker.includes("placeholder") ||
+      marker.includes("off");
   }
 
   function isCuBadgeImage(img) {
@@ -13,15 +36,11 @@
     if (!img.closest(".page-character .topbar")) return false;
     if (img.closest("#charPortrait")) return false;
     if (img.closest("#mkwEnergyInlineStatus")) return false;
-    if (img.closest(`.${ROW_CLASS}`)) return false;
 
-    const src = String(img.getAttribute("src") || "").toLowerCase();
-    const alt = String(img.getAttribute("alt") || "").toLowerCase();
-    const cls = String(img.className || "").toLowerCase();
-    const id = String(img.id || "").toLowerCase();
-    const marker = `${src} ${alt} ${cls} ${id}`;
+    const marker = markerFor(img);
 
     if (marker.includes("energy_") || marker.includes("pv") || marker.includes("heart") || marker.includes("portrait")) return false;
+    if (isEmptyCuBadge(img)) return false;
 
     return marker.includes("cu_") ||
       marker.includes("coup") ||
@@ -33,42 +52,72 @@
 
   function badgeRoot(img) {
     const root = img.closest("button, a, [role='button'], [class*='badge'], [class*='Badge'], [class*='cu'], [class*='CU'], [class*='ult'], [class*='Ult']");
-    if (root && root.closest(".page-character .topbar") && !root.closest("#charPortrait") && !root.closest("#mkwEnergyInlineStatus")) return root;
+    if (root && root.closest(".page-character .topbar") && !root.closest("#charPortrait") && !root.closest("#mkwEnergyInlineStatus") && !root.classList.contains(ROW_CLASS)) return root;
     return img;
   }
 
+  function removeEmptyAndDuplicateBadges(row) {
+    const seen = new Set();
+    Array.from(row.children).forEach(child => {
+      const img = child instanceof HTMLImageElement ? child : child.querySelector?.("img");
+      const key = String(img?.getAttribute("src") || child.getAttribute?.("src") || child.outerHTML || "").toLowerCase();
+
+      if (!img || isEmptyCuBadge(child) || seen.has(key)) {
+        child.remove();
+        return;
+      }
+
+      seen.add(key);
+    });
+  }
+
   function syncBadges() {
-    if (!isMobile()) return;
+    if (isSyncing || !isMobile()) return;
+    isSyncing = true;
 
-    const topbar = document.querySelector(".page-character .topbar");
-    const brand = document.querySelector(".page-character .brand-with-portrait");
-    if (!topbar || !brand) return;
+    try {
+      const topbar = document.querySelector(".page-character .topbar");
+      const brand = document.querySelector(".page-character .brand-with-portrait");
+      if (!topbar || !brand) return;
 
-    let row = topbar.querySelector(`.${ROW_CLASS}`);
-    if (!row) {
-      row = document.createElement("div");
-      row.className = ROW_CLASS;
-      row.setAttribute("aria-label", "Badges Coup Unique");
-      topbar.appendChild(row);
+      let row = topbar.querySelector(`.${ROW_CLASS}`);
+      if (!row) {
+        row = document.createElement("div");
+        row.className = ROW_CLASS;
+        row.setAttribute("aria-label", "Badges Coup Unique");
+        topbar.appendChild(row);
+      }
+
+      removeEmptyAndDuplicateBadges(row);
+
+      const roots = [];
+      topbar.querySelectorAll("img").forEach(img => {
+        if (!isCuBadgeImage(img)) return;
+        const root = badgeRoot(img);
+        if (isEmptyCuBadge(root)) return;
+        if (!roots.includes(root)) roots.push(root);
+      });
+
+      roots.slice(0, 3).forEach(root => {
+        if (root.parentElement !== row) {
+          root.classList.add(BADGE_CLASS);
+          row.appendChild(root);
+        } else {
+          root.classList.add(BADGE_CLASS);
+        }
+      });
+
+      removeEmptyAndDuplicateBadges(row);
+
+      row.style.display = row.children.length ? "flex" : "none";
+      topbar.classList.toggle("has-mobile-cu-badges", row.children.length > 0);
+    } finally {
+      isSyncing = false;
     }
-
-    const roots = [];
-    topbar.querySelectorAll("img").forEach(img => {
-      if (!isCuBadgeImage(img)) return;
-      const root = badgeRoot(img);
-      if (!roots.includes(root)) roots.push(root);
-    });
-
-    roots.slice(0, 3).forEach(root => {
-      root.classList.add(BADGE_CLASS);
-      row.appendChild(root);
-    });
-
-    row.style.display = row.children.length ? "flex" : "none";
-    topbar.classList.toggle("has-mobile-cu-badges", row.children.length > 0);
   }
 
   function scheduleSync() {
+    if (isSyncing) return;
     clearTimeout(scheduleSync.timer);
     scheduleSync.timer = setTimeout(syncBadges, 40);
   }
