@@ -34,7 +34,7 @@
     display: flex !important;
     align-items: center !important;
     justify-content: flex-end !important;
-    gap: 6px !important;
+    gap: 2px !important;
     max-width: none !important;
     overflow: visible !important;
   }
@@ -51,13 +51,13 @@
   .page-character .topbar > .controls img[src*="Coup"],
   .page-character .topbar > .controls img[src*="ult"],
   .page-character .topbar > .controls img[src*="Ult"] {
-    width: 40px !important;
-    height: 40px !important;
-    min-width: 40px !important;
-    min-height: 40px !important;
-    max-width: 40px !important;
-    max-height: 40px !important;
-    flex: 0 0 40px !important;
+    width: 60px !important;
+    height: 60px !important;
+    min-width: 60px !important;
+    min-height: 60px !important;
+    max-width: 60px !important;
+    max-height: 60px !important;
+    flex: 0 0 60px !important;
     object-fit: contain !important;
     object-position: center !important;
     margin: 0 !important;
@@ -80,13 +80,13 @@
   .page-character .topbar > .controls button:has(img[src*="Coup"]),
   .page-character .topbar > .controls button:has(img[src*="ult"]),
   .page-character .topbar > .controls button:has(img[src*="Ult"]) {
-    width: 40px !important;
-    height: 40px !important;
-    min-width: 40px !important;
-    min-height: 40px !important;
-    max-width: 40px !important;
-    max-height: 40px !important;
-    flex: 0 0 40px !important;
+    width: 60px !important;
+    height: 60px !important;
+    min-width: 60px !important;
+    min-height: 60px !important;
+    max-width: 60px !important;
+    max-height: 60px !important;
+    flex: 0 0 60px !important;
     padding: 0 !important;
     margin: 0 !important;
     overflow: visible !important;
@@ -97,6 +97,10 @@
 }
 
 @media (max-width: 390px) {
+  .page-character .topbar > .controls {
+    gap: 1px !important;
+  }
+
   .page-character .brand-with-portrait img[src*="CU_"],
   .page-character .brand-with-portrait img[src*="cu_"],
   .page-character .brand-with-portrait img[src*="coup"],
@@ -121,12 +125,12 @@
   .page-character .topbar > .controls button:has(img[src*="Coup"]),
   .page-character .topbar > .controls button:has(img[src*="ult"]),
   .page-character .topbar > .controls button:has(img[src*="Ult"]) {
-    width: 36px !important;
-    height: 36px !important;
-    min-width: 36px !important;
-    min-height: 36px !important;
-    max-width: 36px !important;
-    max-height: 36px !important;
-    flex-basis: 36px !important;
+    width: 54px !important;
+    height: 54px !important;
+    min-width: 54px !important;
+    min-height: 54px !important;
+    max-width: 54px !important;
+    max-height: 54px !important;
+    flex-basis: 54px !important;
   }
 }
