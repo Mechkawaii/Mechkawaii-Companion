@@ -52,6 +52,12 @@
   .page-character .topbar > .controls img[src*="Coup"],
   .page-character .topbar > .controls img[src*="ult"],
   .page-character .topbar > .controls img[src*="Ult"] {
+    position: relative !important;
+    inset: auto !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
     width: 60px !important;
     height: 60px !important;
     min-width: 60px !important;
@@ -81,6 +87,12 @@
   .page-character .topbar > .controls button:has(img[src*="Coup"]),
   .page-character .topbar > .controls button:has(img[src*="ult"]),
   .page-character .topbar > .controls button:has(img[src*="Ult"]) {
+    position: relative !important;
+    inset: auto !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
     width: 60px !important;
     height: 60px !important;
     min-width: 60px !important;
@@ -94,6 +106,7 @@
     background-size: contain !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
+    transform: none !important;
   }
 }
 
