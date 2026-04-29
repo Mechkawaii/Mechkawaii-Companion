@@ -34,7 +34,8 @@
     display: flex !important;
     align-items: center !important;
     justify-content: flex-end !important;
-    gap: 2px !important;
+    gap: 0 !important;
+    column-gap: 0 !important;
     max-width: none !important;
     overflow: visible !important;
   }
@@ -60,7 +61,7 @@
     flex: 0 0 60px !important;
     object-fit: contain !important;
     object-position: center !important;
-    margin: 0 !important;
+    margin: 0 -4px !important;
     padding: 0 !important;
     overflow: visible !important;
     transform: none !important;
@@ -88,7 +89,7 @@
     max-height: 60px !important;
     flex: 0 0 60px !important;
     padding: 0 !important;
-    margin: 0 !important;
+    margin: 0 -4px !important;
     overflow: visible !important;
     background-size: contain !important;
     background-position: center !important;
@@ -98,7 +99,8 @@
 
 @media (max-width: 390px) {
   .page-character .topbar > .controls {
-    gap: 1px !important;
+    gap: 0 !important;
+    column-gap: 0 !important;
   }
 
   .page-character .brand-with-portrait img[src*="CU_"],
@@ -132,5 +134,6 @@
     max-width: 54px !important;
     max-height: 54px !important;
     flex-basis: 54px !important;
+    margin: 0 -4px !important;
   }
 }
