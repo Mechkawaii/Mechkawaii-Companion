@@ -3,8 +3,10 @@
 
   const PREFIX = "mechkawaii:";
   const FLOW_KEY = PREFIX + "game-flow";
+  const CLASSIC_ASSIGNMENTS_KEY = PREFIX + "shield-assignments";
   const BLUE_BY_TECH_KEY = PREFIX + "blue-shield-by-tech";
   const BLUE_META_KEY = PREFIX + "blue-shield-expiry-meta";
+  const BLUE_KEY_PREFIX = PREFIX + "blue-shield";
 
   const I18N = {
     fr: {
@@ -64,31 +66,47 @@
   function isPlayerTurn(state){ return !state?.playerCamp || state.currentCamp === state.playerCamp; }
   function needsStartConfig(state){ return !state?.started || !state.firstCamp; }
 
-  function clearTechnicianBlueShields(){
+  function getClassicShieldedSet(){
+    return new Set(Object.values(readJson(CLASSIC_ASSIGNMENTS_KEY, {})).filter(Boolean));
+  }
+
+  function collectBlueTargets(){
     const byTech = readJson(BLUE_BY_TECH_KEY, {});
     const meta = readJson(BLUE_META_KEY, {});
-    const targets = Array.from(new Set([
+    const targets = [
       ...Object.values(byTech || {}).filter(Boolean),
       ...Object.values(meta || {}).map(info => info && info.targetId).filter(Boolean)
-    ]));
+    ];
+    return Array.from(new Set(targets));
+  }
 
-    if (!targets.length && !Object.keys(byTech || {}).length && !Object.keys(meta || {}).length) return;
+  function removeShieldClasses(el){
+    if (!el) return;
+    el.classList.remove("has-shield", "is-shielded", "shielded", "mkw-tab-shielded", "mkw-tab-shield-pulse");
+  }
 
+  function clearTechnicianBlueShields(){
+    const targets = collectBlueTargets();
+    const classicShielded = getClassicShieldedSet();
+
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith(BLUE_KEY_PREFIX)) localStorage.removeItem(key);
+    });
     writeJson(BLUE_BY_TECH_KEY, {});
     writeJson(BLUE_META_KEY, {});
 
     const currentId = new URL(location.href).searchParams.get("id") || "";
-    if (targets.includes(currentId)) {
+    if (currentId && !classicShielded.has(currentId)) {
       ["#hpCard", "#charPortrait", ".topbar", ".hp-shields-wrapper", ".hp-section", ".shields-section"].forEach(selector => {
-        const el = document.querySelector(selector);
-        if (!el) return;
-        el.classList.remove("has-shield", "is-shielded", "shielded");
+        removeShieldClasses(document.querySelector(selector));
+      });
+      document.querySelectorAll(".has-shield, .is-shielded, .shielded").forEach(el => {
+        if (!el.closest?.("#unitTabs")) removeShieldClasses(el);
       });
     }
 
     document.querySelectorAll("#unitTabs [data-char-id]").forEach(tab => {
-      if (!targets.includes(tab.dataset.charId)) return;
-      tab.classList.remove("mkw-tab-shielded", "mkw-tab-shield-pulse");
+      if (!classicShielded.has(tab.dataset.charId)) removeShieldClasses(tab);
     });
 
     targets.forEach(charId => {
