@@ -56,9 +56,35 @@
     return img;
   }
 
+  function looksLikeRemoveControl(el, badgeRootEl) {
+    if (!(el instanceof Element) || el === badgeRootEl) return false;
+    const text = String(el.textContent || "").trim().toLowerCase();
+    const aria = String(el.getAttribute("aria-label") || "").toLowerCase();
+    const title = String(el.getAttribute("title") || "").toLowerCase();
+    const cls = String(el.className || "").toLowerCase();
+    const id = String(el.id || "").toLowerCase();
+    const marker = `${text} ${aria} ${title} ${cls} ${id}`;
+
+    return text === "×" || text === "x" || text === "✕" || text === "✖" ||
+      marker.includes("close") ||
+      marker.includes("remove") ||
+      marker.includes("delete") ||
+      marker.includes("retir") ||
+      marker.includes("suppr") ||
+      marker.includes("dismiss");
+  }
+
+  function stripRemoveControls(root) {
+    if (!(root instanceof Element)) return;
+    root.querySelectorAll("button, [role='button'], [aria-label], [title], [class], [id]").forEach(el => {
+      if (looksLikeRemoveControl(el, root)) el.remove();
+    });
+  }
+
   function removeEmptyAndDuplicateBadges(row) {
     const seen = new Set();
     Array.from(row.children).forEach(child => {
+      stripRemoveControls(child);
       const img = child instanceof HTMLImageElement ? child : child.querySelector?.("img");
       const key = String(img?.getAttribute("src") || child.getAttribute?.("src") || child.outerHTML || "").toLowerCase();
 
@@ -95,10 +121,12 @@
         if (!isCuBadgeImage(img)) return;
         const root = badgeRoot(img);
         if (isEmptyCuBadge(root)) return;
+        stripRemoveControls(root);
         if (!roots.includes(root)) roots.push(root);
       });
 
       roots.slice(0, 3).forEach(root => {
+        stripRemoveControls(root);
         if (root.parentElement !== row) {
           root.classList.add(BADGE_CLASS);
           row.appendChild(root);
