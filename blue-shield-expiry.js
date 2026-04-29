@@ -3,6 +3,7 @@
 
   const PREFIX = "mechkawaii:";
   const FLOW_KEY = PREFIX + "game-flow";
+  const CLASSIC_ASSIGNMENTS_KEY = PREFIX + "shield-assignments";
   const BLUE_BY_TECH_KEY = PREFIX + "blue-shield-by-tech";
   const BLUE_META_KEY = PREFIX + "blue-shield-expiry-meta";
   const LAST_TOKEN_KEY = PREFIX + "blue-shield-expiry-last-token";
@@ -29,9 +30,12 @@
     return `${Number(flow.roundNumber || 1)}:${flow.currentCamp || "mechkawaii"}`;
   }
 
+  function currentCharId() {
+    return new URL(location.href).searchParams.get("id") || "";
+  }
+
   function setShieldGlow(targetId, enabled) {
-    const currentId = new URL(location.href).searchParams.get("id") || "";
-    if (!targetId || targetId !== currentId) return;
+    if (!targetId || targetId !== currentCharId()) return;
 
     [
       document.querySelector("#hpCard"),
@@ -45,10 +49,41 @@
     });
   }
 
+  function getStillShieldedIds() {
+    const classicAssignments = readJson(CLASSIC_ASSIGNMENTS_KEY, {});
+    const blueByTech = readJson(BLUE_BY_TECH_KEY, {});
+    return new Set([
+      ...Object.values(classicAssignments).filter(Boolean),
+      ...Object.values(blueByTech).filter(Boolean)
+    ]);
+  }
+
+  function syncVisibleShieldState(expiredTargets = []) {
+    const stillShielded = getStillShieldedIds();
+    const currentId = currentCharId();
+
+    expiredTargets.forEach(id => {
+      if (!stillShielded.has(id)) setShieldGlow(id, false);
+    });
+
+    if (currentId && !stillShielded.has(currentId)) {
+      setShieldGlow(currentId, false);
+    }
+
+    document.querySelectorAll("#unitTabs [data-char-id]").forEach(tab => {
+      const charId = tab.dataset.charId;
+      const isShielded = stillShielded.has(charId);
+      tab.classList.toggle("mkw-tab-shielded", isShielded);
+      if (!isShielded) tab.classList.remove("mkw-tab-shield-pulse");
+    });
+  }
+
   function dispatchBlueExpiry(expiredTargets) {
     const ids = Array.from(new Set(expiredTargets.filter(Boolean)));
+
+    syncVisibleShieldState(ids);
+
     ids.forEach(id => {
-      setShieldGlow(id, false);
       window.dispatchEvent(new CustomEvent("mechkawaii:shield-updated", {
         detail: { charId: id, type: "technician", expired: true }
       }));
@@ -59,6 +94,10 @@
         detail: { charIds: ids, type: "technician" }
       }));
     }
+
+    requestAnimationFrame(() => syncVisibleShieldState(ids));
+    setTimeout(() => syncVisibleShieldState(ids), 80);
+    setTimeout(() => syncVisibleShieldState(ids), 220);
   }
 
   function expireBlueShields() {
@@ -78,8 +117,6 @@
       const info = meta[techId];
       const targetId = byTech[techId] || info?.targetId;
 
-      // Same behavior as the orange shields: once the turn token changes, the protection expires.
-      // Metadata is still supported for old saves, but the decisive rule is the token change.
       const placedToken = info?.placedToken;
       const metaSaysExpired = !!placedToken && placedToken !== currentToken;
       const legacyExpired = !info && tokenChanged;
@@ -96,6 +133,8 @@
       writeJson(BLUE_BY_TECH_KEY, byTech);
       writeJson(BLUE_META_KEY, meta);
       dispatchBlueExpiry(expiredTargets);
+    } else {
+      syncVisibleShieldState();
     }
 
     localStorage.setItem(LAST_TOKEN_KEY, currentToken);
