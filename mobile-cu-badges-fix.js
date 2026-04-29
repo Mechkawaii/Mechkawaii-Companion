@@ -1,8 +1,10 @@
 (function () {
   "use strict";
 
-  const STYLE_ID = "mkwMobileCuBadgesFixStyles";
+  const STYLE_ID = "mkwMobileCuBadgesHardFixStyles";
   const ROW_CLASS = "mkw-mobile-cu-badges-row";
+  const HEADER_CLASS = "mkw-mobile-cu-header-host";
+  const BADGE_CLASS = "mkw-mobile-cu-badge-force";
 
   function ensureStyles() {
     if (document.getElementById(STYLE_ID)) return;
@@ -11,26 +13,19 @@
     style.id = STYLE_ID;
     style.textContent = `
       @media (max-width: 560px) {
-        .page-character .topbar {
-          overflow: visible !important;
-        }
-
-        .page-character .brand-with-portrait {
+        .page-character .${HEADER_CLASS} {
           position: relative !important;
-          width: 100% !important;
-          min-width: 0 !important;
-          padding-right: 104px !important;
           overflow: visible !important;
+          padding-right: 112px !important;
         }
 
-        .page-character .brand-with-portrait > div:not(#charPortrait):not(.${ROW_CLASS}) {
-          min-width: 0 !important;
-          max-width: 100% !important;
+        .page-character .${HEADER_CLASS} * {
+          min-width: 0;
         }
 
-        .page-character #charName,
-        .page-character #charClass {
-          max-width: 100% !important;
+        .page-character .${HEADER_CLASS} #charName,
+        .page-character .${HEADER_CLASS} #charClass {
+          max-width: calc(100vw - 210px) !important;
           overflow: hidden !important;
           text-overflow: ellipsis !important;
           white-space: nowrap !important;
@@ -38,30 +33,32 @@
 
         .page-character .${ROW_CLASS} {
           position: absolute !important;
+          z-index: 999 !important;
           top: 50% !important;
-          right: 2px !important;
+          right: 8px !important;
           transform: translateY(-50%) !important;
-          z-index: 120 !important;
           display: flex !important;
           flex-direction: row !important;
           align-items: center !important;
           justify-content: flex-end !important;
-          gap: 4px !important;
-          width: 96px !important;
-          max-width: 96px !important;
-          height: 34px !important;
-          max-height: 34px !important;
+          gap: 5px !important;
+          width: 104px !important;
+          max-width: 104px !important;
+          height: 36px !important;
+          max-height: 36px !important;
           overflow: visible !important;
           pointer-events: auto !important;
         }
 
-        .page-character .${ROW_CLASS} > * {
+        .page-character .${BADGE_CLASS},
+        .page-character .${BADGE_CLASS} * {
+          box-sizing: border-box !important;
           position: relative !important;
           inset: auto !important;
-          right: auto !important;
-          left: auto !important;
           top: auto !important;
+          right: auto !important;
           bottom: auto !important;
+          left: auto !important;
           transform: none !important;
           width: 30px !important;
           height: 30px !important;
@@ -69,22 +66,23 @@
           min-height: 30px !important;
           max-width: 30px !important;
           max-height: 30px !important;
+          flex: 0 0 30px !important;
           margin: 0 !important;
           padding: 0 !important;
-          flex: 0 0 30px !important;
           overflow: visible !important;
+          object-fit: contain !important;
+          object-position: center !important;
+          background-size: contain !important;
+          background-position: center !important;
+          background-repeat: no-repeat !important;
           border-radius: 0 !important;
-          background: transparent !important;
-          box-shadow: none !important;
+          clip-path: none !important;
+          -webkit-clip-path: none !important;
         }
 
-        .page-character .${ROW_CLASS} > * *,
-        .page-character .${ROW_CLASS} img,
-        .page-character .${ROW_CLASS} svg,
-        .page-character .${ROW_CLASS} canvas {
-          position: static !important;
-          inset: auto !important;
-          transform: none !important;
+        .page-character .${BADGE_CLASS} img,
+        .page-character .${BADGE_CLASS} svg,
+        .page-character .${BADGE_CLASS} canvas {
           display: block !important;
           width: 30px !important;
           height: 30px !important;
@@ -93,38 +91,40 @@
           max-width: 30px !important;
           max-height: 30px !important;
           object-fit: contain !important;
-          object-position: center !important;
-          margin: 0 !important;
-          padding: 0 !important;
-          overflow: visible !important;
         }
       }
 
       @media (max-width: 390px) {
-        .page-character .brand-with-portrait {
-          padding-right: 92px !important;
+        .page-character .${HEADER_CLASS} {
+          padding-right: 100px !important;
+        }
+
+        .page-character .${HEADER_CLASS} #charName,
+        .page-character .${HEADER_CLASS} #charClass {
+          max-width: calc(100vw - 198px) !important;
         }
 
         .page-character .${ROW_CLASS} {
-          width: 84px !important;
-          max-width: 84px !important;
-          height: 30px !important;
-          max-height: 30px !important;
-          gap: 3px !important;
+          width: 92px !important;
+          max-width: 92px !important;
+          height: 32px !important;
+          max-height: 32px !important;
+          gap: 4px !important;
+          right: 6px !important;
         }
 
-        .page-character .${ROW_CLASS} > *,
-        .page-character .${ROW_CLASS} > * *,
-        .page-character .${ROW_CLASS} img,
-        .page-character .${ROW_CLASS} svg,
-        .page-character .${ROW_CLASS} canvas {
-          width: 26px !important;
-          height: 26px !important;
-          min-width: 26px !important;
-          min-height: 26px !important;
-          max-width: 26px !important;
-          max-height: 26px !important;
-          flex-basis: 26px !important;
+        .page-character .${BADGE_CLASS},
+        .page-character .${BADGE_CLASS} *,
+        .page-character .${BADGE_CLASS} img,
+        .page-character .${BADGE_CLASS} svg,
+        .page-character .${BADGE_CLASS} canvas {
+          width: 28px !important;
+          height: 28px !important;
+          min-width: 28px !important;
+          min-height: 28px !important;
+          max-width: 28px !important;
+          max-height: 28px !important;
+          flex-basis: 28px !important;
         }
       }
     `;
@@ -132,82 +132,104 @@
     document.head.appendChild(style);
   }
 
-  function isTopbarBadgeImage(img) {
-    if (!img || !(img instanceof HTMLImageElement)) return false;
-    if (!img.closest(".page-character .topbar")) return false;
-    if (img.closest("#charPortrait")) return false;
-    if (img.closest("#mkwEnergyInlineStatus")) return false;
-    if (img.closest(`.${ROW_CLASS}`)) return false;
-
-    const src = String(img.getAttribute("src") || "").toLowerCase();
-    const klass = String(img.className || "").toLowerCase();
-    const id = String(img.id || "").toLowerCase();
-    const alt = String(img.getAttribute("alt") || "").toLowerCase();
-
-    if (src.includes("energy_") || src.includes("pv") || src.includes("heart") || src.includes("icon-") || src.includes("logo")) return false;
-    if (klass.includes("energy") || id.includes("energy")) return false;
-
-    return (
-      src.includes("badge") ||
-      src.includes("ult") ||
-      src.includes("ultimate") ||
-      src.includes("unique") ||
-      klass.includes("badge") ||
-      klass.includes("ult") ||
-      klass.includes("cu") ||
-      id.includes("badge") ||
-      id.includes("ult") ||
-      id.includes("cu") ||
-      alt.includes("coup") ||
-      alt.includes("unique") ||
-      alt.includes("ultimate")
-    );
+  function isMobile() {
+    return window.matchMedia && window.matchMedia("(max-width: 560px)").matches;
   }
 
-  function getBadgeRoot(img) {
-    const root = img.closest("button, a, [role='button'], [class*='badge'], [class*='Badge'], [class*='ult'], [class*='Ult'], [class*='cu'], [class*='CU']");
-    if (!root) return img;
-    if (root.closest("#charPortrait") || root.closest("#mkwEnergyInlineStatus")) return img;
-    if (!root.closest(".page-character .topbar")) return img;
-    return root;
+  function getHeaderHost() {
+    const name = document.querySelector("#charName");
+    if (!name) return null;
+
+    return name.closest(".topbar, .card, [class*='header'], [class*='Header'], [class*='hero'], [class*='Hero'], [class*='banner'], [class*='Banner']") ||
+      name.parentElement?.parentElement ||
+      document.querySelector(".page-character .container > *:first-child");
+  }
+
+  function hasVisualBackground(el) {
+    if (!(el instanceof Element)) return false;
+    const bg = getComputedStyle(el).backgroundImage || "";
+    return bg !== "none" && bg.includes("url(");
+  }
+
+  function isExcluded(el) {
+    return !!el.closest("#charPortrait, #mkwEnergyInlineStatus, #charName, #charClass, #hpCard, #unitTabsContainer, .unit-tabs-container, .controls, .pill, select, .breadcrumb, nav, .mkw-companion-menu, .mkw-theme-toggle");
+  }
+
+  function looksLikeCuBadge(el, hostRect) {
+    if (!(el instanceof Element)) return false;
+    if (el.classList.contains(ROW_CLASS)) return false;
+    if (el.classList.contains(BADGE_CLASS)) return true;
+    if (isExcluded(el)) return false;
+
+    const rect = el.getBoundingClientRect();
+    if (!rect.width || !rect.height) return false;
+    if (rect.bottom < hostRect.top || rect.top > hostRect.bottom) return false;
+
+    const roughlySquare = Math.abs(rect.width - rect.height) <= Math.max(28, Math.min(rect.width, rect.height) * 0.55);
+    const usableSize = rect.width >= 38 && rect.height >= 38 && rect.width <= 170 && rect.height <= 170;
+    const onRight = rect.left > window.innerWidth * 0.45;
+    const visual = ["IMG", "SVG", "CANVAS", "PICTURE", "BUTTON", "A"].includes(el.tagName) || hasVisualBackground(el) || !!el.querySelector("img, svg, canvas");
+
+    const text = String(el.textContent || "").trim();
+    const mostlyIcon = text.length <= 10;
+
+    return roughlySquare && usableSize && onRight && visual && mostlyIcon;
+  }
+
+  function bestRoot(el, host) {
+    const root = el.closest("button, a, [role='button'], [class*='badge'], [class*='Badge'], [class*='ult'], [class*='Ult'], [class*='unique'], [class*='Unique'], [class*='cu'], [class*='CU']");
+    if (root && host.contains(root) && !isExcluded(root)) return root;
+    return el;
   }
 
   function syncBadges() {
     ensureStyles();
+    if (!isMobile()) return;
 
-    const header = document.querySelector(".page-character .brand-with-portrait");
-    if (!header) return;
+    const host = getHeaderHost();
+    if (!host) return;
 
-    let row = header.querySelector(`.${ROW_CLASS}`);
+    host.classList.add(HEADER_CLASS);
+    host.style.overflow = "visible";
+
+    let row = host.querySelector(`.${ROW_CLASS}`);
     if (!row) {
       row = document.createElement("div");
       row.className = ROW_CLASS;
       row.setAttribute("aria-label", "Badges Coup Unique");
-      header.appendChild(row);
+      host.appendChild(row);
     }
 
-    const roots = [];
-    document.querySelectorAll(".page-character .topbar img").forEach(img => {
-      if (!isTopbarBadgeImage(img)) return;
-      const root = getBadgeRoot(img);
-      if (!roots.includes(root)) roots.push(root);
+    const hostRect = host.getBoundingClientRect();
+    const found = [];
+
+    Array.from(host.querySelectorAll("img, svg, canvas, button, a, [role='button'], div, span")).forEach(el => {
+      if (!looksLikeCuBadge(el, hostRect)) return;
+      const root = bestRoot(el, host);
+      if (!found.includes(root) && !root.classList.contains(ROW_CLASS)) found.push(root);
     });
 
-    roots.slice(0, 3).forEach(root => {
-      if (root.parentElement !== row) row.appendChild(root);
-    });
+    found
+      .filter(el => el !== row && !row.contains(el))
+      .slice(0, 3)
+      .forEach(el => {
+        el.classList.add(BADGE_CLASS);
+        row.appendChild(el);
+      });
 
-    row.style.display = roots.length ? "flex" : "none";
+    Array.from(row.children).forEach(child => child.classList.add(BADGE_CLASS));
+    row.style.display = row.children.length ? "flex" : "none";
   }
 
   function scheduleSync() {
     clearTimeout(scheduleSync.timer);
-    scheduleSync.timer = setTimeout(syncBadges, 30);
+    scheduleSync.timer = setTimeout(syncBadges, 40);
   }
 
   function init() {
+    ensureStyles();
     syncBadges();
-    [80, 180, 350, 700, 1200, 2200].forEach(delay => setTimeout(syncBadges, delay));
+    [80, 160, 320, 700, 1200, 2200, 3500].forEach(delay => setTimeout(syncBadges, delay));
 
     const observer = new MutationObserver(scheduleSync);
     observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "style", "src"] });
