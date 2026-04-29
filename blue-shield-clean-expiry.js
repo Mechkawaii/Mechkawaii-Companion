@@ -8,6 +8,7 @@
   const BLUE_META_KEY = PREFIX + "blue-shield-expiry-meta";
   const BLUE_LOCK_PREFIX = PREFIX + "blue-shield-turn-lock:";
   const TURN_ACTION_PREFIX = PREFIX + "turn-actions:";
+  const PENDING_TARGETS_KEY = PREFIX + "pending-blue-shield-expiry-targets";
 
   const SHIELD_CLASSES = [
     "has-shield",
@@ -64,6 +65,25 @@
     ]));
   }
 
+  function getLiveBlueTargets() {
+    const { byTech, meta } = getBlueData();
+    return getBlueTargets(byTech, meta);
+  }
+
+  function rememberPendingTargets() {
+    const targets = getLiveBlueTargets();
+    if (targets.length) writeJson(PENDING_TARGETS_KEY, targets);
+    return targets;
+  }
+
+  function readPendingTargets() {
+    return readJson(PENDING_TARGETS_KEY, []);
+  }
+
+  function clearPendingTargets() {
+    localStorage.removeItem(PENDING_TARGETS_KEY);
+  }
+
   function stripClasses(el) {
     if (!el) return;
     SHIELD_CLASSES.forEach(cls => el.classList.remove(cls));
@@ -72,8 +92,9 @@
   function removeBlueVisuals(targets) {
     const classic = getClassicShieldedIds();
     const currentId = getCurrentCharId();
+    const uniqueTargets = Array.from(new Set((targets || []).filter(Boolean)));
 
-    if (currentId && targets.includes(currentId) && !classic.has(currentId)) {
+    if (currentId && uniqueTargets.includes(currentId) && !classic.has(currentId)) {
       [
         "#hpCard",
         "#charPortrait",
@@ -90,7 +111,7 @@
 
     document.querySelectorAll("#unitTabs [data-char-id]").forEach(tab => {
       const id = tab.dataset.charId;
-      if (targets.includes(id) && !classic.has(id)) stripClasses(tab);
+      if (uniqueTargets.includes(id) && !classic.has(id)) stripClasses(tab);
     });
   }
 
@@ -135,19 +156,20 @@
   function shouldExpireBlue(currentToken, previousToken, byTech, meta) {
     if (!Object.keys(byTech || {}).length && !Object.keys(meta || {}).length) return false;
 
-    // Same practical behavior as the orange shield: when the active turn changes,
-    // the blue protection is removed at the beginning of the new turn.
     if (previousToken && previousToken !== currentToken) return true;
 
     return Object.values(meta || {}).some(item => item?.placedToken && item.placedToken !== currentToken);
   }
 
-  function expireBlueShields(reason) {
+  function expireBlueShields(reason, forcedTargets = []) {
     if (isExpiring) return;
 
     const currentToken = getTurnToken();
     const { byTech, meta } = getBlueData();
-    const targets = getBlueTargets(byTech, meta);
+    const liveTargets = getBlueTargets(byTech, meta);
+    const pendingTargets = readPendingTargets();
+    const targets = Array.from(new Set([...forcedTargets, ...liveTargets, ...pendingTargets].filter(Boolean)));
+
     if (!targets.length && !Object.keys(byTech || {}).length && !Object.keys(meta || {}).length) return;
 
     isExpiring = true;
@@ -157,7 +179,7 @@
     clearExpiredBlueLocks(currentToken);
     resetCurrentTechActionUi();
 
-    [0, 30, 90, 180, 360].forEach(delay => {
+    [0, 20, 60, 120, 240, 360, 600].forEach(delay => {
       setTimeout(() => {
         writeJson(BLUE_BY_TECH_KEY, {});
         writeJson(BLUE_META_KEY, {});
@@ -171,7 +193,10 @@
       }, delay);
     });
 
-    setTimeout(() => { isExpiring = false; }, 450);
+    setTimeout(() => {
+      clearPendingTargets();
+      isExpiring = false;
+    }, 700);
   }
 
   function sync(reason = "sync") {
@@ -193,14 +218,35 @@
     lastToken = currentToken;
   }
 
+  function isOpponentTurnEndButton(target) {
+    const button = target?.closest?.("button, a, [role='button']");
+    return !!button?.closest?.("#mkwTurnTransitionBackdrop") && button.matches(".mkw-turn-transition-button");
+  }
+
+  function scheduleAfterOpponentTurnClick(targets) {
+    [0, 30, 90, 180, 360, 600].forEach(delay => {
+      setTimeout(() => expireBlueShields("opponent-turn-ended", targets), delay);
+    });
+  }
+
   function init() {
     lastToken = getTurnToken();
+
+    document.addEventListener("pointerdown", event => {
+      if (!isOpponentTurnEndButton(event.target)) return;
+      rememberPendingTargets();
+    }, true);
+
+    document.addEventListener("click", event => {
+      if (!isOpponentTurnEndButton(event.target)) return;
+      const targets = rememberPendingTargets();
+      scheduleAfterOpponentTurnClick(targets);
+    }, true);
 
     window.addEventListener("mechkawaii:game-flow-updated", () => sync("game-flow-updated"));
     window.addEventListener("mechkawaii:turn-start", () => sync("turn-start"));
     window.addEventListener("pageshow", () => sync("pageshow"));
 
-    // Safety net: if another module updates the turn without emitting an event, this still catches it.
     setInterval(() => sync("watchdog"), 150);
   }
 
