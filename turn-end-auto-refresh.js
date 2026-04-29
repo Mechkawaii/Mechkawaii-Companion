@@ -11,32 +11,37 @@
       .trim();
   }
 
-  function isTurnEndButton(target) {
+  function isOpponentTurnModalButton(button) {
+    return !!button?.closest?.("#mkwTurnTransitionBackdrop");
+  }
+
+  function isPlayerEndTurnButton(target) {
     const button = target?.closest?.("button, a, [role='button']");
     if (!button) return false;
 
-    if (button.matches(".mkw-end-turn, .mkw-turn-transition-button")) return true;
+    // Do not refresh when the opponent-turn modal is clicked: this modal must stay visible.
+    if (isOpponentTurnModalButton(button)) return false;
+
+    if (button.matches(".mkw-end-turn")) return true;
 
     const text = normalizeText(button.textContent);
-    return text.includes("fin de tour") ||
-      text.includes("end turn") ||
-      text.includes("est termine") ||
-      text.includes("turn is finished");
+    return text.includes("fin de tour") || text.includes("end turn");
   }
 
   function scheduleReload() {
     if (reloadScheduled) return;
     reloadScheduled = true;
 
-    // Let game-flow.js finish saving the new turn state before refreshing the character sheet.
+    // Leave enough time for game-flow.js to save the new state and display the opponent-turn modal.
+    // The page then reloads on that opponent-turn state, so the modal is visible again after refresh.
     setTimeout(() => {
       location.reload();
-    }, 350);
+    }, 1200);
   }
 
   function init() {
     document.addEventListener("click", event => {
-      if (isTurnEndButton(event.target)) scheduleReload();
+      if (isPlayerEndTurnButton(event.target)) scheduleReload();
     }, true);
   }
 
