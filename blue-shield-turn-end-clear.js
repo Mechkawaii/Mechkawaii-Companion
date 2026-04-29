@@ -57,17 +57,6 @@
       body.${BODY_NO_BLUE_CLASS} .shields-section {
         animation: none !important;
         filter: none !important;
-      }
-
-      body.${BODY_NO_BLUE_CLASS} #hpCard.has-shield,
-      body.${BODY_NO_BLUE_CLASS} #hpCard.is-shielded,
-      body.${BODY_NO_BLUE_CLASS} #hpCard.shielded,
-      body.${BODY_NO_BLUE_CLASS} #charPortrait.has-shield,
-      body.${BODY_NO_BLUE_CLASS} #charPortrait.is-shielded,
-      body.${BODY_NO_BLUE_CLASS} #charPortrait.shielded,
-      body.${BODY_NO_BLUE_CLASS} .topbar.has-shield,
-      body.${BODY_NO_BLUE_CLASS} .topbar.is-shielded,
-      body.${BODY_NO_BLUE_CLASS} .topbar.shielded {
         box-shadow: var(--shadow) !important;
         border-color: var(--border) !important;
       }
@@ -77,22 +66,45 @@
       body.${BODY_NO_BLUE_CLASS} #charPortrait::before,
       body.${BODY_NO_BLUE_CLASS} #charPortrait::after,
       body.${BODY_NO_BLUE_CLASS} .topbar::before,
-      body.${BODY_NO_BLUE_CLASS} .topbar::after {
+      body.${BODY_NO_BLUE_CLASS} .topbar::after,
+      body.${BODY_NO_BLUE_CLASS} .hp-section::before,
+      body.${BODY_NO_BLUE_CLASS} .hp-section::after,
+      body.${BODY_NO_BLUE_CLASS} .shields-section::before,
+      body.${BODY_NO_BLUE_CLASS} .shields-section::after {
         content: none !important;
         display: none !important;
         animation: none !important;
         box-shadow: none !important;
+        background: none !important;
+      }
+
+      body.${BODY_NO_BLUE_CLASS} .mkw-tech-blue-shield-disabled,
+      body.${BODY_NO_BLUE_CLASS} .mkw-tech-class-action-disabled,
+      body.${BODY_NO_BLUE_CLASS} .mkw-energy-disabled-action {
+        opacity: 1 !important;
+        filter: none !important;
+        cursor: pointer !important;
       }
     `;
     document.head.appendChild(style);
   }
 
-  function syncBodyNoBlueClass(targets) {
-    const current = currentCharId();
-    const classic = classicShielded();
-    const targetSet = new Set(targets || []);
-    const currentLostBlue = current && !classic.has(current) && (!targetSet.size || targetSet.has(current));
-    document.body.classList.toggle(BODY_NO_BLUE_CLASS, !!currentLostBlue);
+  function forceResetTechUi() {
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith(PREFIX + "blue-shield-turn-lock:")) localStorage.removeItem(key);
+      if (key.startsWith(PREFIX + "turn-actions:")) localStorage.removeItem(key);
+    });
+
+    document.querySelectorAll(".mkw-tech-blue-shield-disabled, .mkw-tech-class-action-disabled, .mkw-energy-disabled-action, .is-disabled").forEach(el => {
+      el.classList.remove("mkw-tech-blue-shield-disabled", "mkw-tech-class-action-disabled", "mkw-energy-disabled-action", "is-disabled");
+      el.removeAttribute("aria-disabled");
+      if (el.dataset) el.dataset.techShieldDisabled = "0";
+    });
+
+    document.querySelectorAll(".mkw-energy-switch input").forEach(input => {
+      input.checked = false;
+      input.disabled = false;
+    });
   }
 
   function removeVisuals(targets) {
@@ -100,32 +112,40 @@
     const current = currentCharId();
     const targetSet = new Set(targets || []);
     const hasTargets = targetSet.size > 0;
+    const currentIsBlueTarget = current && (!hasTargets || targetSet.has(current));
 
-    if (current && !classic.has(current) && (!hasTargets || targetSet.has(current))) {
-      ["#hpCard", "#charPortrait", ".topbar", ".hp-shields-wrapper", ".hp-section", ".shields-section"].forEach(selector => {
-        removeClasses(document.querySelector(selector));
-      });
+    if (currentIsBlueTarget) {
+      ["#hpCard", "#charPortrait", ".topbar", ".hp-shields-wrapper", ".hp-section", ".shields-section"].forEach(selector => removeClasses(document.querySelector(selector)));
       document.querySelectorAll(".has-shield, .is-shielded, .shielded").forEach(el => {
         if (!el.closest || !el.closest("#unitTabs")) removeClasses(el);
       });
+
+      if (classic.has(current)) {
+        ["#hpCard", "#charPortrait", ".topbar"].forEach(selector => {
+          const el = document.querySelector(selector);
+          if (!el) return;
+          el.classList.add("has-shield", "is-shielded", "shielded");
+        });
+        document.body.classList.remove(BODY_NO_BLUE_CLASS);
+      } else {
+        document.body.classList.add(BODY_NO_BLUE_CLASS);
+      }
     }
 
     document.querySelectorAll("#unitTabs [data-char-id]").forEach(tab => {
       const id = tab.dataset.charId;
-      if (!classic.has(id) && (!hasTargets || targetSet.has(id))) removeClasses(tab);
+      if (!hasTargets || targetSet.has(id)) removeClasses(tab);
+      if (classic.has(id)) tab.classList.add("mkw-tab-shielded");
     });
-
-    syncBodyNoBlueClass(targets);
   }
 
   function clearBlue(targets, reason) {
     writeJson(BLUE_BY_TECH_KEY, {});
     writeJson(BLUE_META_KEY, {});
-    Object.keys(localStorage).forEach(key => {
-      if (key.startsWith(PREFIX + "blue-shield-turn-lock:")) localStorage.removeItem(key);
-    });
-
+    forceResetTechUi();
     removeVisuals(targets);
+
+    if (typeof window.mkwSyncShieldVisualState === "function") window.mkwSyncShieldVisualState();
 
     window.dispatchEvent(new CustomEvent("mechkawaii:blue-shields-cleared", {
       detail: { charIds: targets, reason }
@@ -146,7 +166,7 @@
   function clearOnOpponentTurnEnd() {
     const targets = blueTargets();
     if (!targets.length) return;
-    [0, 40, 120, 260, 600, 1200].forEach(delay => {
+    [0, 40, 120, 260, 600, 1200, 2200].forEach(delay => {
       setTimeout(() => clearBlue(targets, "opponent-turn-ended"), delay);
     });
   }
