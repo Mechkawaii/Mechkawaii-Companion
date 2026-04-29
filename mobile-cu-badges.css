@@ -6,7 +6,7 @@
     align-items: center !important;
     gap: 8px !important;
     overflow: hidden !important;
-    padding-right: 126px !important;
+    padding-right: 150px !important;
   }
 
   .page-character .brand-with-portrait {
@@ -45,9 +45,9 @@
     align-items: center !important;
     justify-content: flex-end !important;
     gap: 0 !important;
-    width: 116px !important;
+    width: 140px !important;
     height: 64px !important;
-    max-width: 116px !important;
+    max-width: 140px !important;
     max-height: 64px !important;
     overflow: visible !important;
     pointer-events: auto !important;
@@ -73,7 +73,7 @@
   }
 
   .page-character .mkw-mobile-cu-badge-row > * + * {
-    margin-left: -32px !important;
+    margin-left: -20px !important;
   }
 
   .page-character .mkw-mobile-cu-badge-row img,
@@ -131,14 +131,14 @@
 
 @media (max-width: 390px) {
   .page-character .topbar {
-    padding-right: 112px !important;
+    padding-right: 132px !important;
   }
 
   .page-character .mkw-mobile-cu-badge-row {
     right: 8px !important;
-    width: 104px !important;
+    width: 124px !important;
     height: 58px !important;
-    max-width: 104px !important;
+    max-width: 124px !important;
     max-height: 58px !important;
   }
 
@@ -168,6 +168,6 @@
   }
 
   .page-character .mkw-mobile-cu-badge-row > * + * {
-    margin-left: -29px !important;
+    margin-left: -17px !important;
   }
 }
