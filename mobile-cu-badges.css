@@ -73,6 +73,17 @@
     pointer-events: none !important;
   }
 
+  .page-character .mkw-mobile-cu-badge-row > .mkw-mobile-cu-badge-empty {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+  }
+
+  .page-character .mkw-mobile-cu-badge-row > .mkw-mobile-cu-badge-empty img,
+  .page-character .mkw-mobile-cu-badge-row > .mkw-mobile-cu-badge-empty svg,
+  .page-character .mkw-mobile-cu-badge-row > .mkw-mobile-cu-badge-empty canvas {
+    pointer-events: auto !important;
+  }
+
   .page-character .mkw-mobile-cu-badge-row > * + * {
     margin-left: 0 !important;
   }
@@ -108,6 +119,11 @@
   .page-character .mkw-mobile-cu-badge-row [class*="remove" i],
   .page-character .mkw-mobile-cu-badge-row [class*="delete" i] {
     pointer-events: none !important;
+  }
+
+  .page-character .mkw-mobile-cu-badge-row > .mkw-mobile-cu-badge-empty,
+  .page-character .mkw-mobile-cu-badge-row > .mkw-mobile-cu-badge-empty:not([aria-label*="retir" i]):not([aria-label*="remove" i]):not([aria-label*="close" i]) {
+    pointer-events: auto !important;
   }
 
   .page-character .mkw-mobile-cu-badge-row > * > button,
