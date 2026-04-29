@@ -15,6 +15,8 @@
   <link rel="stylesheet" href="./charlist.css" />
   <link rel="stylesheet" href="./draft-cards.css" />
   <link rel="stylesheet" href="./breadcrumb.css" />
+  <link rel="stylesheet" href="./presets.css" />
+  <link rel="stylesheet" href="./setup-choice.css" />
   <title>Mechkawaii Companion</title>
   <script src="./session-resume.js"></script>
   <script src="./reset-system.js"></script>
@@ -33,96 +35,6 @@
       } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="./style.css" />
-  <link rel="stylesheet" href="./presets.css" />
-  <style>
-    .device-choice-grid,
-    .faction-choice-grid {
-      margin-top: 14px;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      align-items: stretch;
-    }
-
-    .device-choice-btn,
-    .faction-choice-btn {
-      min-height: 0;
-      padding: 4px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.035);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      overflow: hidden;
-    }
-
-    .device-choice-btn.btn-accent,
-    .faction-choice-btn.btn-accent {
-      border-color: rgba(255, 210, 0, 0.62);
-      background: rgba(255, 210, 0, 0.1);
-      box-shadow: 0 0 18px rgba(255, 210, 0, 0.14);
-    }
-
-    .device-choice-btn img {
-      width: 100%;
-      max-width: none;
-      height: auto;
-      display: block;
-      object-fit: contain;
-      pointer-events: none;
-    }
-
-    .faction-choice-btn img {
-      width: min(74%, 150px);
-      max-width: 150px;
-      height: auto;
-      display: block;
-      object-fit: contain;
-      pointer-events: none;
-      margin: 8px auto 0;
-    }
-
-    .device-choice-label,
-    .faction-choice-label {
-      font-weight: 950;
-      text-align: center;
-      line-height: 1.15;
-      color: var(--text);
-      pointer-events: none;
-      padding: 0 6px 6px;
-    }
-
-    @media (max-width: 560px) {
-      .device-choice-grid,
-      .faction-choice-grid {
-        gap: 8px;
-      }
-
-      .device-choice-btn,
-      .faction-choice-btn {
-        padding: 3px;
-        border-radius: 12px;
-        gap: 4px;
-      }
-
-      .faction-choice-btn img {
-        width: min(68%, 112px);
-        max-width: 112px;
-        margin-top: 6px;
-      }
-
-      .device-choice-label,
-      .faction-choice-label {
-        font-size: 11px;
-        padding: 0 4px 5px;
-      }
-    }
-  </style>
 </head>
 
 <body class="page-index has-splash">
@@ -348,33 +260,7 @@
 </div>
 
   <script src="./app.js"></script>
-  <script>
-    (function () {
-      function defaultToTwoDevices() {
-        try {
-          if (localStorage.getItem("mechkawaii:setup")) return;
-          const setupCard = document.getElementById("setupCard");
-          const modeMulti = document.getElementById("modeMulti");
-          const campPick = document.getElementById("campPick");
-          if (!setupCard || !modeMulti || setupCard.style.display === "none") return;
-          if (modeMulti.dataset.defaultApplied === "1") return;
-          modeMulti.dataset.defaultApplied = "1";
-          modeMulti.click();
-          if (campPick) campPick.style.display = "block";
-        } catch (error) {}
-      }
-
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", function () {
-          setTimeout(defaultToTwoDevices, 0);
-          setTimeout(defaultToTwoDevices, 120);
-        });
-      } else {
-        setTimeout(defaultToTwoDevices, 0);
-        setTimeout(defaultToTwoDevices, 120);
-      }
-    })();
-  </script>
+  <script src="./default-device-choice.js" defer></script>
   <script src="./draft-flow-reset.js" defer></script>
   <script src="./presets.js" defer></script>
   <script src="./tabs-all.js" defer></script>
