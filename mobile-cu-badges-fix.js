@@ -13,27 +13,29 @@
     style.id = STYLE_ID;
     style.textContent = `
       @media (max-width: 560px) {
-        .page-character .${HEADER_CLASS} {
+        .${HEADER_CLASS} {
           position: relative !important;
           overflow: visible !important;
           padding-right: 112px !important;
         }
 
-        .page-character .${HEADER_CLASS} * {
+        .${HEADER_CLASS} * {
           min-width: 0;
         }
 
-        .page-character .${HEADER_CLASS} #charName,
-        .page-character .${HEADER_CLASS} #charClass {
+        .${HEADER_CLASS} #charName,
+        .${HEADER_CLASS} #charClass,
+        .${HEADER_CLASS} [data-char-name],
+        .${HEADER_CLASS} [data-char-class] {
           max-width: calc(100vw - 210px) !important;
           overflow: hidden !important;
           text-overflow: ellipsis !important;
           white-space: nowrap !important;
         }
 
-        .page-character .${ROW_CLASS} {
+        .${ROW_CLASS} {
           position: absolute !important;
-          z-index: 999 !important;
+          z-index: 9999 !important;
           top: 50% !important;
           right: 8px !important;
           transform: translateY(-50%) !important;
@@ -50,8 +52,8 @@
           pointer-events: auto !important;
         }
 
-        .page-character .${BADGE_CLASS},
-        .page-character .${BADGE_CLASS} * {
+        .${BADGE_CLASS},
+        .${BADGE_CLASS} * {
           box-sizing: border-box !important;
           position: relative !important;
           inset: auto !important;
@@ -80,9 +82,9 @@
           -webkit-clip-path: none !important;
         }
 
-        .page-character .${BADGE_CLASS} img,
-        .page-character .${BADGE_CLASS} svg,
-        .page-character .${BADGE_CLASS} canvas {
+        .${BADGE_CLASS} img,
+        .${BADGE_CLASS} svg,
+        .${BADGE_CLASS} canvas {
           display: block !important;
           width: 30px !important;
           height: 30px !important;
@@ -95,16 +97,18 @@
       }
 
       @media (max-width: 390px) {
-        .page-character .${HEADER_CLASS} {
+        .${HEADER_CLASS} {
           padding-right: 100px !important;
         }
 
-        .page-character .${HEADER_CLASS} #charName,
-        .page-character .${HEADER_CLASS} #charClass {
+        .${HEADER_CLASS} #charName,
+        .${HEADER_CLASS} #charClass,
+        .${HEADER_CLASS} [data-char-name],
+        .${HEADER_CLASS} [data-char-class] {
           max-width: calc(100vw - 198px) !important;
         }
 
-        .page-character .${ROW_CLASS} {
+        .${ROW_CLASS} {
           width: 92px !important;
           max-width: 92px !important;
           height: 32px !important;
@@ -113,11 +117,11 @@
           right: 6px !important;
         }
 
-        .page-character .${BADGE_CLASS},
-        .page-character .${BADGE_CLASS} *,
-        .page-character .${BADGE_CLASS} img,
-        .page-character .${BADGE_CLASS} svg,
-        .page-character .${BADGE_CLASS} canvas {
+        .${BADGE_CLASS},
+        .${BADGE_CLASS} *,
+        .${BADGE_CLASS} img,
+        .${BADGE_CLASS} svg,
+        .${BADGE_CLASS} canvas {
           width: 28px !important;
           height: 28px !important;
           min-width: 28px !important;
@@ -136,13 +140,21 @@
     return window.matchMedia && window.matchMedia("(max-width: 560px)").matches;
   }
 
+  function getNameEl() {
+    return document.querySelector("#charName, [data-char-name]") ||
+      Array.from(document.querySelectorAll(".title, h1, h2")).find(el => {
+        const text = String(el.textContent || "").trim();
+        return text.length > 1 && text.length < 28 && !text.toLowerCase().includes("companion");
+      });
+  }
+
   function getHeaderHost() {
-    const name = document.querySelector("#charName");
+    const name = getNameEl();
     if (!name) return null;
 
-    return name.closest(".topbar, .card, [class*='header'], [class*='Header'], [class*='hero'], [class*='Hero'], [class*='banner'], [class*='Banner']") ||
+    return name.closest(".topbar, .card, [class*='header'], [class*='Header'], [class*='hero'], [class*='Hero'], [class*='banner'], [class*='Banner'], [class*='unit'], [class*='Unit']") ||
       name.parentElement?.parentElement ||
-      document.querySelector(".page-character .container > *:first-child");
+      document.querySelector(".container > *:first-child");
   }
 
   function hasVisualBackground(el) {
@@ -152,7 +164,7 @@
   }
 
   function isExcluded(el) {
-    return !!el.closest("#charPortrait, #mkwEnergyInlineStatus, #charName, #charClass, #hpCard, #unitTabsContainer, .unit-tabs-container, .controls, .pill, select, .breadcrumb, nav, .mkw-companion-menu, .mkw-theme-toggle");
+    return !!el.closest("#charPortrait, #mkwEnergyInlineStatus, #charName, #charClass, [data-char-name], [data-char-class], #hpCard, #unitTabsContainer, .unit-tabs-container, .controls, .pill, select, .breadcrumb, nav, .mkw-companion-menu, .mkw-theme-toggle, .theme-toggle");
   }
 
   function looksLikeCuBadge(el, hostRect) {
@@ -166,8 +178,8 @@
     if (rect.bottom < hostRect.top || rect.top > hostRect.bottom) return false;
 
     const roughlySquare = Math.abs(rect.width - rect.height) <= Math.max(28, Math.min(rect.width, rect.height) * 0.55);
-    const usableSize = rect.width >= 38 && rect.height >= 38 && rect.width <= 170 && rect.height <= 170;
-    const onRight = rect.left > window.innerWidth * 0.45;
+    const usableSize = rect.width >= 38 && rect.height >= 38 && rect.width <= 180 && rect.height <= 180;
+    const onRight = rect.left > window.innerWidth * 0.42;
     const visual = ["IMG", "SVG", "CANVAS", "PICTURE", "BUTTON", "A"].includes(el.tagName) || hasVisualBackground(el) || !!el.querySelector("img, svg, canvas");
 
     const text = String(el.textContent || "").trim();
