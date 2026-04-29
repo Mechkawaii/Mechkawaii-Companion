@@ -3,6 +3,8 @@
 
   const PREFIX = "mechkawaii:";
   const FLOW_KEY = PREFIX + "game-flow";
+  const BLUE_BY_TECH_KEY = PREFIX + "blue-shield-by-tech";
+  const BLUE_META_KEY = PREFIX + "blue-shield-expiry-meta";
 
   const I18N = {
     fr: {
@@ -62,6 +64,39 @@
   function isPlayerTurn(state){ return !state?.playerCamp || state.currentCamp === state.playerCamp; }
   function needsStartConfig(state){ return !state?.started || !state.firstCamp; }
 
+  function clearTechnicianBlueShields(){
+    const byTech = readJson(BLUE_BY_TECH_KEY, {});
+    const meta = readJson(BLUE_META_KEY, {});
+    const targets = Array.from(new Set([
+      ...Object.values(byTech || {}).filter(Boolean),
+      ...Object.values(meta || {}).map(info => info && info.targetId).filter(Boolean)
+    ]));
+
+    if (!targets.length && !Object.keys(byTech || {}).length && !Object.keys(meta || {}).length) return;
+
+    writeJson(BLUE_BY_TECH_KEY, {});
+    writeJson(BLUE_META_KEY, {});
+
+    const currentId = new URL(location.href).searchParams.get("id") || "";
+    if (targets.includes(currentId)) {
+      ["#hpCard", "#charPortrait", ".topbar", ".hp-shields-wrapper", ".hp-section", ".shields-section"].forEach(selector => {
+        const el = document.querySelector(selector);
+        if (!el) return;
+        el.classList.remove("has-shield", "is-shielded", "shielded");
+      });
+    }
+
+    document.querySelectorAll("#unitTabs [data-char-id]").forEach(tab => {
+      if (!targets.includes(tab.dataset.charId)) return;
+      tab.classList.remove("mkw-tab-shielded", "mkw-tab-shield-pulse");
+    });
+
+    targets.forEach(charId => {
+      window.dispatchEvent(new CustomEvent("mechkawaii:shield-updated", { detail: { charId, type: "technician", expired: true } }));
+    });
+    window.dispatchEvent(new CustomEvent("mechkawaii:blue-shields-cleared", { detail: { charIds: targets } }));
+  }
+
   function createState(firstCamp){
     const setup = getSetup();
     const playerCamp = getPlayerCamp(firstCamp);
@@ -78,6 +113,7 @@
 
   function startWith(firstCamp){
     const state = createState(firstCamp);
+    clearTechnicianBlueShields();
     setState(state);
     closeStarter();
     closeTurnTransition();
@@ -138,6 +174,8 @@
     const state = getState();
     if(!state?.started) return null;
 
+    clearTechnicianBlueShields();
+
     if(!state.playerCamp) state.playerCamp = getPlayerCamp(state.firstCamp);
 
     const current = state.currentCamp;
@@ -154,6 +192,7 @@
     }
 
     setState(state);
+    clearTechnicianBlueShields();
     return state;
   }
 
@@ -172,6 +211,7 @@
     `;
     document.body.appendChild(backdrop);
     backdrop.querySelector(".mkw-turn-transition-button")?.addEventListener("click", () => {
+      clearTechnicianBlueShields();
       closeTurnTransition();
       const nextState = advanceCurrentCampTurn();
       renderBanner();
@@ -181,13 +221,15 @@
   }
 
   function endTurn(){
+    clearTechnicianBlueShields();
     const nextState = advanceCurrentCampTurn();
     if(!nextState) return showStarter();
     renderBanner();
+    if(nextState) window.dispatchEvent(new CustomEvent("mechkawaii:turn-start", { detail: nextState }));
     if(!isPlayerTurn(nextState)) showTurnTransition(nextState);
   }
 
-  function resetFlow(){ localStorage.removeItem(FLOW_KEY); closeTurnTransition(); renderBanner(); showStarter(); }
+  function resetFlow(){ localStorage.removeItem(FLOW_KEY); clearTechnicianBlueShields(); closeTurnTransition(); renderBanner(); showStarter(); }
 
   function renderBanner(){
     let banner = document.querySelector("#mkwTurnBanner");
@@ -230,6 +272,7 @@
     if(needsStartConfig(state)) setTimeout(showStarter, 250);
     window.mkwGetGameFlowState = getState;
     window.mkwResetGameFlow = resetFlow;
+    window.mkwClearTechnicianBlueShields = clearTechnicianBlueShields;
   }
 
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
