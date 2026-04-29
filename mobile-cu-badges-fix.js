@@ -13,6 +13,59 @@
     style.id = STYLE_ID;
     style.textContent = `
       @media (max-width: 560px) {
+        .topbar {
+          overflow: hidden !important;
+        }
+
+        .topbar .brand-with-portrait {
+          flex: 1 1 auto !important;
+          min-width: 0 !important;
+          max-width: calc(100% - 104px) !important;
+        }
+
+        .topbar .controls {
+          flex: 0 0 104px !important;
+          width: 104px !important;
+          max-width: 104px !important;
+          min-width: 104px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: flex-end !important;
+          gap: 5px !important;
+          overflow: visible !important;
+        }
+
+        .topbar .controls .pill:has(#lang),
+        .topbar .controls select,
+        .topbar .controls #lang {
+          display: none !important;
+        }
+
+        .topbar .controls > *:not(.pill),
+        .topbar .controls img,
+        .topbar .controls svg,
+        .topbar .controls canvas,
+        .topbar .controls button:not(#mkwCompanionMenuButton) {
+          width: 30px !important;
+          height: 30px !important;
+          min-width: 30px !important;
+          min-height: 30px !important;
+          max-width: 30px !important;
+          max-height: 30px !important;
+          flex: 0 0 30px !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          object-fit: contain !important;
+          object-position: center !important;
+          background-size: contain !important;
+          background-position: center !important;
+          background-repeat: no-repeat !important;
+          overflow: visible !important;
+          transform: none !important;
+          clip-path: none !important;
+          -webkit-clip-path: none !important;
+        }
+
         .${HEADER_CLASS} {
           position: relative !important;
           overflow: visible !important;
@@ -97,6 +150,32 @@
       }
 
       @media (max-width: 390px) {
+        .topbar .brand-with-portrait {
+          max-width: calc(100% - 92px) !important;
+        }
+
+        .topbar .controls {
+          flex-basis: 92px !important;
+          width: 92px !important;
+          max-width: 92px !important;
+          min-width: 92px !important;
+          gap: 4px !important;
+        }
+
+        .topbar .controls > *:not(.pill),
+        .topbar .controls img,
+        .topbar .controls svg,
+        .topbar .controls canvas,
+        .topbar .controls button:not(#mkwCompanionMenuButton) {
+          width: 28px !important;
+          height: 28px !important;
+          min-width: 28px !important;
+          min-height: 28px !important;
+          max-width: 28px !important;
+          max-height: 28px !important;
+          flex-basis: 28px !important;
+        }
+
         .${HEADER_CLASS} {
           padding-right: 100px !important;
         }
@@ -164,7 +243,7 @@
   }
 
   function isExcluded(el) {
-    return !!el.closest("#charPortrait, #mkwEnergyInlineStatus, #charName, #charClass, [data-char-name], [data-char-class], #hpCard, #unitTabsContainer, .unit-tabs-container, .controls, .pill, select, .breadcrumb, nav, .mkw-companion-menu, .mkw-theme-toggle, .theme-toggle");
+    return !!el.closest("#charPortrait, #mkwEnergyInlineStatus, #charName, #charClass, [data-char-name], [data-char-class], #hpCard, #unitTabsContainer, .unit-tabs-container, .pill, select, .breadcrumb, nav, .mkw-companion-menu, .mkw-theme-toggle, .theme-toggle");
   }
 
   function looksLikeCuBadge(el, hostRect) {
