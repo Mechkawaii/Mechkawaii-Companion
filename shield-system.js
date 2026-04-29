@@ -923,6 +923,16 @@
     window.addEventListener("mechkawaii:energy-updated", delayedSync);
     window.addEventListener("pageshow", delayedSync);
     window.addEventListener("storage", delayedSync);
+
+    // FIX : quand game-flow.js vide le localStorage du bouclier bleu,
+    // on retire immediatement le glow sur tous les personnages vises.
+    window.addEventListener("mechkawaii:blue-shields-cleared", event => {
+      const charIds = event.detail?.charIds || [];
+      charIds.forEach(id => setShieldGlow(id, false));
+      syncShieldTabs();
+      setTimeout(() => { charIds.forEach(id => setShieldGlow(id, false)); syncShieldTabs(); ensureCurrentRemoveButton(); syncTechUi(); }, 80);
+      setTimeout(() => { charIds.forEach(id => setShieldGlow(id, false)); syncShieldTabs(); ensureCurrentRemoveButton(); syncTechUi(); }, 250);
+    });
   }
 
   function init() {

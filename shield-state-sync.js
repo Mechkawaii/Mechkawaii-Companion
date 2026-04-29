@@ -68,22 +68,32 @@
 
   function expireBlueIfTurnChanged() {
     const blue = getBlueShieldedIds();
+    const currentToken = getFlowToken();
+
     if (!blue.size) {
-      localStorage.setItem(BLUE_TOKEN_KEY, getFlowToken());
+      // Pas de bouclier bleu actif : on met simplement le token à jour
+      // pour qu'il soit prêt pour la prochaine pose de bouclier.
+      localStorage.setItem(BLUE_TOKEN_KEY, currentToken);
       return;
     }
 
-    const currentToken = getFlowToken();
+    // Il y a un bouclier bleu actif : on compare avec le token
+    // enregistré au moment où le bouclier a été posé.
     const previousToken = localStorage.getItem(BLUE_TOKEN_KEY);
 
     if (!previousToken) {
+      // Pas de token de référence → on en pose un maintenant (première exécution).
       localStorage.setItem(BLUE_TOKEN_KEY, currentToken);
       return;
     }
 
     if (previousToken !== currentToken) {
+      // Le tour a changé depuis que le bouclier a été posé → on l'expire.
       clearBlueShields();
-      localStorage.setItem(BLUE_TOKEN_KEY, currentToken);
+      // On NE met PAS à jour le token ici : c'est le prochain
+      // "shield applied" (ou le branch "!blue.size" ci-dessus) qui le fera.
+      // Cela évite que le token soit mis à jour pendant que le bouclier
+      // est encore présent visuellement (race condition).
     }
   }
 
@@ -138,6 +148,13 @@
     window.addEventListener("mechkawaii:turn-start", () => setTimeout(syncShieldVisualState, 0));
     window.addEventListener("mechkawaii:shield-updated", () => setTimeout(syncShieldVisualState, 0));
     window.addEventListener("pageshow", syncShieldVisualState);
+
+    // ✅ FIX : quand le Technicien pose un bouclier bleu, on snapshot le token
+    // du tour en cours. C'est CE token qui sera comparé au tour suivant
+    // pour décider si le bouclier doit expirer.
+    window.addEventListener("mechkawaii:technician-shield-applied", () => {
+      localStorage.setItem(BLUE_TOKEN_KEY, getFlowToken());
+    });
 
     setInterval(syncShieldVisualState, 100);
     syncShieldVisualState();
