@@ -110,39 +110,6 @@
     pointer-events: none !important;
   }
 
-  .page-character .mkw-mobile-cu-badge-row button,
-  .page-character .mkw-mobile-cu-badge-row [role="button"],
-  .page-character .mkw-mobile-cu-badge-row [aria-label*="retir" i],
-  .page-character .mkw-mobile-cu-badge-row [aria-label*="remove" i],
-  .page-character .mkw-mobile-cu-badge-row [aria-label*="close" i],
-  .page-character .mkw-mobile-cu-badge-row [class*="close" i],
-  .page-character .mkw-mobile-cu-badge-row [class*="remove" i],
-  .page-character .mkw-mobile-cu-badge-row [class*="delete" i] {
-    pointer-events: none !important;
-  }
-
-  .page-character .mkw-mobile-cu-badge-row > .mkw-mobile-cu-badge-empty,
-  .page-character .mkw-mobile-cu-badge-row > .mkw-mobile-cu-badge-empty:not([aria-label*="retir" i]):not([aria-label*="remove" i]):not([aria-label*="close" i]) {
-    pointer-events: auto !important;
-  }
-
-  .page-character .mkw-mobile-cu-badge-row > * > button,
-  .page-character .mkw-mobile-cu-badge-row > * > [role="button"],
-  .page-character .mkw-mobile-cu-badge-row > * > [aria-label*="retir" i],
-  .page-character .mkw-mobile-cu-badge-row > * > [aria-label*="remove" i],
-  .page-character .mkw-mobile-cu-badge-row > * > [aria-label*="close" i],
-  .page-character .mkw-mobile-cu-badge-row > * > [class*="close" i],
-  .page-character .mkw-mobile-cu-badge-row > * > [class*="remove" i],
-  .page-character .mkw-mobile-cu-badge-row > * > [class*="delete" i] {
-    display: none !important;
-  }
-
-  .page-character .mkw-mobile-cu-badge-row > *::before,
-  .page-character .mkw-mobile-cu-badge-row > *::after {
-    content: none !important;
-    display: none !important;
-  }
-
   .page-character .brand-with-portrait img[src*="CU_"],
   .page-character .brand-with-portrait img[src*="cu_"],
   .page-character .brand-with-portrait img[src*="coup"],
