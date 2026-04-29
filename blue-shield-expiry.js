@@ -29,10 +29,6 @@
     return `${Number(flow.roundNumber || 1)}:${flow.currentCamp || "mechkawaii"}`;
   }
 
-  function campFor(flow) {
-    return flow?.currentCamp || "mechkawaii";
-  }
-
   function setShieldGlow(targetId, enabled) {
     const currentId = new URL(location.href).searchParams.get("id") || "";
     if (!targetId || targetId !== currentId) return;
@@ -65,12 +61,11 @@
     }
   }
 
-  function expireBlueShields(forceLegacyExpiry = false) {
+  function expireBlueShields() {
     const flow = getFlow();
     if (!flow?.started) return;
 
     const currentToken = tokenFor(flow);
-    const currentCamp = campFor(flow);
     const previousToken = localStorage.getItem(LAST_TOKEN_KEY);
     const tokenChanged = !!previousToken && previousToken !== currentToken;
 
@@ -83,15 +78,13 @@
       const info = meta[techId];
       const targetId = byTech[techId] || info?.targetId;
 
-      const metaSaysExpire = !!info &&
-        info.expireOnCamp === currentCamp &&
-        info.placedToken !== currentToken;
+      // Same behavior as the orange shields: once the turn token changes, the protection expires.
+      // Metadata is still supported for old saves, but the decisive rule is the token change.
+      const placedToken = info?.placedToken;
+      const metaSaysExpired = !!placedToken && placedToken !== currentToken;
+      const legacyExpired = !info && tokenChanged;
 
-      // Old blue shields created without expiry metadata must still follow the orange shield behavior.
-      // We expire them on the next turn transition instead of silently keeping them forever.
-      const legacyShouldExpire = !info && (forceLegacyExpiry || tokenChanged);
-
-      if (!metaSaysExpire && !legacyShouldExpire) return;
+      if (!metaSaysExpired && !legacyExpired) return;
 
       delete byTech[techId];
       delete meta[techId];
@@ -108,10 +101,11 @@
     localStorage.setItem(LAST_TOKEN_KEY, currentToken);
   }
 
-  function scheduleExpiry(forceLegacyExpiry = false) {
-    setTimeout(() => expireBlueShields(forceLegacyExpiry), 0);
-    setTimeout(() => expireBlueShields(forceLegacyExpiry), 80);
-    setTimeout(() => expireBlueShields(forceLegacyExpiry), 220);
+  function scheduleExpiry() {
+    setTimeout(expireBlueShields, 0);
+    setTimeout(expireBlueShields, 80);
+    setTimeout(expireBlueShields, 220);
+    setTimeout(expireBlueShields, 600);
   }
 
   function init() {
@@ -120,9 +114,12 @@
       localStorage.setItem(LAST_TOKEN_KEY, tokenFor(flow));
     }
 
-    window.addEventListener("mechkawaii:game-flow-updated", () => scheduleExpiry(true));
-    window.addEventListener("mechkawaii:turn-start", () => scheduleExpiry(true));
-    window.addEventListener("pageshow", () => scheduleExpiry(false));
+    window.addEventListener("mechkawaii:game-flow-updated", scheduleExpiry);
+    window.addEventListener("mechkawaii:turn-start", scheduleExpiry);
+    window.addEventListener("mechkawaii:shield-updated", scheduleExpiry);
+    window.addEventListener("storage", scheduleExpiry);
+    window.addEventListener("pageshow", scheduleExpiry);
+    scheduleExpiry();
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
