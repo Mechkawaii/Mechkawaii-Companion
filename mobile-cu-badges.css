@@ -6,7 +6,7 @@
     align-items: center !important;
     gap: 8px !important;
     overflow: hidden !important;
-    padding-right: 150px !important;
+    padding-right: 182px !important;
   }
 
   .page-character .brand-with-portrait {
@@ -45,12 +45,12 @@
     align-items: center !important;
     justify-content: flex-end !important;
     gap: 0 !important;
-    width: 140px !important;
+    width: 172px !important;
     height: 64px !important;
-    max-width: 140px !important;
+    max-width: 172px !important;
     max-height: 64px !important;
     overflow: visible !important;
-    pointer-events: auto !important;
+    pointer-events: none !important;
   }
 
   .page-character .mkw-mobile-cu-badge-row > * {
@@ -70,10 +70,11 @@
     background-size: contain !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
+    pointer-events: none !important;
   }
 
   .page-character .mkw-mobile-cu-badge-row > * + * {
-    margin-left: -20px !important;
+    margin-left: -4px !important;
   }
 
   .page-character .mkw-mobile-cu-badge-row img,
@@ -95,6 +96,35 @@
     padding: 0 !important;
     clip-path: none !important;
     -webkit-clip-path: none !important;
+    pointer-events: none !important;
+  }
+
+  .page-character .mkw-mobile-cu-badge-row button,
+  .page-character .mkw-mobile-cu-badge-row [role="button"],
+  .page-character .mkw-mobile-cu-badge-row [aria-label*="retir" i],
+  .page-character .mkw-mobile-cu-badge-row [aria-label*="remove" i],
+  .page-character .mkw-mobile-cu-badge-row [aria-label*="close" i],
+  .page-character .mkw-mobile-cu-badge-row [class*="close" i],
+  .page-character .mkw-mobile-cu-badge-row [class*="remove" i],
+  .page-character .mkw-mobile-cu-badge-row [class*="delete" i] {
+    pointer-events: none !important;
+  }
+
+  .page-character .mkw-mobile-cu-badge-row > * > button,
+  .page-character .mkw-mobile-cu-badge-row > * > [role="button"],
+  .page-character .mkw-mobile-cu-badge-row > * > [aria-label*="retir" i],
+  .page-character .mkw-mobile-cu-badge-row > * > [aria-label*="remove" i],
+  .page-character .mkw-mobile-cu-badge-row > * > [aria-label*="close" i],
+  .page-character .mkw-mobile-cu-badge-row > * > [class*="close" i],
+  .page-character .mkw-mobile-cu-badge-row > * > [class*="remove" i],
+  .page-character .mkw-mobile-cu-badge-row > * > [class*="delete" i] {
+    display: none !important;
+  }
+
+  .page-character .mkw-mobile-cu-badge-row > *::before,
+  .page-character .mkw-mobile-cu-badge-row > *::after {
+    content: none !important;
+    display: none !important;
   }
 
   .page-character .brand-with-portrait img[src*="CU_"],
@@ -131,14 +161,14 @@
 
 @media (max-width: 390px) {
   .page-character .topbar {
-    padding-right: 132px !important;
+    padding-right: 156px !important;
   }
 
   .page-character .mkw-mobile-cu-badge-row {
     right: 8px !important;
-    width: 124px !important;
+    width: 148px !important;
     height: 58px !important;
-    max-width: 124px !important;
+    max-width: 148px !important;
     max-height: 58px !important;
   }
 
@@ -168,6 +198,6 @@
   }
 
   .page-character .mkw-mobile-cu-badge-row > * + * {
-    margin-left: -17px !important;
+    margin-left: -7px !important;
   }
 }
