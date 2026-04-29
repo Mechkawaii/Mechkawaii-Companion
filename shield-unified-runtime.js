@@ -11,6 +11,7 @@
   const SHIELD_CLASSES = ["has-shield", "is-shielded", "shielded", "mkw-tab-shielded", "mkw-tab-shield-pulse"];
   let cachedChars = null;
   let pendingBlueTargets = [];
+  let forceNoBlueUntil = 0;
 
   const MESSAGES = {
     fr: "Cette unité a déjà un bouclier.",
@@ -86,6 +87,8 @@
   function stripShieldClasses(el) {
     if (!el) return;
     SHIELD_CLASSES.forEach(cls => el.classList.remove(cls));
+    el.removeAttribute("data-shielded");
+    el.removeAttribute("data-has-shield");
   }
 
   function showToast(message) {
@@ -163,6 +166,16 @@
     ]));
   }
 
+  function clearBlueStorage() {
+    Object.keys(localStorage).forEach(key => {
+      if (!key.startsWith(PREFIX)) return;
+      const lower = key.toLowerCase();
+      if (lower.includes("blue-shield") || lower.includes("technician-shield")) localStorage.removeItem(key);
+    });
+    writeJson(BLUE_BY_TECH_KEY, {});
+    writeJson(BLUE_META_KEY, {});
+  }
+
   function clearBlueLocks() {
     Object.keys(localStorage).forEach(key => {
       if (key.startsWith(BLUE_LOCK_PREFIX)) localStorage.removeItem(key);
@@ -179,15 +192,19 @@
     if (state && state.token !== token) localStorage.removeItem(key);
   }
 
-  function removeBlueVisuals(targets) {
+  function hardRemoveCurrentShieldVisualIfNeeded(targetFilter = []) {
     const classic = new Set(classicShieldedIds());
-    const uniqueTargets = Array.from(new Set((targets || []).filter(Boolean)));
-    const targetFilterIsKnown = uniqueTargets.length > 0;
     const currentId = getCurrentCharId();
+    const hasFilter = targetFilter.length > 0;
 
-    if (currentId && !classic.has(currentId) && (!targetFilterIsKnown || uniqueTargets.includes(currentId))) {
+    if (currentId && !classic.has(currentId) && (!hasFilter || targetFilter.includes(currentId))) {
       ["#hpCard", "#charPortrait", ".topbar", ".hp-shields-wrapper", ".hp-section", ".shields-section"].forEach(selector => {
-        stripShieldClasses(document.querySelector(selector));
+        const el = document.querySelector(selector);
+        stripShieldClasses(el);
+        if (el) {
+          el.style.removeProperty("filter");
+          el.style.removeProperty("box-shadow");
+        }
       });
 
       document.querySelectorAll(".has-shield, .is-shielded, .shielded").forEach(el => {
@@ -197,22 +214,26 @@
 
     document.querySelectorAll("#unitTabs [data-char-id]").forEach(tab => {
       const charId = tab.dataset.charId;
-      if (!classic.has(charId) && (!targetFilterIsKnown || uniqueTargets.includes(charId))) stripShieldClasses(tab);
+      if (!classic.has(charId) && (!hasFilter || targetFilter.includes(charId))) stripShieldClasses(tab);
     });
+  }
+
+  function removeBlueVisuals(targets) {
+    const uniqueTargets = Array.from(new Set((targets || []).filter(Boolean)));
+    hardRemoveCurrentShieldVisualIfNeeded(uniqueTargets);
   }
 
   function expireBlueShields(reason = "turn-start") {
     const targets = Array.from(new Set([...pendingBlueTargets, ...getBlueTargets()].filter(Boolean)));
+    forceNoBlueUntil = Date.now() + 5000;
 
-    writeJson(BLUE_BY_TECH_KEY, {});
-    writeJson(BLUE_META_KEY, {});
+    clearBlueStorage();
     clearBlueLocks();
     clearBlueClassActionIfStale();
 
-    [0, 30, 90, 180, 360, 700].forEach(delay => {
+    [0, 30, 90, 180, 360, 700, 1200, 2500, 4800].forEach(delay => {
       setTimeout(() => {
-        writeJson(BLUE_BY_TECH_KEY, {});
-        writeJson(BLUE_META_KEY, {});
+        clearBlueStorage();
         removeBlueVisuals(targets);
         if (targets.length) {
           targets.forEach(charId => dispatchShieldUpdate(charId, { type: "technician", expired: true, reason }));
@@ -241,8 +262,34 @@
         filter: grayscale(.75) !important;
         cursor: not-allowed !important;
       }
+      body.mkw-force-no-current-blue-shield #hpCard,
+      body.mkw-force-no-current-blue-shield #charPortrait,
+      body.mkw-force-no-current-blue-shield .topbar,
+      body.mkw-force-no-current-blue-shield .hp-shields-wrapper,
+      body.mkw-force-no-current-blue-shield .hp-section,
+      body.mkw-force-no-current-blue-shield .shields-section {
+        filter: none !important;
+      }
+      body.mkw-force-no-current-blue-shield #unitTabs [data-char-id]:not(.mkw-tab-has-classic-shield) {
+        box-shadow: none !important;
+        border-color: var(--border) !important;
+      }
     `;
     document.head.appendChild(style);
+  }
+
+  function enforceNoBlueVisuals() {
+    const active = Date.now() < forceNoBlueUntil;
+    const classic = new Set(classicShieldedIds());
+    const currentId = getCurrentCharId();
+
+    document.body.classList.toggle("mkw-force-no-current-blue-shield", active && !!currentId && !classic.has(currentId));
+
+    document.querySelectorAll("#unitTabs [data-char-id]").forEach(tab => {
+      tab.classList.toggle("mkw-tab-has-classic-shield", classic.has(tab.dataset.charId));
+    });
+
+    if (active) hardRemoveCurrentShieldVisualIfNeeded([]);
   }
 
   function init() {
@@ -251,6 +298,7 @@
     document.addEventListener("pointerdown", event => {
       if (!isOpponentTurnEndButton(event.target)) return;
       pendingBlueTargets = getBlueTargets();
+      forceNoBlueUntil = Date.now() + 5000;
     }, true);
 
     document.addEventListener("click", event => {
@@ -265,11 +313,15 @@
           if (node instanceof Element) tagShieldModalTargets(node);
         });
       });
+      enforceNoBlueVisuals();
     });
-    observer.observe(document.body, { childList: true, subtree: true });
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
 
     window.addEventListener("mechkawaii:turn-start", () => expireBlueShields("turn-start"));
     window.addEventListener("mechkawaii:game-flow-updated", () => setTimeout(() => tagShieldModalTargets(), 0));
+    window.addEventListener("mechkawaii:shield-updated", enforceNoBlueVisuals);
+
+    setInterval(enforceNoBlueVisuals, 100);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
