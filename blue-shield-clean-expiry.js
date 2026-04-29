@@ -93,8 +93,11 @@
     const classic = getClassicShieldedIds();
     const currentId = getCurrentCharId();
     const uniqueTargets = Array.from(new Set((targets || []).filter(Boolean)));
+    const targetFilterIsKnown = uniqueTargets.length > 0;
 
-    if (currentId && uniqueTargets.includes(currentId) && !classic.has(currentId)) {
+    // The orange shield is the source of truth for visuals that must remain.
+    // If a unit is not in classic shield assignments, any remaining shield glow is blue/stale and can be removed.
+    if (currentId && !classic.has(currentId) && (!targetFilterIsKnown || uniqueTargets.includes(currentId))) {
       [
         "#hpCard",
         "#charPortrait",
@@ -111,7 +114,7 @@
 
     document.querySelectorAll("#unitTabs [data-char-id]").forEach(tab => {
       const id = tab.dataset.charId;
-      if (uniqueTargets.includes(id) && !classic.has(id)) stripClasses(tab);
+      if (!classic.has(id) && (!targetFilterIsKnown || uniqueTargets.includes(id))) stripClasses(tab);
     });
   }
 
@@ -161,7 +164,7 @@
     return Object.values(meta || {}).some(item => item?.placedToken && item.placedToken !== currentToken);
   }
 
-  function expireBlueShields(reason, forcedTargets = []) {
+  function expireBlueShields(reason, forcedTargets = [], forceEvenWithoutBlueData = false) {
     if (isExpiring) return;
 
     const currentToken = getTurnToken();
@@ -170,7 +173,7 @@
     const pendingTargets = readPendingTargets();
     const targets = Array.from(new Set([...forcedTargets, ...liveTargets, ...pendingTargets].filter(Boolean)));
 
-    if (!targets.length && !Object.keys(byTech || {}).length && !Object.keys(meta || {}).length) return;
+    if (!forceEvenWithoutBlueData && !targets.length && !Object.keys(byTech || {}).length && !Object.keys(meta || {}).length) return;
 
     isExpiring = true;
 
@@ -190,6 +193,11 @@
             detail: { charId, type: "technician", expired: true, reason }
           }));
         });
+        if (!targets.length) {
+          window.dispatchEvent(new CustomEvent("mechkawaii:shield-updated", {
+            detail: { type: "technician", expired: true, reason }
+          }));
+        }
       }, delay);
     });
 
@@ -225,7 +233,7 @@
 
   function scheduleAfterOpponentTurnClick(targets) {
     [0, 30, 90, 180, 360, 600].forEach(delay => {
-      setTimeout(() => expireBlueShields("opponent-turn-ended", targets), delay);
+      setTimeout(() => expireBlueShields("opponent-turn-ended", targets, true), delay);
     });
   }
 
