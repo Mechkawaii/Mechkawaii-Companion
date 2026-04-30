@@ -225,6 +225,12 @@
           tooltip:   qs(".mkw-tutorial-tooltip"),
           card, pad: 18
         }), 120);
+        setTimeout(() => drawHighlight({
+          overlay:   qs(".mkw-tutorial-overlay"),
+          highlight: qs(".mkw-tutorial-highlight"),
+          tooltip:   qs(".mkw-tutorial-tooltip"),
+          card, pad: 18
+        }), 300);
       }
       return;
     }

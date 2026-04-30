@@ -111,8 +111,8 @@
     { target: ".hp-section", titleKey: "hpTitle", kickerKey: "hpKicker", textKey: "hpText", pad: 12, mobileTop: 118 },
     { target: ".shields-section", titleKey: "shieldTitle", kickerKey: "shieldKicker", textKey: "shieldText", pad: 16, mobileTop: 110 },
     { target: ".repair-section", titleKey: "repairTitle", kickerKey: "repairKicker", textKey: "repairText", pad: 16, mobileTop: 110 },
-    { target: "#classActionTitle", titleKey: "classActionTitle", kickerKey: "classActionKicker", textKey: "classActionText", pad: 18, mobileTop: 118 },
-    { target: "#ultTitle,#ultToggleContainer", titleKey: "ultimateTitle", kickerKey: "ultimateKicker", textKey: "ultimateText", pad: 18, mobileTop: 118 },
+    { target: "#classActionTitle", titleKey: "classActionTitle", kickerKey: "classActionKicker", textKey: "classActionText", pad: 18, mobileTop: 118, fullCard: true },
+    { target: "#ultTitle,#ultToggleContainer", titleKey: "ultimateTitle", kickerKey: "ultimateKicker", textKey: "ultimateText", pad: 18, mobileTop: 118, fullCard: true },
     { target: ".cu-badges,#cuBadges,.cu-badge-zone,.cu-badge,.copied-cu,[data-cu-badges],[data-cu-badge],.topbar .controls", titleKey: "cuBadgeTitle", kickerKey: "cuBadgeKicker", textKey: "cuBadgeText", pad: 14, mobileTop: 96, optional: true },
     { target: "#mkwSuddenDeathHud", titleKey: "suddenTitle", kickerKey: "suddenKicker", textKey: "suddenText", pad: 14, mobileTop: 100, optional: true },
     { target: "#unitTabs", titleKey: "tabsTitle", kickerKey: "tabsKicker", textKey: "tabsText", pad: 12, allowTabsOverlap: true }
@@ -196,7 +196,14 @@
   function findTarget(step) {
     if (!step?.target) return null;
     const candidates = Array.from(document.querySelectorAll(step.target));
-    return candidates.find(isVisibleTarget) || null;
+    const el = candidates.find(isVisibleTarget) || null;
+    if (!el) return null;
+    // Si fullCard, on remonte à la card parente pour encadrer toute la section
+    if (step.fullCard) {
+      const card = el.closest(".card") || el.parentElement;
+      return (card && isVisibleTarget(card)) ? card : el;
+    }
+    return el;
   }
 
   function findNextAvailableStep(direction = 1) {
@@ -222,30 +229,59 @@
   }
 
   function scrollPageBy(delta) {
+    if (Math.abs(delta) < 2) return;
     const root = document.scrollingElement || document.documentElement;
+    const body = document.body;
+    const html = document.documentElement;
+    // Débloquer temporairement overflow pour que le scroll JS fonctionne
+    const prevBody = body.style.overflow;
+    const prevHtml = html.style.overflow;
+    body.style.setProperty("overflow", "auto", "important");
+    html.style.setProperty("overflow", "auto", "important");
     root.scrollTop += delta;
+    // Restaurer après le frame
+    requestAnimationFrame(() => {
+      if (scrollLocked) {
+        body.style.setProperty("overflow", "hidden", "important");
+        html.style.setProperty("overflow", "hidden", "important");
+      } else {
+        body.style.overflow = prevBody;
+        html.style.overflow = prevHtml;
+      }
+    });
   }
 
   function positionTargetForMobile(target, step) {
     if (!isMobile() || !target) return;
     if (step?.target === "#unitTabs") return;
 
-    const desiredTop = Number(step?.mobileTop ?? 105);
+    const safeTop    = 88;   // sous la topbar + breadcrumb
+    const tabsTop    = getTabsSafeTop();
+    const safeBottom = tabsTop - 36;
+    const available  = Math.max(80, safeBottom - safeTop);
+    const root       = document.scrollingElement || document.documentElement;
+    const curY       = root.scrollTop;
+
     let rect = target.getBoundingClientRect();
-    const firstDelta = rect.top - desiredTop;
-    if (Math.abs(firstDelta) > 6) scrollPageBy(firstDelta);
 
-    rect = target.getBoundingClientRect();
-    const tabsSafeTop = getTabsSafeTop();
-    const safeBottom = Math.max(desiredTop + 64, tabsSafeTop - 24);
-    if (rect.bottom > safeBottom) {
-      scrollPageBy(rect.bottom - safeBottom);
+    // Centrer la card dans la zone disponible
+    let desiredTop = safeTop;
+    if (rect.height < available) {
+      desiredTop = safeTop + Math.max(0, (available - rect.height) / 2);
     }
 
-    rect = target.getBoundingClientRect();
-    if (rect.top < 72) {
-      scrollPageBy(rect.top - 72);
+    let nextY = curY + (rect.top - desiredTop);
+
+    // Si la card dépasse en bas, ajuster
+    const projectedBottom = desiredTop + rect.height;
+    if (projectedBottom > safeBottom) {
+      nextY += projectedBottom - safeBottom;
     }
+
+    const maxY = Math.max(0, root.scrollHeight - window.innerHeight);
+    nextY = Math.max(0, Math.min(nextY, maxY));
+
+    if (Math.abs(nextY - curY) > 2) scrollPageBy(nextY - curY);
   }
 
   function placeTooltip(rect) {
