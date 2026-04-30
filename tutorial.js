@@ -111,8 +111,8 @@
     { target: ".hp-section", titleKey: "hpTitle", kickerKey: "hpKicker", textKey: "hpText", pad: 12, mobileTop: 118 },
     { target: ".shields-section", titleKey: "shieldTitle", kickerKey: "shieldKicker", textKey: "shieldText", pad: 16, mobileTop: 110 },
     { target: ".repair-section", titleKey: "repairTitle", kickerKey: "repairKicker", textKey: "repairText", pad: 16, mobileTop: 110 },
-    { target: "#classActionTitle", titleKey: "classActionTitle", kickerKey: "classActionKicker", textKey: "classActionText", pad: 18, mobileTop: 118 },
-    { target: "#ultTitle,#ultToggleContainer", titleKey: "ultimateTitle", kickerKey: "ultimateKicker", textKey: "ultimateText", pad: 18, mobileTop: 118 },
+    { target: "#classActionTitle", titleKey: "classActionTitle", kickerKey: "classActionKicker", textKey: "classActionText", pad: 18, fullCard: true },
+    { target: "#ultTitle,#ultToggleContainer", titleKey: "ultimateTitle", kickerKey: "ultimateKicker", textKey: "ultimateText", pad: 18, fullCard: true },
     { target: ".cu-badges,#cuBadges,.cu-badge-zone,.cu-badge,.copied-cu,[data-cu-badges],[data-cu-badge],.topbar .controls", titleKey: "cuBadgeTitle", kickerKey: "cuBadgeKicker", textKey: "cuBadgeText", pad: 14, mobileTop: 96, optional: true },
     { target: "#mkwSuddenDeathHud", titleKey: "suddenTitle", kickerKey: "suddenKicker", textKey: "suddenText", pad: 14, mobileTop: 100, optional: true },
     { target: "#unitTabs", titleKey: "tabsTitle", kickerKey: "tabsKicker", textKey: "tabsText", pad: 12, allowTabsOverlap: true }
@@ -135,8 +135,11 @@
     if (scrollLocked) return;
     previousBodyOverflow = document.body.style.overflow || "";
     previousHtmlOverflow = document.documentElement.style.overflow || "";
-    document.body.style.setProperty("overflow", "hidden", "important");
-    document.documentElement.style.setProperty("overflow", "hidden", "important");
+    // iOS Safari : overflow:hidden bloque window.scrollTo. On ne locke pas sur mobile.
+    if (!isMobile()) {
+      document.body.style.setProperty("overflow", "hidden", "important");
+      document.documentElement.style.setProperty("overflow", "hidden", "important");
+    }
     scrollLocked = true;
   }
 
@@ -196,7 +199,10 @@
   function findTarget(step) {
     if (!step?.target) return null;
     const candidates = Array.from(document.querySelectorAll(step.target));
-    return candidates.find(isVisibleTarget) || null;
+    const el = candidates.find(isVisibleTarget) || null;
+    if (!el || !step.fullCard) return el;
+    const card = el.closest(".card") || el.parentElement;
+    return (card && isVisibleTarget(card)) ? card : el;
   }
 
   function findNextAvailableStep(direction = 1) {
@@ -223,24 +229,9 @@
 
   function scrollPageBy(delta) {
     if (Math.abs(delta) < 2) return;
-    const root = document.scrollingElement || document.documentElement;
-    const body = document.body;
-    const html = document.documentElement;
-    const prevBody = body.style.getPropertyValue("overflow");
-    const prevHtml = html.style.getPropertyValue("overflow");
-    body.style.setProperty("overflow", "auto", "important");
-    html.style.setProperty("overflow", "auto", "important");
-    const maxY = Math.max(0, root.scrollHeight - window.innerHeight);
-    root.scrollTop = Math.max(0, Math.min(root.scrollTop + delta, maxY));
-    requestAnimationFrame(() => {
-      if (scrollLocked) {
-        body.style.setProperty("overflow", "hidden", "important");
-        html.style.setProperty("overflow", "hidden", "important");
-      } else {
-        body.style.setProperty("overflow", prevBody);
-        html.style.setProperty("overflow", prevHtml);
-      }
-    });
+    const curY = window.scrollY || window.pageYOffset || 0;
+    const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    window.scrollTo(0, Math.max(0, Math.min(curY + delta, maxY)));
   }
 
   function positionTargetForMobile(target, step) {
@@ -386,21 +377,6 @@
     });
   }
 
-  function scrollUnlocked(fn) {
-    // Débloquer overflow le temps du scroll, puis rebloquer
-    const body = document.body;
-    const html = document.documentElement;
-    body.style.setProperty("overflow", "auto", "important");
-    html.style.setProperty("overflow", "auto", "important");
-    fn();
-    requestAnimationFrame(() => {
-      if (scrollLocked) {
-        body.style.setProperty("overflow", "hidden", "important");
-        html.style.setProperty("overflow", "hidden", "important");
-      }
-    });
-  }
-
   function showStep() {
     const step = STEPS[currentStep];
     const target = findTarget(step);
@@ -412,30 +388,19 @@
     }
     activeTarget = target;
     activeStep = step;
-
-    // Scroll vers la cible en débloquant temporairement overflow
-    scrollUnlocked(() => {
-      if (isMobile()) {
-        positionTargetForMobile(target, step);
-      } else {
-        target.scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
-      }
-    });
-
+    if (isMobile()) {
+      target.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
+      positionTargetForMobile(target, step);
+    } else {
+      target.scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
+    }
     renderTooltip(step);
-
-    // Redessiner le highlight après le scroll (3 passes pour couvrir les délais de rendu)
     requestAnimationFrame(() => {
-      scrollUnlocked(() => { if (isMobile()) positionTargetForMobile(target, step); });
+      positionTargetForMobile(target, step);
       updateOverlayPosition();
+      setTimeout(() => { positionTargetForMobile(target, step); updateOverlayPosition(); }, 80);
+      setTimeout(updateOverlayPosition, 180);
     });
-    setTimeout(() => {
-      scrollUnlocked(() => { if (isMobile()) positionTargetForMobile(target, step); });
-      updateOverlayPosition();
-    }, 100);
-    setTimeout(() => {
-      updateOverlayPosition();
-    }, 250);
   }
 
   function startTutorial() {
