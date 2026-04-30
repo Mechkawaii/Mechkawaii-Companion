@@ -8,6 +8,9 @@
   const SETUP_KEY = PREFIX + "setup";
   const FLOW_KEY = PREFIX + "game-flow";
   const TRIGGERED_KEY = PREFIX + "expert-event-triggered-rounds";
+  const EVENT_TOKEN_SRC = "./assets/events/progress/event_token.png";
+  const EVENT_SLOT_SRC = index => `./assets/events/progress/event_slot_${index}.png`;
+  const TOKEN_ROTATIONS = [1, 3, 5, 2, 4];
 
   const EVENTS = {
     genematrice: {
@@ -85,6 +88,29 @@
     return { building, scenario };
   }
 
+  function getTrackPosition(roundNumber) {
+    const round = Math.max(1, Number(roundNumber || 1));
+    return ((round - 1) % 5) + 1;
+  }
+
+  function renderEventTrack(roundNumber) {
+    const position = getTrackPosition(roundNumber);
+    return `
+      <div class="mkw-event-track" aria-label="Progression de l’événement">
+        ${[1, 2, 3, 4, 5].map(index => {
+          const active = index === position;
+          const rotation = TOKEN_ROTATIONS[(Number(roundNumber || 1) + index - 2) % TOKEN_ROTATIONS.length];
+          return `
+            <div class="mkw-event-track-slot ${active ? "is-active" : ""}">
+              <img class="mkw-event-track-slot-img" src="${EVENT_SLOT_SRC(index)}" alt="Case événement ${index}">
+              ${active ? `<img class="mkw-event-track-token" src="${EVENT_TOKEN_SRC}" alt="Jeton événement" style="--mkw-token-rotation:${rotation}deg;">` : ""}
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
+  }
+
   function injectStyles() {
     if (document.getElementById("mkwExpertEventsStyles")) return;
     const style = document.createElement("style");
@@ -118,10 +144,16 @@
       .mkw-scenario-front > * { position: relative; z-index: 1; }
       .mkw-scenario-kicker { display:block; font-size: 11px; font-weight: 900; opacity: .75; text-transform: uppercase; letter-spacing: .1em; }
       .mkw-scenario-title { display:block; font-size: 20px; line-height: 1.05; font-weight: 1000; text-transform: uppercase; }
-      #mkwExpertEventHud { margin: 12px 0 0; border: 1px solid rgba(255,255,255,.12); border-radius: 16px; padding: 10px; display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, rgba(255,120,180,.12), rgba(255,255,255,.04)); }
-      #mkwExpertEventHud img { width: 58px; height: 58px; border-radius: 12px; object-fit: contain; background:#05060a; flex: 0 0 auto; }
+      #mkwExpertEventHud { margin: 12px 0 0; border: 1px solid rgba(255,255,255,.12); border-radius: 16px; padding: 10px; display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 12px; align-items: center; background: linear-gradient(135deg, rgba(255,120,180,.12), rgba(255,255,255,.04)); }
+      #mkwExpertEventHud > img { width: 58px; height: 58px; border-radius: 12px; object-fit: contain; background:#05060a; }
       .mkw-expert-hud-title { font-weight: 900; text-transform: uppercase; letter-spacing: .04em; font-size: 13px; }
       .mkw-expert-hud-sub { color: var(--muted); font-size: 12px; line-height: 1.35; margin-top: 3px; }
+      .mkw-event-track { margin-top: 9px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px; align-items: center; max-width: 340px; }
+      .mkw-event-track-slot { position: relative; aspect-ratio: 1 / 1; border-radius: 12px; display: grid; place-items: center; }
+      .mkw-event-track-slot-img { width: 100%; height: 100%; object-fit: contain; display: block; filter: drop-shadow(0 5px 8px rgba(0,0,0,.28)); }
+      .mkw-event-track-slot.is-active .mkw-event-track-slot-img { filter: drop-shadow(0 0 8px rgba(255,210,77,.28)) drop-shadow(0 5px 8px rgba(0,0,0,.3)); }
+      .mkw-event-track-token { position: absolute; width: 72%; height: 72%; object-fit: contain; display: block; transform: rotate(var(--mkw-token-rotation, 2deg)) scale(1); transform-origin: 50% 50%; filter: drop-shadow(0 4px 6px rgba(0,0,0,.45)); animation: mkwEventTokenPop .24s ease-out; }
+      @keyframes mkwEventTokenPop { from { transform: rotate(var(--mkw-token-rotation, 2deg)) scale(.82); opacity: .45; } to { transform: rotate(var(--mkw-token-rotation, 2deg)) scale(1); opacity: 1; } }
       #mkwExpertEventBackdrop { position: fixed; inset: 0; background: rgba(0,0,0,.76); z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 18px; }
       #mkwExpertEventPanel { width: min(560px, 100%); border-radius: 24px; border: 1px solid rgba(255,255,255,.16); background: #111217; box-shadow: 0 30px 80px rgba(0,0,0,.55); overflow: hidden; }
       .mkw-expert-modal-visual { width: 100%; aspect-ratio: 1 / 1; max-height: 360px; object-fit: contain; display: block; background: #05060a; }
@@ -131,7 +163,7 @@
       .mkw-expert-modal-intro { font-weight: 800; margin: 0 0 10px; }
       .mkw-expert-modal-effect { color: var(--text); line-height: 1.45; margin: 0 0 16px; }
       .mkw-expert-modal-close { width: 100%; }
-      @media (max-width: 680px) { .mkw-event-grid { grid-template-columns: 1fr; } .mkw-event-card-title { font-size: 16px; } .mkw-event-card-text { font-size: 12px; } .mkw-expert-modal-visual { max-height: 300px; } }
+      @media (max-width: 680px) { .mkw-event-grid { grid-template-columns: 1fr; } .mkw-event-card-title { font-size: 16px; } .mkw-event-card-text { font-size: 12px; } #mkwExpertEventHud { grid-template-columns: 48px minmax(0, 1fr); gap: 10px; } #mkwExpertEventHud > img { width: 48px; height: 48px; } .mkw-event-track { gap: 5px; max-width: 280px; } .mkw-expert-modal-visual { max-height: 300px; } }
     `;
     document.head.appendChild(style);
   }
@@ -299,7 +331,8 @@
       banner.insertAdjacentElement("afterend", hud);
     }
     const flow = getFlow() || {};
-    hud.innerHTML = `<img src="${data.building.image}" alt=""><div><div class="mkw-expert-hud-title">${data.building.label} — ${data.scenario.label}</div><div class="mkw-expert-hud-sub">${nextEventText(flow.roundNumber)} · déclenchement tous les 5 rounds.</div></div>`;
+    const roundNumber = Number(flow.roundNumber || 1);
+    hud.innerHTML = `<img src="${data.building.image}" alt=""><div><div class="mkw-expert-hud-title">${data.building.label} — ${data.scenario.label}</div><div class="mkw-expert-hud-sub">${nextEventText(roundNumber)} · déclenchement tous les 5 rounds.</div>${renderEventTrack(roundNumber)}</div>`;
   }
 
   function hasTriggered(round) {
