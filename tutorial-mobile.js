@@ -38,8 +38,24 @@
      On retire temporairement overflow:hidden sur body/html
   ---------------------------------------------------------- */
   function scrollTo(y) {
-    const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-    window.scrollTo(0, Math.max(0, Math.min(y, maxY)));
+    const root = document.scrollingElement || document.documentElement;
+    const body = document.body;
+    const html = document.documentElement;
+
+    // Bypass overflow:hidden posé par tutorial.js lockPage()
+    body.style.setProperty("overflow", "auto", "important");
+    html.style.setProperty("overflow", "auto", "important");
+
+    const maxY = Math.max(0, root.scrollHeight - window.innerHeight);
+    root.scrollTop = Math.max(0, Math.min(y, maxY));
+
+    // Remettre hidden si tutorial.js avait locké
+    requestAnimationFrame(() => {
+      if (document.querySelector(".mkw-tutorial-overlay, #mkwPatternTutorialOverlay")) {
+        body.style.setProperty("overflow", "hidden", "important");
+        html.style.setProperty("overflow", "hidden", "important");
+      }
+    });
   }
 
   /* ----------------------------------------------------------
@@ -47,13 +63,14 @@
   ---------------------------------------------------------- */
   function cameraTo(card) {
     if (!card || !isMobile()) return;
-    const TOOLTIP_H = 220;
-    const safeTop   = TOOLTIP_H + 16;
-    const safeBtm   = tabsTop() - 12;
-    const avail     = Math.max(40, safeBtm - safeTop);
-    const rect      = card.getBoundingClientRect();
-    const curY      = window.scrollY || window.pageYOffset || 0;
-    let desiredTop  = safeTop;
+    const tEl    = document.querySelector("#mkwPatternTutorialTooltip");
+    const tH     = tEl ? Math.ceil(tEl.getBoundingClientRect().height) : 200;
+    const safeTop = tH + 16;
+    const safeBtm = tabsTop() - 8;
+    const avail   = Math.max(40, safeBtm - safeTop);
+    const rect    = card.getBoundingClientRect();
+    const curY    = window.scrollY || window.pageYOffset || 0;
+    let desiredTop = safeTop;
     if (rect.height < avail) desiredTop = safeTop + Math.round((avail - rect.height) / 2);
     let nextY = curY + (rect.top - desiredTop);
     const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
@@ -88,16 +105,22 @@
   }
 
   function placeTooltip(tooltip, top, left, right, bottom) {
-    if (!tooltip) return;
-    const pad   = 10;
-    const tRect = tooltip.getBoundingClientRect();
-    const maxLeft = window.innerWidth - tRect.width - pad;
-    const tleft = Math.max(pad, Math.min((window.innerWidth - tRect.width) / 2, maxLeft));
-    tooltip.style.position = "fixed";
-    tooltip.style.left     = tleft + "px";
-    tooltip.style.right    = "auto";
-    tooltip.style.bottom   = "auto";
-    tooltip.style.top      = pad + "px";
+    const margin  = 14;
+    const tRect   = tooltip.getBoundingClientRect();
+    const safeBtm = tabsTop() - margin;
+    const maxLeft = window.innerWidth - tRect.width - margin;
+    const tleft   = Math.max(margin, Math.min(left, maxLeft));
+    const spBelow = safeBtm - bottom;
+    const spAbove = top - margin;
+    let ttop = bottom + 18;
+    if (spBelow < tRect.height + 18 && spAbove > spBelow)
+      ttop = top - tRect.height - 18;
+    if (ttop < margin) ttop = margin;
+    if (ttop + tRect.height > safeBtm) ttop = Math.max(margin, safeBtm - tRect.height);
+    tooltip.style.left   = tleft + "px";
+    tooltip.style.right  = "auto";
+    tooltip.style.bottom = "auto";
+    tooltip.style.top    = ttop + "px";
   }
 
   /* ----------------------------------------------------------
