@@ -25,11 +25,11 @@
 
       shieldTitle: "Se protéger",
       shieldKicker: "Boucliers",
-      shieldText: "Un bouclier absorbe 1 PV de dégâts. Chaque camp dispose de 3 boucliers communs pour la partie. Le bouclier disparaît au début de ton prochain tour ou s’il est détruit par une attaque. Le Companion gère aussi certains boucliers bonus indépendants.",
+      shieldText: "Un bouclier absorbe 1 PV de dégâts. Chaque camp dispose de 3 boucliers communs pour la partie. Le bouclier disparaît au début de ton prochain tour ou s’il est détruit par une attaque.",
 
       repairTitle: "Réparer",
       repairKicker: "Clés de réparation",
-      repairText: "Chaque unité commence avec 2 clés de réparation. Une clé permet de se redonner 1 PV ou de relever une unité alliée HS avec 1 PV. Une fois utilisée, la clé est retirée de la partie, sauf effet spécial.",
+      repairText: "Chaque unité commence avec 2 clés de réparation. Une clé peut redonner 1 PV à l’unité qui l’utilise. Elle peut aussi relever une unité alliée HS avec 1 PV, à condition que cette unité soit sur une case adjacente. Une fois utilisée, la clé est retirée de la partie.",
 
       classActionTitle: "Action de classe",
       classActionKicker: "Capacité spéciale",
@@ -71,11 +71,11 @@
 
       shieldTitle: "Protect",
       shieldKicker: "Shields",
-      shieldText: "A shield absorbs 1 HP of damage. Each side has 3 shared shields for the game. A shield disappears at the start of your next turn or when destroyed by an attack. The Companion also handles some independent bonus shields.",
+      shieldText: "A shield absorbs 1 HP of damage. Each side has 3 shared shields for the game. A shield disappears at the start of your next turn or when destroyed by an attack.",
 
       repairTitle: "Repair",
       repairKicker: "Repair Keys",
-      repairText: "Each unit starts with 2 Repair Keys. A key restores 1 HP to itself or brings an allied KO unit back with 1 HP. Once used, the key is removed from the game unless a special effect restores it.",
+      repairText: "Each unit starts with 2 Repair Keys. A key may restore 1 HP to the unit using it. It may also bring an allied KO unit back with 1 HP, as long as that ally is on an adjacent space. Once used, the key is removed from the game.",
 
       classActionTitle: "Class Action",
       classActionKicker: "Special ability",
