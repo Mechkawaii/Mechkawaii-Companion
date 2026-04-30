@@ -379,19 +379,38 @@
   }
 
   .page-character .topbar {
-    align-items: flex-start;
+    align-items: stretch !important;
+    display: flex !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .page-character .topbar > .brand-with-portrait {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    overflow: visible !important;
   }
 
   .page-character .topbar > .controls {
     gap: 6px;
     justify-content: flex-end;
     flex: 0 0 auto;
-    max-width: 38%;
+    max-width: 18%;
+    min-width: 42px;
   }
 
   .page-character .brand-with-portrait {
-    overflow: hidden !important;
+    overflow: visible !important;
     min-width: 0 !important;
+    padding-right: 6px !important;
+  }
+
+  .page-character .brand-with-portrait > div:last-child {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    overflow: visible !important;
   }
 
   .page-character .brand-with-portrait img[src*="CU_"],
