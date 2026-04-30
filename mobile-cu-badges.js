@@ -6,7 +6,7 @@
   "use strict";
 
   const STYLE_ID = "mkwMobileCuBadgeStyles";
-  const SZ = 34; // taille badge px
+  const SZ = 44; // taille badge px
 
   function ensureStyles() {
     if (document.getElementById(STYLE_ID)) return;

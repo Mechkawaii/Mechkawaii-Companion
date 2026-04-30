@@ -1211,13 +1211,7 @@ if (ultToggleContainer) {
       const img=document.createElement("img"); img.src="./assets/cu/CU_"+badge.sourceId+".png";
       img.onerror=()=>{img.src="./assets/cu/CU_vide.png";};
       el.appendChild(img); el.addEventListener("click",()=>_showCuDetail(badge));
-      const rm=document.createElement("div"); rm.className="cu-badge-remove"; rm.textContent="×";
-      rm.addEventListener("click",e=>{ e.stopPropagation();
-        const map=getCuBadges(), cur=map[c.id];
-        if(Array.isArray(cur)){cur.splice(idx,1);if(!cur.length)delete map[c.id];else map[c.id]=cur;}else delete map[c.id];
-        setCuBadges(map); _renderCuBadge();
-      });
-      el.appendChild(rm); _cuSlot.appendChild(el);
+      _cuSlot.appendChild(el);
     });
 
     // Si slot vide pour un Prodrome, afficher CU_vide non cliquable (emplacement réservé)
