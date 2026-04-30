@@ -16,17 +16,15 @@
       sheepard: "Général Sheepard",
       prev: "←",
       next: "Suivant",
-      backToTutorial: "Reprendre",
       movementTitle: "Déplacement",
       movementText: "En Mode Normal, toutes les unités utilisent les mêmes schémas de déplacement et d’attaque. En Mode Expert, chaque unité possède ses propres schémas. Sur le schéma de déplacement, le point de couleur indique la position de l’unité. Les croix indiquent les cases où elle peut se déplacer. Les routes peuvent modifier le déplacement : suis le tracé des routes connectées et applique les règles indiquées par le jeu.",
-      attackTitle: "Attaque",
+      attackTitle: "Attaquer",
       attackText: "Sur le schéma d’attaque, les symboles cible indiquent les tirs à distance. Pour tirer à distance, la ligne de mire doit être dégagée. Le symbole poing indique l’attaque au corps à corps : si elle réussit, la cible recule d’une case si possible."
     },
     en: {
       sheepard: "General Sheepard",
       prev: "←",
       next: "Next",
-      backToTutorial: "Resume",
       movementTitle: "Movement",
       movementText: "In Normal Mode, all units use the same movement and attack patterns. In Expert Mode, each unit has its own patterns. On the movement diagram, the colored dot shows the unit’s position. The crosses show the spaces it may move to. Roads can modify movement: follow connected roads and apply the rules shown by the game.",
       attackTitle: "Attack",
@@ -110,7 +108,6 @@
       .mkw-pattern-tuto-text { font-size: 14px; line-height: 1.42; }
       .mkw-pattern-tuto-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 16px; }
       .mkw-pattern-tuto-actions button { min-width: 48px; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); color: #fff; font-weight: 900; }
-      .mkw-pattern-tuto-actions button:last-child { background: linear-gradient(135deg, #ff4bd8, #ffd24d); color: #111; border: 0; }
       .mkw-pattern-tuto-actions button:disabled { opacity: .35; }
     `;
     document.head.appendChild(style);
@@ -192,7 +189,7 @@
       </div>
       <div class="mkw-pattern-tuto-actions">
         <button type="button" data-pattern-prev ${customIndex === 0 ? "disabled" : ""}>${tr("prev")}</button>
-        <button type="button" data-pattern-next>${customIndex === 1 ? tr("backToTutorial") : tr("next")}</button>
+        <button type="button" data-pattern-next>${tr("next")}</button>
       </div>
     `;
 
