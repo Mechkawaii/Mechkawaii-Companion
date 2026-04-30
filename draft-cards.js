@@ -162,13 +162,6 @@
       heading.className = "draft-col-heading-vis";
       heading.setAttribute("data-col", colKey);
       heading.textContent = (lang === "fr") ? COL_LABELS[colKey].fr : COL_LABELS[colKey].en;
-
-      if (ADDITIONAL_LIMIT.includes(colKey)) {
-        var sub = document.createElement("span");
-        sub.className = "col-sub";
-        sub.textContent = lang === "fr" ? "max 1 par equipe" : "max 1 per team";
-        heading.appendChild(sub);
-      }
       draftList.appendChild(heading);
 
       var rowEl = document.createElement("div");
