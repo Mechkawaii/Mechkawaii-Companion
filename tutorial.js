@@ -111,8 +111,8 @@
     { target: ".hp-section", titleKey: "hpTitle", kickerKey: "hpKicker", textKey: "hpText", pad: 12, mobileTop: 118 },
     { target: ".shields-section", titleKey: "shieldTitle", kickerKey: "shieldKicker", textKey: "shieldText", pad: 16, mobileTop: 110 },
     { target: ".repair-section", titleKey: "repairTitle", kickerKey: "repairKicker", textKey: "repairText", pad: 16, mobileTop: 110 },
-    { target: "#classActionTitle", titleKey: "classActionTitle", kickerKey: "classActionKicker", textKey: "classActionText", pad: 18, fullCard: true },
-    { target: "#ultTitle,#ultToggleContainer", titleKey: "ultimateTitle", kickerKey: "ultimateKicker", textKey: "ultimateText", pad: 18, fullCard: true },
+    { target: "#classActionTitle", titleKey: "classActionTitle", kickerKey: "classActionKicker", textKey: "classActionText", pad: 18, mobileTop: 118 },
+    { target: "#ultTitle,#ultToggleContainer", titleKey: "ultimateTitle", kickerKey: "ultimateKicker", textKey: "ultimateText", pad: 18, mobileTop: 118 },
     { target: ".cu-badges,#cuBadges,.cu-badge-zone,.cu-badge,.copied-cu,[data-cu-badges],[data-cu-badge],.topbar .controls", titleKey: "cuBadgeTitle", kickerKey: "cuBadgeKicker", textKey: "cuBadgeText", pad: 14, mobileTop: 96, optional: true },
     { target: "#mkwSuddenDeathHud", titleKey: "suddenTitle", kickerKey: "suddenKicker", textKey: "suddenText", pad: 14, mobileTop: 100, optional: true },
     { target: "#unitTabs", titleKey: "tabsTitle", kickerKey: "tabsKicker", textKey: "tabsText", pad: 12, allowTabsOverlap: true }
@@ -135,11 +135,8 @@
     if (scrollLocked) return;
     previousBodyOverflow = document.body.style.overflow || "";
     previousHtmlOverflow = document.documentElement.style.overflow || "";
-    // iOS Safari : overflow:hidden bloque window.scrollTo. On ne locke pas sur mobile.
-    if (!isMobile()) {
-      document.body.style.setProperty("overflow", "hidden", "important");
-      document.documentElement.style.setProperty("overflow", "hidden", "important");
-    }
+    document.body.style.setProperty("overflow", "hidden", "important");
+    document.documentElement.style.setProperty("overflow", "hidden", "important");
     scrollLocked = true;
   }
 
@@ -199,10 +196,7 @@
   function findTarget(step) {
     if (!step?.target) return null;
     const candidates = Array.from(document.querySelectorAll(step.target));
-    const el = candidates.find(isVisibleTarget) || null;
-    if (!el || !step.fullCard) return el;
-    const card = el.closest(".card") || el.parentElement;
-    return (card && isVisibleTarget(card)) ? card : el;
+    return candidates.find(isVisibleTarget) || null;
   }
 
   function findNextAvailableStep(direction = 1) {
@@ -229,19 +223,36 @@
 
   function scrollPageBy(delta) {
     if (Math.abs(delta) < 2) return;
-    const curY = window.scrollY || window.pageYOffset || 0;
-    const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-    window.scrollTo(0, Math.max(0, Math.min(curY + delta, maxY)));
+    const root = document.scrollingElement || document.documentElement;
+    const body = document.body;
+    const html = document.documentElement;
+    const prevBody = body.style.getPropertyValue("overflow");
+    const prevHtml = html.style.getPropertyValue("overflow");
+    body.style.setProperty("overflow", "auto", "important");
+    html.style.setProperty("overflow", "auto", "important");
+    const maxY = Math.max(0, root.scrollHeight - window.innerHeight);
+    root.scrollTop = Math.max(0, Math.min(root.scrollTop + delta, maxY));
+    requestAnimationFrame(() => {
+      if (scrollLocked) {
+        body.style.setProperty("overflow", "hidden", "important");
+        html.style.setProperty("overflow", "hidden", "important");
+      } else {
+        body.style.setProperty("overflow", prevBody);
+        html.style.setProperty("overflow", prevHtml);
+      }
+    });
   }
 
   function positionTargetForMobile(target, step) {
     if (!isMobile() || !target) return;
     if (step?.target === "#unitTabs") return;
 
-    const safeTop    = 82;
-    const safeBottom = getTabsSafeTop() - 40;
+    const tabsTop    = getTabsSafeTop();
+    const safeBottom = tabsTop - 16;
+    // Réserver ~45% de l'écran pour le tooltip en haut
+    const tooltipH   = tooltip ? tooltip.getBoundingClientRect().height : 0;
+    const safeTop    = Math.max(tooltipH + 16, Math.round(window.innerHeight * 0.42));
     const available  = Math.max(60, safeBottom - safeTop);
-    const root       = document.scrollingElement || document.documentElement;
 
     let rect = target.getBoundingClientRect();
     let desiredTop = safeTop;
@@ -252,43 +263,35 @@
     const delta = rect.top - desiredTop;
     if (Math.abs(delta) > 2) scrollPageBy(delta);
 
-    // Vérifier après scroll que ça ne dépasse pas en bas
     rect = target.getBoundingClientRect();
     if (rect.bottom > safeBottom) scrollPageBy(rect.bottom - safeBottom);
   }
 
   function placeTooltip(rect) {
     if (!tooltip) return;
-    const pad = isMobile() ? 18 : 14;
+    const pad = 10;
     const tooltipRect = tooltip.getBoundingClientRect();
-    const tabsContainer = document.querySelector("#unitTabsContainer");
-    const tabsRect = tabsContainer ? tabsContainer.getBoundingClientRect() : null;
-    const safeBottom = tabsRect ? Math.max(0, tabsRect.top - pad) : window.innerHeight - pad;
-    const safeTop = isMobile() ? 22 : pad;
-    const maxLeft = window.innerWidth - tooltipRect.width - pad;
-    const centeredLeft = Math.max(pad, Math.min((window.innerWidth - tooltipRect.width) / 2, maxLeft));
-    const targetLeft = Math.max(pad, Math.min(rect.left, maxLeft));
-    const mobileBelowGap = isMobile() ? 22 : pad;
-    const mobileAboveGap = isMobile() ? 22 : pad;
-    const candidates = [
-      { top: rect.bottom + mobileBelowGap, left: targetLeft },
-      { top: rect.top - tooltipRect.height - mobileAboveGap, left: targetLeft },
-      { top: safeTop, left: centeredLeft },
-      { top: safeBottom - tooltipRect.height, left: centeredLeft }
-    ];
-    let chosen = candidates.find(pos => {
-      const candidateRect = { top: pos.top, left: pos.left, right: pos.left + tooltipRect.width, bottom: pos.top + tooltipRect.height };
-      return pos.top >= safeTop && candidateRect.bottom <= safeBottom && !rectsOverlap(candidateRect, rect);
-    });
-    if (!chosen) {
-      const spaceAbove = rect.top - safeTop;
+    const tabsTop    = getTabsSafeTop();
+    const maxLeft    = window.innerWidth - tooltipRect.width - pad;
+    const left       = Math.max(pad, Math.min((window.innerWidth - tooltipRect.width) / 2, maxLeft));
+
+    if (isMobile()) {
+      // Tooltip toujours dans le tiers supérieur, cadre dans le bas → jamais de chevauchement
+      const top = Math.max(pad, rect.top - tooltipRect.height - 12);
+      tooltip.style.left   = left + "px";
+      tooltip.style.right  = "auto";
+      tooltip.style.bottom = "auto";
+      tooltip.style.top    = top + "px";
+    } else {
+      const safeBottom = tabsTop - pad;
       const spaceBelow = safeBottom - rect.bottom;
-      chosen = spaceAbove >= spaceBelow ? { top: safeTop, left: centeredLeft } : { top: Math.max(safeTop, safeBottom - tooltipRect.height), left: centeredLeft };
+      let top = spaceBelow >= tooltipRect.height + 8 ? rect.bottom + 8 : rect.top - tooltipRect.height - 8;
+      top = Math.max(pad, Math.min(top, safeBottom - tooltipRect.height));
+      tooltip.style.left   = left + "px";
+      tooltip.style.right  = "auto";
+      tooltip.style.bottom = "auto";
+      tooltip.style.top    = top + "px";
     }
-    tooltip.style.left = Math.max(pad, Math.min(chosen.left, maxLeft)) + "px";
-    tooltip.style.right = "auto";
-    tooltip.style.bottom = "auto";
-    tooltip.style.top = Math.max(safeTop, Math.min(chosen.top, safeBottom - tooltipRect.height)) + "px";
   }
 
   function getHighlightTarget() {
