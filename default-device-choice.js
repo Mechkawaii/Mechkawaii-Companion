@@ -1,4 +1,15 @@
 (function () {
+  function loadExpertEvents() {
+    try {
+      if (window.__mkwExpertEventsScriptInjected) return;
+      window.__mkwExpertEventsScriptInjected = true;
+      const script = document.createElement("script");
+      script.src = "./expert-events.js?v=1";
+      script.defer = true;
+      document.head.appendChild(script);
+    } catch (error) {}
+  }
+
   function defaultToTwoDevices() {
     try {
       if (localStorage.getItem("mechkawaii:setup")) return;
@@ -14,6 +25,7 @@
   }
 
   function scheduleDefaultChoice() {
+    loadExpertEvents();
     setTimeout(defaultToTwoDevices, 0);
     setTimeout(defaultToTwoDevices, 120);
   }
