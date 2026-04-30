@@ -45,24 +45,31 @@
     if (title === "Déplacement" || title === "Movement") {
       return document.querySelector("#movementImg")?.closest(".card") || null;
     }
-    if (title === "Attaque" || title === "Attack") {
+    if (title === "Attaquer" || title === "Attack") {
       return document.querySelector("#attackImg")?.closest(".card") || null;
     }
     return null;
   }
 
-  function placeAboveTabs(target, desiredTop) {
+  function placeAboveTabs(target, desiredTop, options = {}) {
     if (!target || !isMobile()) return;
 
-    const safeBottom = getTabsTop() - 30;
+    const marginBottom = Number(options.marginBottom ?? 34);
+    const safeBottom = getTabsTop() - marginBottom;
     let rect = target.getBoundingClientRect();
 
-    const availableHeight = Math.max(160, safeBottom - desiredTop);
-    if (rect.height <= availableHeight) {
-      const centeredTop = desiredTop + Math.max(0, (availableHeight - rect.height) / 2);
-      if (Math.abs(rect.top - centeredTop) > 6) scrollByAmount(rect.top - centeredTop);
-    } else if (Math.abs(rect.top - desiredTop) > 6) {
-      scrollByAmount(rect.top - desiredTop);
+    // Pour Action de classe / Coup Unique, on veut voir TOUTE la section,
+    // donc on colle le haut de la carte assez haut au lieu de tenter un centrage trop permissif.
+    if (options.forceTop) {
+      if (Math.abs(rect.top - desiredTop) > 3) scrollByAmount(rect.top - desiredTop);
+    } else {
+      const availableHeight = Math.max(160, safeBottom - desiredTop);
+      if (rect.height <= availableHeight) {
+        const centeredTop = desiredTop + Math.max(0, (availableHeight - rect.height) / 2);
+        if (Math.abs(rect.top - centeredTop) > 6) scrollByAmount(rect.top - centeredTop);
+      } else if (Math.abs(rect.top - desiredTop) > 6) {
+        scrollByAmount(rect.top - desiredTop);
+      }
     }
 
     rect = target.getBoundingClientRect();
@@ -71,8 +78,15 @@
     }
 
     rect = target.getBoundingClientRect();
-    if (rect.top < 74) {
-      scrollByAmount(rect.top - 74);
+    const minTop = Number(options.minTop ?? 64);
+    if (rect.top < minTop) {
+      scrollByAmount(rect.top - minTop);
+    }
+
+    // Dernier passage : si le bas reste masqué par les tabs, on remonte encore.
+    rect = target.getBoundingClientRect();
+    if (rect.bottom > safeBottom) {
+      scrollByAmount(rect.bottom - safeBottom);
     }
   }
 
@@ -186,7 +200,7 @@
         setMainTutorialHidden(false);
         const card = getMainTargetCard();
         if (card) {
-          placeAboveTabs(card, 104);
+          placeAboveTabs(card, 80, { forceTop: true, minTop: 58, marginBottom: 42 });
           setTimeout(() => drawMainHighlight(card), 40);
         }
       };
@@ -215,12 +229,22 @@
 
     const mainCard = getMainTargetCard();
     if (mainCard) {
-      placeAboveTabs(mainCard, 104);
+      const isClassOrUltimate = currentMainTitle() === "Action de classe" || currentMainTitle() === "Class Action" || currentMainTitle() === "Coup Unique" || currentMainTitle() === "Ultimate Ability";
+      const desiredTop = isClassOrUltimate ? 80 : 104;
+      const options = isClassOrUltimate ? { forceTop: true, minTop: 58, marginBottom: 42 } : {};
+      placeAboveTabs(mainCard, desiredTop, options);
       requestAnimationFrame(() => {
-        placeAboveTabs(mainCard, 104);
+        placeAboveTabs(mainCard, desiredTop, options);
         drawMainHighlight(mainCard);
       });
-      setTimeout(() => drawMainHighlight(mainCard), 120);
+      setTimeout(() => {
+        placeAboveTabs(mainCard, desiredTop, options);
+        drawMainHighlight(mainCard);
+      }, 120);
+      setTimeout(() => {
+        placeAboveTabs(mainCard, desiredTop, options);
+        drawMainHighlight(mainCard);
+      }, 260);
     }
   }
 
@@ -258,6 +282,7 @@
       if (event.target.closest?.("#next,#prev,[data-pattern-next],[data-pattern-prev]")) {
         setTimeout(scheduleFix, 40);
         setTimeout(scheduleFix, 140);
+        setTimeout(scheduleFix, 280);
       }
     }, true);
   }
