@@ -10,42 +10,92 @@
       prev: "←",
       next: "Suivant",
       finish: "Terminer",
+
+      turnTitle: "Tour de jeu",
+      turnKicker: "Round et camp actif",
+      turnText: "Cette zone indique le round en cours et le camp qui joue. Une fois tes actions terminées, utilise le bouton de fin de tour pour passer la main. Quand les deux camps ont joué, on passe au round suivant.",
+
+      eventTitle: "Événements Expert",
+      eventKicker: "Piste événement",
+      eventText: "En mode Expert, le jeton avance d’une case à chaque round. Lorsqu’il atteint la 5e case, personne ne joue : un événement se déclenche, puis la partie reprend directement au round suivant.",
+
       hpTitle: "Points de vie",
       hpKicker: "Fonctionnement des PV",
-      hpText: "Les PV indiquent l’état de ton unité. S’ils tombent à 0, l’unité devient Hors Service (HS). Une unité ne peut jamais dépasser le nombre de PV indiqué sur sa carte.",
+      hpText: "Les PV indiquent l’état de ton unité. S’ils tombent à 0, l’unité devient Hors Service (HS). Une unité HS peut revenir en jeu si elle récupère au moins 1 PV.",
+
       shieldTitle: "Se protéger",
       shieldKicker: "Boucliers",
-      shieldText: "Un bouclier absorbe 1 PV de dégâts. Il disparaît au début de ton prochain tour ou s’il est détruit par une attaque. Une fois utilisé, le jeton bouclier est retiré de la partie.",
+      shieldText: "Un bouclier absorbe 1 PV de dégâts. Les boucliers de la réserve commune sont limités. Certains effets, comme le Technicien ou le drone de Rasmus, peuvent donner des boucliers bonus temporaires indépendants.",
+
       repairTitle: "Réparer",
       repairKicker: "Clés de réparation",
-      repairText: "Chaque unité dispose de 2 clés de réparation en début de partie. Une clé permet de redonner 1 PV ou de relever une unité alliée HS avec 1 PV. Une fois utilisée, elle est retirée de la partie.",
+      repairText: "Chaque unité dispose de 2 clés de réparation en début de partie. Une clé redonne 1 PV à une unité alliée ou relève une unité HS avec 1 PV. Certaines capacités peuvent rendre une clé utilisée.",
+
+      classActionTitle: "Action de classe",
+      classActionKicker: "Capacité spéciale",
+      classActionText: "Chaque classe possède une action spéciale. Certaines se jouent pendant ton tour, d’autres réagissent à une situation précise. Pense à vérifier si l’action consomme une cellule d’énergie.",
+
+      ultimateTitle: "Coup Unique",
+      ultimateKicker: "Pouvoir décisif",
+      ultimateText: "Le Coup Unique est une capacité forte, souvent utilisable une seule fois ou à réamorcer selon l’unité. Certains Coups Uniques ouvrent une modale pour choisir des cibles ou distribuer des bonus.",
+
       cuBadgeTitle: "Badges de Coup Unique",
       cuBadgeKicker: "Effets permanents",
-      cuBadgeText: "Cette zone affiche les Coups Uniques permanents appliqués à l’unité, qu’ils viennent d’un allié ou d’un ennemi. En cliquant dessus, tu peux recevoir un Coup Unique du camp adverse.",
+      cuBadgeText: "Cette zone affiche les effets de Coups Uniques appliqués à l’unité. Si un effet ennemi ou allié est actif, tu peux le voir ici pour ne pas l’oublier pendant la partie.",
+
+      suddenTitle: "Mort subite",
+      suddenKicker: "Attention au compte à rebours",
+      suddenText: "Si un camp a 2 unités HS, il entre en mort subite : il dispose de 3 tours pour réparer une unité alliée avec au moins 1 PV. Si les 3 unités sont HS, la partie est perdue immédiatement.",
+
       tabsTitle: "Tes 3 unités",
-      tabsKicker: "Phase de combat",
-      tabsText: "À ton tour, tu choisis les actions de chacune de tes 3 unités, dans l’ordre de ton choix : se déplacer, attaquer, réparer, se protéger ou utiliser une action spéciale."
+      tabsKicker: "Navigation rapide",
+      tabsText: "Les onglets permettent de passer rapidement entre tes unités jouées. Tu peux gérer les PV, boucliers, clés, actions et Coups Uniques de chaque unité depuis sa fiche."
     },
     en: {
       sheepard: "General Sheepard",
       prev: "←",
       next: "Next",
       finish: "Finish",
+
+      turnTitle: "Turn Tracker",
+      turnKicker: "Round and active side",
+      turnText: "This area shows the current round and which side is playing. When you are done, use the end turn button. Once both sides have played, the next round begins.",
+
+      eventTitle: "Expert Events",
+      eventKicker: "Event track",
+      eventText: "In Expert Mode, the token moves one space each round. When it reaches the 5th space, no one plays: an event triggers, then the game immediately continues to the next round.",
+
       hpTitle: "Health Points",
       hpKicker: "HP basics",
-      hpText: "HP shows your unit’s condition. If it drops to 0, the unit becomes Out of Action (KO). A unit can never exceed the HP value shown on its card.",
+      hpText: "HP shows your unit’s condition. If it drops to 0, the unit becomes Out of Action (KO). A KO unit can return if it recovers at least 1 HP.",
+
       shieldTitle: "Protect",
       shieldKicker: "Shields",
-      shieldText: "A shield absorbs 1 HP of damage. It disappears at the start of your next turn or if it is destroyed by an attack. Once used, the shield token is removed from the game.",
+      shieldText: "A shield absorbs 1 HP of damage. Shared shield tokens are limited. Some effects, like the Technician or Rasmus’ drone, may grant independent temporary bonus shields.",
+
       repairTitle: "Repair",
       repairKicker: "Repair Keys",
-      repairText: "Each unit starts the game with 2 Repair Keys. A key restores 1 HP or brings an allied KO unit back with 1 HP. Once used, it is removed from the game.",
-      cuBadgeTitle: "Ultimate Ability Badges",
-      cuBadgeKicker: "Permanent effects",
-      cuBadgeText: "This area shows the permanent Ultimate Abilities applied to this unit, whether they come from an ally or an enemy. Tap it to receive an Ultimate Ability from the opposing camp.",
+      repairText: "Each unit starts with 2 Repair Keys. A key restores 1 HP to an allied unit or brings a KO allied unit back with 1 HP. Some abilities can restore a spent key.",
+
+      classActionTitle: "Class Action",
+      classActionKicker: "Special ability",
+      classActionText: "Each class has a special action. Some are used during your turn, while others react to a specific situation. Check whether the action spends an energy cell.",
+
+      ultimateTitle: "Ultimate Ability",
+      ultimateKicker: "Decisive power",
+      ultimateText: "An Ultimate Ability is a powerful effect, often one-use or requiring a recharge depending on the unit. Some Ultimates open a modal to choose targets or distribute bonuses.",
+
+      cuBadgeTitle: "Ultimate Badges",
+      cuBadgeKicker: "Ongoing effects",
+      cuBadgeText: "This area shows Ultimate effects currently applied to the unit. If an allied or enemy effect is active, you can track it here during the game.",
+
+      suddenTitle: "Sudden Death",
+      suddenKicker: "Countdown warning",
+      suddenText: "If a side has 2 KO units, Sudden Death begins: it has 3 turns to repair an allied unit back to at least 1 HP. If all 3 units are KO, that side immediately loses.",
+
       tabsTitle: "Your 3 units",
-      tabsKicker: "Combat phase",
-      tabsText: "On your turn, choose actions for each of your 3 units in any order: move, attack, repair, protect, or use a special action."
+      tabsKicker: "Quick navigation",
+      tabsText: "Tabs let you quickly switch between your played units. You can manage HP, shields, repair keys, actions, and Ultimate Abilities from each unit sheet."
     }
   };
 
@@ -56,10 +106,15 @@
   }
 
   const STEPS = [
+    { target: "#mkwTurnBanner,.mkw-turn-banner", titleKey: "turnTitle", kickerKey: "turnKicker", textKey: "turnText", pad: 14, mobileTop: 92 },
+    { target: "#mkwExpertEventHud,.mkw-event-track", titleKey: "eventTitle", kickerKey: "eventKicker", textKey: "eventText", pad: 14, mobileTop: 94, optional: true },
     { target: ".hp-section", titleKey: "hpTitle", kickerKey: "hpKicker", textKey: "hpText", pad: 12, mobileTop: 118 },
     { target: ".shields-section", titleKey: "shieldTitle", kickerKey: "shieldKicker", textKey: "shieldText", pad: 16, mobileTop: 110 },
     { target: ".repair-section", titleKey: "repairTitle", kickerKey: "repairKicker", textKey: "repairText", pad: 16, mobileTop: 110 },
-    { target: ".cu-badges,#cuBadges,.cu-badge-zone,.cu-badge,.copied-cu,[data-cu-badges],[data-cu-badge],.topbar .controls", titleKey: "cuBadgeTitle", kickerKey: "cuBadgeKicker", textKey: "cuBadgeText", pad: 14, mobileTop: 96 },
+    { target: "#classActionTitle", titleKey: "classActionTitle", kickerKey: "classActionKicker", textKey: "classActionText", pad: 18, mobileTop: 106 },
+    { target: "#ultTitle,#ultToggleContainer", titleKey: "ultimateTitle", kickerKey: "ultimateKicker", textKey: "ultimateText", pad: 18, mobileTop: 106 },
+    { target: ".cu-badges,#cuBadges,.cu-badge-zone,.cu-badge,.copied-cu,[data-cu-badges],[data-cu-badge],.topbar .controls", titleKey: "cuBadgeTitle", kickerKey: "cuBadgeKicker", textKey: "cuBadgeText", pad: 14, mobileTop: 96, optional: true },
+    { target: "#mkwSuddenDeathHud", titleKey: "suddenTitle", kickerKey: "suddenKicker", textKey: "suddenText", pad: 14, mobileTop: 100, optional: true },
     { target: "#unitTabs", titleKey: "tabsTitle", kickerKey: "tabsKicker", textKey: "tabsText", pad: 12, allowTabsOverlap: true }
   ];
 
@@ -141,7 +196,29 @@
   function findTarget(step) {
     if (!step?.target) return null;
     const candidates = Array.from(document.querySelectorAll(step.target));
-    return candidates.find(isVisibleTarget) || candidates[0] || null;
+    return candidates.find(isVisibleTarget) || null;
+  }
+
+  function findNextAvailableStep(direction = 1) {
+    let index = currentStep;
+    while (index >= 0 && index < STEPS.length) {
+      const step = STEPS[index];
+      if (findTarget(step)) return index;
+      index += direction;
+    }
+    return -1;
+  }
+
+  function goToStep(direction) {
+    const nextIndex = currentStep + direction;
+    currentStep = nextIndex;
+    const available = findNextAvailableStep(direction);
+    if (available < 0) {
+      cleanupTutorial();
+      return;
+    }
+    currentStep = available;
+    showStep();
   }
 
   function positionTargetForMobile(target, step) {
@@ -206,8 +283,23 @@
     placeTooltip({ top, left, right, bottom, width: right - left, height: bottom - top });
   }
 
+  function isLastVisibleStep() {
+    const original = currentStep;
+    let index = currentStep + 1;
+    while (index < STEPS.length) {
+      currentStep = index;
+      if (findTarget(STEPS[index])) {
+        currentStep = original;
+        return false;
+      }
+      index++;
+    }
+    currentStep = original;
+    return true;
+  }
+
   function renderTooltip(step) {
-    const isLast = currentStep === STEPS.length - 1;
+    const isLast = isLastVisibleStep();
     const portraitSize = isMobile() ? "clamp(58px,16vw,76px)" : "clamp(96px,9vw,128px)";
     const textSize = isMobile() ? "14px" : "16px";
     const titleSize = isMobile() ? "17px" : "17px";
@@ -221,25 +313,28 @@
         </div>
       </div>
       <div class="mkw-tutorial-actions">
-        <button id="prev" ${currentStep === 0 ? "disabled" : ""}>${tr("prev")}</button>
+        <button id="prev" ${currentStep === findNextAvailableStep(1) ? "disabled" : ""}>${tr("prev")}</button>
         <button id="next">${isLast ? tr("finish") : tr("next")}</button>
       </div>`;
     document.getElementById("prev")?.addEventListener("click", () => {
       if (currentStep <= 0) return;
-      currentStep--;
-      showStep();
+      goToStep(-1);
     });
     document.getElementById("next")?.addEventListener("click", () => {
       if (isLast) return cleanupTutorial();
-      currentStep++;
-      showStep();
+      goToStep(1);
     });
   }
 
   function showStep() {
     const step = STEPS[currentStep];
     const target = findTarget(step);
-    if (!target) return;
+    if (!target) {
+      const available = findNextAvailableStep(1);
+      if (available < 0) return cleanupTutorial();
+      currentStep = available;
+      return showStep();
+    }
     activeTarget = target;
     activeStep = step;
     if (isMobile()) {
@@ -260,6 +355,9 @@
   function startTutorial() {
     cleanupTutorial();
     currentStep = 0;
+    const first = findNextAvailableStep(1);
+    if (first < 0) return;
+    currentStep = first;
     lockPage();
     blocker = document.createElement("div");
     blocker.className = "mkw-tutorial-blocker";
