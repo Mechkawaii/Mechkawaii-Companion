@@ -1,0 +1,41 @@
+/* Harmonisation des logos de classe dans les onglets personnages */
+.page-character .unit-tab-visual {
+  height: 62% !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+
+.page-character .unit-tab-visual img {
+  width: auto !important;
+  height: auto !important;
+  max-width: 46% !important;
+  max-height: 58% !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  transform: none !important;
+}
+
+.page-character .unit-tab[data-char-id="sheepard"] .unit-tab-visual img,
+.page-character .unit-tab[data-char-id="shepard"] .unit-tab-visual img,
+.page-character .unit-tab[data-char-id="sheppard"] .unit-tab-visual img,
+.page-character .unit-tab[data-char-id*="sheep"] .unit-tab-visual img,
+.page-character .unit-tab[data-char-id*="shep"] .unit-tab-visual img {
+  max-width: 40% !important;
+  max-height: 50% !important;
+}
+
+@media (max-width: 560px) {
+  .page-character .unit-tab-visual img {
+    max-width: 44% !important;
+    max-height: 54% !important;
+  }
+
+  .page-character .unit-tab[data-char-id="sheepard"] .unit-tab-visual img,
+  .page-character .unit-tab[data-char-id="shepard"] .unit-tab-visual img,
+  .page-character .unit-tab[data-char-id="sheppard"] .unit-tab-visual img,
+  .page-character .unit-tab[data-char-id*="sheep"] .unit-tab-visual img,
+  .page-character .unit-tab[data-char-id*="shep"] .unit-tab-visual img {
+    max-width: 38% !important;
+    max-height: 48% !important;
+  }
+}
