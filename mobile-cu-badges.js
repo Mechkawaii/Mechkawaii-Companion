@@ -1,21 +1,21 @@
 /* =============================================================
-   MECHKAWAII — Mobile CU Badges (consolidated, v2)
-   Remplace mobile-cu-badges.js + mobile-cu-badges-fix.js
+   MECHKAWAII — Mobile CU Badges (v3)
+   Layout : 1 badge → 1 colonne, 2 → 2 colonnes, 3 → grille 2×2
    ============================================================= */
 (function () {
   "use strict";
 
-  const PREFIX       = "mechkawaii:";
-  const ROW_ID       = "mkwMobileCuBadgeRow";
-  const BADGE_CLASS  = "mkw-cu-badge";
-  const EMPTY_CLASS  = "mkw-cu-badge-empty";
-  const STYLE_ID     = "mkwMobileCuBadgeStyles";
+  const ROW_ID      = "mkwMobileCuBadgeRow";
+  const BADGE_CLASS = "mkw-cu-badge";
+  const EMPTY_CLASS = "mkw-cu-badge-empty";
+  const STYLE_ID    = "mkwMobileCuBadgeStyles";
 
-  const BADGE_SIZE   = 60;   // px — taille affichée
-  const MAX_BADGES   = 3;
+  const SZ   = 36;   // taille d'un badge en px
+  const GAP  = 3;    // gap entre badges en px
+  const MAX  = 3;
 
   /* ----------------------------------------------------------
-     Styles injectés (remplace mobile-cu-badges.css)
+     Styles
   ---------------------------------------------------------- */
   function ensureStyles() {
     if (document.getElementById(STYLE_ID)) return;
@@ -23,11 +23,13 @@
     s.id = STYLE_ID;
     s.textContent = `
       @media (max-width: 560px) {
-        .page-character .topbar {
-          position: relative !important;
-          overflow: hidden !important;
-          padding-right: ${BADGE_SIZE * MAX_BADGES + 16}px !important;
-        }
+
+        /* Réserve de l'espace à droite selon le nombre de badges */
+        .page-character .topbar { position: relative !important; overflow: hidden !important; }
+        .page-character .topbar.mkw-cu-1 { padding-right: ${SZ + GAP + 12}px !important; }
+        .page-character .topbar.mkw-cu-2 { padding-right: ${SZ * 2 + GAP + 12}px !important; }
+        .page-character .topbar.mkw-cu-3 { padding-right: ${SZ * 2 + GAP + 12}px !important; }
+
         .page-character .brand-with-portrait {
           flex: 1 1 auto !important;
           min-width: 0 !important;
@@ -39,48 +41,72 @@
           text-overflow: ellipsis !important;
           white-space: nowrap !important;
         }
-        /* La row de badges */
+
+        /* Row positionnée à droite */
         #${ROW_ID} {
           position: absolute !important;
           top: 50% !important;
-          right: 10px !important;
+          right: 8px !important;
           transform: translateY(-50%) !important;
           z-index: 20 !important;
-          display: flex !important;
-          flex-direction: row !important;
-          align-items: center !important;
-          justify-content: flex-end !important;
-          gap: 4px !important;
+          display: grid !important;
+          gap: ${GAP}px !important;
           pointer-events: none !important;
+          align-items: center !important;
+          justify-items: center !important;
         }
-        /* Chaque badge */
+
+        /* 1 badge : 1 colonne */
+        #${ROW_ID}.mkw-cu-count-1 {
+          grid-template-columns: ${SZ}px !important;
+          grid-template-rows: ${SZ}px !important;
+        }
+
+        /* 2 badges : 2 colonnes, 1 ligne */
+        #${ROW_ID}.mkw-cu-count-2 {
+          grid-template-columns: repeat(2, ${SZ}px) !important;
+          grid-template-rows: ${SZ}px !important;
+        }
+
+        /* 3 badges : grille 2×2, badge 1 en haut sur 2 colonnes */
+        #${ROW_ID}.mkw-cu-count-3 {
+          grid-template-columns: repeat(2, ${SZ}px) !important;
+          grid-template-rows: repeat(2, ${SZ}px) !important;
+        }
+        #${ROW_ID}.mkw-cu-count-3 .${BADGE_CLASS}:first-child {
+          grid-column: 1 / 3 !important;
+          justify-self: center !important;
+        }
+
+        /* Badge individuel */
         #${ROW_ID} .${BADGE_CLASS} {
           position: relative !important;
-          inset: auto !important;
-          transform: none !important;
-          width: ${BADGE_SIZE}px !important;
-          height: ${BADGE_SIZE}px !important;
-          min-width: ${BADGE_SIZE}px !important;
-          min-height: ${BADGE_SIZE}px !important;
-          max-width: ${BADGE_SIZE}px !important;
-          max-height: ${BADGE_SIZE}px !important;
-          flex: 0 0 ${BADGE_SIZE}px !important;
+          width: ${SZ}px !important;
+          height: ${SZ}px !important;
+          min-width: ${SZ}px !important;
+          min-height: ${SZ}px !important;
+          max-width: ${SZ}px !important;
+          max-height: ${SZ}px !important;
           margin: 0 !important;
           padding: 0 !important;
           overflow: visible !important;
           pointer-events: auto !important;
+          cursor: pointer !important;
         }
         #${ROW_ID} .${BADGE_CLASS} img {
           display: block !important;
-          width: ${BADGE_SIZE}px !important;
-          height: ${BADGE_SIZE}px !important;
+          width: ${SZ}px !important;
+          height: ${SZ}px !important;
+          min-width: ${SZ}px !important;
+          min-height: ${SZ}px !important;
+          max-width: ${SZ}px !important;
+          max-height: ${SZ}px !important;
           object-fit: contain !important;
           pointer-events: none !important;
         }
-        /* Masquer les controls de suppression partout dans la topbar */
-        .page-character .topbar .mkw-cu-remove-btn {
-          display: none !important;
-        }
+
+        /* Masquer les boutons × dans la topbar */
+        .page-character .topbar .mkw-cu-remove-btn { display: none !important; }
       }
     `;
     document.head.appendChild(s);
@@ -94,7 +120,6 @@
   }
 
   function srcOf(el) {
-    if (!el) return "";
     if (el instanceof HTMLImageElement) return el.getAttribute("src") || "";
     return el.querySelector?.("img")?.getAttribute("src") || "";
   }
@@ -105,20 +130,16 @@
   }
 
   /* ----------------------------------------------------------
-     Détection des images CU dans la topbar
-     On cherche uniquement les <img> dont le src contient "CU_"
-     ou "cu_" (ex: ./assets/cu/CU_johanna.png, CU_vide.png…)
+     Détection : uniquement les <img src="*/cu/*"> dans la topbar
   ---------------------------------------------------------- */
   function findCuImages() {
     const topbar = document.querySelector(".page-character .topbar");
     if (!topbar) return [];
-
     const imgs = [];
     topbar.querySelectorAll("img").forEach(img => {
-      if (img.closest("#charPortrait")) return;
-      if (img.closest("#mkwEnergyInlineStatus")) return;
-      if (img.closest(`#${ROW_ID}`)) return;  // déjà dans la row
-
+      if (img.closest("#charPortrait"))            return;
+      if (img.closest("#mkwEnergyInlineStatus"))   return;
+      if (img.closest(`#${ROW_ID}`))               return;
       const src = (img.getAttribute("src") || "").toLowerCase();
       if (src.includes("/cu/") || src.includes("cu_") || src.includes("cu-vide")) {
         imgs.push(img);
@@ -128,35 +149,27 @@
   }
 
   /* ----------------------------------------------------------
-     Supprimer les boutons ×/remove autour des badges
+     Supprimer les boutons × parasites
   ---------------------------------------------------------- */
   function removeCloseButtons() {
     const topbar = document.querySelector(".page-character .topbar");
     if (!topbar) return;
-
     topbar.querySelectorAll("button, [role='button']").forEach(btn => {
       if (btn.id === "mkwCompanionMenuButton") return;
-      if (btn.closest(`#${ROW_ID}`)) return;
-      if (btn.closest("#charPortrait")) return;
-
+      if (btn.closest(`#${ROW_ID}`))           return;
+      if (btn.closest("#charPortrait"))         return;
       const txt = (btn.textContent || "").trim();
       const cls = (btn.className || "").toLowerCase();
       const lbl = (btn.getAttribute("aria-label") || "").toLowerCase();
-
       const isClose =
         txt === "×" || txt === "x" || txt === "✕" || txt === "✖" || txt === "✗" ||
-        cls.includes("remove") || cls.includes("close") || cls.includes("delete") ||
-        lbl.includes("remove") || lbl.includes("close") || lbl.includes("retir") ||
-        lbl.includes("suppr");
-
-      // Petit bouton carré ≤ 28px dans la zone de droite = bouton remove
+        cls.includes("remove") || cls.includes("close") ||
+        lbl.includes("remove") || lbl.includes("retir");
       if (!isClose) {
         const rect = btn.getBoundingClientRect();
-        const isSmallCorner = rect.width > 0 && rect.width <= 28 && rect.height <= 28;
-        if (!isSmallCorner) return;
+        if (!(rect.width > 0 && rect.width <= 28 && rect.height <= 28)) return;
       }
-
-      btn.classList.add("mkw-cu-remove-btn");  // CSS le masque
+      btn.classList.add("mkw-cu-remove-btn");
     });
   }
 
@@ -175,7 +188,6 @@
       const topbar = document.querySelector(".page-character .topbar");
       if (!topbar) return;
 
-      // Créer ou récupérer la row
       let row = document.getElementById(ROW_ID);
       if (!row) {
         row = document.createElement("div");
@@ -184,46 +196,49 @@
         topbar.appendChild(row);
       }
 
-      // Collecter les images CU (hors celles déjà dans la row)
+      // Collecter + dédupliquer par src
       const cuImgs = findCuImages();
-
-      // Séparer vide / plein
       const emptyImgs = cuImgs.filter(isEmptyBadge);
       const fullImgs  = cuImgs.filter(img => !isEmptyBadge(img));
 
-      // Dédupliquer par src
       const seen = new Set();
       const ordered = [...emptyImgs, ...fullImgs].filter(img => {
         const k = srcOf(img).toLowerCase();
         if (seen.has(k)) return false;
         seen.add(k);
         return true;
-      }).slice(0, MAX_BADGES);
+      }).slice(0, MAX);
 
-      // Vider la row et la repeupler proprement
+      const count = ordered.length;
+
+      // Mettre à jour la classe de count sur la row et la topbar
+      row.className = "";
+      if (count > 0) row.classList.add(`mkw-cu-count-${count}`);
+
+      topbar.classList.remove("mkw-cu-1", "mkw-cu-2", "mkw-cu-3");
+      if (count > 0) topbar.classList.add(`mkw-cu-${count}`);
+
+      // Repeupler la row
       row.innerHTML = "";
       ordered.forEach(img => {
         const wrapper = document.createElement("div");
         wrapper.className = BADGE_CLASS;
         if (isEmptyBadge(img)) wrapper.classList.add(EMPTY_CLASS);
 
-        // Cloner l'image pour éviter de déplacer un nœud DOM vivant
         const clone = img.cloneNode(true);
-        clone.style.cssText = "";  // reset styles inline parasites
+        clone.style.cssText = "";
         wrapper.appendChild(clone);
 
-        // Le wrapper du badge original cliqué = on redirige vers le clone
-        const origParent = img.closest("button, [role='button']");
-        if (origParent && !isEmptyBadge(img)) {
-          wrapper.style.pointerEvents = "auto";
-          wrapper.style.cursor = "pointer";
-          wrapper.addEventListener("click", () => origParent.click());
+        // Clic → délégue au bouton parent original
+        const origBtn = img.closest("button, [role='button']");
+        if (origBtn && !isEmptyBadge(img)) {
+          wrapper.addEventListener("click", () => origBtn.click());
         }
 
         row.appendChild(wrapper);
       });
 
-      row.style.display = ordered.length ? "flex" : "none";
+      row.style.display = count ? "grid" : "none";
 
     } finally {
       syncing = false;
@@ -234,28 +249,24 @@
      Scheduling
   ---------------------------------------------------------- */
   let timer = null;
-  function scheduleSync() {
-    clearTimeout(timer);
-    timer = setTimeout(syncBadges, 30);
-  }
+  function scheduleSync() { clearTimeout(timer); timer = setTimeout(syncBadges, 30); }
 
   function init() {
     ensureStyles();
-    // Syncs initiaux pour couvrir les rendus progressifs
     syncBadges();
-    [50, 120, 250, 500, 1000, 2000].forEach(d => setTimeout(syncBadges, d));
+    [50, 120, 300, 600, 1200, 2400].forEach(d => setTimeout(syncBadges, d));
 
     new MutationObserver(scheduleSync).observe(document.body, {
       childList: true, subtree: true,
       attributes: true, attributeFilter: ["src", "class", "style"]
     });
 
-    window.addEventListener("resize",                              scheduleSync);
-    window.addEventListener("pageshow",                            scheduleSync);
-    window.addEventListener("mechkawaii:energy-updated",           scheduleSync);
-    window.addEventListener("mechkawaii:ultimate-cancelled",       scheduleSync);
-    window.addEventListener("mechkawaii:ultimate-energy-finalized",scheduleSync);
-    window.addEventListener("mechkawaii:game-flow-updated",        scheduleSync);
+    window.addEventListener("resize",                               scheduleSync);
+    window.addEventListener("pageshow",                             scheduleSync);
+    window.addEventListener("mechkawaii:energy-updated",            scheduleSync);
+    window.addEventListener("mechkawaii:ultimate-cancelled",        scheduleSync);
+    window.addEventListener("mechkawaii:ultimate-energy-finalized", scheduleSync);
+    window.addEventListener("mechkawaii:game-flow-updated",         scheduleSync);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
