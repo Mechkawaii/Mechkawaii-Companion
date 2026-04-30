@@ -93,6 +93,12 @@
       .mkw-expert-events-pick { margin-top: 18px; border-top: 1px solid rgba(255,255,255,.1); padding-top: 16px; }
       .mkw-expert-step-help { color: var(--muted); font-size: 13px; margin: 0 0 14px; line-height: 1.45; }
       .mkw-event-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; }
+      .mkw-event-building-card { position: relative; width: 100%; aspect-ratio: 1 / 1; border: 1px solid rgba(255,255,255,.15); border-radius: 18px; padding: 0; overflow: hidden; background: #05060a; color: inherit; cursor: pointer; box-shadow: 0 16px 34px rgba(0,0,0,.28); -webkit-tap-highlight-color: transparent; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+      .mkw-event-building-card:hover { transform: translateY(-2px); border-color: rgba(255,210,77,.55); box-shadow: 0 20px 40px rgba(0,0,0,.34); }
+      .mkw-event-building-card:active { transform: scale(.985); }
+      .mkw-event-building-card img { width: 100%; height: 100%; object-fit: contain; display: block; background: #05060a; }
+      .mkw-event-building-label { position: absolute; left: 12px; right: 12px; bottom: 12px; border-radius: 14px; padding: 10px 12px; background: rgba(5,6,10,.9); border: 1px solid rgba(255,255,255,.13); font-weight: 900; text-transform: uppercase; letter-spacing: .04em; text-align: center; }
+      .mkw-event-building-hint { display:block; margin-top:4px; font-size: 10px; color: rgba(255,255,255,.68); text-transform:none; letter-spacing:0; font-weight:700; }
       .mkw-event-flip-card { width: 100%; aspect-ratio: 1 / 1; perspective: 1100px; border: 0; padding: 0; background: transparent; color: inherit; cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; }
       .mkw-event-flip-inner { position: relative; display: block; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .45s ease; }
       .mkw-event-flip-card.is-flipped .mkw-event-flip-inner { transform: rotateY(180deg); }
@@ -128,6 +134,24 @@
       @media (max-width: 680px) { .mkw-event-grid { grid-template-columns: 1fr; } .mkw-event-card-title { font-size: 16px; } .mkw-event-card-text { font-size: 12px; } .mkw-expert-modal-visual { max-height: 300px; } }
     `;
     document.head.appendChild(style);
+  }
+
+  function createBuildingCard(building) {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "mkw-event-building-card";
+    card.innerHTML = `
+      <img src="${building.image}" alt="">
+      <span class="mkw-event-building-label">
+        ${building.label}
+        <span class="mkw-event-building-hint">Voir les scénarios</span>
+      </span>
+    `;
+    card.addEventListener("click", event => {
+      event.preventDefault();
+      renderScenarioStep(building.id);
+    });
+    return card;
   }
 
   function createFlipCard({ image, title, kicker, intro, effect, buttonLabel, onChoose, scenario }) {
@@ -212,7 +236,7 @@
     `;
     const grid = wrap.querySelector("#mkwEventBuildingGrid");
     Object.values(EVENTS).forEach(building => {
-      grid.appendChild(createFlipCard({ image: building.image, title: building.label, effect: building.description, buttonLabel: "Voir les scénarios", onChoose: () => renderScenarioStep(building.id) }));
+      grid.appendChild(createBuildingCard(building));
     });
     wrap.scrollIntoView({ behavior: "smooth", block: "start" });
   }
