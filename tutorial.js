@@ -183,11 +183,7 @@
   function getTabsSafeTop() {
     const tabsContainer = document.querySelector("#unitTabsContainer");
     const tabsRect = tabsContainer ? tabsContainer.getBoundingClientRect() : null;
-    const fromTabs = tabsRect ? tabsRect.top : window.innerHeight;
-    // Sur iOS Safari, la barre du navigateur peut décaler les coords.
-    // On prend le minimum entre le haut des tabs et une marge fixe depuis le bas.
-    const fromBottom = window.innerHeight - 130;
-    return Math.min(fromTabs, fromBottom);
+    return tabsRect ? tabsRect.top : window.innerHeight;
   }
 
   function isVisibleTarget(el) {
@@ -251,10 +247,11 @@
     if (!isMobile() || !target) return;
     if (step?.target === "#unitTabs") return;
 
-    const safeTop    = 82;
-    const safeBottom = getTabsSafeTop() - 40;
-    const available  = Math.max(60, safeBottom - safeTop);
-    const root       = document.scrollingElement || document.documentElement;
+    // On réserve une zone fixe en haut pour le tooltip (position:fixed top:10px)
+    // et on scroll la section cible dans la zone en dessous.
+    const safeTop    = 300;
+    const safeBottom = getTabsSafeTop() - 8;
+    const available  = Math.max(40, safeBottom - safeTop);
 
     let rect = target.getBoundingClientRect();
     let desiredTop = safeTop;
@@ -265,7 +262,6 @@
     const delta = rect.top - desiredTop;
     if (Math.abs(delta) > 2) scrollPageBy(delta);
 
-    // Vérifier après scroll que ça ne dépasse pas en bas
     rect = target.getBoundingClientRect();
     if (rect.bottom > safeBottom) scrollPageBy(rect.bottom - safeBottom);
   }
@@ -322,29 +318,30 @@
 
   function updateOverlayPosition() {
     if (!activeTarget || !highlight || !tooltip || !overlay) return;
+
+    // Sur mobile : scroller d'abord, dessiner ensuite
     if (isMobile()) positionTargetForMobile(activeTarget, activeStep);
 
-    const highlightEl = getHighlightTarget();
-    const rect = highlightEl.getBoundingClientRect();
+    const el   = getHighlightEl();
+    const rect = el.getBoundingClientRect();
     const pad  = Number(activeStep?.pad ?? 12);
-
     const top    = Math.max(10, rect.top - pad);
     const left   = Math.max(10, rect.left - pad);
     const right  = Math.min(window.innerWidth - 10, rect.right + pad);
-    const bottomLimit = activeStep?.allowTabsOverlap ? window.innerHeight - 10 : getTabsSafeTop() - 10;
-    const bottom = Math.min(bottomLimit, rect.bottom + pad, window.innerHeight - 10);
+    const blimit = activeStep?.allowTabsOverlap ? window.innerHeight - 10 : getTabsSafeTop() - 10;
+    const bottom = Math.min(blimit, rect.bottom + pad, window.innerHeight - 10);
 
-    if (bottom <= top + 6 && isMobile()) {
-      scrollPageBy(bottom - top + 80);
-      return requestAnimationFrame(updateOverlayPosition);
-    }
+    // Vérifier que le cadre ne chevauche pas le tooltip (top:300px)
+    const highlightTop = Math.max(top, 300 - 4);
 
-    overlay.style.clipPath = `polygon(0% 0%,0% 100%,${left}px 100%,${left}px ${top}px,${right}px ${top}px,${right}px ${bottom}px,${left}px ${bottom}px,${left}px 100%,100% 100%,100% 0%)`;
-    highlight.style.top    = top + "px";
+    if (bottom <= highlightTop + 6) return; // Section hors zone, on ne dessine pas
+
+    overlay.style.clipPath = `polygon(0% 0%,0% 100%,${left}px 100%,${left}px ${highlightTop}px,${right}px ${highlightTop}px,${right}px ${bottom}px,${left}px ${bottom}px,${left}px 100%,100% 100%,100% 0%)`;
+    highlight.style.top    = highlightTop + "px";
     highlight.style.left   = left + "px";
     highlight.style.width  = (right - left) + "px";
-    highlight.style.height = Math.max(0, bottom - top) + "px";
-    placeTooltip({ top, left, right, bottom, width: right - left, height: bottom - top });
+    highlight.style.height = Math.max(0, bottom - highlightTop) + "px";
+    placeTooltip({ top: highlightTop, left, right, bottom });
   }
 
   function isLastVisibleStep() {

@@ -28,9 +28,7 @@
 
   function tabsTop() {
     const t = document.querySelector("#unitTabsContainer");
-    const fromTabs = t ? t.getBoundingClientRect().top : window.innerHeight;
-    const fromBottom = window.innerHeight - 130;
-    return Math.min(fromTabs, fromBottom);
+    return t ? t.getBoundingClientRect().top : window.innerHeight;
   }
 
   function qs(sel, root = document) { return root.querySelector(sel); }
@@ -65,28 +63,44 @@
   ---------------------------------------------------------- */
   function cameraTo(card) {
     if (!card || !isMobile()) return;
-    const root    = document.scrollingElement || document.documentElement;
-    const safeTop = 90;
-    const safeBtm = tabsTop() - 40;
-    const avail   = Math.max(100, safeBtm - safeTop);
+    const safeTop = 300;
+    const safeBtm = tabsTop() - 8;
+    const avail   = Math.max(40, safeBtm - safeTop);
     const rect    = card.getBoundingClientRect();
-    const curY    = root.scrollTop;
-
+    const curY    = window.scrollY || window.pageYOffset || 0;
     let desiredTop = safeTop;
-    if (rect.height < avail) desiredTop = safeTop + (avail - rect.height) / 2;
-
-    let nextY = curY + rect.top - desiredTop;
-    const projectedBottom = desiredTop + rect.height;
-    if (projectedBottom > safeBtm) nextY += projectedBottom - safeBtm;
-
-    if (Math.abs(nextY - curY) < 2) return;
-    scrollTo(nextY);
+    if (rect.height < avail) desiredTop = safeTop + Math.round((avail - rect.height) / 2);
+    let nextY = curY + (rect.top - desiredTop);
+    const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    nextY = Math.max(0, Math.min(nextY, maxY));
+    if (Math.abs(nextY - curY) > 2) scrollTo(nextY);
   }
 
   /* ----------------------------------------------------------
      Dessine overlay + highlight + positionne tooltip
   ---------------------------------------------------------- */
   function drawHighlight({ overlay, highlight, tooltip, card, pad = 16 }) {
+    if (!overlay || !highlight || !card) return;
+    const rect   = card.getBoundingClientRect();
+    const top    = Math.max(300 - 4, rect.top - pad);
+    const left   = Math.max(10, rect.left - pad);
+    const right  = Math.min(window.innerWidth - 10, rect.right + pad);
+    const bottom = Math.min(tabsTop() - 8, rect.bottom + pad, window.innerHeight - 10);
+
+    if (bottom <= top + 6) return; // hors zone
+
+    overlay.style.clipPath =
+      `polygon(0% 0%,0% 100%,${left}px 100%,${left}px ${top}px,` +
+      `${right}px ${top}px,${right}px ${bottom}px,${left}px ${bottom}px,` +
+      `${left}px 100%,100% 100%,100% 0%)`;
+
+    highlight.style.top    = top + "px";
+    highlight.style.left   = left + "px";
+    highlight.style.width  = Math.max(0, right - left) + "px";
+    highlight.style.height = Math.max(0, bottom - top) + "px";
+
+    if (tooltip) placeTooltip(tooltip, top, left, right, bottom);
+  }) {
     if (!overlay || !highlight || !card) return;
     const rect   = card.getBoundingClientRect();
     const top    = Math.max(10, rect.top - pad);
