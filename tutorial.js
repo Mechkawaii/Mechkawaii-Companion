@@ -33,7 +33,7 @@
 
       classActionTitle: "Action de classe",
       classActionKicker: "Capacité spéciale",
-      classActionText: "Chaque classe possède une action spécifique. Pour réaliser une action, l’unité dépense des cellules d’énergie. Elle ne peut pas dépenser plus d’énergie qu’elle n’en possède et récupère ses cellules au début de son tour.",
+      classActionText: "Chaque classe possède une capacité propre. Elle peut être active, à déclencher au bon moment, ou passive, avec un effet qui s’applique automatiquement selon la situation. Pense à lire la fiche de l’unité pour savoir comment l’utiliser.",
 
       ultimateTitle: "Coup Unique",
       ultimateKicker: "Pouvoir décisif",
@@ -79,7 +79,7 @@
 
       classActionTitle: "Class Action",
       classActionKicker: "Special ability",
-      classActionText: "Each class has a specific action. To perform an action, a unit spends energy cells. It cannot spend more energy than it has and recovers its cells at the start of its turn.",
+      classActionText: "Each class has its own ability. It may be active, triggered at the right moment, or passive, applying automatically when the situation calls for it. Check the unit sheet to know how to use it.",
 
       ultimateTitle: "Ultimate Ability",
       ultimateKicker: "Decisive power",
@@ -111,8 +111,8 @@
     { target: ".hp-section", titleKey: "hpTitle", kickerKey: "hpKicker", textKey: "hpText", pad: 12, mobileTop: 118 },
     { target: ".shields-section", titleKey: "shieldTitle", kickerKey: "shieldKicker", textKey: "shieldText", pad: 16, mobileTop: 110 },
     { target: ".repair-section", titleKey: "repairTitle", kickerKey: "repairKicker", textKey: "repairText", pad: 16, mobileTop: 110 },
-    { target: "#classActionTitle", titleKey: "classActionTitle", kickerKey: "classActionKicker", textKey: "classActionText", pad: 18, mobileTop: 106 },
-    { target: "#ultTitle,#ultToggleContainer", titleKey: "ultimateTitle", kickerKey: "ultimateKicker", textKey: "ultimateText", pad: 18, mobileTop: 106 },
+    { target: "#classActionTitle", titleKey: "classActionTitle", kickerKey: "classActionKicker", textKey: "classActionText", pad: 18, mobileTop: 118 },
+    { target: "#ultTitle,#ultToggleContainer", titleKey: "ultimateTitle", kickerKey: "ultimateKicker", textKey: "ultimateText", pad: 18, mobileTop: 118 },
     { target: ".cu-badges,#cuBadges,.cu-badge-zone,.cu-badge,.copied-cu,[data-cu-badges],[data-cu-badge],.topbar .controls", titleKey: "cuBadgeTitle", kickerKey: "cuBadgeKicker", textKey: "cuBadgeText", pad: 14, mobileTop: 96, optional: true },
     { target: "#mkwSuddenDeathHud", titleKey: "suddenTitle", kickerKey: "suddenKicker", textKey: "suddenText", pad: 14, mobileTop: 100, optional: true },
     { target: "#unitTabs", titleKey: "tabsTitle", kickerKey: "tabsKicker", textKey: "tabsText", pad: 12, allowTabsOverlap: true }
@@ -221,13 +221,31 @@
     showStep();
   }
 
+  function scrollPageBy(delta) {
+    const root = document.scrollingElement || document.documentElement;
+    root.scrollTop += delta;
+  }
+
   function positionTargetForMobile(target, step) {
     if (!isMobile() || !target) return;
     if (step?.target === "#unitTabs") return;
+
     const desiredTop = Number(step?.mobileTop ?? 105);
-    const rect = target.getBoundingClientRect();
-    const delta = rect.top - desiredTop;
-    if (Math.abs(delta) > 6) window.scrollBy({ top: delta, left: 0, behavior: "auto" });
+    let rect = target.getBoundingClientRect();
+    const firstDelta = rect.top - desiredTop;
+    if (Math.abs(firstDelta) > 6) scrollPageBy(firstDelta);
+
+    rect = target.getBoundingClientRect();
+    const tabsSafeTop = getTabsSafeTop();
+    const safeBottom = Math.max(desiredTop + 64, tabsSafeTop - 24);
+    if (rect.bottom > safeBottom) {
+      scrollPageBy(rect.bottom - safeBottom);
+    }
+
+    rect = target.getBoundingClientRect();
+    if (rect.top < 72) {
+      scrollPageBy(rect.top - 72);
+    }
   }
 
   function placeTooltip(rect) {
@@ -266,6 +284,7 @@
 
   function updateOverlayPosition() {
     if (!activeTarget || !highlight || !tooltip || !overlay) return;
+    if (isMobile()) positionTargetForMobile(activeTarget, activeStep);
     const rect = activeTarget.getBoundingClientRect();
     const pad = Number(activeStep?.pad ?? 12);
     const mobileExtraTop = isMobile() && activeStep?.target === ".hp-section" ? 2 : 0;
@@ -275,6 +294,10 @@
     const right = Math.min(window.innerWidth - 10, rect.right + pad);
     const bottomLimit = activeStep?.allowTabsOverlap ? window.innerHeight - 10 : getTabsSafeTop() - 10;
     const bottom = Math.min(bottomLimit, rect.bottom + pad + mobileExtraBottom, window.innerHeight - 10);
+    if (bottom <= top + 6 && isMobile()) {
+      scrollPageBy(bottom - top + 70);
+      return requestAnimationFrame(updateOverlayPosition);
+    }
     overlay.style.clipPath = `polygon(0% 0%,0% 100%,${left}px 100%,${left}px ${top}px,${right}px ${top}px,${right}px ${bottom}px,${left}px ${bottom}px,${left}px 100%,100% 100%,100% 0%)`;
     highlight.style.top = top + "px";
     highlight.style.left = left + "px";
