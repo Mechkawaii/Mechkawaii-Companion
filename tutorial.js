@@ -37,7 +37,7 @@
 
       ultimateTitle: "Coup Unique",
       ultimateKicker: "Pouvoir décisif",
-      ultimateText: "Le Coup Unique s’active selon les conditions indiquées sur la fiche. Une fois utilisé, il n’est plus disponible jusqu’à un éventuel réamorçage. Atteindre la zone d’atterrissage adverse peut le réamorcer une seule fois par partie.",
+      ultimateText: "Le Coup Unique s’active selon les conditions indiquées sur la fiche. Une fois utilisé, il n’est plus disponible jusqu’à un éventuel réamorçage. Pour le réamorcer, ton unité doit arriver sur une case de la ligne d’atterrissage adverse et jouer immédiatement le Coup Unique réamorcé. Attention, certaines unités possèdent un Coup Unique non réamorçable.",
 
       cuBadgeTitle: "Badges de Coup Unique",
       cuBadgeKicker: "Effets permanents",
@@ -83,7 +83,7 @@
 
       ultimateTitle: "Ultimate Ability",
       ultimateKicker: "Decisive power",
-      ultimateText: "An Ultimate Ability activates according to the conditions on the sheet. Once used, it is unavailable until a possible recharge. Reaching the enemy landing zone may recharge it once per game.",
+      ultimateText: "An Ultimate Ability activates according to the conditions on the sheet. Once used, it is unavailable until a possible recharge. To recharge it, your unit must reach a space on the enemy landing row and immediately use the recharged Ultimate Ability. Some units have Ultimate Abilities that cannot be recharged.",
 
       cuBadgeTitle: "Ultimate Badges",
       cuBadgeKicker: "Ongoing effects",
