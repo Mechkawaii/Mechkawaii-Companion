@@ -13,43 +13,43 @@
 
       turnTitle: "Tour de jeu",
       turnKicker: "Round et camp actif",
-      turnText: "Cette zone indique le round en cours et le camp qui joue. Une fois tes actions terminées, utilise le bouton de fin de tour pour passer la main. Quand les deux camps ont joué, on passe au round suivant.",
+      turnText: "Cette zone indique le round en cours et le camp qui joue. À ton tour, tu choisis les actions de chacune de tes 3 unités dans l’ordre de ton choix. Une fois terminé, passe la main à l’adversaire.",
 
       eventTitle: "Événements Expert",
       eventKicker: "Piste événement",
-      eventText: "En mode Expert, le jeton avance d’une case à chaque round. Lorsqu’il atteint la 5e case, personne ne joue : un événement se déclenche, puis la partie reprend directement au round suivant.",
+      eventText: "En mode Expert, le jeton événement avance quand les deux joueurs ont chacun réalisé leur phase d’action. Lorsqu’il atteint la 5e case, les joueurs sont inactifs : l’événement est résolu, puis le jeton revient sur la case 1.",
 
       hpTitle: "Points de vie",
       hpKicker: "Fonctionnement des PV",
-      hpText: "Les PV indiquent l’état de ton unité. S’ils tombent à 0, l’unité devient Hors Service (HS). Une unité HS peut revenir en jeu si elle récupère au moins 1 PV.",
+      hpText: "Les PV indiquent l’état de ton unité. Une unité ne peut jamais dépasser ses PV maximum. À 0 PV, elle devient Hors Service (HS), ne bloque plus les déplacements ni les lignes de mire, mais conserve ses bonus et son Coup Unique.",
 
       shieldTitle: "Se protéger",
       shieldKicker: "Boucliers",
-      shieldText: "Un bouclier absorbe 1 PV de dégâts. Les boucliers de la réserve commune sont limités. Certains effets, comme le Technicien ou le drone de Rasmus, peuvent donner des boucliers bonus temporaires indépendants.",
+      shieldText: "Un bouclier absorbe 1 PV de dégâts. Chaque camp dispose de 3 boucliers communs pour la partie. Le bouclier disparaît au début de ton prochain tour ou s’il est détruit par une attaque. Le Companion gère aussi certains boucliers bonus indépendants.",
 
       repairTitle: "Réparer",
       repairKicker: "Clés de réparation",
-      repairText: "Chaque unité dispose de 2 clés de réparation en début de partie. Une clé redonne 1 PV à une unité alliée ou relève une unité HS avec 1 PV. Certaines capacités peuvent rendre une clé utilisée.",
+      repairText: "Chaque unité commence avec 2 clés de réparation. Une clé permet de se redonner 1 PV ou de relever une unité alliée HS avec 1 PV. Une fois utilisée, la clé est retirée de la partie, sauf effet spécial.",
 
       classActionTitle: "Action de classe",
       classActionKicker: "Capacité spéciale",
-      classActionText: "Chaque classe possède une action spéciale. Certaines se jouent pendant ton tour, d’autres réagissent à une situation précise. Pense à vérifier si l’action consomme une cellule d’énergie.",
+      classActionText: "Chaque classe possède une action spécifique. Pour réaliser une action, l’unité dépense des cellules d’énergie. Elle ne peut pas dépenser plus d’énergie qu’elle n’en possède et récupère ses cellules au début de son tour.",
 
       ultimateTitle: "Coup Unique",
       ultimateKicker: "Pouvoir décisif",
-      ultimateText: "Le Coup Unique est une capacité forte, souvent utilisable une seule fois ou à réamorcer selon l’unité. Certains Coups Uniques ouvrent une modale pour choisir des cibles ou distribuer des bonus.",
+      ultimateText: "Le Coup Unique s’active selon les conditions indiquées sur la fiche. Une fois utilisé, il n’est plus disponible jusqu’à un éventuel réamorçage. Atteindre la zone d’atterrissage adverse peut le réamorcer une seule fois par partie.",
 
       cuBadgeTitle: "Badges de Coup Unique",
       cuBadgeKicker: "Effets permanents",
-      cuBadgeText: "Cette zone affiche les effets de Coups Uniques appliqués à l’unité. Si un effet ennemi ou allié est actif, tu peux le voir ici pour ne pas l’oublier pendant la partie.",
+      cuBadgeText: "Cette zone affiche les effets de Coups Uniques appliqués à l’unité. Ils permettent de garder en mémoire les bonus, malus ou effets qui restent actifs pendant la partie.",
 
       suddenTitle: "Mort subite",
       suddenKicker: "Attention au compte à rebours",
-      suddenText: "Si un camp a 2 unités HS, il entre en mort subite : il dispose de 3 tours pour réparer une unité alliée avec au moins 1 PV. Si les 3 unités sont HS, la partie est perdue immédiatement.",
+      suddenText: "Si un camp n’a plus qu’une seule unité debout, il entre en mort subite : il dispose de 3 tours pour relever une autre unité. Si les 3 unités sont HS, l’adversaire remporte immédiatement la partie.",
 
       tabsTitle: "Tes 3 unités",
       tabsKicker: "Navigation rapide",
-      tabsText: "Les onglets permettent de passer rapidement entre tes unités jouées. Tu peux gérer les PV, boucliers, clés, actions et Coups Uniques de chaque unité depuis sa fiche."
+      tabsText: "Les onglets permettent de passer rapidement entre tes unités jouées. Tu peux gérer les PV, boucliers, clés, actions, énergie et Coups Uniques de chaque unité depuis sa fiche."
     },
     en: {
       sheepard: "General Sheepard",
@@ -59,43 +59,43 @@
 
       turnTitle: "Turn Tracker",
       turnKicker: "Round and active side",
-      turnText: "This area shows the current round and which side is playing. When you are done, use the end turn button. Once both sides have played, the next round begins.",
+      turnText: "This area shows the current round and active side. On your turn, choose actions for each of your 3 units in any order. When you are done, pass the turn to your opponent.",
 
       eventTitle: "Expert Events",
       eventKicker: "Event track",
-      eventText: "In Expert Mode, the token moves one space each round. When it reaches the 5th space, no one plays: an event triggers, then the game immediately continues to the next round.",
+      eventText: "In Expert Mode, the event token advances after both players have completed their action phase. When it reaches the 5th space, players are inactive: the event is resolved, then the token returns to space 1.",
 
       hpTitle: "Health Points",
       hpKicker: "HP basics",
-      hpText: "HP shows your unit’s condition. If it drops to 0, the unit becomes Out of Action (KO). A KO unit can return if it recovers at least 1 HP.",
+      hpText: "HP shows your unit’s condition. A unit can never exceed its maximum HP. At 0 HP, it becomes Out of Action (KO), no longer blocks movement or line of sight, but keeps its bonuses and Ultimate Ability.",
 
       shieldTitle: "Protect",
       shieldKicker: "Shields",
-      shieldText: "A shield absorbs 1 HP of damage. Shared shield tokens are limited. Some effects, like the Technician or Rasmus’ drone, may grant independent temporary bonus shields.",
+      shieldText: "A shield absorbs 1 HP of damage. Each side has 3 shared shields for the game. A shield disappears at the start of your next turn or when destroyed by an attack. The Companion also handles some independent bonus shields.",
 
       repairTitle: "Repair",
       repairKicker: "Repair Keys",
-      repairText: "Each unit starts with 2 Repair Keys. A key restores 1 HP to an allied unit or brings a KO allied unit back with 1 HP. Some abilities can restore a spent key.",
+      repairText: "Each unit starts with 2 Repair Keys. A key restores 1 HP to itself or brings an allied KO unit back with 1 HP. Once used, the key is removed from the game unless a special effect restores it.",
 
       classActionTitle: "Class Action",
       classActionKicker: "Special ability",
-      classActionText: "Each class has a special action. Some are used during your turn, while others react to a specific situation. Check whether the action spends an energy cell.",
+      classActionText: "Each class has a specific action. To perform an action, a unit spends energy cells. It cannot spend more energy than it has and recovers its cells at the start of its turn.",
 
       ultimateTitle: "Ultimate Ability",
       ultimateKicker: "Decisive power",
-      ultimateText: "An Ultimate Ability is a powerful effect, often one-use or requiring a recharge depending on the unit. Some Ultimates open a modal to choose targets or distribute bonuses.",
+      ultimateText: "An Ultimate Ability activates according to the conditions on the sheet. Once used, it is unavailable until a possible recharge. Reaching the enemy landing zone may recharge it once per game.",
 
       cuBadgeTitle: "Ultimate Badges",
       cuBadgeKicker: "Ongoing effects",
-      cuBadgeText: "This area shows Ultimate effects currently applied to the unit. If an allied or enemy effect is active, you can track it here during the game.",
+      cuBadgeText: "This area shows Ultimate effects currently applied to the unit. It helps track bonuses, penalties, or effects that remain active during the game.",
 
       suddenTitle: "Sudden Death",
       suddenKicker: "Countdown warning",
-      suddenText: "If a side has 2 KO units, Sudden Death begins: it has 3 turns to repair an allied unit back to at least 1 HP. If all 3 units are KO, that side immediately loses.",
+      suddenText: "If a side has only one standing unit left, Sudden Death begins: it has 3 turns to bring another unit back. If all 3 units are KO, the opponent immediately wins.",
 
       tabsTitle: "Your 3 units",
       tabsKicker: "Quick navigation",
-      tabsText: "Tabs let you quickly switch between your played units. You can manage HP, shields, repair keys, actions, and Ultimate Abilities from each unit sheet."
+      tabsText: "Tabs let you quickly switch between your played units. You can manage HP, shields, repair keys, actions, energy, and Ultimate Abilities from each unit sheet."
     }
   };
 
