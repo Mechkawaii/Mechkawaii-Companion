@@ -29,8 +29,7 @@
   function tabsTop() {
     const t = document.querySelector("#unitTabsContainer");
     const fromTabs = t ? t.getBoundingClientRect().top : window.innerHeight;
-    const fromBottom = window.innerHeight - 130;
-    return Math.min(fromTabs, fromBottom);
+    return Math.min(fromTabs, window.innerHeight - 130);
   }
 
   function qs(sel, root = document) { return root.querySelector(sel); }
@@ -40,24 +39,8 @@
      On retire temporairement overflow:hidden sur body/html
   ---------------------------------------------------------- */
   function scrollTo(y) {
-    const root = document.scrollingElement || document.documentElement;
-    const body = document.body;
-    const html = document.documentElement;
-
-    // Bypass overflow:hidden posé par tutorial.js lockPage()
-    body.style.setProperty("overflow", "auto", "important");
-    html.style.setProperty("overflow", "auto", "important");
-
-    const maxY = Math.max(0, root.scrollHeight - window.innerHeight);
-    root.scrollTop = Math.max(0, Math.min(y, maxY));
-
-    // Remettre hidden si tutorial.js avait locké
-    requestAnimationFrame(() => {
-      if (document.querySelector(".mkw-tutorial-overlay, #mkwPatternTutorialOverlay")) {
-        body.style.setProperty("overflow", "hidden", "important");
-        html.style.setProperty("overflow", "hidden", "important");
-      }
-    });
+    const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    window.scrollTo(0, Math.max(0, Math.min(y, maxY)));
   }
 
   /* ----------------------------------------------------------
@@ -65,28 +48,63 @@
   ---------------------------------------------------------- */
   function cameraTo(card) {
     if (!card || !isMobile()) return;
-    const root    = document.scrollingElement || document.documentElement;
-    const safeTop = 90;
-    const safeBtm = tabsTop() - 40;
-    const avail   = Math.max(100, safeBtm - safeTop);
-    const rect    = card.getBoundingClientRect();
-    const curY    = root.scrollTop;
-
-    let desiredTop = safeTop;
-    if (rect.height < avail) desiredTop = safeTop + (avail - rect.height) / 2;
-
-    let nextY = curY + rect.top - desiredTop;
-    const projectedBottom = desiredTop + rect.height;
-    if (projectedBottom > safeBtm) nextY += projectedBottom - safeBtm;
-
-    if (Math.abs(nextY - curY) < 2) return;
-    scrollTo(nextY);
+    const TOOLTIP_H = 300;
+    const safeTop   = TOOLTIP_H;
+    const safeBtm   = tabsTop() - 8;
+    const avail     = Math.max(40, safeBtm - safeTop);
+    const rect      = card.getBoundingClientRect();
+    const curY      = window.scrollY || window.pageYOffset || 0;
+    let desiredTop  = safeTop;
+    if (rect.height < avail) desiredTop = safeTop + Math.round((avail - rect.height) / 2);
+    let nextY = curY + (rect.top - desiredTop);
+    const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    nextY = Math.max(0, Math.min(nextY, maxY));
+    if (Math.abs(nextY - curY) > 2) scrollTo(nextY);
   }
 
   /* ----------------------------------------------------------
      Dessine overlay + highlight + positionne tooltip
   ---------------------------------------------------------- */
   function drawHighlight({ overlay, highlight, tooltip, card, pad = 16 }) {
+    if (!overlay || !highlight || !card) return;
+    const rect   = card.getBoundingClientRect();
+    const rawTop = Math.max(10, rect.top - pad);
+    const top    = Math.max(rawTop, 296);
+    const left   = Math.max(10, rect.left - pad);
+    const right  = Math.min(window.innerWidth - 10, rect.right + pad);
+    const bottom = Math.min(tabsTop() - 8, rect.bottom + pad, window.innerHeight - 10);
+    if (bottom <= top + 6) return;
+    overlay.style.clipPath =
+      `polygon(0% 0%,0% 100%,${left}px 100%,${left}px ${top}px,` +
+      `${right}px ${top}px,${right}px ${bottom}px,${left}px ${bottom}px,` +
+      `${left}px 100%,100% 100%,100% 0%)`;
+    highlight.style.top    = top + "px";
+    highlight.style.left   = left + "px";
+    highlight.style.width  = Math.max(0, right - left) + "px";
+    highlight.style.height = Math.max(0, bottom - top) + "px";
+    if (tooltip) placeTooltip(tooltip, top, left, right, bottom);
+  }) {
+    if (!overlay || !highlight || !card) return;
+    const rect   = card.getBoundingClientRect();
+    const top    = Math.max(300 - 4, rect.top - pad);
+    const left   = Math.max(10, rect.left - pad);
+    const right  = Math.min(window.innerWidth - 10, rect.right + pad);
+    const bottom = Math.min(tabsTop() - 8, rect.bottom + pad, window.innerHeight - 10);
+
+    if (bottom <= top + 6) return; // hors zone
+
+    overlay.style.clipPath =
+      `polygon(0% 0%,0% 100%,${left}px 100%,${left}px ${top}px,` +
+      `${right}px ${top}px,${right}px ${bottom}px,${left}px ${bottom}px,` +
+      `${left}px 100%,100% 100%,100% 0%)`;
+
+    highlight.style.top    = top + "px";
+    highlight.style.left   = left + "px";
+    highlight.style.width  = Math.max(0, right - left) + "px";
+    highlight.style.height = Math.max(0, bottom - top) + "px";
+
+    if (tooltip) placeTooltip(tooltip, top, left, right, bottom);
+  }) {
     if (!overlay || !highlight || !card) return;
     const rect   = card.getBoundingClientRect();
     const top    = Math.max(10, rect.top - pad);
@@ -110,22 +128,16 @@
   }
 
   function placeTooltip(tooltip, top, left, right, bottom) {
-    const margin  = 14;
-    const tRect   = tooltip.getBoundingClientRect();
-    const safeBtm = tabsTop() - margin;
-    const maxLeft = window.innerWidth - tRect.width - margin;
-    const tleft   = Math.max(margin, Math.min(left, maxLeft));
-    const spBelow = safeBtm - bottom;
-    const spAbove = top - margin;
-    let ttop = bottom + 18;
-    if (spBelow < tRect.height + 18 && spAbove > spBelow)
-      ttop = top - tRect.height - 18;
-    if (ttop < margin) ttop = margin;
-    if (ttop + tRect.height > safeBtm) ttop = Math.max(margin, safeBtm - tRect.height);
-    tooltip.style.left   = tleft + "px";
-    tooltip.style.right  = "auto";
-    tooltip.style.bottom = "auto";
-    tooltip.style.top    = ttop + "px";
+    if (!tooltip) return;
+    const pad   = 10;
+    const tRect = tooltip.getBoundingClientRect();
+    const maxLeft = window.innerWidth - tRect.width - pad;
+    const tleft = Math.max(pad, Math.min((window.innerWidth - tRect.width) / 2, maxLeft));
+    tooltip.style.position = "fixed";
+    tooltip.style.left     = tleft + "px";
+    tooltip.style.right    = "auto";
+    tooltip.style.bottom   = "auto";
+    tooltip.style.top      = pad + "px";
   }
 
   /* ----------------------------------------------------------
