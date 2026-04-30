@@ -1,0 +1,274 @@
+#mkwEnergyCard {
+  display: none !important;
+}
+
+.mkw-energy-inline-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+.mkw-energy-inline-status img {
+  width: 86px;
+  max-width: 32vw;
+  height: auto;
+  display: block;
+}
+
+.mkw-energy-header-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+.mkw-energy-header-action .section-title {
+  margin: 0;
+  min-width: 0;
+  flex: 1 1 auto;
+  line-height: 1.15;
+}
+
+.mkw-header-energy-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  min-width: max-content;
+}
+
+.mkw-header-energy-tools img {
+  width: 86px;
+  max-width: 34vw;
+  height: auto;
+  display: block;
+}
+
+.mkw-resource-energy-cost {
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px;
+  width: 86px !important;
+  min-width: 86px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  flex: 0 0 24px !important;
+}
+
+.mkw-resource-energy-cost img {
+  width: 86px !important;
+  max-width: 34vw !important;
+  height: 24px !important;
+  object-fit: contain !important;
+  object-position: left center !important;
+  display: block !important;
+}
+
+.mkw-resource-energy-cost.is-energy-disabled img {
+  opacity: 0.38;
+  filter: grayscale(0.75);
+}
+
+.mkw-resource-action-desc {
+  margin: 0 0 12px 0 !important;
+  color: var(--muted, rgba(255, 255, 255, 0.72)) !important;
+  font-size: 13px !important;
+  line-height: 1.35 !important;
+  max-width: 34rem !important;
+}
+
+.mkw-resource-action-head,
+.mkw-resource-title-wrap,
+.mkw-resource-action-title,
+.mkw-resource-main-title {
+  display: none !important;
+}
+
+.mkw-energy-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 900;
+  color: var(--text, #fff);
+  flex: 0 0 auto;
+}
+
+.mkw-energy-switch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mkw-energy-slider {
+  width: 52px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.09);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+  position: relative;
+  transition: 0.18s ease;
+  flex: 0 0 auto;
+}
+
+.mkw-energy-slider::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.86);
+  left: 3px;
+  top: 3px;
+  transition: 0.18s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.mkw-energy-switch input:checked + .mkw-energy-slider {
+  background: rgba(255, 210, 77, 0.9);
+  border-color: rgba(255, 210, 77, 0.95);
+  box-shadow: 0 0 18px rgba(255, 210, 77, 0.22);
+}
+
+.mkw-energy-switch input:checked + .mkw-energy-slider::after {
+  transform: translateX(22px);
+  background: #111;
+}
+
+.mkw-energy-switch.is-disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  filter: grayscale(0.35);
+}
+
+.mkw-energy-switch-label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 850;
+}
+
+.mkw-road-toggle-inline {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "title toggle"
+    "desc desc";
+  align-items: center;
+  gap: 4px 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mkw-road-toggle-text {
+  min-width: 0;
+  display: contents;
+}
+
+.mkw-road-title-inline {
+  grid-area: title;
+  font-weight: 900;
+  color: var(--text, #fff);
+}
+
+.mkw-road-help-inline {
+  grid-area: desc;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+.mkw-road-toggle-inline > .mkw-energy-switch {
+  grid-area: toggle;
+  justify-self: end;
+}
+
+.mkw-energy-disabled-action {
+  opacity: 0.38 !important;
+  filter: grayscale(0.75) !important;
+  cursor: not-allowed !important;
+}
+
+@media (max-width: 560px) {
+  .mkw-energy-inline-status {
+    display: flex;
+    margin-left: 0;
+    margin-top: 8px;
+  }
+
+  .mkw-energy-inline-status img {
+    width: 92px;
+  }
+
+  .mkw-energy-header-action {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .mkw-energy-header-action .section-title {
+    width: 100%;
+    font-size: 15px;
+    line-height: 1.18;
+  }
+
+  .mkw-header-energy-tools {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .mkw-header-energy-tools img {
+    width: 72px;
+    max-width: 42vw;
+  }
+
+  .mkw-resource-energy-cost {
+    width: 72px !important;
+    min-width: 72px !important;
+    height: 22px !important;
+    min-height: 22px !important;
+    flex-basis: 22px !important;
+  }
+
+  .mkw-resource-energy-cost img {
+    width: 72px !important;
+    max-width: 30vw !important;
+    height: 22px !important;
+  }
+
+  .mkw-resource-action-desc {
+    font-size: 12px !important;
+  }
+
+  .mkw-energy-slider {
+    width: 44px;
+    height: 26px;
+  }
+
+  .mkw-energy-slider::after {
+    width: 18px;
+    height: 18px;
+    left: 3px;
+    top: 3px;
+  }
+
+  .mkw-energy-switch input:checked + .mkw-energy-slider::after {
+    transform: translateX(18px);
+  }
+
+  .mkw-energy-switch-label {
+    display: none;
+  }
+}

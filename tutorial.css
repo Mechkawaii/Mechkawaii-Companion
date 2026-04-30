@@ -1,0 +1,85 @@
+.mkw-tutorial-blocker {
+  position: fixed;
+  inset: 0;
+  z-index: 2999;
+  background: transparent;
+  touch-action: none;
+}
+
+.mkw-tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 3000;
+  transition: clip-path 0.25s ease;
+  pointer-events: none;
+  touch-action: none;
+}
+
+.mkw-tutorial-highlight {
+  position: fixed;
+  border: 2px solid #ff4dfc;
+  border-radius: 12px;
+  z-index: 3001;
+  pointer-events: none;
+  box-shadow: 0 0 18px rgba(255, 77, 252, 0.7);
+}
+
+.mkw-tutorial-tooltip {
+  position: fixed;
+  width: min(520px, calc(100vw - 28px));
+  max-height: 42vh;
+  overflow: auto;
+  background: #111;
+  color: #fff;
+  padding: 16px;
+  border-radius: 14px;
+  z-index: 3002;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+  pointer-events: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mkw-tutorial-content {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.mkw-tutorial-portrait {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  background: #000;
+  flex: 0 0 auto;
+  box-shadow: 0 0 16px rgba(255, 210, 77, 0.45);
+}
+
+.mkw-tutorial-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.mkw-tutorial-speaker {
+  font-size: 11px;
+  font-weight: 900;
+  color: #ffd24d;
+  text-transform: uppercase;
+}
+
+.mkw-tutorial-title {
+  font-weight: 900;
+  margin-top: 4px;
+}
+
+.mkw-tutorial-text {
+  margin-top: 6px;
+  line-height: 1.35;
+}
+
+.mkw-tutorial-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  gap: 10px;
+}

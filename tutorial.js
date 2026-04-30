@@ -212,15 +212,15 @@
     const textSize = isMobile() ? "14px" : "16px";
     const titleSize = isMobile() ? "17px" : "17px";
     tooltip.innerHTML = `
-      <div style="display:flex;gap:14px;align-items:flex-start;">
-        <img src="${SHEEPARD_SRC}" style="width:${portraitSize};height:${portraitSize};border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.3);background:#000;flex:0 0 auto;box-shadow:0 0 16px rgba(255,210,77,.45);">
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:11px;font-weight:900;color:#ffd24d;text-transform:uppercase;">${tr("sheepard")}</div>
-          <div style="font-weight:900;margin-top:4px;font-size:${titleSize};">${tr(step.titleKey)}</div>
-          <div style="margin-top:6px;line-height:1.35;font-size:${textSize};">${tr(step.textKey)}</div>
+      <div class="mkw-tutorial-content">
+        <img class="mkw-tutorial-portrait" src="${SHEEPARD_SRC}" style="width:${portraitSize};height:${portraitSize};" alt="">
+        <div class="mkw-tutorial-body">
+          <div class="mkw-tutorial-speaker">${tr("sheepard")}</div>
+          <div class="mkw-tutorial-title" style="font-size:${titleSize};">${tr(step.titleKey)}</div>
+          <div class="mkw-tutorial-text" style="font-size:${textSize};">${tr(step.textKey)}</div>
         </div>
       </div>
-      <div style="display:flex;justify-content:space-between;margin-top:12px;gap:10px;">
+      <div class="mkw-tutorial-actions">
         <button id="prev" ${currentStep === 0 ? "disabled" : ""}>${tr("prev")}</button>
         <button id="next">${isLast ? tr("finish") : tr("next")}</button>
       </div>`;
@@ -262,17 +262,17 @@
     currentStep = 0;
     lockPage();
     blocker = document.createElement("div");
-    blocker.style.cssText = "position:fixed;inset:0;z-index:2999;background:transparent;touch-action:none;";
+    blocker.className = "mkw-tutorial-blocker";
     blocker.addEventListener("click", (event) => event.preventDefault());
     document.body.appendChild(blocker);
     overlay = document.createElement("div");
-    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:3000;transition:clip-path .25s ease;pointer-events:none;touch-action:none";
+    overlay.className = "mkw-tutorial-overlay";
     document.body.appendChild(overlay);
     highlight = document.createElement("div");
-    highlight.style.cssText = "position:fixed;border:2px solid #ff4dfc;border-radius:12px;z-index:3001;pointer-events:none;box-shadow:0 0 18px rgba(255,77,252,.7)";
+    highlight.className = "mkw-tutorial-highlight";
     document.body.appendChild(highlight);
     tooltip = document.createElement("div");
-    tooltip.style.cssText = "position:fixed;width:min(520px,calc(100vw - 28px));max-height:42vh;overflow:auto;background:#111;color:#fff;padding:16px;border-radius:14px;z-index:3002;box-shadow:0 18px 40px rgba(0,0,0,.55);pointer-events:auto;-webkit-overflow-scrolling:touch";
+    tooltip.className = "mkw-tutorial-tooltip";
     tooltip.addEventListener("click", (event) => event.stopPropagation());
     document.body.appendChild(tooltip);
     window.addEventListener("wheel", blockScroll, { passive: false });

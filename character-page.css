@@ -1,0 +1,458 @@
+/* Character page specific layout */
+.brand-with-portrait {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+#charPortrait {
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+#charPortrait img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+#charPortrait .ko-overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.patterns-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.image-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 8px;
+}
+
+.image-container img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.shields-display {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+#repairKeysDisplay {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hp-section,
+.shields-section,
+.repair-section {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(19, 19, 26, 0.72);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.mkw-mini-section-head {
+  padding: var(--space-md);
+  background: rgba(15, 15, 21, 0.65);
+  border-bottom: 1px solid var(--border);
+}
+
+.mkw-mini-section-title {
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.mkw-mini-section-body {
+  padding: var(--space-md);
+}
+
+.mkw-mini-section-body .hp {
+  margin-bottom: 12px;
+}
+
+.hp-shields-wrapper {
+  gap: 16px !important;
+}
+
+.page-character #charName {
+  font-size: clamp(26px, 4vw, 42px);
+  line-height: 1.02;
+  font-weight: 1000;
+  letter-spacing: 0.01em;
+  margin-bottom: 4px;
+}
+
+.page-character #charClass {
+  font-size: clamp(16px, 2.2vw, 22px);
+  line-height: 1.12;
+  font-weight: 800;
+  opacity: 0.88;
+  margin-bottom: 8px;
+}
+
+.page-character #mkwEnergyInlineStatus {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 8px 0 0 0;
+  width: fit-content;
+}
+
+.page-character #mkwEnergyInlineStatus img {
+  width: 104px;
+  max-width: 42vw;
+  height: auto;
+  display: block;
+}
+
+.unit-tabs-container,
+.unit-tabs {
+  animation: none !important;
+  transform: none !important;
+}
+
+.unit-tab {
+  border-radius: var(--radius, 16px) !important;
+  overflow: hidden !important;
+  background-clip: padding-box !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  isolation: isolate !important;
+  animation: none !important;
+  transform: none;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    filter 0.16s ease,
+    opacity 0.16s ease,
+    background-color 0.16s ease !important;
+}
+
+.unit-tab:not(.active) {
+  border-color: var(--border) !important;
+}
+
+.unit-tab:hover {
+  transform: translateY(-2px) !important;
+}
+
+.unit-tab[data-camp="mechkawaii"] {
+  background-image: url("./assets/background_mechkawaii.png") !important;
+}
+
+.unit-tab[data-camp="prodrome"] {
+  background-image: url("./assets/background_prodrome.png") !important;
+}
+
+.unit-tab:not(.active)::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: inherit !important;
+  pointer-events: none !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035) !important;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.18)) !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+.unit-tab.active {
+  border-radius: var(--radius, 16px) !important;
+  overflow: hidden !important;
+}
+
+.unit-tab.active::before {
+  border-radius: var(--radius, 16px) var(--radius, 16px) 0 0 !important;
+  overflow: hidden !important;
+}
+
+.unit-tab.mkw-tab-shield-pulse {
+  animation: none !important;
+}
+
+.unit-tab-visual {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  height: 70% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 8px !important;
+  animation: none !important;
+}
+
+.unit-tab-visual img {
+  display: block !important;
+  margin: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: 50% !important;
+  height: auto !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  border-radius: 0 !important;
+}
+
+.unit-tab-info {
+  position: relative !important;
+  z-index: 1 !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+
+.unit-tab-hp {
+  position: absolute !important;
+  z-index: 3 !important;
+  top: 6px !important;
+  right: 6px !important;
+  left: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  background: rgba(0, 0, 0, 0.8) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-full, 999px) !important;
+  animation: none !important;
+}
+
+.unit-tab-name,
+.unit-tab-role {
+  color: #fff !important;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85), 0 0 10px rgba(0, 0, 0, 0.65) !important;
+}
+
+@supports (overflow: clip) {
+  .unit-tab {
+    overflow: clip !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #charPortrait {
+    width: 80px;
+    height: 80px;
+  }
+
+  .brand-with-portrait {
+    gap: 12px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .image-container {
+    min-height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .image-container {
+    min-height: 150px;
+  }
+}
+
+@media (min-width: 769px) {
+  .patterns-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .image-container {
+    min-height: 300px;
+  }
+
+  .hp-section,
+  .shields-section,
+  .repair-section {
+    min-width: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .image-container {
+    min-height: 350px;
+  }
+}
+
+@media (max-width: 768px) {
+  .patterns-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .patterns-grid .card {
+    min-width: 0 !important;
+  }
+
+  .patterns-grid .card-h,
+  .patterns-grid .card-b {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .patterns-grid .section-title {
+    font-size: 13px !important;
+    line-height: 1.15 !important;
+  }
+
+  .patterns-grid p {
+    font-size: 12px !important;
+    line-height: 1.28 !important;
+  }
+
+  .patterns-grid .image-container {
+    min-height: 118px !important;
+    padding: 5px !important;
+    border-radius: 10px !important;
+  }
+
+  .patterns-grid .mkw-header-energy-tools img {
+    width: 64px !important;
+    max-width: 100% !important;
+  }
+
+  .patterns-grid .mkw-header-energy-tools .mkw-energy-slider {
+    width: 44px !important;
+    height: 26px !important;
+  }
+
+  .patterns-grid .mkw-header-energy-tools .mkw-energy-slider::after {
+    width: 18px !important;
+    height: 18px !important;
+    left: 3px !important;
+    top: 3px !important;
+  }
+
+  .patterns-grid .mkw-header-energy-tools .mkw-energy-switch input:checked + .mkw-energy-slider::after {
+    transform: translateX(18px) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .page-character #charName {
+    font-size: 28px;
+  }
+
+  .page-character #charClass {
+    font-size: 17px;
+  }
+
+  .page-character #mkwEnergyInlineStatus img {
+    width: 96px;
+  }
+
+  .page-character .topbar {
+    align-items: flex-start;
+  }
+
+  .page-character .topbar > .controls {
+    gap: 6px;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+    max-width: 38%;
+  }
+
+  .page-character .brand-with-portrait {
+    overflow: hidden !important;
+    min-width: 0 !important;
+  }
+
+  .page-character .brand-with-portrait img[src*="CU_"],
+  .page-character .brand-with-portrait img[src*="cu_"],
+  .page-character .brand-with-portrait img[src*="coup"],
+  .page-character .brand-with-portrait img[src*="Coup"] {
+    width: 96px !important;
+    max-width: 96px !important;
+    height: auto !important;
+    max-height: 96px !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    flex: 0 0 auto !important;
+  }
+
+  .page-character .topbar > .controls img,
+  .page-character .topbar > .controls [src*="cu"],
+  .page-character .topbar > .controls [src*="CU"],
+  .page-character .topbar > .controls [src*="ultimate"],
+  .page-character .topbar > .controls [src*="Ultimate"] {
+    width: 34px !important;
+    max-width: 34px !important;
+    height: auto !important;
+    max-height: 34px !important;
+    object-fit: contain !important;
+  }
+
+  .page-character #charName,
+  .page-character #charClass,
+  .page-character #mkwEnergyInlineStatus {
+    position: relative !important;
+    z-index: 2 !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .patterns-grid {
+    gap: 8px !important;
+  }
+
+  .patterns-grid .card-h,
+  .patterns-grid .card-b {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .patterns-grid .mkw-header-energy-tools img {
+    width: 56px !important;
+  }
+
+  .patterns-grid .mkw-header-energy-tools .mkw-energy-slider {
+    width: 40px !important;
+    height: 24px !important;
+  }
+
+  .patterns-grid .mkw-header-energy-tools .mkw-energy-slider::after {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .patterns-grid .mkw-header-energy-tools .mkw-energy-switch input:checked + .mkw-energy-slider::after {
+    transform: translateX(16px) !important;
+  }
+}

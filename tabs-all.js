@@ -135,6 +135,13 @@
     });
   }
 
+  function setFactionDataset(tab, char) {
+    if (!tab || !char) return;
+    const camp = char?.camp || "mechkawaii";
+    tab.dataset.camp = camp === "prodrome" ? "prodrome" : "mechkawaii";
+    tab.classList.remove("mkw-tab-shield-pulse");
+  }
+
   function pulseTab(charId) {
     if (!charId) return;
     ensureTabFeedbackStyles();
@@ -198,6 +205,7 @@
     tabCharacters.forEach(char => {
       const tab = createCharacterTab(char, lang);
       bindDirectNavigation(tab, char.id);
+      setFactionDataset(tab, char);
       if (char.id === currentCharId) tab.classList.add("active");
       tabsContainer.appendChild(tab);
     });
@@ -307,4 +315,6 @@
     setTimeout(forceRender, 80);
     setTimeout(forceRender, 180);
   });
+  window.addEventListener("mechkawaii:shield-updated", forceRender);
+  window.addEventListener("mechkawaii:game-flow-updated", forceRender);
 })();

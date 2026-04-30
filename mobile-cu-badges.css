@@ -1,0 +1,187 @@
+/* Mobile-only Coup Unique badge sizing for the clean-codebase branch. */
+
+@media (max-width: 560px) {
+  .page-character .topbar {
+    position: relative !important;
+    align-items: center !important;
+    gap: 8px !important;
+    overflow: hidden !important;
+    padding-right: 198px !important;
+  }
+
+  .page-character .brand-with-portrait {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    gap: 10px !important;
+  }
+
+  .page-character .brand-with-portrait > div:not(#charPortrait) {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .page-character #charName,
+  .page-character #charClass {
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .page-character .topbar > .controls {
+    display: none !important;
+  }
+
+  .page-character .mkw-mobile-cu-badge-row {
+    position: absolute !important;
+    top: 50% !important;
+    right: 10px !important;
+    transform: translateY(-50%) !important;
+    z-index: 20 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 4px !important;
+    width: 188px !important;
+    height: 64px !important;
+    max-width: 188px !important;
+    max-height: 64px !important;
+    overflow: visible !important;
+    pointer-events: none !important;
+  }
+
+  .page-character .mkw-mobile-cu-badge-row > * {
+    position: relative !important;
+    inset: auto !important;
+    transform: none !important;
+    width: 60px !important;
+    height: 60px !important;
+    min-width: 60px !important;
+    min-height: 60px !important;
+    max-width: 60px !important;
+    max-height: 60px !important;
+    flex: 0 0 60px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    background-size: contain !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    pointer-events: none !important;
+  }
+
+  .page-character .mkw-mobile-cu-badge-row > .mkw-mobile-cu-badge-empty {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+  }
+
+  .page-character .mkw-mobile-cu-badge-row > .mkw-mobile-cu-badge-empty img,
+  .page-character .mkw-mobile-cu-badge-row > .mkw-mobile-cu-badge-empty svg,
+  .page-character .mkw-mobile-cu-badge-row > .mkw-mobile-cu-badge-empty canvas {
+    pointer-events: auto !important;
+  }
+
+  .page-character .mkw-mobile-cu-badge-row > * + * {
+    margin-left: 0 !important;
+  }
+
+  .page-character .mkw-mobile-cu-badge-row img,
+  .page-character .mkw-mobile-cu-badge-row svg,
+  .page-character .mkw-mobile-cu-badge-row canvas {
+    display: block !important;
+    position: relative !important;
+    inset: auto !important;
+    transform: none !important;
+    width: 60px !important;
+    height: 60px !important;
+    min-width: 60px !important;
+    min-height: 60px !important;
+    max-width: 60px !important;
+    max-height: 60px !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    clip-path: none !important;
+    -webkit-clip-path: none !important;
+    pointer-events: none !important;
+  }
+
+  .page-character .brand-with-portrait img[src*="CU_"],
+  .page-character .brand-with-portrait img[src*="cu_"],
+  .page-character .brand-with-portrait img[src*="coup"],
+  .page-character .brand-with-portrait img[src*="Coup"],
+  .page-character .brand-with-portrait img[src*="ult"],
+  .page-character .brand-with-portrait img[src*="Ult"],
+  .page-character .topbar > .controls img[src*="CU_"],
+  .page-character .topbar > .controls img[src*="cu_"],
+  .page-character .topbar > .controls img[src*="coup"],
+  .page-character .topbar > .controls img[src*="Coup"],
+  .page-character .topbar > .controls img[src*="ult"],
+  .page-character .topbar > .controls img[src*="Ult"] {
+    position: relative !important;
+    inset: auto !important;
+    width: 60px !important;
+    height: 60px !important;
+    min-width: 60px !important;
+    min-height: 60px !important;
+    max-width: 60px !important;
+    max-height: 60px !important;
+    flex: 0 0 60px !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    transform: none !important;
+    clip-path: none !important;
+    -webkit-clip-path: none !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .page-character .topbar {
+    padding-right: 180px !important;
+  }
+
+  .page-character .mkw-mobile-cu-badge-row {
+    right: 8px !important;
+    gap: 4px !important;
+    width: 170px !important;
+    height: 58px !important;
+    max-width: 170px !important;
+    max-height: 58px !important;
+  }
+
+  .page-character .mkw-mobile-cu-badge-row > *,
+  .page-character .mkw-mobile-cu-badge-row img,
+  .page-character .mkw-mobile-cu-badge-row svg,
+  .page-character .mkw-mobile-cu-badge-row canvas,
+  .page-character .brand-with-portrait img[src*="CU_"],
+  .page-character .brand-with-portrait img[src*="cu_"],
+  .page-character .brand-with-portrait img[src*="coup"],
+  .page-character .brand-with-portrait img[src*="Coup"],
+  .page-character .brand-with-portrait img[src*="ult"],
+  .page-character .brand-with-portrait img[src*="Ult"],
+  .page-character .topbar > .controls img[src*="CU_"],
+  .page-character .topbar > .controls img[src*="cu_"],
+  .page-character .topbar > .controls img[src*="coup"],
+  .page-character .topbar > .controls img[src*="Coup"],
+  .page-character .topbar > .controls img[src*="ult"],
+  .page-character .topbar > .controls img[src*="Ult"] {
+    width: 54px !important;
+    height: 54px !important;
+    min-width: 54px !important;
+    min-height: 54px !important;
+    max-width: 54px !important;
+    max-height: 54px !important;
+    flex-basis: 54px !important;
+  }
+
+  .page-character .mkw-mobile-cu-badge-row > * + * {
+    margin-left: 0 !important;
+  }
+}

@@ -3,7 +3,6 @@
 
   const PREFIX = "mechkawaii:";
   const HISTORY_KEY = PREFIX + "action-history";
-  const STYLE_ID = "mkwActionFeedbackStyles";
   const MAX_HISTORY = 30;
 
   const I18N = {
@@ -69,31 +68,6 @@
   }
   function getHistory() { return readJson(HISTORY_KEY, []); }
   function saveHistory(items) { writeJson(HISTORY_KEY, items.slice(0, MAX_HISTORY)); }
-
-  function ensureStyles() {
-    if (document.getElementById(STYLE_ID)) return;
-    const style = document.createElement("style");
-    style.id = STYLE_ID;
-    style.textContent = `
-      #mkwToastRoot { position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 9000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; width: min(420px, calc(100vw - 28px)); }
-      .mkw-toast { background: rgba(18,18,26,.94); color: #fff; border: 1px solid rgba(255,255,255,.16); border-radius: 14px; box-shadow: 0 18px 36px rgba(0,0,0,.45); padding: 11px 13px; font-weight: 850; font-size: 14px; line-height: 1.3; opacity: 0; transform: translateY(10px) scale(.98); animation: mkwToastIn .18s ease-out forwards, mkwToastOut .22s ease-in forwards 2.25s; }
-      @keyframes mkwToastIn { to { opacity: 1; transform: translateY(0) scale(1); } }
-      @keyframes mkwToastOut { to { opacity: 0; transform: translateY(8px) scale(.98); } }
-      #mkwHistoryBackdrop { position: fixed; inset: 0; z-index: 9100; background: rgba(0,0,0,.62); display: flex; align-items: flex-end; justify-content: center; padding: 18px; }
-      #mkwHistoryPanel { width: min(520px, 100%); max-height: min(70vh, 620px); overflow: auto; background: linear-gradient(180deg,#1a1a24,#101018); color: #fff; border: 1px solid rgba(255,255,255,.15); border-radius: 20px; box-shadow: 0 24px 60px rgba(0,0,0,.55); padding: 16px; }
-      .mkw-history-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
-      .mkw-history-title { font-size: 18px; font-weight: 950; }
-      .mkw-history-actions { display: flex; gap: 8px; }
-      .mkw-history-actions button { border-radius: 12px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.08); color: #fff; padding: 8px 10px; font-weight: 850; cursor: pointer; }
-      .mkw-history-item { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-top: 1px solid rgba(255,255,255,.1); }
-      .mkw-history-dot { width: 9px; height: 9px; margin-top: 5px; border-radius: 50%; background: #ffd24d; box-shadow: 0 0 12px rgba(255,210,77,.55); flex: 0 0 auto; }
-      .mkw-history-text { font-weight: 800; line-height: 1.3; }
-      .mkw-history-time { margin-top: 2px; color: rgba(255,255,255,.58); font-size: 12px; }
-      .mkw-history-empty { color: rgba(255,255,255,.68); padding: 18px 0 4px; }
-      @media (min-width: 760px) { #mkwToastRoot { bottom: 24px; } #mkwHistoryBackdrop { align-items: center; } }
-    `;
-    document.head.appendChild(style);
-  }
 
   function ensureToastRoot() {
     if (toastRoot) return toastRoot;
@@ -173,7 +147,7 @@
     window.addEventListener("mechkawaii:shield-updated", delayedCheckAll);
     window.addEventListener("storage", delayedCheckAll);
   }
-  function init() { ensureStyles(); ensureToastRoot(); setTimeout(snapshot, 80); installListeners(); window.mkwOpenActionHistory = openHistory; }
+  function init() { ensureToastRoot(); setTimeout(snapshot, 80); installListeners(); window.mkwOpenActionHistory = openHistory; }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
 })();

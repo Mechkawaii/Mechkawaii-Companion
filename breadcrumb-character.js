@@ -14,60 +14,7 @@
     return localStorage.getItem(PREFIX + "lang") || "fr";
   }
 
-  function ensureLayoutStyles() {
-    if (document.getElementById("mkwBreadcrumbMenuLayoutStyles")) return;
-    const style = document.createElement("style");
-    style.id = "mkwBreadcrumbMenuLayoutStyles";
-    style.textContent = `
-      #mkw-char-nav-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin: 0 0 12px 0;
-        width: 100%;
-      }
-
-      #mkw-char-nav-row #mkw-breadcrumb-char {
-        flex: 1 1 auto;
-        min-width: 0;
-        margin: 0 !important;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        overflow-x: auto;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-      }
-
-      #mkw-char-nav-row #mkw-breadcrumb-char::-webkit-scrollbar {
-        display: none;
-      }
-
-      #mkw-char-menu-slot {
-        flex: 0 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-      }
-
-      @media (max-width: 520px) {
-        #mkw-char-nav-row {
-          gap: 8px;
-          margin-bottom: 10px;
-        }
-
-        #mkw-char-nav-row #mkw-breadcrumb-char {
-          gap: 6px;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
   function inject() {
-    ensureLayoutStyles();
-
     // Masquer le bouton retour existant
     const backBtn = document.getElementById("backBtn");
     if (backBtn) backBtn.style.display = "none";

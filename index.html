@@ -15,6 +15,8 @@
   <link rel="stylesheet" href="./charlist.css" />
   <link rel="stylesheet" href="./draft-cards.css" />
   <link rel="stylesheet" href="./breadcrumb.css" />
+  <link rel="stylesheet" href="./presets.css" />
+  <link rel="stylesheet" href="./setup-choice.css" />
   <title>Mechkawaii Companion</title>
   <script src="./session-resume.js"></script>
   <script src="./reset-system.js"></script>
@@ -33,8 +35,6 @@
       } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="./style.css" />
-  <link rel="stylesheet" href="./presets.css" />
 </head>
 
 <body class="page-index has-splash">
@@ -65,20 +65,29 @@
       <div class="card-b">
         <div class="rule" style="margin-top:0;">
           <h3 data-i18n="setup_q_devices">1) Combien d'appareil ?</h3>
-          <p class="text" data-i18n="setup_q_devices_desc">
-            Si un seul appareil sert à tout le monde, tu verras tous les persos. Sinon, chaque joueur choisit son camp.
-          </p>
-          <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-            <button id="modeSingle" class="btn-accent" data-i18n="setup_mode_single">Un seul appareil pour la table</button>
-            <button id="modeMulti" data-i18n="setup_mode_multi">Chaque joueur à son appareil</button>
+          <div class="device-choice-grid">
+            <button id="modeMulti" class="device-choice-btn btn-accent" aria-label="Chaque joueur à son appareil">
+              <img src="./assets/Two_device.png" alt="Chaque joueur à son appareil">
+              <span class="device-choice-label" data-i18n="setup_mode_multi">Chaque joueur à son appareil</span>
+            </button>
+            <button id="modeSingle" class="device-choice-btn" aria-label="Un seul appareil pour la table">
+              <img src="./assets/One_device.png" alt="Un seul appareil pour la table">
+              <span class="device-choice-label" data-i18n="setup_mode_single">Un seul appareil pour la table</span>
+            </button>
           </div>
         </div>
 
         <div id="campPick" class="rule" style="display:none;">
           <h3 data-i18n="setup_q_camp">2) Choisis ton camp</h3>
-          <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-            <button id="campMech" class="btn-accent" data-i18n="camp_mech">Mechkawaii</button>
-            <button id="campProd" data-i18n="camp_prod">Prodrome</button>
+          <div class="faction-choice-grid">
+            <button id="campMech" class="faction-choice-btn btn-accent" aria-label="Mechkawaii">
+              <img src="./assets/faction_mechkawaii.png" alt="Mechkawaii">
+              <span class="faction-choice-label" data-i18n="camp_mech">Mechkawaii</span>
+            </button>
+            <button id="campProd" class="faction-choice-btn" aria-label="Prodrome">
+              <img src="./assets/faction_prodrome.png" alt="Prodrome">
+              <span class="faction-choice-label" data-i18n="camp_prod">Prodrome</span>
+            </button>
           </div>
          </div>
 
@@ -251,6 +260,7 @@
 </div>
 
   <script src="./app.js"></script>
+  <script src="./default-device-choice.js" defer></script>
   <script src="./draft-flow-reset.js" defer></script>
   <script src="./presets.js" defer></script>
   <script src="./tabs-all.js" defer></script>

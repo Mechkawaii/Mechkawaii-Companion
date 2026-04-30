@@ -4,6 +4,9 @@
 
 /* Par défaut : illuminé orange */
 #ultCard {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   border-color: rgba(255, 159, 80, 0.6);
   box-shadow: 0 0 24px rgba(255, 159, 80, 0.2);
   background: rgba(255, 159, 80, 0.6);
@@ -18,10 +21,85 @@
   color: #FFFFFF;
 }
 
-/* Coup unique utilisé : grisé */
-#ultCard.ult-used {
+/* Coup unique utilisé : grisé uniquement si réamorçable */
+#ultCard.ult-used:not(.ult-skill-locked) {
   border-color: rgba(255, 255, 255, 0.08);
   box-shadow: none;
   opacity: 0.45;
   background: rgba(18, 19, 24, 0.6);
+}
+
+/* Coup unique non réamorçable déjà utilisé : overlay PNG propre */
+#ultCard.ult-skill-locked {
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+  opacity: 1;
+  background: rgba(18, 19, 24, 0.78);
+}
+
+/* Retire les anciens overlays CU_vide / barres rouges hérités */
+#ultCard.ult-skill-locked [src*="CU_vide"],
+#ultCard.ult-skill-locked [src*="cu_vide"],
+#ultCard.ult-skill-locked [src*="cu-vide"],
+#ultCard.ult-skill-locked [src*="CoupUnique_vide"],
+#ultCard.ult-skill-locked [class*="cu-vide"],
+#ultCard.ult-skill-locked [class*="cu_vide"],
+#ultCard.ult-skill-locked [class*="CU_vide"],
+#ultCard.ult-skill-locked [class*="legacy"],
+#ultCard.ult-skill-locked [class*="stripe"],
+#ultCard.ult-skill-locked [class*="diagonal"],
+#ultCard.ult-skill-locked [id*="cu-vide"],
+#ultCard.ult-skill-locked [id*="cu_vide"],
+#ultCard.ult-skill-locked [id*="legacy"],
+#ultCard.ult-skill-locked [id*="stripe"],
+#ultCard.ult-skill-locked [id*="diagonal"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+#ultCard.ult-skill-locked::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+#ultCard.ult-skill-locked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background-image: url("./assets/skill_lock.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.62));
+}
+
+.mkw-ultimate-energy-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 92px;
+  transform: translateX(-50%);
+  z-index: 99999;
+  background: #111;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 10px 14px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  font-weight: 850;
+  text-align: center;
+  max-width: calc(100vw - 28px);
+}
+
+@media (max-width: 560px) {
+  #ultCard.ult-skill-locked::after {
+    background-size: contain;
+    background-position: center center;
+  }
 }
