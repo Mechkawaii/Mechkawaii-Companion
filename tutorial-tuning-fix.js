@@ -12,9 +12,43 @@
     return tabs ? tabs.getBoundingClientRect().top : window.innerHeight;
   }
 
+  function getScrollRoot() {
+    return document.scrollingElement || document.documentElement;
+  }
+
+  function unlockForProgrammaticScroll() {
+    const body = document.body;
+    const html = document.documentElement;
+    const previous = {
+      bodyOverflow: body.style.overflow,
+      htmlOverflow: html.style.overflow,
+      bodyTouchAction: body.style.touchAction,
+      htmlTouchAction: html.style.touchAction
+    };
+
+    body.style.setProperty("overflow", "auto", "important");
+    html.style.setProperty("overflow", "auto", "important");
+    body.style.setProperty("touch-action", "none", "important");
+    html.style.setProperty("touch-action", "none", "important");
+
+    return function relock() {
+      body.style.setProperty("overflow", previous.bodyOverflow || "hidden", "important");
+      html.style.setProperty("overflow", previous.htmlOverflow || "hidden", "important");
+      if (previous.bodyTouchAction) body.style.touchAction = previous.bodyTouchAction;
+      else body.style.removeProperty("touch-action");
+      if (previous.htmlTouchAction) html.style.touchAction = previous.htmlTouchAction;
+      else html.style.removeProperty("touch-action");
+    };
+  }
+
   function scrollByAmount(amount) {
-    const root = document.scrollingElement || document.documentElement;
-    root.scrollTop += amount;
+    if (!Number.isFinite(amount) || Math.abs(amount) < 1) return;
+    const relock = unlockForProgrammaticScroll();
+    const root = getScrollRoot();
+    const start = root.scrollTop;
+    root.scrollTop = start + amount;
+    window.scrollTo(0, start + amount);
+    requestAnimationFrame(relock);
   }
 
   function currentMainTitle() {
@@ -58,8 +92,6 @@
     const safeBottom = getTabsTop() - marginBottom;
     let rect = target.getBoundingClientRect();
 
-    // Pour Action de classe / Coup Unique, on veut voir TOUTE la section,
-    // donc on colle le haut de la carte assez haut au lieu de tenter un centrage trop permissif.
     if (options.forceTop) {
       if (Math.abs(rect.top - desiredTop) > 3) scrollByAmount(rect.top - desiredTop);
     } else {
@@ -73,21 +105,14 @@
     }
 
     rect = target.getBoundingClientRect();
-    if (rect.bottom > safeBottom) {
-      scrollByAmount(rect.bottom - safeBottom);
-    }
+    if (rect.bottom > safeBottom) scrollByAmount(rect.bottom - safeBottom);
 
     rect = target.getBoundingClientRect();
     const minTop = Number(options.minTop ?? 64);
-    if (rect.top < minTop) {
-      scrollByAmount(rect.top - minTop);
-    }
+    if (rect.top < minTop) scrollByAmount(rect.top - minTop);
 
-    // Dernier passage : si le bas reste masqué par les tabs, on remonte encore.
     rect = target.getBoundingClientRect();
-    if (rect.bottom > safeBottom) {
-      scrollByAmount(rect.bottom - safeBottom);
-    }
+    if (rect.bottom > safeBottom) scrollByAmount(rect.bottom - safeBottom);
   }
 
   function placeTooltip(tooltip, rect) {
@@ -104,14 +129,9 @@
     const spaceAbove = rect.top - safeTop;
     let top = rect.bottom + 18;
 
-    if (spaceBelow < tooltipRect.height + 18 && spaceAbove > spaceBelow) {
-      top = rect.top - tooltipRect.height - 18;
-    }
-
+    if (spaceBelow < tooltipRect.height + 18 && spaceAbove > spaceBelow) top = rect.top - tooltipRect.height - 18;
     if (top < safeTop) top = safeTop;
-    if (top + tooltipRect.height > safeBottom) {
-      top = Math.max(safeTop, safeBottom - tooltipRect.height);
-    }
+    if (top + tooltipRect.height > safeBottom) top = Math.max(safeTop, safeBottom - tooltipRect.height);
 
     tooltip.style.left = left + "px";
     tooltip.style.right = "auto";
@@ -120,12 +140,11 @@
   }
 
   function setMainTutorialHidden(hidden) {
-    const elements = [
+    [
       document.querySelector(".mkw-tutorial-tooltip"),
       document.querySelector(".mkw-tutorial-highlight"),
       document.querySelector(".mkw-tutorial-overlay")
-    ];
-    elements.forEach(el => {
+    ].forEach(el => {
       if (!el) return;
       el.style.visibility = hidden ? "hidden" : "";
       el.style.pointerEvents = hidden ? "none" : "";
@@ -222,6 +241,10 @@
         placeAboveTabs(patternCard, 104);
         drawPatternHighlight(patternCard);
       }, 120);
+      setTimeout(() => {
+        placeAboveTabs(patternCard, 104);
+        drawPatternHighlight(patternCard);
+      }, 260);
       return;
     }
 
@@ -229,7 +252,8 @@
 
     const mainCard = getMainTargetCard();
     if (mainCard) {
-      const isClassOrUltimate = currentMainTitle() === "Action de classe" || currentMainTitle() === "Class Action" || currentMainTitle() === "Coup Unique" || currentMainTitle() === "Ultimate Ability";
+      const title = currentMainTitle();
+      const isClassOrUltimate = title === "Action de classe" || title === "Class Action" || title === "Coup Unique" || title === "Ultimate Ability";
       const desiredTop = isClassOrUltimate ? 80 : 104;
       const options = isClassOrUltimate ? { forceTop: true, minTop: 58, marginBottom: 42 } : {};
       placeAboveTabs(mainCard, desiredTop, options);
@@ -245,6 +269,10 @@
         placeAboveTabs(mainCard, desiredTop, options);
         drawMainHighlight(mainCard);
       }, 260);
+      setTimeout(() => {
+        placeAboveTabs(mainCard, desiredTop, options);
+        drawMainHighlight(mainCard);
+      }, 420);
     }
   }
 
@@ -265,9 +293,7 @@
         border: 1px solid rgba(255,255,255,.14) !important;
         box-shadow: none !important;
       }
-      #mkwPatternTutorialTooltip .mkw-pattern-tuto-actions button:disabled {
-        opacity: .35 !important;
-      }
+      #mkwPatternTutorialTooltip .mkw-pattern-tuto-actions button:disabled { opacity: .35 !important; }
     `;
     document.head.appendChild(style);
   }
@@ -283,6 +309,7 @@
         setTimeout(scheduleFix, 40);
         setTimeout(scheduleFix, 140);
         setTimeout(scheduleFix, 280);
+        setTimeout(scheduleFix, 460);
       }
     }, true);
   }
