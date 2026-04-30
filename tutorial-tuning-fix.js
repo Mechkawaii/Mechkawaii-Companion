@@ -81,18 +81,23 @@
     const rect = card.getBoundingClientRect();
     const currentY = root.scrollTop || window.scrollY || 0;
     const tabsTop = getTabsTop();
-    const safeTop = mode === "main" ? 86 : 96;
-    const safeBottom = tabsTop - 32;
-    const availableHeight = Math.max(160, safeBottom - safeTop);
+    const safeTop = mode === "main" ? 86 : 92;
+    const safeBottom = tabsTop - 42;
+    const availableHeight = Math.max(150, safeBottom - safeTop);
 
     let desiredTop = safeTop;
     if (rect.height < availableHeight) {
       desiredTop = safeTop + Math.max(0, (availableHeight - rect.height) / 2);
     }
 
-    const absoluteTarget = currentY + rect.top - desiredTop;
+    let nextY = currentY + rect.top - desiredTop;
+    const projectedBottom = desiredTop + rect.height;
+    if (projectedBottom > safeBottom) {
+      nextY += projectedBottom - safeBottom;
+    }
+
     const maxY = Math.max(0, root.scrollHeight - window.innerHeight);
-    const nextY = Math.max(0, Math.min(maxY, absoluteTarget));
+    nextY = Math.max(0, Math.min(maxY, nextY));
 
     if (Math.abs(nextY - currentY) < 2) return;
 
@@ -130,13 +135,15 @@
     });
   }
 
-  function drawHighlight({ card, overlay, highlight, tooltip, pad = 18 }) {
+  function drawHighlight({ card, overlay, highlight, tooltip, pad = 18, allowFull = false }) {
     if (!overlay || !highlight || !tooltip || !card) return;
     const rect = card.getBoundingClientRect();
     const top = Math.max(10, rect.top - pad);
     const left = Math.max(10, rect.left - pad);
     const right = Math.min(window.innerWidth - 10, rect.right + pad);
-    const bottom = Math.min(getTabsTop() - 12, rect.bottom + pad, window.innerHeight - 10);
+    const naturalBottom = Math.min(window.innerHeight - 10, rect.bottom + pad);
+    const limitedBottom = Math.min(getTabsTop() - 12, naturalBottom);
+    const bottom = allowFull ? naturalBottom : limitedBottom;
     overlay.style.clipPath = `polygon(0% 0%,0% 100%,${left}px 100%,${left}px ${top}px,${right}px ${top}px,${right}px ${bottom}px,${left}px ${bottom}px,${left}px 100%,100% 100%,100% 0%)`;
     highlight.style.top = top + "px";
     highlight.style.left = left + "px";
@@ -152,7 +159,8 @@
       overlay: document.querySelector(".mkw-tutorial-overlay"),
       highlight: document.querySelector(".mkw-tutorial-highlight"),
       tooltip: document.querySelector(".mkw-tutorial-tooltip"),
-      pad: 18
+      pad: 18,
+      allowFull: true
     });
   }
 
@@ -162,7 +170,8 @@
       overlay: document.querySelector("#mkwPatternTutorialOverlay"),
       highlight: document.querySelector("#mkwPatternTutorialHighlight"),
       tooltip: document.querySelector("#mkwPatternTutorialTooltip"),
-      pad: 16
+      pad: 16,
+      allowFull: true
     });
   }
 
@@ -184,11 +193,14 @@
     const patternCard = getPatternTargetCard();
     if (patternCard) {
       setMainTutorialHidden(true);
-      if (lastMode !== "pattern") {
+      if (lastMode !== "pattern:" + currentPatternTitle()) {
         cameraToCard(patternCard, "pattern");
-        lastMode = "pattern";
+        lastMode = "pattern:" + currentPatternTitle();
       }
-      requestAnimationFrame(() => drawPatternHighlight(patternCard));
+      requestAnimationFrame(() => {
+        cameraToCard(patternCard, "pattern");
+        drawPatternHighlight(patternCard);
+      });
       setTimeout(() => drawPatternHighlight(patternCard), 90);
       return;
     }
