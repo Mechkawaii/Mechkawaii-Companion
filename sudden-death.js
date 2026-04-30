@@ -222,7 +222,6 @@
           <p>${reason === "timer" ? "Le délai de mort subite est écoulé." : "Les 3 unités du camp sont HS."}</p>
           <div class="mkw-sd-actions">
             <button type="button" class="mkw-sd-btn btn-accent" data-action="title">Retour à l’écran titre</button>
-            <button type="button" class="mkw-sd-btn" data-action="close">Voir la partie</button>
           </div>
         </div>
       </div>
@@ -241,8 +240,6 @@
       } catch (error) {}
       location.href = "index.html";
     });
-
-    backdrop.querySelector("[data-action='close']")?.addEventListener("click", () => removeElement("mkwGameOverBackdrop"));
   }
 
   function renderHud(statuses, suddenState) {
