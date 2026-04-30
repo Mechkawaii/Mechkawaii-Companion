@@ -113,7 +113,7 @@
     { target: ".repair-section", titleKey: "repairTitle", kickerKey: "repairKicker", textKey: "repairText", pad: 16, mobileTop: 110 },
     { target: "#classActionTitle", titleKey: "classActionTitle", kickerKey: "classActionKicker", textKey: "classActionText", pad: 18, mobileTop: 118 },
     { target: "#ultTitle,#ultToggleContainer", titleKey: "ultimateTitle", kickerKey: "ultimateKicker", textKey: "ultimateText", pad: 18, mobileTop: 118 },
-    { target: ".cu-header-slot,.cu-badges,#cuBadges,.cu-badge-zone,.cu-badge,.topbar .controls", titleKey: "cuBadgeTitle", kickerKey: "cuBadgeKicker", textKey: "cuBadgeText", pad: 14, mobileTop: 96, optional: true },
+    { target: ".cu-badges,#cuBadges,.cu-badge-zone,.cu-badge,.copied-cu,[data-cu-badges],[data-cu-badge],.topbar .controls", titleKey: "cuBadgeTitle", kickerKey: "cuBadgeKicker", textKey: "cuBadgeText", pad: 14, mobileTop: 96, optional: true },
     { target: "#mkwSuddenDeathHud", titleKey: "suddenTitle", kickerKey: "suddenKicker", textKey: "suddenText", pad: 14, mobileTop: 100, optional: true },
     { target: "#unitTabs", titleKey: "tabsTitle", kickerKey: "tabsKicker", textKey: "tabsText", pad: 12, allowTabsOverlap: true }
   ];
@@ -183,7 +183,11 @@
   function getTabsSafeTop() {
     const tabsContainer = document.querySelector("#unitTabsContainer");
     const tabsRect = tabsContainer ? tabsContainer.getBoundingClientRect() : null;
-    return tabsRect ? tabsRect.top : window.innerHeight;
+    const fromTabs = tabsRect ? tabsRect.top : window.innerHeight;
+    // Sur iOS Safari, la barre du navigateur peut décaler les coords.
+    // On prend le minimum entre le haut des tabs et une marge fixe depuis le bas.
+    const fromBottom = window.innerHeight - 130;
+    return Math.min(fromTabs, fromBottom);
   }
 
   function isVisibleTarget(el) {
@@ -247,11 +251,10 @@
     if (!isMobile() || !target) return;
     if (step?.target === "#unitTabs") return;
 
-    // Hauteur réelle du tooltip (déjà rendu) + marge
-    const tooltipH   = tooltip ? Math.ceil(tooltip.getBoundingClientRect().height) : 200;
-    const safeTop    = tooltipH + 16;
-    const safeBottom = getTabsSafeTop() - 8;
-    const available  = Math.max(40, safeBottom - safeTop);
+    const safeTop    = 82;
+    const safeBottom = getTabsSafeTop() - 40;
+    const available  = Math.max(60, safeBottom - safeTop);
+    const root       = document.scrollingElement || document.documentElement;
 
     let rect = target.getBoundingClientRect();
     let desiredTop = safeTop;
@@ -262,32 +265,43 @@
     const delta = rect.top - desiredTop;
     if (Math.abs(delta) > 2) scrollPageBy(delta);
 
+    // Vérifier après scroll que ça ne dépasse pas en bas
     rect = target.getBoundingClientRect();
     if (rect.bottom > safeBottom) scrollPageBy(rect.bottom - safeBottom);
   }
 
   function placeTooltip(rect) {
     if (!tooltip) return;
-    const pad   = 10;
-    const tRect = tooltip.getBoundingClientRect();
-    const maxLeft = window.innerWidth - tRect.width - pad;
-    const left = Math.max(pad, Math.min((window.innerWidth - tRect.width) / 2, maxLeft));
-    if (isMobile()) {
-      tooltip.style.position = "fixed";
-      tooltip.style.left     = left + "px";
-      tooltip.style.right    = "auto";
-      tooltip.style.bottom   = "auto";
-      tooltip.style.top      = pad + "px";
-    } else {
-      const safeBottom = getTabsSafeTop() - pad;
+    const pad = isMobile() ? 18 : 14;
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const tabsContainer = document.querySelector("#unitTabsContainer");
+    const tabsRect = tabsContainer ? tabsContainer.getBoundingClientRect() : null;
+    const safeBottom = tabsRect ? Math.max(0, tabsRect.top - pad) : window.innerHeight - pad;
+    const safeTop = isMobile() ? 22 : pad;
+    const maxLeft = window.innerWidth - tooltipRect.width - pad;
+    const centeredLeft = Math.max(pad, Math.min((window.innerWidth - tooltipRect.width) / 2, maxLeft));
+    const targetLeft = Math.max(pad, Math.min(rect.left, maxLeft));
+    const mobileBelowGap = isMobile() ? 22 : pad;
+    const mobileAboveGap = isMobile() ? 22 : pad;
+    const candidates = [
+      { top: rect.bottom + mobileBelowGap, left: targetLeft },
+      { top: rect.top - tooltipRect.height - mobileAboveGap, left: targetLeft },
+      { top: safeTop, left: centeredLeft },
+      { top: safeBottom - tooltipRect.height, left: centeredLeft }
+    ];
+    let chosen = candidates.find(pos => {
+      const candidateRect = { top: pos.top, left: pos.left, right: pos.left + tooltipRect.width, bottom: pos.top + tooltipRect.height };
+      return pos.top >= safeTop && candidateRect.bottom <= safeBottom && !rectsOverlap(candidateRect, rect);
+    });
+    if (!chosen) {
+      const spaceAbove = rect.top - safeTop;
       const spaceBelow = safeBottom - rect.bottom;
-      let top = spaceBelow >= tRect.height + 8 ? rect.bottom + 8 : rect.top - tRect.height - 8;
-      top = Math.max(pad, Math.min(top, safeBottom - tRect.height));
-      tooltip.style.left   = left + "px";
-      tooltip.style.right  = "auto";
-      tooltip.style.bottom = "auto";
-      tooltip.style.top    = top + "px";
+      chosen = spaceAbove >= spaceBelow ? { top: safeTop, left: centeredLeft } : { top: Math.max(safeTop, safeBottom - tooltipRect.height), left: centeredLeft };
     }
+    tooltip.style.left = Math.max(pad, Math.min(chosen.left, maxLeft)) + "px";
+    tooltip.style.right = "auto";
+    tooltip.style.bottom = "auto";
+    tooltip.style.top = Math.max(safeTop, Math.min(chosen.top, safeBottom - tooltipRect.height)) + "px";
   }
 
   function getHighlightTarget() {
@@ -350,12 +364,6 @@
 
   function renderTooltip(step) {
     const isLast = isLastVisibleStep();
-    // Limiter la hauteur du tooltip sur mobile pour ne pas déborder sur le cadre
-    if (isMobile() && tooltip) {
-      const maxH = Math.round(window.innerHeight * 0.44);
-      tooltip.style.maxHeight = maxH + "px";
-      tooltip.style.overflowY = "auto";
-    }
     const portraitSize = isMobile() ? "clamp(58px,16vw,76px)" : "clamp(96px,9vw,128px)";
     const textSize = isMobile() ? "14px" : "16px";
     const titleSize = isMobile() ? "17px" : "17px";

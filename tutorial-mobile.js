@@ -28,7 +28,9 @@
 
   function tabsTop() {
     const t = document.querySelector("#unitTabsContainer");
-    return t ? t.getBoundingClientRect().top : window.innerHeight;
+    const fromTabs = t ? t.getBoundingClientRect().top : window.innerHeight;
+    const fromBottom = window.innerHeight - 130;
+    return Math.min(fromTabs, fromBottom);
   }
 
   function qs(sel, root = document) { return root.querySelector(sel); }
@@ -63,19 +65,22 @@
   ---------------------------------------------------------- */
   function cameraTo(card) {
     if (!card || !isMobile()) return;
-    const tEl    = document.querySelector("#mkwPatternTutorialTooltip");
-    const tH     = tEl ? Math.ceil(tEl.getBoundingClientRect().height) : 200;
-    const safeTop = tH + 16;
-    const safeBtm = tabsTop() - 8;
-    const avail   = Math.max(40, safeBtm - safeTop);
+    const root    = document.scrollingElement || document.documentElement;
+    const safeTop = 90;
+    const safeBtm = tabsTop() - 40;
+    const avail   = Math.max(100, safeBtm - safeTop);
     const rect    = card.getBoundingClientRect();
-    const curY    = window.scrollY || window.pageYOffset || 0;
+    const curY    = root.scrollTop;
+
     let desiredTop = safeTop;
-    if (rect.height < avail) desiredTop = safeTop + Math.round((avail - rect.height) / 2);
-    let nextY = curY + (rect.top - desiredTop);
-    const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-    nextY = Math.max(0, Math.min(nextY, maxY));
-    if (Math.abs(nextY - curY) > 2) scrollTo(nextY);
+    if (rect.height < avail) desiredTop = safeTop + (avail - rect.height) / 2;
+
+    let nextY = curY + rect.top - desiredTop;
+    const projectedBottom = desiredTop + rect.height;
+    if (projectedBottom > safeBtm) nextY += projectedBottom - safeBtm;
+
+    if (Math.abs(nextY - curY) < 2) return;
+    scrollTo(nextY);
   }
 
   /* ----------------------------------------------------------
