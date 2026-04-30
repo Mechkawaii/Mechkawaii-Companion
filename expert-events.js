@@ -92,38 +92,40 @@
     style.textContent = `
       .mkw-expert-events-pick { margin-top: 18px; border-top: 1px solid rgba(255,255,255,.1); padding-top: 16px; }
       .mkw-expert-step-help { color: var(--muted); font-size: 13px; margin: 0 0 14px; line-height: 1.45; }
-      .mkw-event-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-      .mkw-event-flip-card { min-height: 260px; perspective: 1000px; border: 0; padding: 0; background: transparent; color: inherit; cursor: pointer; text-align: left; }
-      .mkw-event-flip-inner { position: relative; display:block; width: 100%; height: 100%; min-height: 260px; transform-style: preserve-3d; transition: transform .45s ease; }
+      .mkw-event-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; }
+      .mkw-event-flip-card { width: 100%; aspect-ratio: 1 / 1; perspective: 1100px; border: 0; padding: 0; background: transparent; color: inherit; cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; }
+      .mkw-event-flip-inner { position: relative; display: block; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .45s ease; }
       .mkw-event-flip-card.is-flipped .mkw-event-flip-inner { transform: rotateY(180deg); }
-      .mkw-event-face { position: absolute; inset: 0; backface-visibility: hidden; border: 1px solid rgba(255,255,255,.15); border-radius: 18px; overflow: hidden; background: rgba(255,255,255,.045); box-shadow: 0 16px 34px rgba(0,0,0,.28); }
-      .mkw-event-back { transform: rotateY(180deg); padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; }
-      .mkw-event-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-      .mkw-event-front-label { position: absolute; left: 12px; right: 12px; bottom: 12px; border-radius: 14px; padding: 10px 12px; background: rgba(5,6,10,.78); border: 1px solid rgba(255,255,255,.13); font-weight: 900; text-transform: uppercase; letter-spacing: .04em; text-align: center; }
+      .mkw-event-face { position: absolute; inset: 0; -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255,255,255,.15); border-radius: 18px; overflow: hidden; background: #111217; box-shadow: 0 16px 34px rgba(0,0,0,.28); transform: rotateY(0deg) translateZ(1px); }
+      .mkw-event-front { z-index: 2; }
+      .mkw-event-back { z-index: 1; transform: rotateY(180deg) translateZ(2px); padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; background: #111217; }
+      .mkw-event-flip-card.is-flipped .mkw-event-front { pointer-events: none; }
+      .mkw-event-img { width: 100%; height: 100%; object-fit: contain; display: block; background: #05060a; }
+      .mkw-event-front-label { position: absolute; left: 12px; right: 12px; bottom: 12px; border-radius: 14px; padding: 10px 12px; background: rgba(5,6,10,.88); border: 1px solid rgba(255,255,255,.13); font-weight: 900; text-transform: uppercase; letter-spacing: .04em; text-align: center; }
       .mkw-event-card-title { display:block; font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 8px; }
       .mkw-event-card-text { display:block; font-size: 13px; line-height: 1.45; color: var(--text); margin: 0; }
       .mkw-event-card-intro { display:block; font-weight: 800; color: #fff; margin: 0 0 8px; line-height: 1.35; }
       .mkw-event-choose { display:block; width: 100%; margin-top: auto; text-align:center; border-radius: 14px; padding: 10px 12px; }
       .mkw-event-back-button { margin-bottom: 12px; }
-      .mkw-scenario-front { padding: 16px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; text-align: center; background-size: cover; background-position: center; }
+      .mkw-scenario-front { padding: 16px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; text-align: center; background-size: contain; background-repeat: no-repeat; background-position: center; background-color: #05060a; }
       .mkw-scenario-front::before { content: ""; position: absolute; inset: 0; background: rgba(5,6,10,.18); }
       .mkw-scenario-front > * { position: relative; z-index: 1; }
       .mkw-scenario-kicker { display:block; font-size: 11px; font-weight: 900; opacity: .75; text-transform: uppercase; letter-spacing: .1em; }
       .mkw-scenario-title { display:block; font-size: 20px; line-height: 1.05; font-weight: 1000; text-transform: uppercase; }
       #mkwExpertEventHud { margin: 12px 0 0; border: 1px solid rgba(255,255,255,.12); border-radius: 16px; padding: 10px; display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, rgba(255,120,180,.12), rgba(255,255,255,.04)); }
-      #mkwExpertEventHud img { width: 58px; height: 58px; border-radius: 12px; object-fit: cover; flex: 0 0 auto; }
+      #mkwExpertEventHud img { width: 58px; height: 58px; border-radius: 12px; object-fit: contain; background:#05060a; flex: 0 0 auto; }
       .mkw-expert-hud-title { font-weight: 900; text-transform: uppercase; letter-spacing: .04em; font-size: 13px; }
       .mkw-expert-hud-sub { color: var(--muted); font-size: 12px; line-height: 1.35; margin-top: 3px; }
       #mkwExpertEventBackdrop { position: fixed; inset: 0; background: rgba(0,0,0,.76); z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 18px; }
       #mkwExpertEventPanel { width: min(560px, 100%); border-radius: 24px; border: 1px solid rgba(255,255,255,.16); background: #111217; box-shadow: 0 30px 80px rgba(0,0,0,.55); overflow: hidden; }
-      .mkw-expert-modal-visual { width: 100%; height: 240px; object-fit: cover; display: block; background: #05060a; }
-      .mkw-expert-modal-body { padding: 18px; }
+      .mkw-expert-modal-visual { width: 100%; aspect-ratio: 1 / 1; max-height: 360px; object-fit: contain; display: block; background: #05060a; }
+      .mkw-expert-modal-body { padding: 18px; background: #111217; }
       .mkw-expert-modal-kicker { font-size: 12px; color: var(--muted); font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
       .mkw-expert-modal-title { font-size: 24px; font-weight: 1000; text-transform: uppercase; line-height: 1.05; margin: 6px 0 10px; }
       .mkw-expert-modal-intro { font-weight: 800; margin: 0 0 10px; }
       .mkw-expert-modal-effect { color: var(--text); line-height: 1.45; margin: 0 0 16px; }
       .mkw-expert-modal-close { width: 100%; }
-      @media (max-width: 680px) { .mkw-event-grid { grid-template-columns: 1fr; } .mkw-event-flip-card, .mkw-event-flip-inner { min-height: 230px; } .mkw-expert-modal-visual { height: 190px; } }
+      @media (max-width: 680px) { .mkw-event-grid { grid-template-columns: 1fr; } .mkw-event-card-title { font-size: 16px; } .mkw-event-card-text { font-size: 12px; } .mkw-expert-modal-visual { max-height: 300px; } }
     `;
     document.head.appendChild(style);
   }
@@ -134,7 +136,7 @@
     card.className = "mkw-event-flip-card";
     card.innerHTML = `
       <span class="mkw-event-flip-inner">
-        <span class="mkw-event-face ${scenario ? "mkw-scenario-front" : ""}" ${scenario ? `style="background-image:url('${image}')"` : ""}>
+        <span class="mkw-event-face mkw-event-front ${scenario ? "mkw-scenario-front" : ""}" ${scenario ? `style="background-image:url('${image}')"` : ""}>
           ${scenario ? `<span class="mkw-scenario-kicker">${kicker || "Scénario"}</span><span class="mkw-scenario-title">${title}</span>` : `<img class="mkw-event-img" src="${image}" alt=""><span class="mkw-event-front-label">${title}</span>`}
         </span>
         <span class="mkw-event-face mkw-event-back">
