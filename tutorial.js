@@ -386,6 +386,21 @@
     });
   }
 
+  function scrollUnlocked(fn) {
+    // Débloquer overflow le temps du scroll, puis rebloquer
+    const body = document.body;
+    const html = document.documentElement;
+    body.style.setProperty("overflow", "auto", "important");
+    html.style.setProperty("overflow", "auto", "important");
+    fn();
+    requestAnimationFrame(() => {
+      if (scrollLocked) {
+        body.style.setProperty("overflow", "hidden", "important");
+        html.style.setProperty("overflow", "hidden", "important");
+      }
+    });
+  }
+
   function showStep() {
     const step = STEPS[currentStep];
     const target = findTarget(step);
@@ -397,19 +412,30 @@
     }
     activeTarget = target;
     activeStep = step;
-    if (isMobile()) {
-      target.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
-      positionTargetForMobile(target, step);
-    } else {
-      target.scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
-    }
-    renderTooltip(step);
-    requestAnimationFrame(() => {
-      positionTargetForMobile(target, step);
-      updateOverlayPosition();
-      setTimeout(() => { positionTargetForMobile(target, step); updateOverlayPosition(); }, 80);
-      setTimeout(updateOverlayPosition, 180);
+
+    // Scroll vers la cible en débloquant temporairement overflow
+    scrollUnlocked(() => {
+      if (isMobile()) {
+        positionTargetForMobile(target, step);
+      } else {
+        target.scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
+      }
     });
+
+    renderTooltip(step);
+
+    // Redessiner le highlight après le scroll (3 passes pour couvrir les délais de rendu)
+    requestAnimationFrame(() => {
+      scrollUnlocked(() => { if (isMobile()) positionTargetForMobile(target, step); });
+      updateOverlayPosition();
+    });
+    setTimeout(() => {
+      scrollUnlocked(() => { if (isMobile()) positionTargetForMobile(target, step); });
+      updateOverlayPosition();
+    }, 100);
+    setTimeout(() => {
+      updateOverlayPosition();
+    }, 250);
   }
 
   function startTutorial() {

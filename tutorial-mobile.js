@@ -182,20 +182,21 @@
         lastStepKey = key;
         cameraTo(card);
       }
-      requestAnimationFrame(() => {
+      // Attendre après cameraTo avant de dessiner
+      setTimeout(() => {
         drawHighlight({
           overlay:   qs("#mkwPatternTutorialOverlay"),
           highlight: qs("#mkwPatternTutorialHighlight"),
           tooltip:   qs("#mkwPatternTutorialTooltip"),
           card, pad: 16
         });
-      });
+      }, 80);
       setTimeout(() => drawHighlight({
         overlay:   qs("#mkwPatternTutorialOverlay"),
         highlight: qs("#mkwPatternTutorialHighlight"),
         tooltip:   qs("#mkwPatternTutorialTooltip"),
         card, pad: 16
-      }), 120);
+      }), 220);
       return;
     }
 
@@ -392,12 +393,14 @@
 
     if (card) cameraTo(card);
 
-    requestAnimationFrame(() => {
+    // On attend que le scroll soit terminé avant de dessiner le highlight
+    setTimeout(() => {
+      if (card) cameraTo(card); // second passage pour affiner
       drawHighlight({ overlay, highlight, tooltip, card, pad: 16 });
-    });
+    }, 80);
     setTimeout(() => {
       drawHighlight({ overlay, highlight, tooltip, card, pad: 16 });
-    }, 150);
+    }, 220);
   }
 
   /* ----------------------------------------------------------
