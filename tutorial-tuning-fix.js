@@ -25,6 +25,10 @@
     return document.querySelector(".mkw-pattern-tuto-title")?.textContent?.trim() || "";
   }
 
+  function patternIsOpen() {
+    return !!document.querySelector("#mkwPatternTutorialTooltip");
+  }
+
   function getMainTargetCard() {
     const title = currentMainTitle();
     if (title === "Action de classe" || title === "Class Action") {
@@ -53,7 +57,11 @@
     const safeBottom = getTabsTop() - 30;
     let rect = target.getBoundingClientRect();
 
-    if (Math.abs(rect.top - desiredTop) > 6) {
+    const availableHeight = Math.max(160, safeBottom - desiredTop);
+    if (rect.height <= availableHeight) {
+      const centeredTop = desiredTop + Math.max(0, (availableHeight - rect.height) / 2);
+      if (Math.abs(rect.top - centeredTop) > 6) scrollByAmount(rect.top - centeredTop);
+    } else if (Math.abs(rect.top - desiredTop) > 6) {
       scrollByAmount(rect.top - desiredTop);
     }
 
@@ -97,7 +105,21 @@
     tooltip.style.top = top + "px";
   }
 
+  function setMainTutorialHidden(hidden) {
+    const elements = [
+      document.querySelector(".mkw-tutorial-tooltip"),
+      document.querySelector(".mkw-tutorial-highlight"),
+      document.querySelector(".mkw-tutorial-overlay")
+    ];
+    elements.forEach(el => {
+      if (!el) return;
+      el.style.visibility = hidden ? "hidden" : "";
+      el.style.pointerEvents = hidden ? "none" : "";
+    });
+  }
+
   function drawMainHighlight(card) {
+    if (patternIsOpen()) return;
     const overlay = document.querySelector(".mkw-tutorial-overlay");
     const highlight = document.querySelector(".mkw-tutorial-highlight");
     const tooltip = document.querySelector(".mkw-tutorial-tooltip");
@@ -124,7 +146,7 @@
     const tooltip = document.querySelector("#mkwPatternTutorialTooltip");
     if (!overlay || !highlight || !tooltip || !card) return;
 
-    const pad = 14;
+    const pad = 16;
     const rect = card.getBoundingClientRect();
     const top = Math.max(10, rect.top - pad);
     const left = Math.max(10, rect.left - pad);
@@ -161,6 +183,7 @@
         document.querySelector("#mkwPatternTutorialOverlay")?.remove();
         document.querySelector("#mkwPatternTutorialHighlight")?.remove();
         document.querySelector("#mkwPatternTutorialTooltip")?.remove();
+        setMainTutorialHidden(false);
         const card = getMainTargetCard();
         if (card) {
           placeAboveTabs(card, 104);
@@ -173,6 +196,23 @@
   function applyFixes() {
     normalizePatternButtons();
 
+    const patternCard = getPatternTargetCard();
+    if (patternCard) {
+      setMainTutorialHidden(true);
+      placeAboveTabs(patternCard, 104);
+      requestAnimationFrame(() => {
+        placeAboveTabs(patternCard, 104);
+        drawPatternHighlight(patternCard);
+      });
+      setTimeout(() => {
+        placeAboveTabs(patternCard, 104);
+        drawPatternHighlight(patternCard);
+      }, 120);
+      return;
+    }
+
+    setMainTutorialHidden(false);
+
     const mainCard = getMainTargetCard();
     if (mainCard) {
       placeAboveTabs(mainCard, 104);
@@ -181,16 +221,6 @@
         drawMainHighlight(mainCard);
       });
       setTimeout(() => drawMainHighlight(mainCard), 120);
-    }
-
-    const patternCard = getPatternTargetCard();
-    if (patternCard) {
-      placeAboveTabs(patternCard, 104);
-      requestAnimationFrame(() => {
-        placeAboveTabs(patternCard, 104);
-        drawPatternHighlight(patternCard);
-      });
-      setTimeout(() => drawPatternHighlight(patternCard), 120);
     }
   }
 
