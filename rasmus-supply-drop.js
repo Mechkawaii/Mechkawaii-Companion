@@ -4,9 +4,10 @@
   const PREFIX = "mechkawaii:";
   const CURRENT_ID = () => new URL(location.href).searchParams.get("id") || "";
   const STATE_KEY = id => PREFIX + "state:" + id;
-  const SHIELDS_KEY = PREFIX + "shields";
   const SHIELD_ASSIGNMENTS_KEY = PREFIX + "shield-assignments";
-  const SHIELD_META_KEY = PREFIX + "shield-expiry-meta";
+  const BLUE_BY_TECH_KEY = PREFIX + "blue-shield-by-tech";
+  const BLUE_META_KEY = PREFIX + "blue-shield-expiry-meta";
+  const RASMUS_SHIELD_KEY = "rasmus-supply-drop";
   const FLOW_KEY = PREFIX + "game-flow";
 
   let cachedChars = null;
@@ -134,47 +135,44 @@
     return flow?.currentCamp || "mechkawaii";
   }
 
-  function getSharedShields() {
-    const shields = readJson(SHIELDS_KEY, [true, true, true]);
-    return Array.isArray(shields) ? shields.slice(0, 3).concat([true, true, true]).slice(0, 3) : [true, true, true];
-  }
-
-  function getShieldAssignments() {
+  function getClassicShieldAssignments() {
     return readJson(SHIELD_ASSIGNMENTS_KEY, {});
   }
 
+  function getBlueShieldAssignments() {
+    return readJson(BLUE_BY_TECH_KEY, {});
+  }
+
   function isShielded(charId) {
-    const assignments = getShieldAssignments();
-    return Object.values(assignments).includes(charId);
+    const classic = getClassicShieldAssignments();
+    const blue = getBlueShieldAssignments();
+    return Object.values(classic).includes(charId) || Object.values(blue).includes(charId);
   }
 
   function canReceiveShield(char) {
-    return getSharedShields().some(Boolean) && !isShielded(char.id);
+    return !isShielded(char.id);
   }
 
   function giveShield(char) {
     if (isShielded(char.id)) return false;
-    const shields = getSharedShields();
-    const index = shields.findIndex(Boolean);
-    if (index < 0) return false;
 
-    const assignments = getShieldAssignments();
-    const meta = readJson(SHIELD_META_KEY, {});
+    const byTech = getBlueShieldAssignments();
+    const meta = readJson(BLUE_META_KEY, {});
     const flow = getFlow();
 
-    shields[index] = false;
-    assignments[index] = char.id;
-    meta[String(index)] = {
+    byTech[RASMUS_SHIELD_KEY] = char.id;
+    meta[RASMUS_SHIELD_KEY] = {
       targetId: char.id,
       placedToken: getToken(flow),
-      expireOnCamp: getCamp(flow)
+      expireOnCamp: getCamp(flow),
+      source: "rasmus"
     };
 
-    writeJson(SHIELDS_KEY, shields);
-    writeJson(SHIELD_ASSIGNMENTS_KEY, assignments);
-    writeJson(SHIELD_META_KEY, meta);
+    writeJson(BLUE_BY_TECH_KEY, byTech);
+    writeJson(BLUE_META_KEY, meta);
 
-    window.dispatchEvent(new CustomEvent("mechkawaii:shield-updated", { detail: { charId: char.id, type: "supply_drop" } }));
+    window.dispatchEvent(new CustomEvent("mechkawaii:technician-shield-applied", { detail: { technicianId: RASMUS_SHIELD_KEY, targetId: char.id, source: "rasmus" } }));
+    window.dispatchEvent(new CustomEvent("mechkawaii:shield-updated", { detail: { charId: char.id, type: "rasmus_supply_drop" } }));
     return true;
   }
 
@@ -241,13 +239,13 @@
       },
       {
         id: "shield",
-        title: "Bouclier",
-        help: "Choisis une deuxième unité alliée distincte qui reçoit un bouclier. Si aucun bouclier n’est disponible, le bonus est perdu.",
+        title: "Bouclier bonus",
+        help: "Choisis une deuxième unité alliée distincte qui reçoit un bouclier bonus. Ce bouclier ne consomme pas la réserve commune.",
         canApply: canReceiveShield,
-        unavailable: "Impossible",
+        unavailable: "Déjà protégé",
         value: char => isShielded(char.id) ? "Protégé" : "OK",
         apply: giveShield,
-        done: char => `Bouclier → ${unitName(char)}`
+        done: char => `Bouclier bonus → ${unitName(char)}`
       },
       {
         id: "repair_key",
