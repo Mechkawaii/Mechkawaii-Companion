@@ -111,8 +111,8 @@
     { target: ".hp-section", titleKey: "hpTitle", kickerKey: "hpKicker", textKey: "hpText", pad: 12, mobileTop: 118 },
     { target: ".shields-section", titleKey: "shieldTitle", kickerKey: "shieldKicker", textKey: "shieldText", pad: 16, mobileTop: 110 },
     { target: ".repair-section", titleKey: "repairTitle", kickerKey: "repairKicker", textKey: "repairText", pad: 16, mobileTop: 110 },
-    { target: "#classActionTitle", titleKey: "classActionTitle", kickerKey: "classActionKicker", textKey: "classActionText", pad: 18, mobileTop: 118, fullCard: true },
-    { target: "#ultTitle,#ultToggleContainer", titleKey: "ultimateTitle", kickerKey: "ultimateKicker", textKey: "ultimateText", pad: 18, mobileTop: 118, fullCard: true },
+    { target: "#classActionTitle", titleKey: "classActionTitle", kickerKey: "classActionKicker", textKey: "classActionText", pad: 18, mobileTop: 118 },
+    { target: "#ultTitle,#ultToggleContainer", titleKey: "ultimateTitle", kickerKey: "ultimateKicker", textKey: "ultimateText", pad: 18, mobileTop: 118 },
     { target: ".cu-badges,#cuBadges,.cu-badge-zone,.cu-badge,.copied-cu,[data-cu-badges],[data-cu-badge],.topbar .controls", titleKey: "cuBadgeTitle", kickerKey: "cuBadgeKicker", textKey: "cuBadgeText", pad: 14, mobileTop: 96, optional: true },
     { target: "#mkwSuddenDeathHud", titleKey: "suddenTitle", kickerKey: "suddenKicker", textKey: "suddenText", pad: 14, mobileTop: 100, optional: true },
     { target: "#unitTabs", titleKey: "tabsTitle", kickerKey: "tabsKicker", textKey: "tabsText", pad: 12, allowTabsOverlap: true }
@@ -196,14 +196,7 @@
   function findTarget(step) {
     if (!step?.target) return null;
     const candidates = Array.from(document.querySelectorAll(step.target));
-    const el = candidates.find(isVisibleTarget) || null;
-    if (!el) return null;
-    // Si fullCard, on remonte à la card parente pour encadrer toute la section
-    if (step.fullCard) {
-      const card = el.closest(".card") || el.parentElement;
-      return (card && isVisibleTarget(card)) ? card : el;
-    }
-    return el;
+    return candidates.find(isVisibleTarget) || null;
   }
 
   function findNextAvailableStep(direction = 1) {
@@ -233,20 +226,19 @@
     const root = document.scrollingElement || document.documentElement;
     const body = document.body;
     const html = document.documentElement;
-    // Débloquer temporairement overflow pour que le scroll JS fonctionne
-    const prevBody = body.style.overflow;
-    const prevHtml = html.style.overflow;
+    const prevBody = body.style.getPropertyValue("overflow");
+    const prevHtml = html.style.getPropertyValue("overflow");
     body.style.setProperty("overflow", "auto", "important");
     html.style.setProperty("overflow", "auto", "important");
-    root.scrollTop += delta;
-    // Restaurer après le frame
+    const maxY = Math.max(0, root.scrollHeight - window.innerHeight);
+    root.scrollTop = Math.max(0, Math.min(root.scrollTop + delta, maxY));
     requestAnimationFrame(() => {
       if (scrollLocked) {
         body.style.setProperty("overflow", "hidden", "important");
         html.style.setProperty("overflow", "hidden", "important");
       } else {
-        body.style.overflow = prevBody;
-        html.style.overflow = prevHtml;
+        body.style.setProperty("overflow", prevBody);
+        html.style.setProperty("overflow", prevHtml);
       }
     });
   }
@@ -255,33 +247,23 @@
     if (!isMobile() || !target) return;
     if (step?.target === "#unitTabs") return;
 
-    const safeTop    = 88;   // sous la topbar + breadcrumb
-    const tabsTop    = getTabsSafeTop();
-    const safeBottom = tabsTop - 36;
-    const available  = Math.max(80, safeBottom - safeTop);
+    const safeTop    = 82;
+    const safeBottom = getTabsSafeTop() - 40;
+    const available  = Math.max(60, safeBottom - safeTop);
     const root       = document.scrollingElement || document.documentElement;
-    const curY       = root.scrollTop;
 
     let rect = target.getBoundingClientRect();
-
-    // Centrer la card dans la zone disponible
     let desiredTop = safeTop;
     if (rect.height < available) {
-      desiredTop = safeTop + Math.max(0, (available - rect.height) / 2);
+      desiredTop = safeTop + Math.round((available - rect.height) / 2);
     }
 
-    let nextY = curY + (rect.top - desiredTop);
+    const delta = rect.top - desiredTop;
+    if (Math.abs(delta) > 2) scrollPageBy(delta);
 
-    // Si la card dépasse en bas, ajuster
-    const projectedBottom = desiredTop + rect.height;
-    if (projectedBottom > safeBottom) {
-      nextY += projectedBottom - safeBottom;
-    }
-
-    const maxY = Math.max(0, root.scrollHeight - window.innerHeight);
-    nextY = Math.max(0, Math.min(nextY, maxY));
-
-    if (Math.abs(nextY - curY) > 2) scrollPageBy(nextY - curY);
+    // Vérifier après scroll que ça ne dépasse pas en bas
+    rect = target.getBoundingClientRect();
+    if (rect.bottom > safeBottom) scrollPageBy(rect.bottom - safeBottom);
   }
 
   function placeTooltip(rect) {
@@ -318,26 +300,45 @@
     tooltip.style.top = Math.max(safeTop, Math.min(chosen.top, safeBottom - tooltipRect.height)) + "px";
   }
 
+  function getHighlightTarget() {
+    // Pour certains steps, on encadre la card parente complète
+    if (!activeTarget || !activeStep) return activeTarget;
+    const t = activeStep.target || "";
+    if (
+      t.includes("classActionTitle") ||
+      t.includes("ultTitle") ||
+      t.includes("repair-section") ||
+      t.includes("shields-section")
+    ) {
+      const card = activeTarget.closest(".card") || activeTarget.closest(".shields-section") || activeTarget.closest(".repair-section") || activeTarget;
+      return card;
+    }
+    return activeTarget;
+  }
+
   function updateOverlayPosition() {
     if (!activeTarget || !highlight || !tooltip || !overlay) return;
     if (isMobile()) positionTargetForMobile(activeTarget, activeStep);
-    const rect = activeTarget.getBoundingClientRect();
-    const pad = Number(activeStep?.pad ?? 12);
-    const mobileExtraTop = isMobile() && activeStep?.target === ".hp-section" ? 2 : 0;
-    const mobileExtraBottom = isMobile() && activeStep?.target === ".hp-section" ? 8 : 0;
-    const top = Math.max(10, rect.top - pad - mobileExtraTop);
-    const left = Math.max(10, rect.left - pad);
-    const right = Math.min(window.innerWidth - 10, rect.right + pad);
+
+    const highlightEl = getHighlightTarget();
+    const rect = highlightEl.getBoundingClientRect();
+    const pad  = Number(activeStep?.pad ?? 12);
+
+    const top    = Math.max(10, rect.top - pad);
+    const left   = Math.max(10, rect.left - pad);
+    const right  = Math.min(window.innerWidth - 10, rect.right + pad);
     const bottomLimit = activeStep?.allowTabsOverlap ? window.innerHeight - 10 : getTabsSafeTop() - 10;
-    const bottom = Math.min(bottomLimit, rect.bottom + pad + mobileExtraBottom, window.innerHeight - 10);
+    const bottom = Math.min(bottomLimit, rect.bottom + pad, window.innerHeight - 10);
+
     if (bottom <= top + 6 && isMobile()) {
-      scrollPageBy(bottom - top + 70);
+      scrollPageBy(bottom - top + 80);
       return requestAnimationFrame(updateOverlayPosition);
     }
+
     overlay.style.clipPath = `polygon(0% 0%,0% 100%,${left}px 100%,${left}px ${top}px,${right}px ${top}px,${right}px ${bottom}px,${left}px ${bottom}px,${left}px 100%,100% 100%,100% 0%)`;
-    highlight.style.top = top + "px";
-    highlight.style.left = left + "px";
-    highlight.style.width = (right - left) + "px";
+    highlight.style.top    = top + "px";
+    highlight.style.left   = left + "px";
+    highlight.style.width  = (right - left) + "px";
     highlight.style.height = Math.max(0, bottom - top) + "px";
     placeTooltip({ top, left, right, bottom, width: right - left, height: bottom - top });
   }

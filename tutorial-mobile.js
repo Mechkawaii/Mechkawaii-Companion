@@ -42,22 +42,19 @@
     const body = document.body;
     const html = document.documentElement;
 
-    // Sauvegarder et débloquer
-    const prev = {
-      bodyOverflow: body.style.overflow,
-      htmlOverflow: html.style.overflow,
-    };
+    // Bypass overflow:hidden posé par tutorial.js lockPage()
     body.style.setProperty("overflow", "auto", "important");
     html.style.setProperty("overflow", "auto", "important");
 
     const maxY = Math.max(0, root.scrollHeight - window.innerHeight);
     root.scrollTop = Math.max(0, Math.min(y, maxY));
-    window.scrollTo({ top: root.scrollTop });
 
-    // Restaurer après le frame
+    // Remettre hidden si tutorial.js avait locké
     requestAnimationFrame(() => {
-      body.style.overflow = prev.bodyOverflow || "";
-      html.style.overflow = prev.htmlOverflow || "";
+      if (document.querySelector(".mkw-tutorial-overlay, #mkwPatternTutorialOverlay")) {
+        body.style.setProperty("overflow", "hidden", "important");
+        html.style.setProperty("overflow", "hidden", "important");
+      }
     });
   }
 
