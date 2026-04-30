@@ -109,10 +109,10 @@
     { target: "#mkwTurnBanner,.mkw-turn-banner", titleKey: "turnTitle", kickerKey: "turnKicker", textKey: "turnText", pad: 14, mobileTop: 92 },
     { target: "#mkwExpertEventHud,.mkw-event-track", titleKey: "eventTitle", kickerKey: "eventKicker", textKey: "eventText", pad: 14, mobileTop: 94, optional: true },
     { target: ".hp-section", titleKey: "hpTitle", kickerKey: "hpKicker", textKey: "hpText", pad: 12, mobileTop: 118 },
-    { target: ".shields-section", titleKey: "shieldTitle", kickerKey: "shieldKicker", textKey: "shieldText", pad: 16, mobileTop: 110 },
-    { target: ".repair-section", titleKey: "repairTitle", kickerKey: "repairKicker", textKey: "repairText", pad: 16, mobileTop: 110 },
-    { target: "#classActionTitle", titleKey: "classActionTitle", kickerKey: "classActionKicker", textKey: "classActionText", pad: 18, mobileTop: 118 },
-    { target: "#ultTitle,#ultToggleContainer", titleKey: "ultimateTitle", kickerKey: "ultimateKicker", textKey: "ultimateText", pad: 18, mobileTop: 118 },
+    { target: ".shields-section", titleKey: "shieldTitle", kickerKey: "shieldKicker", textKey: "shieldText", pad: 14, fullCard: true },
+    { target: ".repair-section", titleKey: "repairTitle", kickerKey: "repairKicker", textKey: "repairText", pad: 14, fullCard: true },
+    { target: "#classActionTitle", titleKey: "classActionTitle", kickerKey: "classActionKicker", textKey: "classActionText", pad: 14, fullCard: true },
+    { target: "#ultTitle,#ultToggleContainer", titleKey: "ultimateTitle", kickerKey: "ultimateKicker", textKey: "ultimateText", pad: 14, fullCard: true },
     { target: ".cu-badges,#cuBadges,.cu-badge-zone,.cu-badge,.copied-cu,[data-cu-badges],[data-cu-badge],.topbar .controls", titleKey: "cuBadgeTitle", kickerKey: "cuBadgeKicker", textKey: "cuBadgeText", pad: 14, mobileTop: 96, optional: true },
     { target: "#mkwSuddenDeathHud", titleKey: "suddenTitle", kickerKey: "suddenKicker", textKey: "suddenText", pad: 14, mobileTop: 100, optional: true },
     { target: "#unitTabs", titleKey: "tabsTitle", kickerKey: "tabsKicker", textKey: "tabsText", pad: 12, allowTabsOverlap: true }
@@ -135,8 +135,10 @@
     if (scrollLocked) return;
     previousBodyOverflow = document.body.style.overflow || "";
     previousHtmlOverflow = document.documentElement.style.overflow || "";
-    document.body.style.setProperty("overflow", "hidden", "important");
-    document.documentElement.style.setProperty("overflow", "hidden", "important");
+    if (!isMobile()) {
+      document.body.style.setProperty("overflow", "hidden", "important");
+      document.documentElement.style.setProperty("overflow", "hidden", "important");
+    }
     scrollLocked = true;
   }
 
@@ -196,7 +198,13 @@
   function findTarget(step) {
     if (!step?.target) return null;
     const candidates = Array.from(document.querySelectorAll(step.target));
-    return candidates.find(isVisibleTarget) || null;
+    const el = candidates.find(isVisibleTarget) || null;
+    if (!el || !step.fullCard) return el;
+    const card = el.closest(".card") ||
+                 el.closest(".shields-section") ||
+                 el.closest(".repair-section") ||
+                 el.parentElement;
+    return (card && isVisibleTarget(card)) ? card : el;
   }
 
   function findNextAvailableStep(direction = 1) {
@@ -223,46 +231,26 @@
 
   function scrollPageBy(delta) {
     if (Math.abs(delta) < 2) return;
-    const root = document.scrollingElement || document.documentElement;
-    const body = document.body;
-    const html = document.documentElement;
-    const prevBody = body.style.getPropertyValue("overflow");
-    const prevHtml = html.style.getPropertyValue("overflow");
-    body.style.setProperty("overflow", "auto", "important");
-    html.style.setProperty("overflow", "auto", "important");
-    const maxY = Math.max(0, root.scrollHeight - window.innerHeight);
-    root.scrollTop = Math.max(0, Math.min(root.scrollTop + delta, maxY));
-    requestAnimationFrame(() => {
-      if (scrollLocked) {
-        body.style.setProperty("overflow", "hidden", "important");
-        html.style.setProperty("overflow", "hidden", "important");
-      } else {
-        body.style.setProperty("overflow", prevBody);
-        html.style.setProperty("overflow", prevHtml);
-      }
-    });
+    const curY = window.scrollY || window.pageYOffset || 0;
+    const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    window.scrollTo(0, Math.max(0, Math.min(curY + delta, maxY)));
   }
 
   function positionTargetForMobile(target, step) {
     if (!isMobile() || !target) return;
     if (step?.target === "#unitTabs") return;
-
-    const tabsTop    = getTabsSafeTop();
-    const safeBottom = tabsTop - 16;
-    // Réserver ~45% de l'écran pour le tooltip en haut
-    const tooltipH   = tooltip ? tooltip.getBoundingClientRect().height : 0;
-    const safeTop    = Math.max(tooltipH + 16, Math.round(window.innerHeight * 0.42));
-    const available  = Math.max(60, safeBottom - safeTop);
-
+    // Tooltip fixé en haut (~220px) → section dans la moitié basse
+    const TOOLTIP_H = 220;
+    const safeTop    = TOOLTIP_H + 16;
+    const safeBottom = getTabsSafeTop() - 12;
+    const available  = Math.max(40, safeBottom - safeTop);
     let rect = target.getBoundingClientRect();
     let desiredTop = safeTop;
     if (rect.height < available) {
       desiredTop = safeTop + Math.round((available - rect.height) / 2);
     }
-
     const delta = rect.top - desiredTop;
     if (Math.abs(delta) > 2) scrollPageBy(delta);
-
     rect = target.getBoundingClientRect();
     if (rect.bottom > safeBottom) scrollPageBy(rect.bottom - safeBottom);
   }
@@ -270,23 +258,20 @@
   function placeTooltip(rect) {
     if (!tooltip) return;
     const pad = 10;
-    const tooltipRect = tooltip.getBoundingClientRect();
-    const tabsTop    = getTabsSafeTop();
-    const maxLeft    = window.innerWidth - tooltipRect.width - pad;
-    const left       = Math.max(pad, Math.min((window.innerWidth - tooltipRect.width) / 2, maxLeft));
-
+    const tRect = tooltip.getBoundingClientRect();
+    const maxLeft = window.innerWidth - tRect.width - pad;
+    const left = Math.max(pad, Math.min((window.innerWidth - tRect.width) / 2, maxLeft));
     if (isMobile()) {
-      // Tooltip toujours dans le tiers supérieur, cadre dans le bas → jamais de chevauchement
-      const top = Math.max(pad, rect.top - tooltipRect.height - 12);
-      tooltip.style.left   = left + "px";
-      tooltip.style.right  = "auto";
-      tooltip.style.bottom = "auto";
-      tooltip.style.top    = top + "px";
+      tooltip.style.position = "fixed";
+      tooltip.style.left     = left + "px";
+      tooltip.style.right    = "auto";
+      tooltip.style.bottom   = "auto";
+      tooltip.style.top      = pad + "px";
     } else {
-      const safeBottom = tabsTop - pad;
+      const safeBottom = getTabsSafeTop() - pad;
       const spaceBelow = safeBottom - rect.bottom;
-      let top = spaceBelow >= tooltipRect.height + 8 ? rect.bottom + 8 : rect.top - tooltipRect.height - 8;
-      top = Math.max(pad, Math.min(top, safeBottom - tooltipRect.height));
+      let top = spaceBelow >= tRect.height + 8 ? rect.bottom + 8 : rect.top - tRect.height - 8;
+      top = Math.max(pad, Math.min(top, safeBottom - tRect.height));
       tooltip.style.left   = left + "px";
       tooltip.style.right  = "auto";
       tooltip.style.bottom = "auto";
@@ -310,31 +295,39 @@
     return activeTarget;
   }
 
+  function getHighlightEl() {
+    if (!activeTarget || !activeStep) return activeTarget;
+    if (activeStep.fullCard) {
+      const card = activeTarget.closest(".card") ||
+                   activeTarget.closest(".shields-section") ||
+                   activeTarget.closest(".repair-section") ||
+                   activeTarget.parentElement;
+      if (card && isVisibleTarget(card)) return card;
+    }
+    return activeTarget;
+  }
+
   function updateOverlayPosition() {
     if (!activeTarget || !highlight || !tooltip || !overlay) return;
     if (isMobile()) positionTargetForMobile(activeTarget, activeStep);
-
-    const highlightEl = getHighlightTarget();
-    const rect = highlightEl.getBoundingClientRect();
+    const el   = getHighlightEl();
+    const rect = el.getBoundingClientRect();
     const pad  = Number(activeStep?.pad ?? 12);
-
     const top    = Math.max(10, rect.top - pad);
     const left   = Math.max(10, rect.left - pad);
     const right  = Math.min(window.innerWidth - 10, rect.right + pad);
-    const bottomLimit = activeStep?.allowTabsOverlap ? window.innerHeight - 10 : getTabsSafeTop() - 10;
-    const bottom = Math.min(bottomLimit, rect.bottom + pad, window.innerHeight - 10);
-
+    const blimit = activeStep?.allowTabsOverlap ? window.innerHeight - 10 : getTabsSafeTop() - 10;
+    const bottom = Math.min(blimit, rect.bottom + pad, window.innerHeight - 10);
     if (bottom <= top + 6 && isMobile()) {
       scrollPageBy(bottom - top + 80);
       return requestAnimationFrame(updateOverlayPosition);
     }
-
     overlay.style.clipPath = `polygon(0% 0%,0% 100%,${left}px 100%,${left}px ${top}px,${right}px ${top}px,${right}px ${bottom}px,${left}px ${bottom}px,${left}px 100%,100% 100%,100% 0%)`;
     highlight.style.top    = top + "px";
     highlight.style.left   = left + "px";
     highlight.style.width  = (right - left) + "px";
     highlight.style.height = Math.max(0, bottom - top) + "px";
-    placeTooltip({ top, left, right, bottom, width: right - left, height: bottom - top });
+    placeTooltip({ top, left, right, bottom });
   }
 
   function isLastVisibleStep() {
@@ -392,18 +385,20 @@
     activeTarget = target;
     activeStep = step;
     if (isMobile()) {
-      target.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
       positionTargetForMobile(target, step);
     } else {
       target.scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
     }
     renderTooltip(step);
     requestAnimationFrame(() => {
-      positionTargetForMobile(target, step);
+      if (isMobile()) positionTargetForMobile(target, step);
       updateOverlayPosition();
-      setTimeout(() => { positionTargetForMobile(target, step); updateOverlayPosition(); }, 80);
-      setTimeout(updateOverlayPosition, 180);
     });
+    setTimeout(() => {
+      if (isMobile()) positionTargetForMobile(target, step);
+      updateOverlayPosition();
+    }, 120);
+    setTimeout(updateOverlayPosition, 280);
   }
 
   function startTutorial() {

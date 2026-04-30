@@ -38,24 +38,8 @@
      On retire temporairement overflow:hidden sur body/html
   ---------------------------------------------------------- */
   function scrollTo(y) {
-    const root = document.scrollingElement || document.documentElement;
-    const body = document.body;
-    const html = document.documentElement;
-
-    // Bypass overflow:hidden posé par tutorial.js lockPage()
-    body.style.setProperty("overflow", "auto", "important");
-    html.style.setProperty("overflow", "auto", "important");
-
-    const maxY = Math.max(0, root.scrollHeight - window.innerHeight);
-    root.scrollTop = Math.max(0, Math.min(y, maxY));
-
-    // Remettre hidden si tutorial.js avait locké
-    requestAnimationFrame(() => {
-      if (document.querySelector(".mkw-tutorial-overlay, #mkwPatternTutorialOverlay")) {
-        body.style.setProperty("overflow", "hidden", "important");
-        html.style.setProperty("overflow", "hidden", "important");
-      }
-    });
+    const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    window.scrollTo(0, Math.max(0, Math.min(y, maxY)));
   }
 
   /* ----------------------------------------------------------
@@ -63,26 +47,18 @@
   ---------------------------------------------------------- */
   function cameraTo(card) {
     if (!card || !isMobile()) return;
-    const safeBtm = tabsTop() - 16;
-    // Réserver ~45% en haut pour le tooltip
-    const safeTop = Math.round(window.innerHeight * 0.42);
-    const avail   = Math.max(60, safeBtm - safeTop);
-    const rect    = card.getBoundingClientRect();
-    const curY    = window.scrollY || window.pageYOffset || 0;
-
-    let desiredTop = safeTop;
+    const TOOLTIP_H = 220;
+    const safeTop   = TOOLTIP_H + 16;
+    const safeBtm   = tabsTop() - 12;
+    const avail     = Math.max(40, safeBtm - safeTop);
+    const rect      = card.getBoundingClientRect();
+    const curY      = window.scrollY || window.pageYOffset || 0;
+    let desiredTop  = safeTop;
     if (rect.height < avail) desiredTop = safeTop + Math.round((avail - rect.height) / 2);
-
     let nextY = curY + (rect.top - desiredTop);
-    if (rect.height >= avail) {
-      // Card trop haute : aligner le haut sur safeTop
-      nextY = curY + (rect.top - safeTop);
-    }
-
     const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
     nextY = Math.max(0, Math.min(nextY, maxY));
-    if (Math.abs(nextY - curY) < 2) return;
-    scrollTo(nextY);
+    if (Math.abs(nextY - curY) > 2) scrollTo(nextY);
   }
 
   /* ----------------------------------------------------------
@@ -112,16 +88,16 @@
   }
 
   function placeTooltip(tooltip, top, left, right, bottom) {
-    const margin  = 10;
-    const tRect   = tooltip.getBoundingClientRect();
-    const maxLeft = window.innerWidth - tRect.width - margin;
-    const tleft   = Math.max(margin, Math.min((window.innerWidth - tRect.width) / 2, maxLeft));
-    // Toujours au-dessus du cadre sur mobile
-    const ttop = Math.max(margin, top - tRect.height - 12);
-    tooltip.style.left   = tleft + "px";
-    tooltip.style.right  = "auto";
-    tooltip.style.bottom = "auto";
-    tooltip.style.top    = ttop + "px";
+    if (!tooltip) return;
+    const pad   = 10;
+    const tRect = tooltip.getBoundingClientRect();
+    const maxLeft = window.innerWidth - tRect.width - pad;
+    const tleft = Math.max(pad, Math.min((window.innerWidth - tRect.width) / 2, maxLeft));
+    tooltip.style.position = "fixed";
+    tooltip.style.left     = tleft + "px";
+    tooltip.style.right    = "auto";
+    tooltip.style.bottom   = "auto";
+    tooltip.style.top      = pad + "px";
   }
 
   /* ----------------------------------------------------------
