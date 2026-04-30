@@ -63,20 +63,24 @@
   ---------------------------------------------------------- */
   function cameraTo(card) {
     if (!card || !isMobile()) return;
-    const root    = document.scrollingElement || document.documentElement;
-    const safeTop = 90;
-    const safeBtm = tabsTop() - 40;
-    const avail   = Math.max(100, safeBtm - safeTop);
+    const safeBtm = tabsTop() - 16;
+    // Réserver ~45% en haut pour le tooltip
+    const safeTop = Math.round(window.innerHeight * 0.42);
+    const avail   = Math.max(60, safeBtm - safeTop);
     const rect    = card.getBoundingClientRect();
-    const curY    = root.scrollTop;
+    const curY    = window.scrollY || window.pageYOffset || 0;
 
     let desiredTop = safeTop;
-    if (rect.height < avail) desiredTop = safeTop + (avail - rect.height) / 2;
+    if (rect.height < avail) desiredTop = safeTop + Math.round((avail - rect.height) / 2);
 
-    let nextY = curY + rect.top - desiredTop;
-    const projectedBottom = desiredTop + rect.height;
-    if (projectedBottom > safeBtm) nextY += projectedBottom - safeBtm;
+    let nextY = curY + (rect.top - desiredTop);
+    if (rect.height >= avail) {
+      // Card trop haute : aligner le haut sur safeTop
+      nextY = curY + (rect.top - safeTop);
+    }
 
+    const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    nextY = Math.max(0, Math.min(nextY, maxY));
     if (Math.abs(nextY - curY) < 2) return;
     scrollTo(nextY);
   }
@@ -108,18 +112,12 @@
   }
 
   function placeTooltip(tooltip, top, left, right, bottom) {
-    const margin  = 14;
+    const margin  = 10;
     const tRect   = tooltip.getBoundingClientRect();
-    const safeBtm = tabsTop() - margin;
     const maxLeft = window.innerWidth - tRect.width - margin;
-    const tleft   = Math.max(margin, Math.min(left, maxLeft));
-    const spBelow = safeBtm - bottom;
-    const spAbove = top - margin;
-    let ttop = bottom + 18;
-    if (spBelow < tRect.height + 18 && spAbove > spBelow)
-      ttop = top - tRect.height - 18;
-    if (ttop < margin) ttop = margin;
-    if (ttop + tRect.height > safeBtm) ttop = Math.max(margin, safeBtm - tRect.height);
+    const tleft   = Math.max(margin, Math.min((window.innerWidth - tRect.width) / 2, maxLeft));
+    // Toujours au-dessus du cadre sur mobile
+    const ttop = Math.max(margin, top - tRect.height - 12);
     tooltip.style.left   = tleft + "px";
     tooltip.style.right  = "auto";
     tooltip.style.bottom = "auto";
@@ -182,21 +180,20 @@
         lastStepKey = key;
         cameraTo(card);
       }
-      // Attendre après cameraTo avant de dessiner
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         drawHighlight({
           overlay:   qs("#mkwPatternTutorialOverlay"),
           highlight: qs("#mkwPatternTutorialHighlight"),
           tooltip:   qs("#mkwPatternTutorialTooltip"),
           card, pad: 16
         });
-      }, 80);
+      });
       setTimeout(() => drawHighlight({
         overlay:   qs("#mkwPatternTutorialOverlay"),
         highlight: qs("#mkwPatternTutorialHighlight"),
         tooltip:   qs("#mkwPatternTutorialTooltip"),
         card, pad: 16
-      }), 220);
+      }), 120);
       return;
     }
 
@@ -393,14 +390,12 @@
 
     if (card) cameraTo(card);
 
-    // On attend que le scroll soit terminé avant de dessiner le highlight
-    setTimeout(() => {
-      if (card) cameraTo(card); // second passage pour affiner
+    requestAnimationFrame(() => {
       drawHighlight({ overlay, highlight, tooltip, card, pad: 16 });
-    }, 80);
+    });
     setTimeout(() => {
       drawHighlight({ overlay, highlight, tooltip, card, pad: 16 });
-    }, 220);
+    }, 150);
   }
 
   /* ----------------------------------------------------------
