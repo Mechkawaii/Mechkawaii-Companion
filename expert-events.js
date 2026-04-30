@@ -8,9 +8,9 @@
   const SETUP_KEY = PREFIX + "setup";
   const FLOW_KEY = PREFIX + "game-flow";
   const TRIGGERED_KEY = PREFIX + "expert-event-triggered-rounds";
+  const TOKEN_ROTATION_KEY = PREFIX + "expert-event-token-rotations";
   const EVENT_TOKEN_SRC = "./assets/events/progress/event_token.png";
   const EVENT_SLOT_SRC = index => `./assets/events/progress/event_slot_${index}.png`;
-  const TOKEN_ROTATIONS = [1, 3, 5, 2, 4];
 
   const EVENTS = {
     genematrice: {
@@ -93,13 +93,23 @@
     return ((round - 1) % 5) + 1;
   }
 
+  function getTokenRotation(roundNumber) {
+    const round = Math.max(1, Number(roundNumber || 1));
+    const rotations = readJson(TOKEN_ROTATION_KEY, {});
+    if (typeof rotations[round] === "number") return rotations[round];
+    const rotation = Math.round((Math.random() * 10 - 5) * 10) / 10;
+    rotations[round] = rotation;
+    writeJson(TOKEN_ROTATION_KEY, rotations);
+    return rotation;
+  }
+
   function renderEventTrack(roundNumber) {
     const position = getTrackPosition(roundNumber);
+    const rotation = getTokenRotation(roundNumber);
     return `
       <div class="mkw-event-track" aria-label="Progression de l’événement">
         ${[1, 2, 3, 4, 5].map(index => {
           const active = index === position;
-          const rotation = TOKEN_ROTATIONS[(Number(roundNumber || 1) + index - 2) % TOKEN_ROTATIONS.length];
           return `
             <div class="mkw-event-track-slot ${active ? "is-active" : ""}">
               <img class="mkw-event-track-slot-img" src="${EVENT_SLOT_SRC(index)}" alt="Case événement ${index}">
@@ -152,8 +162,8 @@
       .mkw-event-track-slot { position: relative; aspect-ratio: 1 / 1; border-radius: 12px; display: grid; place-items: center; }
       .mkw-event-track-slot-img { width: 100%; height: 100%; object-fit: contain; display: block; filter: drop-shadow(0 5px 8px rgba(0,0,0,.28)); }
       .mkw-event-track-slot.is-active .mkw-event-track-slot-img { filter: drop-shadow(0 0 8px rgba(255,210,77,.28)) drop-shadow(0 5px 8px rgba(0,0,0,.3)); }
-      .mkw-event-track-token { position: absolute; width: 72%; height: 72%; object-fit: contain; display: block; transform: rotate(var(--mkw-token-rotation, 2deg)) scale(1); transform-origin: 50% 50%; filter: drop-shadow(0 4px 6px rgba(0,0,0,.45)); animation: mkwEventTokenPop .24s ease-out; }
-      @keyframes mkwEventTokenPop { from { transform: rotate(var(--mkw-token-rotation, 2deg)) scale(.82); opacity: .45; } to { transform: rotate(var(--mkw-token-rotation, 2deg)) scale(1); opacity: 1; } }
+      .mkw-event-track-token { position: absolute; width: 72%; height: 72%; object-fit: contain; display: block; transform: rotate(var(--mkw-token-rotation, 0deg)) scale(1); transform-origin: 50% 50%; filter: drop-shadow(0 4px 6px rgba(0,0,0,.45)); animation: mkwEventTokenPop .24s ease-out; }
+      @keyframes mkwEventTokenPop { from { transform: rotate(var(--mkw-token-rotation, 0deg)) scale(.82); opacity: .45; } to { transform: rotate(var(--mkw-token-rotation, 0deg)) scale(1); opacity: 1; } }
       #mkwExpertEventBackdrop { position: fixed; inset: 0; background: rgba(0,0,0,.76); z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 18px; }
       #mkwExpertEventPanel { width: min(560px, 100%); border-radius: 24px; border: 1px solid rgba(255,255,255,.16); background: #111217; box-shadow: 0 30px 80px rgba(0,0,0,.55); overflow: hidden; }
       .mkw-expert-modal-visual { width: 100%; aspect-ratio: 1 / 1; max-height: 360px; object-fit: contain; display: block; background: #05060a; }
@@ -229,6 +239,7 @@
 
   function clearTriggeredRounds() {
     localStorage.removeItem(TRIGGERED_KEY);
+    localStorage.removeItem(TOKEN_ROTATION_KEY);
   }
 
   function saveExpertSetup(buildingId, scenarioId) {
