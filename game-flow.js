@@ -27,6 +27,8 @@
       normal: "Mode Normal",
       turnScreenPrefix: "Tour des",
       turnScreenHelp: "C’est au tour de l’adversaire. Cliquez sur le bouton dès qu’il a terminé son tour.",
+      handoffHelp: "Passez l’appareil à l’autre joueur. Quand il est prêt, il peut gérer ses unités.",
+      handoffButton: "OK, jouer ce camp",
       turnFinishedPrefix: "Le tour des",
       turnFinishedSuffix: "est terminé"
     },
@@ -48,6 +50,8 @@
       normal: "Normal Mode",
       turnScreenPrefix: "Turn of",
       turnScreenHelp: "It’s your opponent’s turn. Tap the button once they have finished their turn.",
+      handoffHelp: "Pass the device to the other player. When ready, they can manage their units.",
+      handoffButton: "OK, play this side",
       turnFinishedPrefix: "The",
       turnFinishedSuffix: "turn is finished"
     }
@@ -60,10 +64,11 @@
   function opponent(camp){ return camp === "mechkawaii" ? "prodrome" : "mechkawaii"; }
   function campLabel(camp){ return camp === "mechkawaii" ? "Mechkawaii" : "Prodromes"; }
   function getSetup(){ return readJson(PREFIX + "setup", {}); }
-  function getPlayerCamp(fallbackCamp){ const setup = getSetup(); return setup?.mode === "multi" ? (setup.camp || fallbackCamp) : (setup.camp || fallbackCamp); }
+  function isSingleDevice(){ return getSetup()?.mode === "single"; }
+  function getPlayerCamp(fallbackCamp){ const setup = getSetup(); return setup?.mode === "multi" ? (setup.camp || fallbackCamp) : null; }
   function getState(){ return readJson(FLOW_KEY, null); }
   function setState(state){ writeJson(FLOW_KEY, state); window.dispatchEvent(new CustomEvent("mechkawaii:game-flow-updated", { detail: state })); }
-  function isPlayerTurn(state){ return !state?.playerCamp || state.currentCamp === state.playerCamp; }
+  function isPlayerTurn(state){ return isSingleDevice() || !state?.playerCamp || state.currentCamp === state.playerCamp; }
   function needsStartConfig(state){ return !state?.started || !state.firstCamp; }
 
   function getClassicShieldedSet(){
@@ -129,6 +134,37 @@
     };
   }
 
+  function getActiveIdsForCamp(camp){
+    const draft = readJson(PREFIX + "draft", null);
+    const ids = Array.isArray(draft?.activeIds) ? draft.activeIds : [];
+    const chars = Array.isArray(window.__cachedChars) ? window.__cachedChars : null;
+    if (!chars) return ids;
+    return ids.filter(id => {
+      const char = chars.find(c => c.id === id);
+      return (char?.camp || "mechkawaii") === camp;
+    });
+  }
+
+  async function loadCharsIfNeeded(){
+    if (Array.isArray(window.__cachedChars)) return window.__cachedChars;
+    try {
+      const res = await fetch("./data/characters.json", { cache: "no-store" });
+      window.__cachedChars = await res.json();
+      return window.__cachedChars;
+    } catch(e) {
+      return [];
+    }
+  }
+
+  async function goToFirstUnitOfCamp(camp){
+    await loadCharsIfNeeded();
+    const ids = getActiveIdsForCamp(camp);
+    if (!ids.length) return;
+    const currentId = new URL(location.href).searchParams.get("id") || "";
+    if (ids.includes(currentId)) return;
+    location.href = "character.html?id=" + encodeURIComponent(ids[0]);
+  }
+
   function startWith(firstCamp){
     const state = createState(firstCamp);
     clearTechnicianBlueShields();
@@ -137,7 +173,8 @@
     closeTurnTransition();
     renderBanner();
     window.dispatchEvent(new CustomEvent("mechkawaii:turn-start", { detail: state }));
-    if(state.currentCamp !== state.playerCamp) showTurnTransition(state);
+    if(isSingleDevice()) goToFirstUnitOfCamp(state.currentCamp);
+    else if(state.currentCamp !== state.playerCamp) showTurnTransition(state);
   }
 
   function closeStarter(){ document.querySelector("#mkwFirstPlayerBackdrop")?.remove(); }
@@ -214,8 +251,9 @@
     return state;
   }
 
-  function showTurnTransition(state){
+  function showTurnTransition(state, options = {}){
     if(!state?.started) return;
+    const handoffOnly = !!options.handoffOnly || isSingleDevice();
     closeTurnTransition();
     const backdrop = document.createElement("div");
     backdrop.id = "mkwTurnTransitionBackdrop";
@@ -223,14 +261,20 @@
       <div id="mkwTurnTransitionPanel" role="dialog" aria-modal="true">
         <div class="mkw-turn-transition-round">${tr("round")} ${state.roundNumber}</div>
         <div class="mkw-turn-transition-title">${tr("turnScreenPrefix")} ${campLabel(state.currentCamp)}</div>
-        <div class="mkw-turn-transition-help">${tr("turnScreenHelp")}</div>
-        <button type="button" class="mkw-turn-transition-button">${turnDoneLabel(state.currentCamp)}</button>
+        <div class="mkw-turn-transition-help">${handoffOnly ? tr("handoffHelp") : tr("turnScreenHelp")}</div>
+        <button type="button" class="mkw-turn-transition-button">${handoffOnly ? tr("handoffButton") : turnDoneLabel(state.currentCamp)}</button>
       </div>
     `;
     document.body.appendChild(backdrop);
     backdrop.querySelector(".mkw-turn-transition-button")?.addEventListener("click", () => {
       clearTechnicianBlueShields();
       closeTurnTransition();
+      if(handoffOnly){
+        renderBanner();
+        window.dispatchEvent(new CustomEvent("mechkawaii:turn-start", { detail: state }));
+        goToFirstUnitOfCamp(state.currentCamp);
+        return;
+      }
       const nextState = advanceCurrentCampTurn();
       renderBanner();
       if(nextState) window.dispatchEvent(new CustomEvent("mechkawaii:turn-start", { detail: nextState }));
@@ -244,7 +288,8 @@
     if(!nextState) return showStarter();
     renderBanner();
     if(nextState) window.dispatchEvent(new CustomEvent("mechkawaii:turn-start", { detail: nextState }));
-    if(!isPlayerTurn(nextState)) showTurnTransition(nextState);
+    if(isSingleDevice()) showTurnTransition(nextState, { handoffOnly: true });
+    else if(!isPlayerTurn(nextState)) showTurnTransition(nextState);
   }
 
   function resetFlow(){ localStorage.removeItem(FLOW_KEY); clearTechnicianBlueShields(); closeTurnTransition(); renderBanner(); showStarter(); }
